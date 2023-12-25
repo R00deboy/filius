@@ -182,6 +182,22 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
     private void initKontextMenue() {
         menu = new JPopupMenu();
 
+        JMenuItem localPathThroughLayers = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
+        localPathThroughLayers.addMouseListener(new MouseInputAdapter() {
+            public void mousePressed(MouseEvent e) {
+                menu.setVisible(false);
+            }
+        });
+        menu.add(localPathThroughLayers);
+		
+		JMenuItem globalPathThroughLayers = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
+        globalPathThroughLayers.addMouseListener(new MouseInputAdapter() {
+            public void mousePressed(MouseEvent e) {
+                menu.setVisible(false);
+            }
+        });
+        menu.add(globalPathThroughLayers);
+        
         JMenuItem resetMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg7"));
         resetMenuItem.addMouseListener(new MouseInputAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -190,6 +206,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
             }
         });
         menu.add(resetMenuItem);
+        
         JMenuItem exportMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg9"));
         exportMenuItem.addMouseListener(new MouseInputAdapter() {
             public void mousePressed(MouseEvent e) {

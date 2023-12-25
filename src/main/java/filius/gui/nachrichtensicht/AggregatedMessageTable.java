@@ -78,6 +78,9 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
     public static final int BEMERKUNG_SPALTE = 6;
     public static final int LFD_NR_SPALTE = 0;
 
+    /** Abmessungen einer Zelle der Tabelle */
+    private static final int CELL_TOTAL_HEIGHT = 25;
+    
     private String interfaceId;
 
     private JCheckBoxMenuItem checkbox;
@@ -131,6 +134,10 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
                 if (e.getButton() == 3) {
                     menu.setVisible(true);
                     menu.show(getTabelle(), e.getX(), e.getY());
+                    
+	                 // Test: Berechnung der Nummer des angewählten Pakets
+	                 System.out.println("Y:" + e.getY() + "  CELL_TOTAL_HEIGHT = " + CELL_TOTAL_HEIGHT);
+	                 System.out.println("Paket-Nr. " + (e.getY() / CELL_TOTAL_HEIGHT + 1));
                 }
             }
         });

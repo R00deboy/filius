@@ -141,7 +141,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 					int message_no = (e.getY() / CELL_TOTAL_HEIGHT + 1);
 					Object[][] daten = Lauscher.getLauscher().getDaten(macAddress, false, 0);
 					for (int j = 0; j < daten[message_no - 1].length; j++) {
-						System.out.println("" + daten[message_no][j]);
+						System.out.println("" + daten[message_no - 1][j]);
 					}
                 }
             }

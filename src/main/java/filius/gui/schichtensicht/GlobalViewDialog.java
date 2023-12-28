@@ -34,14 +34,6 @@ public class GlobalViewDialog extends JDialog implements I18n {
 	 * Dann muss gecheckt werden, ob das gewählte IP-Paket wirklich angekommen ist.
 	 */
 	
-	/** Zugehöriges IP-Paket */
-	private IpPaket ip_paket;
-	
-	/*
-	 *  Diese Methode soll überprüfen, ob das ausgewählte Ethernet-Frame tatsächlich beim
-	 *  Ziel angekommen ist.
-	 */
-	
 	/*
 	 * VISUALISIERUNG
 	 */

@@ -1,9 +1,10 @@
 package filius.gui.schichtensicht;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 
+import filius.hardware.knoten.Host;
 import filius.rahmenprogramm.I18n;
-import filius.software.vermittlungsschicht.IpPaket;
 
 /**
  * This class is used to visualise the path of a data packet through the TCP/IP layers on the 
@@ -31,22 +32,16 @@ public class LocalViewDialog extends JDialog implements I18n {
 	 * Dann muss gecheckt werden, ob das gewählte IP-Paket wirklich angekommen ist.
 	 */
 	
-	/** Zugehöriges IP-Paket */
-	private IpPaket ip_paket;
+	private Host host;
 	
-	/*
-	 *  Diese Methode soll überprüfen, ob das ausgewählte Ethernet-Frame tatsächlich beim
-	 *  Ziel angekommen ist.
-	 */
-	
+	private int selectedFrameNumber;
+
+    private LocalViewDialog(JFrame owner, Host host) {
+        super(owner);
+        this.host = host;
+    }
+    
 	/*
 	 * VISUALISIERUNG
 	 */
-	
-	/**  Diese Methode soll die Anzahl Router ("Hops") bestimmen, die auf dem Weg lagen. */
-	private int getNumberOfRouters() {
-		return 0;
-	}
-	
-	
 }

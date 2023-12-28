@@ -437,27 +437,24 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		return lines;
 	}
 	
-	/*
-	 *  Die folgende Methode soll überprüfen, ob das ausgewählte Ethernet-Frame tatsächlich beim
-	 *  Ziel angekommen ist.
-	 */
-	
-	private Boolean hasMessageArrived() {
-		return false;	
-	}
-	
+
 	/*
 	 *  Die folgende Methode zeigt die lokale Ansicht der Schichten-Visualisierung an.
 	 */
-	
 	private void showLocalPathThroughLayers(int selectedFrameNumber, Host host) {
 		
 	}
 	
 	/*
+	 *  Überprüfung, ob Nachricht mit der Nummer messageNumber bei der Ziel-IP angekommen ist.
+	 */
+	private Boolean hasMessageArrived(int messageNumber) {
+		return false;	
+	}
+	
+	/*
 	 *  Die folgende Methode zeigt die globale Ansicht der Schichten-Visualisierung an.
 	 */
-	
 	private void showGlobalPathThroughLayers(int selectedFrameNumber, Host host) {
 		
 	}

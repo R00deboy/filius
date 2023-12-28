@@ -442,14 +442,15 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 *  Die folgende Methode zeigt die lokale Ansicht der Schichten-Visualisierung an.
 	 */
 	private void showLocalPathThroughLayers(int selectedFrameNumber, Host host) {
-		
+		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
+        + " (AggregatedMessageTable), showLocalPathThroughLayers()");
 	}
 	
 	/*
 	 *  Überprüfung, ob Nachricht mit der Nummer messageNumber bei der Ziel-IP angekommen ist.
 	 */
 	private Boolean hasMessageArrived(int messageNumber) {
-		return false;	
+		return false;
 	}
 	
 	/*

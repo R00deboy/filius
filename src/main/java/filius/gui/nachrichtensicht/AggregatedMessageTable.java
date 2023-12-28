@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
+import filius.gui.schichtensicht.LocalPathThroughLayersDialog;
 import filius.hardware.knoten.Host;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
@@ -81,6 +82,8 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
 	/** Gesamthöhe einer Zelle der Tabelle */
 	private static final int CELL_TOTAL_HEIGHT = 25;
+	
+	private LocalPathThroughLayersDialog localPathThroughLayersDialog;
 
 	private String interfaceId;
 
@@ -444,6 +447,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showLocalPathThroughLayers(int selectedFrameNumber, Host host) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
         + " (AggregatedMessageTable), showLocalPathThroughLayers()");
+		//localPathThroughLayersDialog = new LocalPathThroughLayersDialog(owner, host);
 	}
 	
 	/*

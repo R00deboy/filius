@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
+import filius.hardware.knoten.Host;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
@@ -134,16 +135,6 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 				if (e.getButton() == 3) {
 					menu.setVisible(true);
 					menu.show(getTabelle(), e.getX(), e.getY());
-
-					// Nummer des mit Rechtsklick angeklickten Frames
-					int selectedFrameNumber = e.getY() / CELL_TOTAL_HEIGHT + 1;
-					
-					/*
-					 * Lokale Ansicht öffnen, pseudocodemässig so:
-					 * 
-					 * openLocalView(macAddress, selectedFrameNumber); 
-					 * 
-					 */
 				}
 			}
 		});
@@ -188,21 +179,27 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void initKontextMenue() {
 		menu = new JPopupMenu();
 
-		JMenuItem localPathThroughLayers = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
-		localPathThroughLayers.addMouseListener(new MouseInputAdapter() {
+		JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
+		localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
 			public void mousePressed(MouseEvent e) {
 				menu.setVisible(false);
+				// Nummer des mit Rechtsklick angeklickten Frames
+				int selectedFrameNumber = e.getY() / CELL_TOTAL_HEIGHT + 1;
+				
+//				Host host = Host.getHost(interfaceId);
+				
+//				showLocalPathThroughLayers(selectedFrameNumber, host);
 			}
 		});
-		menu.add(localPathThroughLayers);
+		menu.add(localPathThroughLayersMenuItem);
 
-		JMenuItem globalPathThroughLayers = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
-		globalPathThroughLayers.addMouseListener(new MouseInputAdapter() {
+		JMenuItem globalPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
+		globalPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
 			public void mousePressed(MouseEvent e) {
 				menu.setVisible(false);
 			}
 		});
-		menu.add(globalPathThroughLayers);
+		menu.add(globalPathThroughLayersMenuItem);
 
 		JMenuItem resetMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg7"));
 		resetMenuItem.addMouseListener(new MouseInputAdapter() {
@@ -438,5 +435,30 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		}
 		lines.add(lineBuilder.toString().trim());
 		return lines;
+	}
+	
+	/*
+	 *  Die folgende Methode soll überprüfen, ob das ausgewählte Ethernet-Frame tatsächlich beim
+	 *  Ziel angekommen ist.
+	 */
+	
+	private Boolean hasMessageArrived() {
+		return false;	
+	}
+	
+	/*
+	 *  Die folgende Methode zeigt die lokale Ansicht der Schichten-Visualisierung an.
+	 */
+	
+	private void showLocalPathThroughLayers(int selectedFrameNumber, Host host) {
+		
+	}
+	
+	/*
+	 *  Die folgende Methode zeigt die globale Ansicht der Schichten-Visualisierung an.
+	 */
+	
+	private void showGlobalPathThroughLayers(int selectedFrameNumber, Host host) {
+		
 	}
 }

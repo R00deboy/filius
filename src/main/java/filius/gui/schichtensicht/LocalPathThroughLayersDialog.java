@@ -19,7 +19,7 @@ import filius.rahmenprogramm.I18n;
  * @author Christoph Irniger
  */
 
-public class LocalViewDialog extends JDialog implements I18n {
+public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	
 	/** 
 	 * Diese Ansicht muss auf der Position des Maus-Rechtsklicks in der Wireshark-Ansicht
@@ -36,7 +36,7 @@ public class LocalViewDialog extends JDialog implements I18n {
 	
 	private int selectedFrameNumber;
 
-    private LocalViewDialog(JFrame owner, Host host) {
+    private LocalPathThroughLayersDialog(JFrame owner, Host host) {
         super(owner);
         this.host = host;
     }

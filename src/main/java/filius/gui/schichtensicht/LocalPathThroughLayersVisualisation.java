@@ -5,6 +5,6 @@ import javax.swing.JPanel;
  * @author Christoph Irniger
  * 
  */
-public class LocalViewVisualisation extends JPanel {
+public class LocalPathThroughLayersVisualisation extends JPanel {
 
 }

@@ -5,6 +5,6 @@ import javax.swing.JPanel;
  * @author Christoph Irniger
  * 
  */
-public class GlobalViewVisualisation extends JPanel {
+public class GlobalPathThroughLayersVisualisation extends JPanel {
 
 }

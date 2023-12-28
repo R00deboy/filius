@@ -67,374 +67,376 @@ import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.rahmenprogramm.nachrichten.LauscherBeobachter;
 
 public class AggregatedMessageTable extends JTable implements LauscherBeobachter, I18n {
-    private static Logger LOG = LoggerFactory.getLogger(AggregatedMessageTable.class);
+	private static Logger LOG = LoggerFactory.getLogger(AggregatedMessageTable.class);
 
-    private static final int EXPORT_MAX_LINES_PER_MESSAGE = 5;
+	private static final int EXPORT_MAX_LINES_PER_MESSAGE = 5;
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /** Index der Spalte, in der die Schicht des Protokollschichtenmodells steht */
-    public static final int SCHICHT_SPALTE = 5;
-    public static final int BEMERKUNG_SPALTE = 6;
-    public static final int LFD_NR_SPALTE = 0;
+	/** Index der Spalte, in der die Schicht des Protokollschichtenmodells steht */
+	public static final int SCHICHT_SPALTE = 5;
+	public static final int BEMERKUNG_SPALTE = 6;
+	public static final int LFD_NR_SPALTE = 0;
 
-    /** Abmessungen einer Zelle der Tabelle */
-    private static final int CELL_TOTAL_HEIGHT = 25;
-    
-    private String interfaceId;
+	/** Gesamthöhe einer Zelle der Tabelle */
+	private static final int CELL_TOTAL_HEIGHT = 25;
 
-    private JCheckBoxMenuItem checkbox;
+	private String interfaceId;
 
-    private AggregatedExchangeComponent exchangeComponent;
-    private JScrollPane scrollPane = null;
-    private boolean autoscroll = true;
-    private JPopupMenu menu;
+	private JCheckBoxMenuItem checkbox;
 
-    public AggregatedMessageTable(AggregatedExchangeComponent component, String macAddress) {
-        super();
+	private AggregatedExchangeComponent exchangeComponent;
+	private JScrollPane scrollPane = null;
+	private boolean autoscroll = true;
+	private JPopupMenu menu;
 
-        TableColumn col;
-        DefaultTableColumnModel columnModel;
+	public AggregatedMessageTable(AggregatedExchangeComponent component, String macAddress) {
+		super();
 
-        this.exchangeComponent = component;
-        setinterfaceId(macAddress);
+		TableColumn col;
+		DefaultTableColumnModel columnModel;
 
-        this.initTableModel();
+		this.exchangeComponent = component;
+		setinterfaceId(macAddress);
 
-        this.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		this.initTableModel();
 
-        columnModel = new DefaultTableColumnModel();
-        String[] spalten = Lauscher.SPALTEN;
-        for (int i = 0; i < spalten.length; i++) {
-            col = new TableColumn();
-            col.setHeaderValue(spalten[i]);
-            col.setIdentifier(spalten[i]);
-            col.setModelIndex(i);
-            columnModel.addColumn(col);
-        }
+		this.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
-        this.setColumnModel(columnModel);
+		columnModel = new DefaultTableColumnModel();
+		String[] spalten = Lauscher.SPALTEN;
+		for (int i = 0; i < spalten.length; i++) {
+			col = new TableColumn();
+			col.setHeaderValue(spalten[i]);
+			col.setIdentifier(spalten[i]);
+			col.setModelIndex(i);
+			columnModel.addColumn(col);
+		}
 
-        this.setIntercellSpacing(new Dimension(0, 5));
-        this.setRowHeight(25);
-        this.setEnabled(true);
-        this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.setShowGrid(false);
-        this.setColumnSelectionAllowed(false);
-        this.setBackground(Color.DARK_GRAY);
-        this.getTableHeader().setReorderingAllowed(false);
-        this.setFillsViewportHeight(true);
+		this.setColumnModel(columnModel);
 
-        initTableColumnWidth();
-        this.setDefaultRenderer(Object.class, new LauscherTableCellRenderer());
-        initKontextMenue();
+		this.setIntercellSpacing(new Dimension(0, 5));
+		this.setRowHeight(25);
+		this.setEnabled(true);
+		this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.setShowGrid(false);
+		this.setColumnSelectionAllowed(false);
+		this.setBackground(Color.DARK_GRAY);
+		this.getTableHeader().setReorderingAllowed(false);
+		this.setFillsViewportHeight(true);
 
-        this.addMouseListener(new MouseInputAdapter() {
-            public void mousePressed(MouseEvent e) {
-                if (e.getButton() == 3) {
-                    menu.setVisible(true);
-                    menu.show(getTabelle(), e.getX(), e.getY());
-                    
-					// Test: Berechnung der Nummer des angewählten Pakets
-					System.out.println("Y:" + e.getY() + "  CELL_TOTAL_HEIGHT = " + CELL_TOTAL_HEIGHT);
-					System.out.println("Paket-Nr. " + (e.getY() / CELL_TOTAL_HEIGHT + 1));
-					int message_no = (e.getY() / CELL_TOTAL_HEIGHT + 1);
-					Object[][] daten = Lauscher.getLauscher().getDaten(macAddress, false, 0);
-					for (int j = 0; j < daten[message_no - 1].length; j++) {
-						System.out.println("" + daten[message_no - 1][j]);
-					}
-                }
-            }
-        });
+		initTableColumnWidth();
+		this.setDefaultRenderer(Object.class, new LauscherTableCellRenderer());
+		initKontextMenue();
 
-        update();
-    }
+		this.addMouseListener(new MouseInputAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.getButton() == 3) {
+					menu.setVisible(true);
+					menu.show(getTabelle(), e.getX(), e.getY());
 
-    private void initTableModel() {
-        LauscherTableModel tableModel = new LauscherTableModel();
-        tableModel.addTableModelListener(this);
-        tableModel.setColumnIdentifiers(Lauscher.SPALTEN);
-        this.setModel(tableModel);
-    }
+					// Nummer des mit Rechtsklick angeklickten Frames
+					int selectedFrameNumber = e.getY() / CELL_TOTAL_HEIGHT + 1;
+					
+					/*
+					 * Lokale Ansicht öffnen, pseudocodemässig so:
+					 * 
+					 * openLocalView(macAddress, selectedFrameNumber); 
+					 * 
+					 */
+				}
+			}
+		});
 
-    public void setScrollPane(JScrollPane scrollPane) {
-        this.scrollPane = scrollPane;
-    }
+		update();
+	}
 
-    private AggregatedMessageTable getTabelle() {
-        return this;
-    }
+	private void initTableModel() {
+		LauscherTableModel tableModel = new LauscherTableModel();
+		tableModel.addTableModelListener(this);
+		tableModel.setColumnIdentifiers(Lauscher.SPALTEN);
+		this.setModel(tableModel);
+	}
 
-    private void initTableColumnWidth() {
+	public void setScrollPane(JScrollPane scrollPane) {
+		this.scrollPane = scrollPane;
+	}
 
-        this.getColumnModel().getColumn(0).setMaxWidth(40);
-        this.getColumnModel().getColumn(0).setPreferredWidth(30);
-        this.getColumnModel().getColumn(1).setMaxWidth(120);
-        this.getColumnModel().getColumn(1).setPreferredWidth(90);
-        this.getColumnModel().getColumn(2).setMaxWidth(180);
-        this.getColumnModel().getColumn(2).setPreferredWidth(160);
-        this.getColumnModel().getColumn(3).setMaxWidth(180);
-        this.getColumnModel().getColumn(3).setPreferredWidth(160);
-        this.getColumnModel().getColumn(4).setMaxWidth(100);
-        this.getColumnModel().getColumn(4).setPreferredWidth(70);
-        this.getColumnModel().getColumn(5).setMaxWidth(140);
-        this.getColumnModel().getColumn(5).setPreferredWidth(100);
-        this.getColumnModel().getColumn(6).setMaxWidth(Integer.MAX_VALUE);
-        this.getColumnModel().getColumn(6).setPreferredWidth(460);
-        this.getColumnModel().getColumn(6).setResizable(true);
-    }
+	private AggregatedMessageTable getTabelle() {
+		return this;
+	}
 
-    private void initKontextMenue() {
-        menu = new JPopupMenu();
+	private void initTableColumnWidth() {
 
-        JMenuItem localPathThroughLayers = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
-        localPathThroughLayers.addMouseListener(new MouseInputAdapter() {
-            public void mousePressed(MouseEvent e) {
-                menu.setVisible(false);
-            }
-        });
-        menu.add(localPathThroughLayers);
-		
+		this.getColumnModel().getColumn(0).setMaxWidth(40);
+		this.getColumnModel().getColumn(0).setPreferredWidth(30);
+		this.getColumnModel().getColumn(1).setMaxWidth(120);
+		this.getColumnModel().getColumn(1).setPreferredWidth(90);
+		this.getColumnModel().getColumn(2).setMaxWidth(180);
+		this.getColumnModel().getColumn(2).setPreferredWidth(160);
+		this.getColumnModel().getColumn(3).setMaxWidth(180);
+		this.getColumnModel().getColumn(3).setPreferredWidth(160);
+		this.getColumnModel().getColumn(4).setMaxWidth(100);
+		this.getColumnModel().getColumn(4).setPreferredWidth(70);
+		this.getColumnModel().getColumn(5).setMaxWidth(140);
+		this.getColumnModel().getColumn(5).setPreferredWidth(100);
+		this.getColumnModel().getColumn(6).setMaxWidth(Integer.MAX_VALUE);
+		this.getColumnModel().getColumn(6).setPreferredWidth(460);
+		this.getColumnModel().getColumn(6).setResizable(true);
+	}
+
+	private void initKontextMenue() {
+		menu = new JPopupMenu();
+
+		JMenuItem localPathThroughLayers = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
+		localPathThroughLayers.addMouseListener(new MouseInputAdapter() {
+			public void mousePressed(MouseEvent e) {
+				menu.setVisible(false);
+			}
+		});
+		menu.add(localPathThroughLayers);
+
 		JMenuItem globalPathThroughLayers = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
-        globalPathThroughLayers.addMouseListener(new MouseInputAdapter() {
-            public void mousePressed(MouseEvent e) {
-                menu.setVisible(false);
-            }
-        });
-        menu.add(globalPathThroughLayers);
-        
-        JMenuItem resetMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg7"));
-        resetMenuItem.addMouseListener(new MouseInputAdapter() {
-            public void mousePressed(MouseEvent e) {
-                menu.setVisible(false);
-                Lauscher.getLauscher().reset();
-            }
-        });
-        menu.add(resetMenuItem);
-        
-        JMenuItem exportMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg9"));
-        exportMenuItem.addMouseListener(new MouseInputAdapter() {
-            public void mousePressed(MouseEvent e) {
-                menu.setVisible(false);
+		globalPathThroughLayers.addMouseListener(new MouseInputAdapter() {
+			public void mousePressed(MouseEvent e) {
+				menu.setVisible(false);
+			}
+		});
+		menu.add(globalPathThroughLayers);
 
-                FileDialog fileDialog = new FileDialog(JMainFrame.getJMainFrame(), messages.getString("main_msg4"),
-                        FileDialog.SAVE);
-                FilenameFilter filiusFilenameFilter = (dir, name) -> name.endsWith(".txt");
-                fileDialog.setFilenameFilter(filiusFilenameFilter);
+		JMenuItem resetMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg7"));
+		resetMenuItem.addMouseListener(new MouseInputAdapter() {
+			public void mousePressed(MouseEvent e) {
+				menu.setVisible(false);
+				Lauscher.getLauscher().reset();
+			}
+		});
+		menu.add(resetMenuItem);
 
-                String path = SzenarioVerwaltung.getInstance().holePfad();
-                if (path != null) {
-                    File preselectedFile = new File(
-                            exchangeComponent.getTabTitle(AggregatedMessageTable.this.interfaceId) + ".txt");
-                    fileDialog.setFile(preselectedFile.toString());
-                }
+		JMenuItem exportMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg9"));
+		exportMenuItem.addMouseListener(new MouseInputAdapter() {
+			public void mousePressed(MouseEvent e) {
+				menu.setVisible(false);
 
-                fileDialog.setVisible(true);
-                if (fileDialog.getFile() != null) {
-                    Path outFile;
-                    boolean nameChanged = false;
-                    if (StringUtils.endsWith(fileDialog.getFile(), ".txt")) {
-                        outFile = Path.of(fileDialog.getDirectory(), fileDialog.getFile());
-                    } else {
-                        nameChanged = true;
-                        outFile = Path.of(fileDialog.getDirectory(), fileDialog.getFile() + ".txt");
-                    }
-                    int entscheidung = JOptionPane.YES_OPTION;
-                    if (nameChanged && outFile.toFile().exists()) {
-                        entscheidung = JOptionPane.showConfirmDialog(JMainFrame.getJMainFrame(),
-                                messages.getString("guimainmemu_msg17"), messages.getString("guimainmemu_msg10"),
-                                JOptionPane.YES_NO_OPTION);
-                    }
-                    if (entscheidung == JOptionPane.YES_OPTION) {
-                        try (FileOutputStream outputStream = new FileOutputStream(outFile.toString())) {
-                            writeToStream(outputStream);
-                        } catch (IOException e1) {}
-                    }
-                }
-            }
-        });
-        menu.add(exportMenuItem);
+				FileDialog fileDialog = new FileDialog(JMainFrame.getJMainFrame(), messages.getString("main_msg4"),
+						FileDialog.SAVE);
+				FilenameFilter filiusFilenameFilter = (dir, name) -> name.endsWith(".txt");
+				fileDialog.setFilenameFilter(filiusFilenameFilter);
 
-        checkbox = new JCheckBoxMenuItem(messages.getString("nachrichtentabelle_msg8"), autoscroll);
-        checkbox.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (autoscroll != checkbox.getState()) {
-                    menu.setVisible(false);
-                    autoscroll = checkbox.getState();
-                    update();
-                }
-            }
-        });
-        menu.add(checkbox);
+				String path = SzenarioVerwaltung.getInstance().holePfad();
+				if (path != null) {
+					File preselectedFile = new File(
+							exchangeComponent.getTabTitle(AggregatedMessageTable.this.interfaceId) + ".txt");
+					fileDialog.setFile(preselectedFile.toString());
+				}
 
-        menu.setVisible(false);
-        exchangeComponent.getRootPane().getLayeredPane().add(menu);
-    }
+				fileDialog.setVisible(true);
+				if (fileDialog.getFile() != null) {
+					Path outFile;
+					boolean nameChanged = false;
+					if (StringUtils.endsWith(fileDialog.getFile(), ".txt")) {
+						outFile = Path.of(fileDialog.getDirectory(), fileDialog.getFile());
+					} else {
+						nameChanged = true;
+						outFile = Path.of(fileDialog.getDirectory(), fileDialog.getFile() + ".txt");
+					}
+					int entscheidung = JOptionPane.YES_OPTION;
+					if (nameChanged && outFile.toFile().exists()) {
+						entscheidung = JOptionPane.showConfirmDialog(JMainFrame.getJMainFrame(),
+								messages.getString("guimainmemu_msg17"), messages.getString("guimainmemu_msg10"),
+								JOptionPane.YES_NO_OPTION);
+					}
+					if (entscheidung == JOptionPane.YES_OPTION) {
+						try (FileOutputStream outputStream = new FileOutputStream(outFile.toString())) {
+							writeToStream(outputStream);
+						} catch (IOException e1) {
+						}
+					}
+				}
+			}
+		});
+		menu.add(exportMenuItem);
 
-    private void setinterfaceId(String interfaceId) {
-        this.interfaceId = interfaceId;
+		checkbox = new JCheckBoxMenuItem(messages.getString("nachrichtentabelle_msg8"), autoscroll);
+		checkbox.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (autoscroll != checkbox.getState()) {
+					menu.setVisible(false);
+					autoscroll = checkbox.getState();
+					update();
+				}
+			}
+		});
+		menu.add(checkbox);
 
-        Lauscher.getLauscher().addBeobachter(interfaceId, this);
-    }
+		menu.setVisible(false);
+		exchangeComponent.getRootPane().getLayeredPane().add(menu);
+	}
 
-    @Override
-    public synchronized void update() {
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (NachrichtenTabelle), update()");
+	private void setinterfaceId(String interfaceId) {
+		this.interfaceId = interfaceId;
 
-        int selectedRow = getSelectedRow();
-        Object[][] daten = Lauscher.getLauscher().getDaten(interfaceId, true, 0);
+		Lauscher.getLauscher().addBeobachter(interfaceId, this);
+	}
 
-        if (daten.length == 0) {
-            initTableModel();
-            initTableColumnWidth();
-        }
-        int lastNo = -1;
-        if (getModel().getRowCount() > 0) {
-            lastNo = Integer.parseInt(this.getModel().getValueAt(this.getModel().getRowCount() - 1, 0).toString());
-        }
+	@Override
+	public synchronized void update() {
+		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (NachrichtenTabelle), update()");
 
-        int currentNo = 1;
-        int previousNo = 1;
-        for (int i = 0; i < daten.length; i++) {
-            currentNo = Integer.parseInt(daten[i][0].toString());
-            if (currentNo <= lastNo || currentNo == previousNo) {
-                continue;
-            }
+		int selectedRow = getSelectedRow();
+		Object[][] daten = Lauscher.getLauscher().getDaten(interfaceId, true, 0);
 
-            if (currentNo > previousNo && previousNo > lastNo && i > 0) {
-                Object[] row = daten[i - 1];
-                addRowData(row);
-                previousNo = currentNo;
-            }
-        }
-        if (currentNo > lastNo && daten.length > 0) {
-            addRowData(daten[daten.length - 1]);
-        }
+		if (daten.length == 0) {
+			initTableModel();
+			initTableColumnWidth();
+		}
+		int lastNo = -1;
+		if (getModel().getRowCount() > 0) {
+			lastNo = Integer.parseInt(this.getModel().getValueAt(this.getModel().getRowCount() - 1, 0).toString());
+		}
 
-        ((DefaultTableModel) this.getModel()).fireTableDataChanged();
-        if (getModel().getRowCount() > 0 && scrollPane != null && scrollPane.getViewport() != null && autoscroll) {
-            scrollPane.getViewport().setViewPosition(new Point(0, this.getHeight()));
-        }
-        if (selectedRow >= 0 && selectedRow < getModel().getRowCount()) {
-            setRowSelectionInterval(selectedRow, selectedRow);
-        }
-    }
+		int currentNo = 1;
+		int previousNo = 1;
+		for (int i = 0; i < daten.length; i++) {
+			currentNo = Integer.parseInt(daten[i][0].toString());
+			if (currentNo <= lastNo || currentNo == previousNo) {
+				continue;
+			}
 
-    private void addRowData(Object[] row) {
-        Vector<Object> rowData = new Vector<Object>(row.length);
-        for (int col = 0; col < row.length; col++) {
-            rowData.add(col, row[col]);
-        }
-        ((DefaultTableModel) this.getModel()).addRow(rowData);
-    }
+			if (currentNo > previousNo && previousNo > lastNo && i > 0) {
+				Object[] row = daten[i - 1];
+				addRowData(row);
+				previousNo = currentNo;
+			}
+		}
+		if (currentNo > lastNo && daten.length > 0) {
+			addRowData(daten[daten.length - 1]);
+		}
 
-    @Override
-    public synchronized void writeToStream(OutputStream outputStream) throws IOException {
-        String rowTemplate;
-        String lineSeparator;
+		((DefaultTableModel) this.getModel()).fireTableDataChanged();
+		if (getModel().getRowCount() > 0 && scrollPane != null && scrollPane.getViewport() != null && autoscroll) {
+			scrollPane.getViewport().setViewPosition(new Point(0, this.getHeight()));
+		}
+		if (selectedRow >= 0 && selectedRow < getModel().getRowCount()) {
+			setRowSelectionInterval(selectedRow, selectedRow);
+		}
+	}
 
-        Object[] columnNames = getColumnHeader();
-        StringBuilder tmplBuilder = new StringBuilder("| ");
-        StringBuilder lineSeparatorBuilder = new StringBuilder("+");
-        for (int colIdx = 0; colIdx < getColumnCount(); colIdx++) {
-            if (colIdx == BEMERKUNG_SPALTE) {
-                tmplBuilder.append("%-40s | ");
-                lineSeparatorBuilder.append(StringUtils.repeat('-', 42) + "+");
-            } else if (colIdx == LFD_NR_SPALTE) {
-                tmplBuilder.append("%-10s | ");
-                lineSeparatorBuilder.append(StringUtils.repeat('-', 12) + "+");
-            } else {
-                tmplBuilder.append("%-20s | ");
-                lineSeparatorBuilder.append(StringUtils.repeat('-', 22) + "+");
-            }
-        }
-        tmplBuilder.append("\r\n");
-        rowTemplate = tmplBuilder.toString();
-        lineSeparatorBuilder.append("\r\n");
-        lineSeparator = lineSeparatorBuilder.toString();
+	private void addRowData(Object[] row) {
+		Vector<Object> rowData = new Vector<Object>(row.length);
+		for (int col = 0; col < row.length; col++) {
+			rowData.add(col, row[col]);
+		}
+		((DefaultTableModel) this.getModel()).addRow(rowData);
+	}
 
-        outputStream.write(lineSeparator.replace('-', '=').getBytes("UTF8"));
-        outputStream.write(String.format(rowTemplate, columnNames).getBytes("UTF8"));
-        outputStream.write(lineSeparator.replace('-', '=').getBytes("UTF8"));
+	@Override
+	public synchronized void writeToStream(OutputStream outputStream) throws IOException {
+		String rowTemplate;
+		String lineSeparator;
 
-        for (int rowIndex = 0; rowIndex < getRowCount(); rowIndex++) {
-            String[] values = new String[getColumnCount()];
-            for (int columnIndex = 0; columnIndex < getColumnCount(); columnIndex++) {
-                values[columnIndex] = getModel().getValueAt(rowIndex, columnIndex).toString();
-            }
-            List<String[]> lineData = prepareDataArrays(values, 40);
-            for (String[] data : lineData) {
-                outputStream.write(String.format(rowTemplate, (Object[]) data).getBytes("UTF8"));
-            }
-            outputStream.write(lineSeparator.getBytes("UTF8"));
-        }
-    }
+		Object[] columnNames = getColumnHeader();
+		StringBuilder tmplBuilder = new StringBuilder("| ");
+		StringBuilder lineSeparatorBuilder = new StringBuilder("+");
+		for (int colIdx = 0; colIdx < getColumnCount(); colIdx++) {
+			if (colIdx == BEMERKUNG_SPALTE) {
+				tmplBuilder.append("%-40s | ");
+				lineSeparatorBuilder.append(StringUtils.repeat('-', 42) + "+");
+			} else if (colIdx == LFD_NR_SPALTE) {
+				tmplBuilder.append("%-10s | ");
+				lineSeparatorBuilder.append(StringUtils.repeat('-', 12) + "+");
+			} else {
+				tmplBuilder.append("%-20s | ");
+				lineSeparatorBuilder.append(StringUtils.repeat('-', 22) + "+");
+			}
+		}
+		tmplBuilder.append("\r\n");
+		rowTemplate = tmplBuilder.toString();
+		lineSeparatorBuilder.append("\r\n");
+		lineSeparator = lineSeparatorBuilder.toString();
 
-    public Object[] getColumnHeader() {
-        Object[] columnNames = new Object[getColumnCount()];
-        for (int colIdx = 0; colIdx < getColumnCount(); colIdx++) {
-            columnNames[colIdx] = getColumnName(colIdx);
-        }
-        return columnNames;
-    }
+		outputStream.write(lineSeparator.replace('-', '=').getBytes("UTF8"));
+		outputStream.write(String.format(rowTemplate, columnNames).getBytes("UTF8"));
+		outputStream.write(lineSeparator.replace('-', '=').getBytes("UTF8"));
 
-    static List<String[]> prepareDataArrays(String[] values, int maxRemarkLength) {
-        List<String> remarks = Collections.<String> emptyList();
-        String[] data = new String[values.length];
-        for (int columnIndex = 0; columnIndex < values.length; columnIndex++) {
-            if (columnIndex == BEMERKUNG_SPALTE) {
-                if (StringUtils.isNoneBlank(values[columnIndex])) {
-                    remarks = splitString(values[columnIndex].toString(), maxRemarkLength);
-                    data[columnIndex] = remarks.get(0);
-                }
-            } else {
-                data[columnIndex] = values[columnIndex];
-            }
-        }
-        List<String[]> lineData = new ArrayList<String[]>();
-        lineData.add(data);
-        for (int i = 1; i < remarks.size() && i < EXPORT_MAX_LINES_PER_MESSAGE; i++) {
-            data = new String[values.length];
-            Arrays.fill(data, StringUtils.EMPTY);
-            data[BEMERKUNG_SPALTE] = remarks.get(i);
-            lineData.add(data);
-        }
-        if (remarks.size() > EXPORT_MAX_LINES_PER_MESSAGE) {
-            data = new String[values.length];
-            Arrays.fill(data, StringUtils.EMPTY);
-            data[BEMERKUNG_SPALTE] = "...";
-            lineData.add(data);
-        }
-        return lineData;
-    }
+		for (int rowIndex = 0; rowIndex < getRowCount(); rowIndex++) {
+			String[] values = new String[getColumnCount()];
+			for (int columnIndex = 0; columnIndex < getColumnCount(); columnIndex++) {
+				values[columnIndex] = getModel().getValueAt(rowIndex, columnIndex).toString();
+			}
+			List<String[]> lineData = prepareDataArrays(values, 40);
+			for (String[] data : lineData) {
+				outputStream.write(String.format(rowTemplate, (Object[]) data).getBytes("UTF8"));
+			}
+			outputStream.write(lineSeparator.getBytes("UTF8"));
+		}
+	}
 
-    static List<String> splitString(String text, int maxLength) {
-        String normalizedText = StringUtils.normalizeSpace(text);
-        String[] tokens = normalizedText.split(" ");
-        List<String> lines = new ArrayList<String>();
-        int currentLength = 0;
-        StringBuilder lineBuilder = new StringBuilder();
-        for (String token : tokens) {
-            if (currentLength + token.length() <= maxLength) {
-                lineBuilder.append(token).append(" ");
-                currentLength += token.length() + 1;
-            } else if (token.length() > maxLength) {
-                if (currentLength > 0) {
-                    lines.add(lineBuilder.toString().trim());
-                }
-                String[] parts = token.split("(?<=\\G.{" + maxLength + "})");
-                for (int i = 0; i < parts.length - 1; i++) {
-                    lines.add(parts[i]);
-                }
-                lineBuilder = new StringBuilder(parts[parts.length - 1]).append(" ");
-                currentLength = parts[parts.length - 1].length() + 1;
-            } else {
-                lines.add(lineBuilder.toString().trim());
-                lineBuilder = new StringBuilder(token).append(" ");
-                currentLength = token.length() + 1;
-            }
-        }
-        lines.add(lineBuilder.toString().trim());
-        return lines;
-    }
+	public Object[] getColumnHeader() {
+		Object[] columnNames = new Object[getColumnCount()];
+		for (int colIdx = 0; colIdx < getColumnCount(); colIdx++) {
+			columnNames[colIdx] = getColumnName(colIdx);
+		}
+		return columnNames;
+	}
+
+	static List<String[]> prepareDataArrays(String[] values, int maxRemarkLength) {
+		List<String> remarks = Collections.<String>emptyList();
+		String[] data = new String[values.length];
+		for (int columnIndex = 0; columnIndex < values.length; columnIndex++) {
+			if (columnIndex == BEMERKUNG_SPALTE) {
+				if (StringUtils.isNoneBlank(values[columnIndex])) {
+					remarks = splitString(values[columnIndex].toString(), maxRemarkLength);
+					data[columnIndex] = remarks.get(0);
+				}
+			} else {
+				data[columnIndex] = values[columnIndex];
+			}
+		}
+		List<String[]> lineData = new ArrayList<String[]>();
+		lineData.add(data);
+		for (int i = 1; i < remarks.size() && i < EXPORT_MAX_LINES_PER_MESSAGE; i++) {
+			data = new String[values.length];
+			Arrays.fill(data, StringUtils.EMPTY);
+			data[BEMERKUNG_SPALTE] = remarks.get(i);
+			lineData.add(data);
+		}
+		if (remarks.size() > EXPORT_MAX_LINES_PER_MESSAGE) {
+			data = new String[values.length];
+			Arrays.fill(data, StringUtils.EMPTY);
+			data[BEMERKUNG_SPALTE] = "...";
+			lineData.add(data);
+		}
+		return lineData;
+	}
+
+	static List<String> splitString(String text, int maxLength) {
+		String normalizedText = StringUtils.normalizeSpace(text);
+		String[] tokens = normalizedText.split(" ");
+		List<String> lines = new ArrayList<String>();
+		int currentLength = 0;
+		StringBuilder lineBuilder = new StringBuilder();
+		for (String token : tokens) {
+			if (currentLength + token.length() <= maxLength) {
+				lineBuilder.append(token).append(" ");
+				currentLength += token.length() + 1;
+			} else if (token.length() > maxLength) {
+				if (currentLength > 0) {
+					lines.add(lineBuilder.toString().trim());
+				}
+				String[] parts = token.split("(?<=\\G.{" + maxLength + "})");
+				for (int i = 0; i < parts.length - 1; i++) {
+					lines.add(parts[i]);
+				}
+				lineBuilder = new StringBuilder(parts[parts.length - 1]).append(" ");
+				currentLength = parts[parts.length - 1].length() + 1;
+			} else {
+				lines.add(lineBuilder.toString().trim());
+				lineBuilder = new StringBuilder(token).append(" ");
+				currentLength = token.length() + 1;
+			}
+		}
+		lines.add(lineBuilder.toString().trim());
+		return lines;
+	}
 }

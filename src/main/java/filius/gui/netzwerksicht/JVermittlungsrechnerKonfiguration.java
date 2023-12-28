@@ -516,7 +516,7 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
     private void showConnectionsDialog() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (JVermittlungsrechnerKonfiguration), showBasicSettingsDialog()");
+                + " (JVermittlungsrechnerKonfiguration), showConnectionsDialog()");
         GUIContainer.getGUIContainer().getProperty().minimieren();
         // basic dialog creation and settings
         changeBasicSettingsDialog = new JConnectionsDialog(filius.gui.JMainFrame.getJMainFrame(),

@@ -3,7 +3,7 @@
 	<appender name="STDOUT"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level><!--${FILIUS_LOG_LEVEL:-INFO}--></level>
+			<level>${FILIUS_LOG_LEVEL:-INFO}</level>
 		</filter>
 		<encoder>
 			<pattern>%msg%n</pattern>
@@ -20,7 +20,7 @@
 			</pattern>
 		</encoder>
 	</appender>
-	<root level="trace">
+	<root level="debug">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
 	</root>

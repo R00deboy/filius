@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 
 import filius.hardware.knoten.Host;
 import filius.rahmenprogramm.I18n;
+import filius.software.system.SystemSoftware;
 
 /**
  * This class is used to visualise the path of a data packet through the TCP/IP layers on the 
@@ -32,13 +33,13 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	 * Dann muss gecheckt werden, ob das gewählte IP-Paket wirklich angekommen ist.
 	 */
 	
-	private Host host;
+	private SystemSoftware systemSoftware;
 	
 	private int selectedFrameNumber;
 
-    public LocalPathThroughLayersDialog(JFrame owner, Host host, int selectedFrameNumber) {
+    public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, int selectedFrameNumber) {
         super(owner);
-        this.host = host;
+        this.systemSoftware = systemSoftware;
         this.selectedFrameNumber = selectedFrameNumber;
     }
     

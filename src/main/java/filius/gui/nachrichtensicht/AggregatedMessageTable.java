@@ -450,12 +450,12 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	/*
 	 *  Die folgende Methode zeigt die lokale Ansicht der Schichten-Visualisierung an.
 	 */
-	private void showLocalPathThroughLayers(int selectedFrameNumber, Host host) {
+	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
         		+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
 		// basic dialog creation and settings
 		localPathThroughLayersDialog = new LocalPathThroughLayersDialog(
-				filius.gui.JMainFrame.getJMainFrame(), host, selectedFrameNumber);
+				filius.gui.JMainFrame.getJMainFrame(), systemSoftware, selectedFrameNumber);
 		localPathThroughLayersDialog.setTitle(messages.getString("lokaler_weg_durch_schichten_msg1"));
 		
         // positioning and size

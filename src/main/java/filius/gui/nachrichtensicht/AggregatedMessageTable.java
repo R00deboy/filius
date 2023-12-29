@@ -89,6 +89,8 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	
 	private String interfaceId;
 	
+	private int yCoordOfRightclick;
+	
 	private LocalPathThroughLayersDialog localPathThroughLayersDialog;
 
 	private JCheckBoxMenuItem checkbox;
@@ -139,16 +141,59 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		this.setDefaultRenderer(Object.class, new LauscherTableCellRenderer());
 		initKontextMenue();
 
-		this.addMouseListener(new MouseInputAdapter() {
-			public void mousePressed(MouseEvent e) {
-				if (e.getButton() == 3) {
-					menu.setVisible(true);
-					menu.show(getTabelle(), e.getX(), e.getY());
-				}
-			}
-		});
+		this.addMouseListener(new MouseInputAdapterSetYCoord(this));
 
 		update();
+	}
+	
+	/**
+	 * Diese Klasse ist dazu befähigt, yCoordOfRightclick (die y-Koordinate der Position
+	 * des letzten Rechtsklicks) in der Hauptklasse "AggregatedMessageTable" zu setzen. 
+	 */
+	private class MouseInputAdapterSetYCoord extends MouseInputAdapter {
+		
+		private AggregatedMessageTable aggregatedMessageTable;
+		
+		public MouseInputAdapterSetYCoord(AggregatedMessageTable aggregatedMessageTable) {
+			super();
+			this.aggregatedMessageTable = aggregatedMessageTable;
+		}
+		
+		public void mousePressed(MouseEvent e) {
+			if (e.getButton() == 3) {
+				menu.setVisible(true);
+				menu.show(getTabelle(), e.getX(), e.getY());
+				this.aggregatedMessageTable.yCoordOfRightclick = e.getY();
+			}
+		}
+	}
+	
+	/**
+	 * Diese Klasse ist dazu befähigt, yCoordOfRightclick (die y-Koordinate der Position
+	 * des letzten Rechtsklicks) in der Hauptklasse "AggregatedMessageTable" zurückzubekommen. 
+	 */
+	private class MouseInputAdapterGetYCoord extends MouseInputAdapter {
+		
+		private AggregatedMessageTable aggregatedMessageTable;
+		
+		public MouseInputAdapterGetYCoord(AggregatedMessageTable aggregatedMessageTable) {
+			super();
+			this.aggregatedMessageTable = aggregatedMessageTable;
+		}
+		
+		public void mousePressed(MouseEvent e) {
+			menu.setVisible(false);
+			
+			// Nummer des mit Rechtsklick angewählten Frames
+			int selectedFrameNumber =
+					this.aggregatedMessageTable.yCoordOfRightclick / CELL_TOTAL_HEIGHT + 1;
+			
+			showLocalPathThroughLayers(systemSoftware, selectedFrameNumber);
+		}
+	}
+	
+	public void setYCoordOfRightClick(int yCoordOfRightclick) {
+		this.yCoordOfRightclick = yCoordOfRightclick;
 	}
 
 	private void initTableModel() {
@@ -189,15 +234,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		menu = new JPopupMenu();
 
 		JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
-		localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
-			public void mousePressed(MouseEvent e) {
-				menu.setVisible(false);
-				// Nummer des mit Rechtsklick angeklickten Frames
-				int selectedFrameNumber = e.getY() / CELL_TOTAL_HEIGHT + 1;
-				
-				showLocalPathThroughLayers(systemSoftware, selectedFrameNumber);
-			}
-		});
+		localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapterGetYCoord(this));
 		menu.add(localPathThroughLayersMenuItem);
 
 		JMenuItem globalPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
@@ -466,14 +503,14 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
         localPathThroughLayersDialog.setVisible(true);
 	}
 	
-	/*
+	/**
 	 *  Überprüfung, ob Nachricht mit der Nummer messageNumber bei der Ziel-IP angekommen ist.
 	 */
 	private Boolean hasMessageArrived(int messageNumber) {
 		return false;
 	}
 	
-	/*
+	/**
 	 *  Die folgende Methode zeigt die globale Ansicht der Schichten-Visualisierung an.
 	 */
 	private void showGlobalPathThroughLayers(int selectedFrameNumber, Host host) {

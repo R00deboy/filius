@@ -1,6 +1,5 @@
 package filius.gui.schichtensicht;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -11,13 +10,10 @@ import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.I18n;
-import filius.software.netzzugangsschicht.Ethernet;
 import filius.software.system.Betriebssystem;
 import filius.software.system.GatewayFirmware;
-import filius.software.system.InternetKnotenBetriebssystem;
 import filius.software.system.SystemSoftware;
 import filius.software.system.VermittlungsrechnerBetriebssystem;
-import filius.software.vermittlungsschicht.IP;
 
 /**
  * This class is used to visualise the path of a data packet through the TCP/IP
@@ -49,9 +45,9 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	 * muss gecheckt werden, ob das gewählte IP-Paket wirklich angekommen ist.
 	 */
 
-	private SystemSoftware systemSoftware;
+	private final SystemSoftware systemSoftware;
 
-	private int selectedFrameNumber;
+	private final int selectedFrameNumber;
 
 	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, int selectedFrameNumber) {
 		super(owner);

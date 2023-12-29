@@ -36,9 +36,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	
 	private int selectedFrameNumber;
 
-    public LocalPathThroughLayersDialog(JFrame owner, Host host) {
+    public LocalPathThroughLayersDialog(JFrame owner, Host host, int selectedFrameNumber) {
         super(owner);
         this.host = host;
+        this.selectedFrameNumber = selectedFrameNumber;
     }
     
 	/*

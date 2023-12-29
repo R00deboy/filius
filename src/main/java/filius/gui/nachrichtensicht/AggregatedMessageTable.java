@@ -446,8 +446,11 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 */
 	private void showLocalPathThroughLayers(int selectedFrameNumber, Host host) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-        + " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		//localPathThroughLayersDialog = new LocalPathThroughLayersDialog(owner, host);
+        		+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
+		// basic dialog creation and settings
+		localPathThroughLayersDialog = new LocalPathThroughLayersDialog(
+				filius.gui.JMainFrame.getJMainFrame(), host);
+		localPathThroughLayersDialog.setTitle(messages.getString("lokaler_weg_durch_schichten_msg1"));
 	}
 	
 	/*

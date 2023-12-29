@@ -29,6 +29,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -449,8 +450,17 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
         		+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
 		// basic dialog creation and settings
 		localPathThroughLayersDialog = new LocalPathThroughLayersDialog(
-				filius.gui.JMainFrame.getJMainFrame(), host);
+				filius.gui.JMainFrame.getJMainFrame(), host, selectedFrameNumber);
 		localPathThroughLayersDialog.setTitle(messages.getString("lokaler_weg_durch_schichten_msg1"));
+		
+        // positioning and size
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        localPathThroughLayersDialog.setLocation(screenSize.width / 2 - 300, screenSize.height / 2 - 200);
+
+        localPathThroughLayersDialog.setSize(750, 530);
+        localPathThroughLayersDialog.setResizable(true);
+
+        localPathThroughLayersDialog.setVisible(true);
 	}
 	
 	/*

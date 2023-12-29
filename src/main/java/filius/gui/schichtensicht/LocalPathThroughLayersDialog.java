@@ -68,7 +68,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			String gateway = ((Betriebssystem) systemSoftware).getStandardGateway();
 			String dnsServer = ((Betriebssystem) systemSoftware).getDNSServer();
 			
-			message = message + "IP: " + ipAddress + "\n" + 
+			message = message + "Nummer des Frames: " + this.selectedFrameNumber + "\n\n" +
+								"IP: " + ipAddress + "\n" + 
 								"Netzmaske: " + subnetMask + "\n" +
 								"MAC: " + macAddress + "\n" +
 								"Gateway: " + gateway + "\n" +
@@ -79,10 +80,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			Vermittlungsrechner knoten = (Vermittlungsrechner) systemSoftware.getKnoten();
 			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
 			
+			message = message + "Nummer des Frames: " + selectedFrameNumber + "\n";
+			
 			for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
-				if (message != "") {
-					message = message + "\n";
-				}
+				message = message + "\n";
 				message = message + "IP: " + netzwerkInterface.getIp() + "\n";
 				message = message + "Netzmaske: " + netzwerkInterface.getSubnetzMaske() + "\n";
 				message = message + "MAC: " + netzwerkInterface.getMac() + "\n";
@@ -93,10 +94,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			Gateway knoten = (Gateway) systemSoftware.getKnoten();
 			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
 			
+			message = message + "Nummer des Frames: " + selectedFrameNumber + "\n";
+			
 			for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
-				if (message != "") {
-					message = message + "\n";
-				}
+				message = message + "\n";
 				message = message + "IP: " + netzwerkInterface.getIp() + "\n";
 				message = message + "Netzmaske: " + netzwerkInterface.getSubnetzMaske() + "\n";
 				message = message + "MAC: " + netzwerkInterface.getMac() + "\n";

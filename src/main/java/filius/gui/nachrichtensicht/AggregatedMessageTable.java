@@ -195,9 +195,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 				// Nummer des mit Rechtsklick angeklickten Frames
 				int selectedFrameNumber = e.getY() / CELL_TOTAL_HEIGHT + 1;
 				
-//				Host host = Host.getHost(interfaceId);
-				
-//				showLocalPathThroughLayers(selectedFrameNumber, host);
+				showLocalPathThroughLayers(systemSoftware, selectedFrameNumber);
 			}
 		});
 		menu.add(localPathThroughLayersMenuItem);

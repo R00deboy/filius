@@ -92,7 +92,7 @@ public class AggregatedExchangePanel extends JTabbedPane implements AggregatedEx
         final MessageDetailsPanel detailsPanel = new MessageDetailsPanel(identifier);
 
         if (openedTabs.get(identifier) == null) {
-            tabelle = new AggregatedMessageTable(this, identifier);
+            tabelle = new AggregatedMessageTable(this, identifier, system);
             tabelle.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
                 @Override

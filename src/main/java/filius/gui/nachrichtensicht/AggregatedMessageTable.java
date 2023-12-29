@@ -68,6 +68,7 @@ import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.rahmenprogramm.nachrichten.LauscherBeobachter;
+import filius.software.system.SystemSoftware;
 
 public class AggregatedMessageTable extends JTable implements LauscherBeobachter, I18n {
 	private static Logger LOG = LoggerFactory.getLogger(AggregatedMessageTable.class);
@@ -84,9 +85,11 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	/** Gesamthöhe einer Zelle der Tabelle */
 	private static final int CELL_TOTAL_HEIGHT = 25;
 	
-	private LocalPathThroughLayersDialog localPathThroughLayersDialog;
-
+	private SystemSoftware systemSoftware;
+	
 	private String interfaceId;
+	
+	private LocalPathThroughLayersDialog localPathThroughLayersDialog;
 
 	private JCheckBoxMenuItem checkbox;
 
@@ -95,12 +98,14 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private boolean autoscroll = true;
 	private JPopupMenu menu;
 
-	public AggregatedMessageTable(AggregatedExchangeComponent component, String macAddress) {
+	public AggregatedMessageTable(AggregatedExchangeComponent component, String macAddress,
+				SystemSoftware systemSoftware) {
 		super();
 
 		TableColumn col;
 		DefaultTableColumnModel columnModel;
-
+		
+		this.systemSoftware = systemSoftware;
 		this.exchangeComponent = component;
 		setinterfaceId(macAddress);
 

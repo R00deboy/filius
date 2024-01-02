@@ -23,9 +23,9 @@ import filius.software.system.VermittlungsrechnerBetriebssystem;
  * 
  * This view corresponds to reality. In packet-switching networks like the
  * internet a single node in general cannot track the end-to-end path of a
- * message. This follows immediately from the properties of the packet-switching
+ * datenImport. This follows immediately from the properties of the packet-switching
  * network model. The node can only reproduce the receiving, processing and
- * forwarding of a message.
+ * forwarding of a datenImport.
  * 
  * @author Christoph Irniger
  */
@@ -35,15 +35,24 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	private final SystemSoftware systemSoftware;
 
 	private final int selectedFrameNumber;
+	
+	private JOptionPane optionPane;
+	
+	private String datenImport;
 
 	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, int selectedFrameNumber) {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
 		this.selectedFrameNumber = selectedFrameNumber;
 		
-		JOptionPane optionPane = new JOptionPane();
-		String message = "";
-
+		optionPane = new JOptionPane();
+		datenImport = "";
+		
+		showDaten();
+	}
+	
+	// Methode kann später gelöscht werden. Nur als Hilfe gedacht für den Moment.
+	private void showDaten() {
 		if (systemSoftware instanceof Betriebssystem) {
 			String ipAddress = ((Betriebssystem) systemSoftware).primaryIPAdresse();
 			String subnetMask = ((Betriebssystem) systemSoftware).primarySubnetMask();
@@ -51,7 +60,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			String gateway = ((Betriebssystem) systemSoftware).getStandardGateway();
 			String dnsServer = ((Betriebssystem) systemSoftware).getDNSServer();
 			
-			message = message + "Nummer des Frames: " + this.selectedFrameNumber + "\n\n" +
+			datenImport = datenImport + "Nummer des Frames: " + this.selectedFrameNumber + "\n\n" +
 								"IP: " + ipAddress + "\n" + 
 								"Netzmaske: " + subnetMask + "\n" +
 								"MAC: " + macAddress + "\n" +
@@ -63,13 +72,13 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			Vermittlungsrechner knoten = (Vermittlungsrechner) systemSoftware.getKnoten();
 			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
 			
-			message = message + "Nummer des Frames: " + selectedFrameNumber + "\n";
+			datenImport = datenImport + "Nummer des Frames: " + selectedFrameNumber + "\n";
 			
 			for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
-				message = message + "\n";
-				message = message + "IP: " + netzwerkInterface.getIp() + "\n";
-				message = message + "Netzmaske: " + netzwerkInterface.getSubnetzMaske() + "\n";
-				message = message + "MAC: " + netzwerkInterface.getMac() + "\n";
+				datenImport = datenImport + "\n";
+				datenImport = datenImport + "IP: " + netzwerkInterface.getIp() + "\n";
+				datenImport = datenImport + "Netzmaske: " + netzwerkInterface.getSubnetzMaske() + "\n";
+				datenImport = datenImport + "MAC: " + netzwerkInterface.getMac() + "\n";
 			}
 		}
 		
@@ -77,17 +86,17 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			Gateway knoten = (Gateway) systemSoftware.getKnoten();
 			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
 			
-			message = message + "Nummer des Frames: " + selectedFrameNumber + "\n";
+			datenImport = datenImport + "Nummer des Frames: " + selectedFrameNumber + "\n";
 			
 			for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
-				message = message + "\n";
-				message = message + "IP: " + netzwerkInterface.getIp() + "\n";
-				message = message + "Netzmaske: " + netzwerkInterface.getSubnetzMaske() + "\n";
-				message = message + "MAC: " + netzwerkInterface.getMac() + "\n";
+				datenImport = datenImport + "\n";
+				datenImport = datenImport + "IP: " + netzwerkInterface.getIp() + "\n";
+				datenImport = datenImport + "Netzmaske: " + netzwerkInterface.getSubnetzMaske() + "\n";
+				datenImport = datenImport + "MAC: " + netzwerkInterface.getMac() + "\n";
 			}
 		}
 
-		optionPane.setMessage(message);
+		optionPane.setMessage(datenImport);
 		this.add(optionPane);
 	}
 

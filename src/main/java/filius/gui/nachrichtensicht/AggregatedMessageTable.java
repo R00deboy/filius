@@ -63,7 +63,6 @@ import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
 import filius.gui.schichtensicht.LocalPathThroughLayersDialog;
-import filius.hardware.knoten.Host;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;

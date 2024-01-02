@@ -80,17 +80,12 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	public static final int SCHICHT_SPALTE = 5;
 	public static final int BEMERKUNG_SPALTE = 6;
 	public static final int LFD_NR_SPALTE = 0;
-
-	/** Gesamthöhe einer Zelle der Tabelle */
-	private static final int CELL_TOTAL_HEIGHT = 25;
 	
 	private SystemSoftware systemSoftware;
 	
 	private String interfaceId;
 	
 	private int selectedRowByRightclick;
-	
-	private final int numberOfInitialContextMenuItems;
 	
 	private LocalPathThroughLayersDialog localPathThroughLayersDialog;
 
@@ -140,7 +135,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
 		initTableColumnWidth();
 		this.setDefaultRenderer(Object.class, new LauscherTableCellRenderer());
-		this.numberOfInitialContextMenuItems = initKontextMenue();
+		initKontextMenue();
 
 		this.addMouseListener(new MouseInputAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -505,16 +500,17 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 	
 	/**
-	 *  Überprüfung, ob Nachricht mit der Nummer messageNumber bei der Ziel-IP angekommen ist.
-	 */
-	private Boolean hasMessageArrived(int messageNumber) {
-		return false;
-	}
-	
-	/**
 	 *  Die folgende Methode zeigt die globale Ansicht der Schichten-Visualisierung an.
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		
+	}
+	
+	/**
+	 *  Überprüfung, ob Nachricht mit der Nummer messageNumber bei der Ziel-IP angekommen ist.
+	 *  (für globalen Weg durch die Schichten)
+	 */
+	private Boolean hasMessageArrived(int messageNumber) {
+		return false;
 	}
 }

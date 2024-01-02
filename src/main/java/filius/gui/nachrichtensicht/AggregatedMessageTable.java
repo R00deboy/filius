@@ -294,19 +294,19 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		return menu.getComponentCount();
 	}
 
-	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." aktivieren
-	private void setPathOptionsDisabled() {
-		if (menu.getComponent(0).isEnabled() && menu.getComponent(1).isEnabled()) {
-			menu.getComponent(0).setEnabled(false);
-			menu.getComponent(1).setEnabled(false);
-		}
-	}
-	
 	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." deaktivieren
 	private void setPathOptionsEnabled() {
 		if (!menu.getComponent(0).isEnabled() && !menu.getComponent(1).isEnabled()) {
 			menu.getComponent(0).setEnabled(true);
 			menu.getComponent(1).setEnabled(true);
+		}
+	}
+	
+	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." aktivieren
+	private void setPathOptionsDisabled() {
+		if (menu.getComponent(0).isEnabled() && menu.getComponent(1).isEnabled()) {
+			menu.getComponent(0).setEnabled(false);
+			menu.getComponent(1).setEnabled(false);
 		}
 	}
 	
@@ -512,7 +512,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	/**
 	 *  Die folgende Methode zeigt die globale Ansicht der Schichten-Visualisierung an.
 	 */
-	private void showGlobalPathThroughLayers(int selectedFrameNumber, Host host) {
+	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		
 	}
 }

@@ -53,8 +53,6 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
 		this.selectedFrameNumber = selectedFrameNumber;
-
-		this.setAlwaysOnTop(true);
 		
 		JOptionPane optionPane = new JOptionPane();
 		String message = "";

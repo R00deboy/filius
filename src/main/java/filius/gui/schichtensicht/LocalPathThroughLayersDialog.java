@@ -1,10 +1,15 @@
 package filius.gui.schichtensicht;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.border.Border;
 
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.Gateway;
@@ -45,14 +50,16 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		this.systemSoftware = systemSoftware;
 		this.selectedFrameNumber = selectedFrameNumber;
 		
-		optionPane = new JOptionPane();
-		datenImport = "";
+		this.setLayout(new BorderLayout());
 		
 		showDaten();
 	}
 	
 	// Methode kann später gelöscht werden. Nur als Hilfe gedacht für den Moment.
 	private void showDaten() {
+		optionPane = new JOptionPane();
+		datenImport = "";
+		
 		if (systemSoftware instanceof Betriebssystem) {
 			String ipAddress = ((Betriebssystem) systemSoftware).primaryIPAdresse();
 			String subnetMask = ((Betriebssystem) systemSoftware).primarySubnetMask();

@@ -50,10 +50,12 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	private final int selectedFrameNumber;
 
 	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, int selectedFrameNumber) {
-		super(owner);
+		super(owner, true);
 		this.systemSoftware = systemSoftware;
 		this.selectedFrameNumber = selectedFrameNumber;
 
+		this.setAlwaysOnTop(true);
+		
 		JOptionPane optionPane = new JOptionPane();
 		String message = "";
 

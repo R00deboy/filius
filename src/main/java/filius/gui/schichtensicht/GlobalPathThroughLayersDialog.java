@@ -26,10 +26,10 @@ public class GlobalPathThroughLayersDialog extends JDialog implements I18n {
 	/** 
 	 * Diese Ansicht muss auf der Position des Maus-Rechtsklicks in der Wireshark-Ansicht
 	 * basieren. Denn sie bestimmt das Datenpaket, das untersucht werden soll.
-	 * 
 	 */
 	
-	/* Zuerst wird gecheckt, ob Quell- UND Ziel-IP von einem Host sind.
+	/** 
+	 * Zuerst wird gecheckt, ob Quell- UND Ziel-IP von einem Host sind.
 	 * (Pings von Routern (von einem Host aus) werden also vorläufig nicht visualisiert.)
 	 * Dann muss gecheckt werden, ob das gewählte IP-Paket wirklich angekommen ist.
 	 */

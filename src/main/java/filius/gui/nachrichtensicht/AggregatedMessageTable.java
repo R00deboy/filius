@@ -488,7 +488,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		// basic dialog creation and settings
 		localPathThroughLayersDialog = new LocalPathThroughLayersDialog(
 				filius.gui.JMainFrame.getJMainFrame(), systemSoftware, selectedFrameNumber);
-		localPathThroughLayersDialog.setTitle(messages.getString("lokaler_weg_durch_schichten_msg1"));
+		localPathThroughLayersDialog.setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 		
         // positioning and size
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

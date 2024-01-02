@@ -1,16 +1,13 @@
 package filius.gui.schichtensicht;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Insets;
 import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.border.Border;
-
+import javax.swing.JPanel;
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.Vermittlungsrechner;
@@ -19,6 +16,7 @@ import filius.software.system.Betriebssystem;
 import filius.software.system.GatewayFirmware;
 import filius.software.system.SystemSoftware;
 import filius.software.system.VermittlungsrechnerBetriebssystem;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This class is used to visualise the path of a data packet through the TCP/IP
@@ -41,19 +39,37 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private final int selectedFrameNumber;
 	
-	private JOptionPane optionPane;
+	private JPanel messageDetails;
 	
-	private String datenImport;
+	private JOptionPane optionPane;  // Nur für Hilfszwecke
+	
+	private String datenImport;  // Nur für Hilfszwecke
 
 	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, int selectedFrameNumber) {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
 		this.selectedFrameNumber = selectedFrameNumber;
 		
-		this.setLayout(new BorderLayout());
+		this.setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 		
-		showDaten();
+		BorderLayout borderLayout = new BorderLayout(10, 10);
+		this.setLayout(borderLayout);
+		
+		fillMessageDetails();
+		
+		// showDaten();
 	}
+	
+	private void fillMessageDetails() {
+		messageDetails = new JPanel(new MigLayout("wrap, insets 10, fill, debug"));
+		
+		messageDetails.add(new JLabel(messages.getString("schichten_lokaler_weg_msg2")), "wrap");
+		messageDetails.add(new JLabel(messages.getString("schichten_lokaler_weg_msg3")), "wrap");
+		messageDetails.add(new JLabel(messages.getString("schichten_lokaler_weg_msg4")));
+		
+		this.add(messageDetails, BorderLayout.SOUTH);
+	}
+	
 	
 	// Methode kann später gelöscht werden. Nur als Hilfe gedacht für den Moment.
 	private void showDaten() {
@@ -106,8 +122,4 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		optionPane.setMessage(datenImport);
 		this.add(optionPane);
 	}
-
-	/*
-	 * VISUALISIERUNG
-	 */
 }

@@ -89,7 +89,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	
 	private String interfaceId;
 	
-	private int yCoordOfRightclick;
+	private int selectedRowByRightclick;
 	
 	private LocalPathThroughLayersDialog localPathThroughLayersDialog;
 
@@ -141,59 +141,19 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		this.setDefaultRenderer(Object.class, new LauscherTableCellRenderer());
 		initKontextMenue();
 
-		this.addMouseListener(new MouseInputAdapterSetYCoord(this));
+		this.addMouseListener(new MouseInputAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.getButton() == 3) {
+					AggregatedMessageTable target = (AggregatedMessageTable) e.getSource();
+					target.selectedRowByRightclick = target.rowAtPoint(e.getPoint());
+					
+					menu.setVisible(true);
+					menu.show(getTabelle(), e.getX(), e.getY());
+				}
+			}
+		});
 
 		update();
-	}
-	
-	/**
-	 * Diese Klasse ist dazu befähigt, yCoordOfRightclick (die y-Koordinate der Position
-	 * des letzten Rechtsklicks) in der Hauptklasse "AggregatedMessageTable" zu setzen. 
-	 */
-	private class MouseInputAdapterSetYCoord extends MouseInputAdapter {
-		
-		private AggregatedMessageTable aggregatedMessageTable;
-		
-		public MouseInputAdapterSetYCoord(AggregatedMessageTable aggregatedMessageTable) {
-			super();
-			this.aggregatedMessageTable = aggregatedMessageTable;
-		}
-		
-		public void mousePressed(MouseEvent e) {
-			if (e.getButton() == 3) {
-				menu.setVisible(true);
-				menu.show(getTabelle(), e.getX(), e.getY());
-				this.aggregatedMessageTable.yCoordOfRightclick = e.getY();
-			}
-		}
-	}
-	
-	/**
-	 * Diese Klasse ist dazu befähigt, yCoordOfRightclick (die y-Koordinate der Position
-	 * des letzten Rechtsklicks) in der Hauptklasse "AggregatedMessageTable" zurückzubekommen. 
-	 */
-	private class MouseInputAdapterGetYCoord extends MouseInputAdapter {
-		
-		private AggregatedMessageTable aggregatedMessageTable;
-		
-		public MouseInputAdapterGetYCoord(AggregatedMessageTable aggregatedMessageTable) {
-			super();
-			this.aggregatedMessageTable = aggregatedMessageTable;
-		}
-		
-		public void mousePressed(MouseEvent e) {
-			menu.setVisible(false);
-			
-			// Nummer des mit Rechtsklick angewählten Frames
-			int selectedFrameNumber =
-					this.aggregatedMessageTable.yCoordOfRightclick / CELL_TOTAL_HEIGHT + 1;
-			
-			showLocalPathThroughLayers(systemSoftware, selectedFrameNumber);
-		}
-	}
-	
-	public void setYCoordOfRightClick(int yCoordOfRightclick) {
-		this.yCoordOfRightclick = yCoordOfRightclick;
 	}
 
 	private void initTableModel() {
@@ -232,9 +192,15 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
 	private void initKontextMenue() {
 		menu = new JPopupMenu();
+		AggregatedMessageTable target = this;
 
 		JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
-		localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapterGetYCoord(this));
+		localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
+			public void mousePressed(MouseEvent e) {
+				menu.setVisible(false);
+				showLocalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+			}
+		});
 		menu.add(localPathThroughLayersMenuItem);
 
 		JMenuItem globalPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
@@ -481,7 +447,6 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		return lines;
 	}
 	
-
 	/*
 	 *  Die folgende Methode zeigt die lokale Ansicht der Schichten-Visualisierung an.
 	 */

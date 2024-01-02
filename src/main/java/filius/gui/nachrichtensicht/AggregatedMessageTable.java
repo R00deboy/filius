@@ -142,6 +142,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 				if (e.getButton() == 3) {
 					AggregatedMessageTable target = (AggregatedMessageTable) e.getSource();
 					target.selectedRowByRightclick = target.rowAtPoint(e.getPoint());
+					target.setRowSelectionInterval(target.selectedRowByRightclick, target.selectedRowByRightclick);
 					
 					// Falls der Rechtsklick im leeren Bereich gemacht wurde
 					if (target.selectedRowByRightclick == -1) {  

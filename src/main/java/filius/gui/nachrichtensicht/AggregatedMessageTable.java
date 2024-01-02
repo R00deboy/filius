@@ -91,6 +91,8 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	
 	private int selectedRowByRightclick;
 	
+	private final int numberOfInitialContextMenuItems;
+	
 	private LocalPathThroughLayersDialog localPathThroughLayersDialog;
 
 	private JCheckBoxMenuItem checkbox;
@@ -139,13 +141,21 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
 		initTableColumnWidth();
 		this.setDefaultRenderer(Object.class, new LauscherTableCellRenderer());
-		initKontextMenue();
+		this.numberOfInitialContextMenuItems = initKontextMenue();
 
 		this.addMouseListener(new MouseInputAdapter() {
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == 3) {
 					AggregatedMessageTable target = (AggregatedMessageTable) e.getSource();
 					target.selectedRowByRightclick = target.rowAtPoint(e.getPoint());
+					
+					// Falls der Rechtsklick im leeren Bereich gemacht wurde
+					if (target.selectedRowByRightclick == -1) {  
+						setPathOptionsDisabled();
+					}
+					else {
+						setPathOptionsEnabled();
+					}
 					
 					menu.setVisible(true);
 					menu.show(getTabelle(), e.getX(), e.getY());
@@ -190,15 +200,17 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		this.getColumnModel().getColumn(6).setResizable(true);
 	}
 
-	private void initKontextMenue() {
+	private int initKontextMenue() {
 		menu = new JPopupMenu();
 		AggregatedMessageTable target = this;
 
 		JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
 		localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
 			public void mousePressed(MouseEvent e) {
-				menu.setVisible(false);
-				showLocalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+				if (isPathOptionsEnabled()) {
+					menu.setVisible(false);
+					showLocalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+				}
 			}
 		});
 		menu.add(localPathThroughLayersMenuItem);
@@ -278,8 +290,30 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
 		menu.setVisible(false);
 		exchangeComponent.getRootPane().getLayeredPane().add(menu);
+		
+		return menu.getComponentCount();
 	}
 
+	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." aktivieren
+	private void setPathOptionsDisabled() {
+		if (menu.getComponent(0).isEnabled() && menu.getComponent(1).isEnabled()) {
+			menu.getComponent(0).setEnabled(false);
+			menu.getComponent(1).setEnabled(false);
+		}
+	}
+	
+	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." deaktivieren
+	private void setPathOptionsEnabled() {
+		if (!menu.getComponent(0).isEnabled() && !menu.getComponent(1).isEnabled()) {
+			menu.getComponent(0).setEnabled(true);
+			menu.getComponent(1).setEnabled(true);
+		}
+	}
+	
+	private boolean isPathOptionsEnabled() {
+		return menu.getComponent(0).isEnabled() && menu.getComponent(1).isEnabled();
+	}
+	
 	private void setinterfaceId(String interfaceId) {
 		this.interfaceId = interfaceId;
 

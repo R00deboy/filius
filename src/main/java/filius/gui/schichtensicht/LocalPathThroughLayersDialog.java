@@ -54,7 +54,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private String datenImport; // Nur für Hilfszwecke
 
-	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, int selectedFrameNumber) {
+	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware,
+			String interfaceId, int selectedFrameNumber) {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
 		this.selectedFrameNumber = selectedFrameNumber;
@@ -113,24 +114,34 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 					messageDetailsTable[2][2] = new JLabel(daten[i][2].toString());
 					messageDetailsTable[3][2] = new JLabel(daten[i][3].toString());
 					messageDetailsTable[4][2] = new JLabel(daten[i][6].toString());
+					LOG.debug(daten[i][2].toString());
+					LOG.debug(daten[i][3].toString());
+					LOG.debug(daten[i][6].toString());
 
 					// Vermittlungs-Daten (falls existent)
-					if (daten[i + 1][0].equals(selectedFrameNumberString)) {
+					if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberString)) {
 						messageDetailsTable[2][4] = new JLabel(daten[i + 1][2].toString());
 						messageDetailsTable[3][4] = new JLabel(daten[i + 1][3].toString());
 						messageDetailsTable[4][4] = new JLabel(daten[i + 1][6].toString());
+						LOG.debug(daten[i + 1][2].toString());
+						LOG.debug(daten[i + 1][3].toString());
+						LOG.debug(daten[i + 1][6].toString());
 					}
 
 					// Transport-Daten (falls existent)
-					if (daten[i + 2][0].equals(selectedFrameNumberString)) {
+					if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberString)) {
 						messageDetailsTable[2][6] = new JLabel(daten[i + 2][2].toString());
 						messageDetailsTable[3][6] = new JLabel(daten[i + 2][3].toString());
 						messageDetailsTable[4][6] = new JLabel(daten[i + 2][6].toString());
+						LOG.debug(daten[i + 2][2].toString());
+						LOG.debug(daten[i + 2][3].toString());
+						LOG.debug(daten[i + 2][6].toString());
 					}
 
 					// Anwendungs-Daten (falls existent)
-					if (daten[i + 3][0].equals(selectedFrameNumberString)) {
+					if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberString)) {
 						messageDetailsTable[2][7] = new JLabel(daten[i + 3][6].toString());
+						LOG.debug(daten[i + 3][6].toString());
 					}
 					break;
 				}

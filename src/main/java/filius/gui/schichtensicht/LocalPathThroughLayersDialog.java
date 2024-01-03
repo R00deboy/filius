@@ -83,6 +83,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		messageDetailsTable[0][3] = new JLabel(messages.getString("rp_lauscher_msg9"));
 		messageDetailsTable[0][5] = new JLabel(messages.getString("rp_lauscher_msg10"));
 		messageDetailsTable[0][7] = new JLabel(messages.getString("rp_lauscher_msg11"));
+		messageDetailsTable[1][1] = new JLabel("Ethernet");
 		messageDetailsTable[2][1] = new JLabel(messages.getString("rp_lauscher_msg3"));
 		messageDetailsTable[3][1] = new JLabel(messages.getString("rp_lauscher_msg4"));
 		messageDetailsTable[3][1] = new JLabel(messages.getString("rp_lauscher_msg7"));
@@ -123,9 +124,11 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 						messageDetailsTable[2][4] = new JLabel(daten[i + 1][2].toString());
 						messageDetailsTable[3][4] = new JLabel(daten[i + 1][3].toString());
 						messageDetailsTable[4][4] = new JLabel(daten[i + 1][6].toString());
+						messageDetailsTable[1][3] = new JLabel(daten[i + 1][4].toString());
 						LOG.debug(daten[i + 1][2].toString());
 						LOG.debug(daten[i + 1][3].toString());
 						LOG.debug(daten[i + 1][6].toString());
+						LOG.debug(daten[i + 1][4].toString());
 					}
 
 					// Transport-Daten (falls existent)
@@ -133,15 +136,19 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 						messageDetailsTable[2][6] = new JLabel(daten[i + 2][2].toString());
 						messageDetailsTable[3][6] = new JLabel(daten[i + 2][3].toString());
 						messageDetailsTable[4][6] = new JLabel(daten[i + 2][6].toString());
+						messageDetailsTable[1][3] = new JLabel(daten[i + 2][4].toString());
 						LOG.debug(daten[i + 2][2].toString());
 						LOG.debug(daten[i + 2][3].toString());
 						LOG.debug(daten[i + 2][6].toString());
+						LOG.debug(daten[i + 2][4].toString());
 					}
 
 					// Anwendungs-Daten (falls existent)
 					if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberString)) {
 						messageDetailsTable[2][7] = new JLabel(daten[i + 3][6].toString());
+						messageDetailsTable[1][3] = new JLabel(daten[i + 3][4].toString());
 						LOG.debug(daten[i + 3][6].toString());
+						LOG.debug(daten[i + 3][4].toString());
 					}
 					break;
 				}

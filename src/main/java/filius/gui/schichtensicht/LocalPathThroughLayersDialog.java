@@ -102,6 +102,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		if (systemSoftware instanceof Betriebssystem) {
 			String macAddress = ((Betriebssystem) systemSoftware).primaryMACAddress();
 
+			// Lauscher-Daten holen
 			Object[][] daten = Lauscher.getLauscher().getDaten(macAddress, false, 0);
 
 			String selectedFrameNumberString = Integer.toString(selectedFrameNumber);
@@ -134,6 +135,22 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 					break;
 				}
 			}
+		}
+		
+		// Wenn der ausgewählte Knoten ein Vermittlungsrechner ist
+		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem) {
+			Vermittlungsrechner knoten = (Vermittlungsrechner) systemSoftware.getKnoten();
+			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
+			
+			// to be continued...
+		}
+		
+		// Wenn der ausgewählte Knoten ein Heimrouter ist
+		else if (systemSoftware instanceof GatewayFirmware) {
+			Gateway knoten = (Gateway) systemSoftware.getKnoten();
+			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
+			
+			// to be continued...
 		}
 	}
 

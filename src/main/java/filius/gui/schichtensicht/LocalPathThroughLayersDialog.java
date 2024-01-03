@@ -43,7 +43,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	private static Logger LOG = LoggerFactory.getLogger(AggregatedMessageTable.class);
 
 	private final SystemSoftware systemSoftware;
-	
+
 	private final String interfaceId;
 
 	private final int selectedFrameNumber;
@@ -56,8 +56,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private String datenImport; // Nur für Hilfszwecke
 
-	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware,
-			String interfaceId, int selectedFrameNumber) {
+	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
+			int selectedFrameNumber) {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
 		this.interfaceId = interfaceId;
@@ -103,13 +103,13 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	 */
 	private void fillMessageDetailsTable() {
 
+		String selectedFrameNumberString = Integer.toString(selectedFrameNumber);
+
+		// Lauscher-Daten holen
+		Object[][] daten = Lauscher.getLauscher().getDaten(interfaceId, false, 0);
+
 		// Wenn der ausgewählte Knoten ein Host (Rechner oder ein Notebook) ist
 		if (systemSoftware instanceof Betriebssystem) {
-
-			// Lauscher-Daten holen
-			Object[][] daten = Lauscher.getLauscher().getDaten(interfaceId, false, 0);
-
-			String selectedFrameNumberString = Integer.toString(selectedFrameNumber);
 
 			for (int i = 0; i < daten.length; i++) {
 				if (daten[i][0].equals(selectedFrameNumberString)) {
@@ -156,22 +156,63 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 				}
 			}
 		}
-		
+
 		// Wenn der ausgewählte Knoten ein Vermittlungsrechner ist
 		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem) {
 			Vermittlungsrechner knoten = (Vermittlungsrechner) systemSoftware.getKnoten();
 			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
-			
-			
-			
-			// to be continued...
+
+			for (int i = 0; i < daten.length; i++) {
+				if (daten[i][0].equals(selectedFrameNumberString)) {
+					// Netzzugangs-Daten
+					messageDetailsTable[2][2] = new JLabel(daten[i][2].toString());
+					messageDetailsTable[3][2] = new JLabel(daten[i][3].toString());
+					messageDetailsTable[4][2] = new JLabel(daten[i][6].toString());
+					LOG.debug(daten[i][2].toString());
+					LOG.debug(daten[i][3].toString());
+					LOG.debug(daten[i][6].toString());
+
+					// Vermittlungs-Daten (falls existent)
+					if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberString)) {
+						messageDetailsTable[2][4] = new JLabel(daten[i + 1][2].toString());
+						messageDetailsTable[3][4] = new JLabel(daten[i + 1][3].toString());
+						messageDetailsTable[4][4] = new JLabel(daten[i + 1][6].toString());
+						messageDetailsTable[1][3] = new JLabel(daten[i + 1][4].toString());
+						LOG.debug(daten[i + 1][2].toString());
+						LOG.debug(daten[i + 1][3].toString());
+						LOG.debug(daten[i + 1][6].toString());
+						LOG.debug(daten[i + 1][4].toString());
+					}
+
+					// Transport-Daten (falls existent)
+					if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberString)) {
+						messageDetailsTable[2][6] = new JLabel(daten[i + 2][2].toString());
+						messageDetailsTable[3][6] = new JLabel(daten[i + 2][3].toString());
+						messageDetailsTable[4][6] = new JLabel(daten[i + 2][6].toString());
+						messageDetailsTable[1][3] = new JLabel(daten[i + 2][4].toString());
+						LOG.debug(daten[i + 2][2].toString());
+						LOG.debug(daten[i + 2][3].toString());
+						LOG.debug(daten[i + 2][6].toString());
+						LOG.debug(daten[i + 2][4].toString());
+					}
+
+					// Anwendungs-Daten (falls existent)
+					if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberString)) {
+						messageDetailsTable[2][7] = new JLabel(daten[i + 3][6].toString());
+						messageDetailsTable[1][3] = new JLabel(daten[i + 3][4].toString());
+						LOG.debug(daten[i + 3][6].toString());
+						LOG.debug(daten[i + 3][4].toString());
+					}
+					break;
+				}
+			}
 		}
-		
+
 		// Wenn der ausgewählte Knoten ein Heimrouter ist
 		else if (systemSoftware instanceof GatewayFirmware) {
 			Gateway knoten = (Gateway) systemSoftware.getKnoten();
 			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
-			
+
 			// to be continued...
 		}
 	}

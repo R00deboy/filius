@@ -79,23 +79,23 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	 * für alle Tabellen gleich, egal welche Nachricht ausgewählt wurde.
 	 */
 	private void fillMessageDetailsTableConstants() {
-		messageDetailsTable[0][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
-		messageDetailsTable[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
-		messageDetailsTable[2][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
-		messageDetailsTable[0][1] = new JLabel(messages.getString("rp_lauscher_msg8"));
-		messageDetailsTable[0][3] = new JLabel(messages.getString("rp_lauscher_msg9"));
-		messageDetailsTable[0][5] = new JLabel(messages.getString("rp_lauscher_msg10"));
-		messageDetailsTable[0][7] = new JLabel(messages.getString("rp_lauscher_msg11"));
-		messageDetailsTable[1][1] = new JLabel("Ethernet");
-		messageDetailsTable[2][1] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetailsTable[3][1] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][1] = new JLabel(messages.getString("rp_lauscher_msg7"));
-		messageDetailsTable[2][3] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetailsTable[3][3] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][3] = new JLabel(messages.getString("rp_lauscher_msg7"));
-		messageDetailsTable[2][5] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetailsTable[3][5] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][5] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetailsTable[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
+		messageDetailsTable[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
+		messageDetailsTable[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
+		messageDetailsTable[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
+		messageDetailsTable[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
+		messageDetailsTable[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
+		messageDetailsTable[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
+		messageDetailsTable[1][0] = new JLabel("Ethernet");
+		messageDetailsTable[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetailsTable[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetailsTable[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
 	}
 
 	/**
@@ -114,18 +114,18 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			for (int i = 0; i < daten.length; i++) {
 				if (daten[i][0].equals(selectedFrameNumberString)) {
 					// Netzzugangs-Daten
-					messageDetailsTable[2][2] = new JLabel(daten[i][2].toString());
-					messageDetailsTable[3][2] = new JLabel(daten[i][3].toString());
-					messageDetailsTable[4][2] = new JLabel(daten[i][6].toString());
+					messageDetailsTable[2][1] = new JLabel(daten[i][2].toString());
+					messageDetailsTable[3][1] = new JLabel(daten[i][3].toString());
+					messageDetailsTable[4][1] = new JLabel(daten[i][6].toString());
 					LOG.debug(daten[i][2].toString());
 					LOG.debug(daten[i][3].toString());
 					LOG.debug(daten[i][6].toString());
 
 					// Vermittlungs-Daten (falls existent)
 					if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][4] = new JLabel(daten[i + 1][2].toString());
-						messageDetailsTable[3][4] = new JLabel(daten[i + 1][3].toString());
-						messageDetailsTable[4][4] = new JLabel(daten[i + 1][6].toString());
+						messageDetailsTable[2][3] = new JLabel(daten[i + 1][2].toString());
+						messageDetailsTable[3][3] = new JLabel(daten[i + 1][3].toString());
+						messageDetailsTable[4][3] = new JLabel(daten[i + 1][6].toString());
 						messageDetailsTable[1][3] = new JLabel(daten[i + 1][4].toString());
 						LOG.debug(daten[i + 1][2].toString());
 						LOG.debug(daten[i + 1][3].toString());
@@ -135,10 +135,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 					// Transport-Daten (falls existent)
 					if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][6] = new JLabel(daten[i + 2][2].toString());
-						messageDetailsTable[3][6] = new JLabel(daten[i + 2][3].toString());
-						messageDetailsTable[4][6] = new JLabel(daten[i + 2][6].toString());
-						messageDetailsTable[1][3] = new JLabel(daten[i + 2][4].toString());
+						messageDetailsTable[2][5] = new JLabel(daten[i + 2][2].toString());
+						messageDetailsTable[3][5] = new JLabel(daten[i + 2][3].toString());
+						messageDetailsTable[4][5] = new JLabel(daten[i + 2][6].toString());
+						messageDetailsTable[1][5] = new JLabel(daten[i + 2][4].toString());
 						LOG.debug(daten[i + 2][2].toString());
 						LOG.debug(daten[i + 2][3].toString());
 						LOG.debug(daten[i + 2][6].toString());
@@ -147,8 +147,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 					// Anwendungs-Daten (falls existent)
 					if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][7] = new JLabel(daten[i + 3][6].toString());
-						messageDetailsTable[1][3] = new JLabel(daten[i + 3][4].toString());
+						messageDetailsTable[2][6] = new JLabel(daten[i + 3][6].toString());
+						messageDetailsTable[1][6] = new JLabel(daten[i + 3][4].toString());
 						LOG.debug(daten[i + 3][6].toString());
 						LOG.debug(daten[i + 3][4].toString());
 					}

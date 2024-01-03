@@ -46,9 +46,9 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private final int selectedFrameNumber;
 
-	private BorderLayout borderLayout;
+	private JLabel[][] messageDetailsTable = new JLabel[5][8];
 
-	private JPanel messageDetails;
+	private BorderLayout borderLayout;
 
 	private JOptionPane optionPane; // Nur für Hilfszwecke
 
@@ -63,81 +63,78 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 		borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
-		
-		JLabel[][] test = fillMessageDetails();
 
-		// fillMessageDetails();
+		fillMessageDetailsTableConstants();
+		fillMessageDetailsTable();
 
 		// showDaten();
 	}
 
 	/**
-	 * Diese Methode gibt einen 2D-Array zurück für die Einträge in die Tabelle mit den
-	 * Nachrichten-Details.
-	 * 
-	 * @return messageDetails
+	 * Diese Methode füllt die Tabelle mit den Zellbezeichnungen. Diese Werte sind
+	 * für alle Tabellen gleich, egal welche Nachricht ausgewählt wurde.
 	 */
-	private JLabel[][] fillMessageDetails() {
-		JLabel[][] messageDetails = new JLabel[5][8];
+	private void fillMessageDetailsTableConstants() {
+		messageDetailsTable[0][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
+		messageDetailsTable[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
+		messageDetailsTable[2][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
+		messageDetailsTable[0][1] = new JLabel(messages.getString("rp_lauscher_msg8"));
+		messageDetailsTable[0][3] = new JLabel(messages.getString("rp_lauscher_msg9"));
+		messageDetailsTable[0][5] = new JLabel(messages.getString("rp_lauscher_msg10"));
+		messageDetailsTable[0][7] = new JLabel(messages.getString("rp_lauscher_msg11"));
+		messageDetailsTable[2][1] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable[3][1] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable[3][1] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetailsTable[2][3] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable[3][3] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable[3][3] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetailsTable[2][5] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable[3][5] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable[3][5] = new JLabel(messages.getString("rp_lauscher_msg7"));
+	}
 
-		// Konstante Werte der Tabelle
-		messageDetails[0][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
-		messageDetails[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
-		messageDetails[2][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
-		messageDetails[0][1] = new JLabel(messages.getString("rp_lauscher_msg8"));
-		messageDetails[0][3] = new JLabel(messages.getString("rp_lauscher_msg9"));
-		messageDetails[0][5] = new JLabel(messages.getString("rp_lauscher_msg10"));
-		messageDetails[0][7] = new JLabel(messages.getString("rp_lauscher_msg11"));
-		messageDetails[2][1] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetails[3][1] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetails[3][1] = new JLabel(messages.getString("rp_lauscher_msg7"));
-		messageDetails[2][3] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetails[3][3] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetails[3][3] = new JLabel(messages.getString("rp_lauscher_msg7"));
-		messageDetails[2][5] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetails[3][5] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetails[3][5] = new JLabel(messages.getString("rp_lauscher_msg7"));
+	/**
+	 * Diese Methode füllt die Tabelle mit den Werten für die ausgewählte Nachricht.
+	 */
+	private void fillMessageDetailsTable() {
 
-		// Ab hier: Werte, die vom Frame abhängen
-		
 		// Wenn der ausgewählte Knoten ein Host (Rechner oder ein Notebook) ist
 		if (systemSoftware instanceof Betriebssystem) {
 			String macAddress = ((Betriebssystem) systemSoftware).primaryMACAddress();
-			
+
 			Object[][] daten = Lauscher.getLauscher().getDaten(macAddress, false, 0);
-			
+
 			String selectedFrameNumberString = Integer.toString(selectedFrameNumber);
-			
+
 			for (int i = 0; i < daten.length; i++) {
 				if (daten[i][0].equals(selectedFrameNumberString)) {
 					// Netzzugangs-Daten
-					messageDetails[2][2] = new JLabel(daten[i][2].toString());
-					messageDetails[3][2] = new JLabel(daten[i][3].toString());
-					messageDetails[4][2] = new JLabel(daten[i][6].toString());
-					
+					messageDetailsTable[2][2] = new JLabel(daten[i][2].toString());
+					messageDetailsTable[3][2] = new JLabel(daten[i][3].toString());
+					messageDetailsTable[4][2] = new JLabel(daten[i][6].toString());
+
 					// Vermittlungs-Daten (falls existent)
 					if (daten[i + 1][0].equals(selectedFrameNumberString)) {
-						messageDetails[2][4] = new JLabel(daten[i + 1][2].toString());
-						messageDetails[3][4] = new JLabel(daten[i + 1][3].toString());
-						messageDetails[4][4] = new JLabel(daten[i + 1][6].toString());
+						messageDetailsTable[2][4] = new JLabel(daten[i + 1][2].toString());
+						messageDetailsTable[3][4] = new JLabel(daten[i + 1][3].toString());
+						messageDetailsTable[4][4] = new JLabel(daten[i + 1][6].toString());
 					}
-					
+
 					// Transport-Daten (falls existent)
 					if (daten[i + 2][0].equals(selectedFrameNumberString)) {
-						messageDetails[2][6] = new JLabel(daten[i + 2][2].toString());
-						messageDetails[3][6] = new JLabel(daten[i + 2][3].toString());
-						messageDetails[4][6] = new JLabel(daten[i + 2][6].toString());
+						messageDetailsTable[2][6] = new JLabel(daten[i + 2][2].toString());
+						messageDetailsTable[3][6] = new JLabel(daten[i + 2][3].toString());
+						messageDetailsTable[4][6] = new JLabel(daten[i + 2][6].toString());
 					}
-					
+
 					// Anwendungs-Daten (falls existent)
 					if (daten[i + 3][0].equals(selectedFrameNumberString)) {
-						messageDetails[2][7] = new JLabel(daten[i + 3][6].toString());
+						messageDetailsTable[2][7] = new JLabel(daten[i + 3][6].toString());
 					}
 					break;
 				}
 			}
 		}
-		return messageDetails;
 	}
 
 	// Methode kann später gelöscht werden. Nur als Hilfe gedacht für den Moment.

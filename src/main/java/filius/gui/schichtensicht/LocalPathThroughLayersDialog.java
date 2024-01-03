@@ -43,6 +43,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	private static Logger LOG = LoggerFactory.getLogger(AggregatedMessageTable.class);
 
 	private final SystemSoftware systemSoftware;
+	
+	private final String interfaceId;
 
 	private final int selectedFrameNumber;
 
@@ -58,6 +60,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			String interfaceId, int selectedFrameNumber) {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
+		this.interfaceId = interfaceId;
 		this.selectedFrameNumber = selectedFrameNumber;
 
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
@@ -102,10 +105,9 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 		// Wenn der ausgewählte Knoten ein Host (Rechner oder ein Notebook) ist
 		if (systemSoftware instanceof Betriebssystem) {
-			String macAddress = ((Betriebssystem) systemSoftware).primaryMACAddress();
 
 			// Lauscher-Daten holen
-			Object[][] daten = Lauscher.getLauscher().getDaten(macAddress, false, 0);
+			Object[][] daten = Lauscher.getLauscher().getDaten(interfaceId, false, 0);
 
 			String selectedFrameNumberString = Integer.toString(selectedFrameNumber);
 
@@ -159,6 +161,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem) {
 			Vermittlungsrechner knoten = (Vermittlungsrechner) systemSoftware.getKnoten();
 			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
+			
+			
 			
 			// to be continued...
 		}

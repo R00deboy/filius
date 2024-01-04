@@ -1,6 +1,7 @@
 package filius.gui.schichtensicht;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -48,7 +49,9 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private final int selectedFrameNumber;
 
-	private JLabel[][] messageDetailsTable = new JLabel[5][8];
+	private JLabel[][] messageDetailsTable1 = new JLabel[5][8];
+
+	private JLabel[][] messageDetailsTable2 = new JLabel[5][8]; // nur für Vermittlungsrechner
 
 	private BorderLayout borderLayout;
 
@@ -69,7 +72,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		setLayout(borderLayout);
 
 		fillMessageDetailsTableConstants();
-		fillMessageDetailsTable();
+
+		if (systemSoftware instanceof Betriebssystem) {
+			fillMessageDetailsTableHost();
+		}
 
 		// showDaten();
 	}
@@ -79,33 +85,32 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	 * für alle Tabellen gleich, egal welche Nachricht ausgewählt wurde.
 	 */
 	private void fillMessageDetailsTableConstants() {
-		messageDetailsTable[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
-		messageDetailsTable[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
-		messageDetailsTable[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
-		messageDetailsTable[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
-		messageDetailsTable[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
-		messageDetailsTable[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
-		messageDetailsTable[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
-		messageDetailsTable[1][0] = new JLabel("Ethernet");
-		messageDetailsTable[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
-		messageDetailsTable[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
-		messageDetailsTable[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetailsTable1[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
+		messageDetailsTable1[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
+		messageDetailsTable1[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
+		messageDetailsTable1[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
+		messageDetailsTable1[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
+		messageDetailsTable1[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
+		messageDetailsTable1[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
+		messageDetailsTable1[1][0] = new JLabel("Ethernet");
+		messageDetailsTable1[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable1[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable1[3][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetailsTable1[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable1[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable1[3][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetailsTable1[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetailsTable1[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetailsTable1[3][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
 	}
 
 	/**
 	 * Diese Methode füllt die Tabelle mit den Werten für die ausgewählte Nachricht.
 	 */
-	private void fillMessageDetailsTable() {
+	private void fillMessageDetailsTableHost() {
 
 		String selectedFrameNumberString = Integer.toString(selectedFrameNumber);
 
-		// Lauscher-Daten holen
 		Object[][] daten = Lauscher.getLauscher().getDaten(interfaceId, false, 0);
 
 		// Wenn der ausgewählte Knoten ein Host (Rechner oder ein Notebook) ist
@@ -114,19 +119,19 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			for (int i = 0; i < daten.length; i++) {
 				if (daten[i][0].equals(selectedFrameNumberString)) {
 					// Netzzugangs-Daten
-					messageDetailsTable[2][1] = new JLabel(daten[i][2].toString());
-					messageDetailsTable[3][1] = new JLabel(daten[i][3].toString());
-					messageDetailsTable[4][1] = new JLabel(daten[i][6].toString());
+					messageDetailsTable1[2][1] = new JLabel(daten[i][2].toString());
+					messageDetailsTable1[3][1] = new JLabel(daten[i][3].toString());
+					messageDetailsTable1[4][1] = new JLabel(daten[i][6].toString());
 					LOG.debug(daten[i][2].toString());
 					LOG.debug(daten[i][3].toString());
 					LOG.debug(daten[i][6].toString());
 
 					// Vermittlungs-Daten (falls existent)
 					if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][3] = new JLabel(daten[i + 1][2].toString());
-						messageDetailsTable[3][3] = new JLabel(daten[i + 1][3].toString());
-						messageDetailsTable[4][3] = new JLabel(daten[i + 1][6].toString());
-						messageDetailsTable[1][3] = new JLabel(daten[i + 1][4].toString());
+						messageDetailsTable1[2][3] = new JLabel(daten[i + 1][2].toString());
+						messageDetailsTable1[3][3] = new JLabel(daten[i + 1][3].toString());
+						messageDetailsTable1[4][3] = new JLabel(daten[i + 1][6].toString());
+						messageDetailsTable1[1][3] = new JLabel(daten[i + 1][4].toString());
 						LOG.debug(daten[i + 1][2].toString());
 						LOG.debug(daten[i + 1][3].toString());
 						LOG.debug(daten[i + 1][6].toString());
@@ -135,10 +140,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 					// Transport-Daten (falls existent)
 					if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][5] = new JLabel(daten[i + 2][2].toString());
-						messageDetailsTable[3][5] = new JLabel(daten[i + 2][3].toString());
-						messageDetailsTable[4][5] = new JLabel(daten[i + 2][6].toString());
-						messageDetailsTable[1][5] = new JLabel(daten[i + 2][4].toString());
+						messageDetailsTable1[2][5] = new JLabel(daten[i + 2][2].toString());
+						messageDetailsTable1[3][5] = new JLabel(daten[i + 2][3].toString());
+						messageDetailsTable1[4][5] = new JLabel(daten[i + 2][6].toString());
+						messageDetailsTable1[1][5] = new JLabel(daten[i + 2][4].toString());
 						LOG.debug(daten[i + 2][2].toString());
 						LOG.debug(daten[i + 2][3].toString());
 						LOG.debug(daten[i + 2][6].toString());
@@ -147,8 +152,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 					// Anwendungs-Daten (falls existent)
 					if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][6] = new JLabel(daten[i + 3][6].toString());
-						messageDetailsTable[1][6] = new JLabel(daten[i + 3][4].toString());
+						messageDetailsTable1[2][6] = new JLabel(daten[i + 3][6].toString());
+						messageDetailsTable1[1][6] = new JLabel(daten[i + 3][4].toString());
 						LOG.debug(daten[i + 3][6].toString());
 						LOG.debug(daten[i + 3][4].toString());
 					}
@@ -159,37 +164,35 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 		// Wenn der ausgewählte Knoten ein Vermittlungsrechner ist
 		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem) {
-			Vermittlungsrechner knoten = (Vermittlungsrechner) systemSoftware.getKnoten();
-			List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
-
+			
 			for (int i = 0; i < daten.length; i++) {
 				if (daten[i][0].equals(selectedFrameNumberString)) {
 					// Netzzugangs-Daten
-					messageDetailsTable[2][2] = new JLabel(daten[i][2].toString());
-					messageDetailsTable[3][2] = new JLabel(daten[i][3].toString());
-					messageDetailsTable[4][2] = new JLabel(daten[i][6].toString());
+					messageDetailsTable1[2][2] = new JLabel(daten[i][2].toString());
+					messageDetailsTable1[3][2] = new JLabel(daten[i][3].toString());
+					messageDetailsTable1[4][2] = new JLabel(daten[i][6].toString());
 					LOG.debug(daten[i][2].toString());
 					LOG.debug(daten[i][3].toString());
 					LOG.debug(daten[i][6].toString());
 
 					// Vermittlungs-Daten (falls existent)
 					if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][4] = new JLabel(daten[i + 1][2].toString());
-						messageDetailsTable[3][4] = new JLabel(daten[i + 1][3].toString());
-						messageDetailsTable[4][4] = new JLabel(daten[i + 1][6].toString());
-						messageDetailsTable[1][3] = new JLabel(daten[i + 1][4].toString());
+						messageDetailsTable1[2][4] = new JLabel(daten[i + 1][2].toString());
+						messageDetailsTable1[3][4] = new JLabel(daten[i + 1][3].toString());
+						messageDetailsTable1[4][4] = new JLabel(daten[i + 1][6].toString());
+						messageDetailsTable1[1][3] = new JLabel(daten[i + 1][4].toString());
 						LOG.debug(daten[i + 1][2].toString());
 						LOG.debug(daten[i + 1][3].toString());
 						LOG.debug(daten[i + 1][6].toString());
 						LOG.debug(daten[i + 1][4].toString());
 					}
-
+						
 					// Transport-Daten (falls existent)
 					if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][6] = new JLabel(daten[i + 2][2].toString());
-						messageDetailsTable[3][6] = new JLabel(daten[i + 2][3].toString());
-						messageDetailsTable[4][6] = new JLabel(daten[i + 2][6].toString());
-						messageDetailsTable[1][3] = new JLabel(daten[i + 2][4].toString());
+						messageDetailsTable1[2][5] = new JLabel(daten[i + 2][2].toString());
+						messageDetailsTable1[3][5] = new JLabel(daten[i + 2][3].toString());
+						messageDetailsTable1[4][5] = new JLabel(daten[i + 2][6].toString());
+						messageDetailsTable1[1][5] = new JLabel(daten[i + 2][4].toString());
 						LOG.debug(daten[i + 2][2].toString());
 						LOG.debug(daten[i + 2][3].toString());
 						LOG.debug(daten[i + 2][6].toString());
@@ -198,14 +201,20 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 					// Anwendungs-Daten (falls existent)
 					if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberString)) {
-						messageDetailsTable[2][7] = new JLabel(daten[i + 3][6].toString());
-						messageDetailsTable[1][3] = new JLabel(daten[i + 3][4].toString());
+						messageDetailsTable1[2][6] = new JLabel(daten[i + 3][6].toString());
+						messageDetailsTable1[1][6] = new JLabel(daten[i + 3][4].toString());
 						LOG.debug(daten[i + 3][6].toString());
 						LOG.debug(daten[i + 3][4].toString());
 					}
 					break;
 				}
 			}
+			
+			// messageDetailsTable2 unterscheidet sich nur auf der Netzzugangs-Ebene von messageDetailsTable1.
+			// Deshalb wird sie hier geklont und dann abgeändert.
+			messageDetailsTable2 = messageDetailsTable1.clone();
+			
+			// Netzzugangs-Daten für messageDetailsTable2 abändern gemäss neuem Konzept
 		}
 
 		// Wenn der ausgewählte Knoten ein Heimrouter ist
@@ -215,6 +224,24 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 			// to be continued...
 		}
+	}
+
+	/**
+	 * Diese Methode dient dazu, dasjenige Frame aus dem Datenaustausch (Lauscher)
+	 * der anderen Netzwerkarten eines Routers zu finden, welches in der Transport-
+	 * und Anwendungsschicht identische Daten hat.
+	 * 
+	 * Schaut man sich also ein ankommendes Frame an, sucht man das zugehörige
+	 * weitergeleitete Frame. Schaut man sich ein weitergeleitetes Frame an, sucht
+	 * man das zugehörige ankommende Frame.
+	 */
+	private ArrayList<Object[]> findFrameOnNIC(NetzwerkInterface netzwerkInterface) {
+		ArrayList<Object[]> frameData;
+
+		// Lauscher-Daten holen
+		Object[][] daten = Lauscher.getLauscher().getDaten(netzwerkInterface.getMac(), false, 0);
+
+		return frameData;
 	}
 
 	// Methode kann später gelöscht werden. Nur als Hilfe gedacht für den Moment.

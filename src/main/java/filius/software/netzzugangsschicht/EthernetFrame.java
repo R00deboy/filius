@@ -54,6 +54,12 @@ public class EthernetFrame implements Serializable {
 
     /** die Nutzdaten */
     private Object daten;
+    
+    /** Rückverfolgung für die Schichten-Visualisierung */
+    private EthernetFrame previousFrame;
+    
+    /** Rückverfolgung für die Schichten-Visualisierung */
+    private EthernetFrame nextFrame;
 
     private Set<String> readByLauscherForMac = new HashSet<>();
 

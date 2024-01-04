@@ -27,6 +27,7 @@ package filius.software.vermittlungsschicht;
 
 import java.io.Serializable;
 
+import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.transportschicht.Segment;
 
 /**
@@ -44,6 +45,9 @@ public class IpPaket implements Serializable, Cloneable {
     private int ttl;
     final private int protocol;
     private Segment data;
+    
+    /** Rückverfolgung für die Schichten-Visualisierung */
+    private EthernetFrame unpackedFromFrame;
 
     public IpPaket(int protocol) {
         this.protocol = protocol;

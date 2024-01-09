@@ -111,4 +111,8 @@ public class IpPaket implements Serializable, Cloneable {
     public void decrementTtl() {
         ttl--;
     }
+    
+    public void setUnpackedFromFrame(EthernetFrame frame) {
+    	this.unpackedFromFrame = frame;
+    }
 }

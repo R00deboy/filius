@@ -105,4 +105,12 @@ public class EthernetFrame implements Serializable {
         return "[" + "src=" + quellMacAdresse + ", " + "dest=" + zielMacAdresse + ", " + "type=" + typ
                 + (daten != null ? " | " + daten : "") + "]";
     }
+    
+    public void setPreviousFrame(EthernetFrame frame) {
+    	this.previousFrame = frame;
+    }
+    
+    public void setNextFrame(EthernetFrame frame) {
+    	this.nextFrame = frame;
+    }
 }

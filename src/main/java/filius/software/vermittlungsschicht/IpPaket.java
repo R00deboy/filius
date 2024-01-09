@@ -115,4 +115,8 @@ public class IpPaket implements Serializable, Cloneable {
     public void setUnpackedFromFrame(EthernetFrame frame) {
     	this.unpackedFromFrame = frame;
     }
+    
+    public EthernetFrame getUnpackedFromFrame() {
+    	return this.unpackedFromFrame;
+    }
 }

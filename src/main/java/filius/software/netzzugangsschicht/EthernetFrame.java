@@ -113,4 +113,12 @@ public class EthernetFrame implements Serializable {
     public void setNextFrame(EthernetFrame frame) {
     	this.nextFrame = frame;
     }
+    
+    public EthernetFrame getPreviousFrame() {
+    	return this.previousFrame;
+    }
+    
+    public EthernetFrame getNextFrame() {
+    	return this.nextFrame;
+    }
 }

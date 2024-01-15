@@ -489,4 +489,17 @@ public class Lauscher implements I18n {
     public void resetDroppedDataUnits() {
         droppedDataUnits.clear();
     }
+    
+    
+    /**
+     * 
+     * @author Christoph Irniger
+     * @param interfaceId MAC-Adresse des Interfaces
+     * @param frameNumber Nummer des Frames im Lauscher (GUI: Stelle des Frames im Datenaustausch)
+     * @return Das EthernetFrame zur angegebenen frameNumber
+     */
+    public EthernetFrame getFrame(String interfaceId, int frameNumber) {
+    	Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber);
+    	return (EthernetFrame) frameMitZeitstempel[1];
+    }
 }

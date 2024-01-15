@@ -70,7 +70,7 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
 
         if (etp.getTyp().equals(EthernetFrame.IP)) {
             IpPaket ipPacket = (IpPaket) etp.getDaten();
-            ipPacket.setUnpackedFromFrame(etp);
+            ipPacket.setUnpackedFromFrame(etp);  // backtracking for visualisation of layers
             if (ipPacket.getProtocol() == IcmpPaket.ICMP_PROTOCOL) {
                 synchronized (ethernet.holeICMPPuffer()) {
                     ethernet.holeICMPPuffer().add((IcmpPaket) ipPacket);

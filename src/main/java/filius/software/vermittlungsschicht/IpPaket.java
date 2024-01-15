@@ -65,6 +65,7 @@ public class IpPaket implements Serializable, Cloneable {
         clone.empfaenger = empfaenger;
         clone.sender = sender;
         clone.data = data;
+        clone.unpackedFromFrame = unpackedFromFrame;
     }
 
     public String getEmpfaenger() {

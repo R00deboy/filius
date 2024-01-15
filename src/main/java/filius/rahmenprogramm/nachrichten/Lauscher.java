@@ -495,11 +495,31 @@ public class Lauscher implements I18n {
      * 
      * @author Christoph Irniger
      * @param interfaceId MAC-Adresse des Interfaces
-     * @param frameNumber Nummer des Frames im Lauscher (GUI: Stelle des Frames im Datenaustausch)
+     * @param frameNumber Nummer des Frames im Lauscher (GUI: Stelle des Frames im Datenaustausch), beginnt bei 1
      * @return Das EthernetFrame zur angegebenen frameNumber
      */
     public EthernetFrame getFrame(String interfaceId, int frameNumber) {
-    	Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber);
+    	Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);
     	return (EthernetFrame) frameMitZeitstempel[1];
+    }
+    
+    /**
+     * 
+     * @author Christoph Irniger
+     * @param interfaceId MAC-Adresse des Interfaces
+     * @param frame Das EthernetFrame zur angegebenen frameNumber
+     * @return 	Nummer des Frames im Lauscher (GUI: Stelle des Frames im Datenaustausch), beginnt bei 1
+     */
+    public int getFrameNumber(String interfaceId, EthernetFrame frame) {
+    	LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
+    	int frameNumber;
+    	
+    	// Gehe die Liste durch und suche nach dem Frame
+    	for (frameNumber = 0; frameNumber < framesMitZeitstempel.size() - 1; frameNumber++) {
+    		if (((EthernetFrame) framesMitZeitstempel.get(frameNumber)[1]).equals(frame)) {
+    			break;
+    		}
+    	}
+    	return frameNumber + 1;
     }
 }

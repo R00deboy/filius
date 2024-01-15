@@ -87,7 +87,7 @@ public class Ethernet extends Protokoll {
     }
 
     /**
-     * sendet Pakete ueber als Ethernet-Frame weiter. Zuerst wird dazu ueberprueft, ob die Ziel-MAC-Adresse eine eigene
+     * Sendet Pakete als Ethernet-Frame weiter. Zuerst wird dazu ueberprueft, ob die Ziel-MAC-Adresse eine eigene
      * Netzwerkkarte adressiert. Wenn dies nicht der Fall ist, wird der Frame ueber die Netzwerkkarte verschickt, die
      * durch die Quell-MAC-Adresse spezifiziert wird.
      */
@@ -98,6 +98,21 @@ public class Ethernet extends Protokoll {
         boolean gesendet = false;
 
         ethernetFrame = new EthernetFrame(daten, startMAC, zielMAC, typ);
+        
+        if (daten instanceof IcmpPaket) {
+        	EthernetFrame unpackedFromFrame = ((IcmpPaket) daten).getUnpackedFromFrame();
+        	if (unpackedFromFrame != null) {
+        		ethernetFrame.setPreviousFrame(unpackedFromFrame);
+        		unpackedFromFrame.setNextFrame(ethernetFrame);
+        	}
+        }
+        else if (daten instanceof IpPaket) {
+        	EthernetFrame unpackedFromFrame = ((IpPaket) daten).getUnpackedFromFrame();
+        	if (unpackedFromFrame != null) {
+        		ethernetFrame.setPreviousFrame(unpackedFromFrame);
+        		unpackedFromFrame.setNextFrame(ethernetFrame);
+        	}
+        }
 
         for (NetzwerkInterface nic : ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces()) {
             if (nic.getMac().equalsIgnoreCase(zielMAC)) {

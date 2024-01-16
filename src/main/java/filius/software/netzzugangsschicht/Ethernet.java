@@ -97,8 +97,9 @@ public class Ethernet extends Protokoll {
         EthernetFrame ethernetFrame;
         boolean gesendet = false;
 
-        ethernetFrame = new EthernetFrame(daten, startMAC, zielMAC, typ);
+        ethernetFrame = new EthernetFrame(daten, startMAC, zielMAC, typ, null, null);
         
+        // setze previousFrame und nextFrame für Schichten-Visualisierung
         if (daten instanceof IcmpPaket) {
         	EthernetFrame unpackedFromFrame = ((IcmpPaket) daten).getUnpackedFromFrame();
         	if (unpackedFromFrame != null) {

@@ -27,6 +27,8 @@ package filius.software.transportschicht;
 
 import java.io.Serializable;
 
+import filius.software.vermittlungsschicht.ArpPaket;
+
 @SuppressWarnings("serial")
 public class Segment implements Serializable {
 
@@ -65,5 +67,28 @@ public class Segment implements Serializable {
 
     public void setZielPort(int zielPort) {
         this.zielPort = zielPort;
+    }
+    
+    /**
+	 * Gleich, wenn protokollTyp, operation, senderMAC, senderIP, targetMAC und targetIP gleich sind.
+	 */    
+    @Override
+    public boolean equals(Object o) {
+ 
+        if (o == this) {
+            return true;
+        }
+ 
+        if (!(o instanceof Segment)) {
+            return false;
+        }
+        else {
+        	Segment segment = (Segment) o;
+			
+			return segment.quellPort == this.quellPort &&
+					segment.zielPort == this.zielPort &&
+					segment.pruefSumme == this.pruefSumme &&
+					segment.daten.equals(this.daten);
+		}
     }
 }

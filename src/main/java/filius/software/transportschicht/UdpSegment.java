@@ -45,41 +45,41 @@ public class UdpSegment extends Segment implements Serializable {
 	}
 	
 	/**
-	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn laenge gleich ist.
+	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn laenge gleich
+	 * ist.
+	 * 
+	 * @author Christoph Irniger
 	 */
 	@Override
-    public boolean equals(Object o) {
- 
-        if (o == this) {
-            return true;
-        }
- 
-        if (!(o instanceof UdpSegment)) {
-            return false;
-        }
-        
-     // Zuerst Oberklasse checken
-        if (o instanceof Segment) {
-        	Segment segment = (Segment) o;
-        	
-        	if (segment.equals(this)) {
-        		
-        		// Dann Rest
-        		if (o instanceof UdpSegment) {
-        			UdpSegment udpSegment = (UdpSegment) o;
-        			
-        			return udpSegment.laenge == this.laenge;
-                	}
-        		else {
-        			return false;
-        		}
-        	}
-        	else {
+	public boolean equals(Object o) {
+
+		if (o == this) {
+			return true;
+		}
+
+		if (!(o instanceof UdpSegment)) {
+			return false;
+		}
+
+		// Zuerst Oberklasse checken
+		if (o instanceof Segment) {
+			Segment segment = (Segment) o;
+
+			if (segment.equals(this)) {
+
+				// Dann Rest
+				if (o instanceof UdpSegment) {
+					UdpSegment udpSegment = (UdpSegment) o;
+
+					return udpSegment.laenge == this.laenge;
+				} else {
+					return false;
+				}
+			} else {
 				return false;
 			}
-        }
-        else {
-        	return false;
-        }
-    }
+		} else {
+			return false;
+		}
+	}
 }

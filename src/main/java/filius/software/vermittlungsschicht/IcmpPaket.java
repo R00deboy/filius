@@ -107,25 +107,27 @@ public class IcmpPaket extends IpPaket {
                 + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + "]";
     }
     
-    /**
-	 * Gleich, wenn darunterliegende IpPakete gleich sind und wenn seqNr, icmpType und icmpCode
-	 * gleich sind.
+	/**
+	 * Gleich, wenn darunterliegende IpPakete gleich sind und wenn seqNr, icmpType
+	 * und icmpCode gleich sind.
+	 * 
+	 * @author Christoph Irniger
 	 */
-    @Override
-    public boolean equals(Object o) {
- 
-        if (o == this) {
-            return true;
-        }
- 
-        if (!(o instanceof IcmpPaket)) {
-            return false;
-        }
-        
-     // Zuerst Oberklasse checken
-        if (o instanceof IpPaket) {
-        	IpPaket ipPacket = (IpPaket) o;
-        	
+	@Override
+	public boolean equals(Object o) {
+
+		if (o == this) {
+			return true;
+		}
+
+		if (!(o instanceof IcmpPaket)) {
+			return false;
+		}
+
+		// Zuerst Oberklasse checken
+		if (o instanceof IpPaket) {
+			IpPaket ipPacket = (IpPaket) o;
+
         	if (ipPacket.equals(this)) {
         		
         		// Dann Rest

@@ -147,29 +147,32 @@ public class TcpSegment extends Segment implements Serializable {
 	}
 	
 	/**
-	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn seqNummer, ackNummer, reservedField,
-	 * urg, ack, psh, rst, syn, fin, window, urgentPointer
+	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn seqNummer,
+	 * ackNummer, reservedField, urg, ack, psh, rst, syn, fin, window und
+	 * urgentPointer gleich sind.
+	 * 
+	 * @author Christoph Irniger
 	 */
 	@Override
-    public boolean equals(Object o) {
- 
-        if (o == this) {
-            return true;
-        }
- 
-        if (!(o instanceof TcpSegment)) {
-            return false;
-        }
-        
-     // Zuerst Oberklasse checken
-        if (o instanceof Segment) {
-        	Segment segment = (Segment) o;
-        	
-        	if (segment.equals(this)) {
-        		
-        		// Dann Rest
-        		if (o instanceof TcpSegment) {
-        			TcpSegment tcpSegment = (TcpSegment) o;
+	public boolean equals(Object o) {
+
+		if (o == this) {
+			return true;
+		}
+
+		if (!(o instanceof TcpSegment)) {
+			return false;
+		}
+
+		// Zuerst Oberklasse checken
+		if (o instanceof Segment) {
+			Segment segment = (Segment) o;
+
+			if (segment.equals(this)) {
+
+				// Dann Rest
+				if (o instanceof TcpSegment) {
+					TcpSegment tcpSegment = (TcpSegment) o;
         			
         			return tcpSegment.seqNummer == this.seqNummer &&
 					tcpSegment.ackNummer == this.ackNummer &&

@@ -71,6 +71,8 @@ public class Segment implements Serializable {
     
     /**
 	 * Gleich, wenn protokollTyp, operation, senderMAC, senderIP, targetMAC und targetIP gleich sind.
+	 * 
+	 * @author Christoph Irniger
 	 */    
     @Override
     public boolean equals(Object o) {

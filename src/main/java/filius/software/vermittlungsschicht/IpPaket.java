@@ -121,21 +121,23 @@ public class IpPaket implements Serializable, Cloneable {
     	return this.unpackedFromFrame;
     }
     
-    /**
+	/**
 	 * Gleich, wenn Sender, Empfänger, TTL, Protokoll und Daten gleich sind.
+	 * 
+	 * @author Christoph Irniger
 	 */
-    @Override
-    public boolean equals(Object o) {
- 
-        if (o == this) {
-            return true;
-        }
- 
-        if (!(o instanceof IpPaket)) {
-            return false;
-        }
-        
-        IpPaket packet = (IpPaket) o;
+	@Override
+	public boolean equals(Object o) {
+
+		if (o == this) {
+			return true;
+		}
+
+		if (!(o instanceof IpPaket)) {
+			return false;
+		}
+
+		IpPaket packet = (IpPaket) o;
         
         if (packet.sender.equals(this.sender) &&
         		packet.empfaenger.equals(this.empfaenger) &&

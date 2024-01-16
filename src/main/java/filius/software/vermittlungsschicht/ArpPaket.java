@@ -106,4 +106,29 @@ public class ArpPaket implements Serializable {
     public void setOperation(int operation) {
         this.operation = operation;
     }
+    
+    /**
+	 * Gleich, wenn protokollTyp, operation, senderMAC, senderIP, targetMAC und targetIP gleich sind.
+	 */    
+    @Override
+    public boolean equals(Object o) {
+ 
+        if (o == this) {
+            return true;
+        }
+ 
+        if (!(o instanceof ArpPaket)) {
+            return false;
+        }
+        else {
+			ArpPaket arpPaket = (ArpPaket) o;
+			
+			return arpPaket.protokollTyp == this.protokollTyp &&
+					arpPaket.operation == this.operation &&
+					arpPaket.senderMAC == this.senderMAC &&
+					arpPaket.senderIP == this.senderIP &&
+					arpPaket.targetMAC == this.targetMAC &&
+					arpPaket.targetIP == this.targetIP;
+        }
+    }
 }

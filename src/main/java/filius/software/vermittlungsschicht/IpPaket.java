@@ -120,4 +120,34 @@ public class IpPaket implements Serializable, Cloneable {
     public EthernetFrame getUnpackedFromFrame() {
     	return this.unpackedFromFrame;
     }
+    
+    /**
+	 * Gleich, wenn Sender, Empfänger, TTL, Protokoll und Daten gleich sind.
+	 */
+    @Override
+    public boolean equals(Object o) {
+ 
+        if (o == this) {
+            return true;
+        }
+ 
+        if (!(o instanceof IpPaket)) {
+            return false;
+        }
+        
+        IpPaket packet = (IpPaket) o;
+        
+        if (packet.sender.equals(this.sender) &&
+        		packet.empfaenger.equals(this.empfaenger) &&
+        		packet.ttl == this.ttl &&
+        		packet.protocol == this.protocol) {
+        	
+        	Segment data1 = packet.data;
+        	Segment data2 = this.data;
+        	return data1.equals(data2);
+        }
+        else {
+        	return false;
+        }
+    }
 }

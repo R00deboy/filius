@@ -129,6 +129,9 @@ public class EthernetFrame implements Serializable {
 		return this.nextFrame;
 	}
 	
+	/**
+	 * Gleich, wenn Sender, Empfänger, Typ und Daten gleich sind.
+	 */
     @Override
     public boolean equals(Object o) {
  
@@ -140,34 +143,39 @@ public class EthernetFrame implements Serializable {
             return false;
         }
         
-        EthernetFrame frame = (EthernetFrame) o;
-        
-        if (frame.zielMacAdresse.equals(this.zielMacAdresse) &&
-        		frame.quellMacAdresse.equals(this.quellMacAdresse) &&
-        		frame.typ.equals(this.typ)) {
-        	
-        	Object daten = frame.getDaten();
-        	if (frame.getTyp().equals(IP)) {
-        		if (!(daten instanceof IcmpPaket)) {
-        		
-	        		IpPaket ipPacket1 = (IpPaket) frame.getDaten();
-	        		IpPaket ipPacket2 = (IpPaket) this.daten;
-	        		return ipPacket1.equals(ipPacket2);
-        		}
-        		else {
-        			IcmpPaket icmpPacket1 = (IcmpPaket) frame.getDaten();
-	        		IcmpPaket icmpPacket2 = (IcmpPaket) this.daten;
-	        		return icmpPacket1.equals(icmpPacket2);
-        		}
-        	}
-        	else if (frame.getTyp().equals(ARP)) {
-        		ArpPaket arpPaket1 = (ArpPaket) frame.getDaten();
-        		ArpPaket arpPaket2 = (ArpPaket) this.daten;
-        		return arpPaket1.equals(arpPaket2);
-        	}
-        	else {
-        		return false;
-        	}
+        if (o instanceof EthernetFrame) {
+        	EthernetFrame frame = (EthernetFrame) o;
+            
+            if (frame.zielMacAdresse.equals(this.zielMacAdresse) &&
+            		frame.quellMacAdresse.equals(this.quellMacAdresse) &&
+            		frame.typ.equals(this.typ)) {
+            	
+            	Object daten = frame.daten;
+            	if (frame.typ.equals(IP)) {
+            		if (!(daten instanceof IcmpPaket)) {
+            		
+    	        		IpPaket ipPacket1 = (IpPaket) frame.daten;
+    	        		IpPaket ipPacket2 = (IpPaket) this.daten;
+    	        		return ipPacket1.equals(ipPacket2);
+            		}
+            		else {
+            			IcmpPaket icmpPacket1 = (IcmpPaket) frame.daten;
+    	        		IcmpPaket icmpPacket2 = (IcmpPaket) this.daten;
+    	        		return icmpPacket1.equals(icmpPacket2);
+            		}
+            	}
+            	else if (frame.typ.equals(ARP)) {
+            		ArpPaket arpPaket1 = (ArpPaket) frame.daten;
+            		ArpPaket arpPaket2 = (ArpPaket) this.daten;
+            		return arpPaket1.equals(arpPaket2);
+            	}
+            	else {
+            		return false;
+            	}
+            }
+            else {
+            	return false;
+            }
         }
         else {
         	return false;

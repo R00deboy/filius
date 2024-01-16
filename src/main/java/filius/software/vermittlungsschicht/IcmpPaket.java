@@ -25,6 +25,8 @@
  */
 package filius.software.vermittlungsschicht;
 
+import filius.software.transportschicht.Segment;
+
 /** Diese Klasse umfasst die Attribute eines ICMP-Pakets */
 @SuppressWarnings("serial")
 public class IcmpPaket extends IpPaket {
@@ -103,5 +105,47 @@ public class IcmpPaket extends IpPaket {
     public String toString() {
         return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
                 + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + "]";
+    }
+    
+    /**
+	 * Gleich, wenn darunterliegende IpPakete gleich sind und wenn seqNr, icmpType und icmpCode
+	 * gleich sind.
+	 */
+    @Override
+    public boolean equals(Object o) {
+ 
+        if (o == this) {
+            return true;
+        }
+ 
+        if (!(o instanceof IcmpPaket)) {
+            return false;
+        }
+        
+     // Zuerst Oberklasse checken
+        if (o instanceof IpPaket) {
+        	IpPaket ipPacket = (IpPaket) o;
+        	
+        	if (ipPacket.equals(this)) {
+        		
+        		// Dann Rest
+        		if (o instanceof IcmpPaket) {
+        			IcmpPaket icmpPacket = (IcmpPaket) o;
+        			
+        			return icmpPacket.seqNr == this.seqNr &&
+        					icmpPacket.icmpType == this.icmpType &&
+        					icmpPacket.icmpCode == this.icmpCode;
+                	}
+        		else {
+        			return false;
+        		}
+        	}
+        	else {
+				return false;
+			}
+        }
+        else {
+        	return false;
+        }
     }
 }

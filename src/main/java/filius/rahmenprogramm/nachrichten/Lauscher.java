@@ -40,9 +40,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.itextpdf.text.pdf.parser.LineDashPattern.DashArrayElem;
+
+import filius.hardware.NetzwerkInterface;
+import filius.hardware.knoten.InternetKnoten;
+import filius.hardware.knoten.Knoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.Information;
 import filius.software.netzzugangsschicht.EthernetFrame;
+import filius.software.system.SystemSoftware;
 import filius.software.transportschicht.TcpSegment;
 import filius.software.transportschicht.UdpSegment;
 import filius.software.vermittlungsschicht.ArpPaket;
@@ -179,10 +185,10 @@ public class Lauscher implements I18n {
             daten = frame.getDaten();
         }
         frameMitZeitstempel[1] = new EthernetFrame(daten, frame.getQuellMacAdresse(), frame.getZielMacAdresse(),
-                frame.getTyp());
+                frame.getTyp(), null, null);
         return frameMitZeitstempel;
     }
-
+    
     public Object[][] getDaten(String interfaceId, boolean inheritAddress, int offset) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", getDaten(" + interfaceId + ")");
         Vector<Object[]> vector;
@@ -490,36 +496,110 @@ public class Lauscher implements I18n {
         droppedDataUnits.clear();
     }
     
-    
-    /**
-     * 
-     * @author Christoph Irniger
-     * @param interfaceId MAC-Adresse des Interfaces
-     * @param frameNumber Nummer des Frames im Lauscher (GUI: Stelle des Frames im Datenaustausch), beginnt bei 1
-     * @return Das EthernetFrame zur angegebenen frameNumber
-     */
-    public EthernetFrame getFrame(String interfaceId, int frameNumber) {
-    	Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);
-    	return (EthernetFrame) frameMitZeitstempel[1];
-    }
-    
-    /**
-     * 
-     * @author Christoph Irniger
-     * @param interfaceId MAC-Adresse des Interfaces
-     * @param frame Das EthernetFrame zur angegebenen frameNumber
-     * @return Nummer des Frames im Lauscher (GUI: Stelle des Frames im Datenaustausch), beginnt bei 1
-     */
-    public int getFrameNumber(String interfaceId, EthernetFrame frame) {
-    	LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
-    	int frameNumber;
-    	
-    	// Gehe die Liste durch und suche nach dem Frame
-    	for (frameNumber = 0; frameNumber < framesMitZeitstempel.size() - 1; frameNumber++) {
-    		if (((EthernetFrame) framesMitZeitstempel.get(frameNumber)[1]).equals(frame)) {
-    			break;
-    		}
-    	}
-    	return frameNumber + 1;
-    }
+	/**
+	 * Der Lauscher wird auf anderen Netzwerkkarten nach einem Frame abgesucht,
+	 * welches denselben Inhalt weitertransportiert hat oder diesen Inhalt
+	 * ursprünglich zu diesem Knoten transportiert hat. Diese Methode gibt nur für
+	 * Router (Vermittlungsrechner oder Heimrouter) eine Rückgabe ungleich null
+	 * zurück. Dies auch nur dann, wenn es sich tatsächlich um ein weitergeleitetes
+	 * bzw. nicht für den Knoten bestimmtes bzw. nicht vom Knoten versendetes Paket
+	 * handelt.
+	 * 
+	 * @author Christoph Irniger
+	 * @param originalInterfaceId ursprüngliche Netzwerkkarte
+	 * @param originalFrameNumber Nummer des ursprünglichen Frames
+	 * @return Array mit erstem Eintrag interfaceId und zweitem Eintrag frameNumber
+	 */
+	public Object[] getCorrespondingFrame(String originalInterfaceId, int originalFrameNumber,
+			SystemSoftware systemsoftware) {
+		Object[] interfaceIdAndFrameNumber = new Object[2];
+		EthernetFrame originalFrame = getFrame(originalInterfaceId, originalFrameNumber);
+		
+		if (frameOnlyReceivedOrOnlySent(originalFrame, systemsoftware)) {
+			for (String interfaceId : datenEinheiten.keySet()) {
+				if (!(interfaceId.equals(originalInterfaceId))) {
+
+					for (Object[] element : datenEinheiten.get(interfaceId)) {
+						EthernetFrame frame = (EthernetFrame) element[1];
+
+						if (frame.equalExceptSourceAndDestination(originalFrame)) {
+							interfaceIdAndFrameNumber[0] = (String) interfaceId;
+							interfaceIdAndFrameNumber[1] = getFrameNumber(interfaceId, frame);
+						}
+					}
+				}
+			}
+		}
+		return interfaceIdAndFrameNumber;
+	}
+	
+	/**
+	 * Diese Methode überprüft, ob das IpPaket entweder für den Knoten bestimmt war
+	 * oder das IpPaket vom Knoten ursprünglich erstellt worden war für die
+	 * Versendung. Anders ausgedrückt: Sie überprüft, ob das Paket beim Router nur
+	 * "auf dem Vorbeiweg" ist.
+	 * 
+	 * @param frame Das Frame, das überprüft werden soll.
+	 * @param systemSoftware Die Systemsoftware, die auf dem Knoten läuft.
+	 * @return true oder false
+	 */
+	private boolean frameOnlyReceivedOrOnlySent(EthernetFrame frame, SystemSoftware systemSoftware) {
+		Object daten = frame.getDaten();
+		InternetKnoten knoten = (InternetKnoten) systemSoftware.getKnoten();
+		List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
+		
+		if (daten instanceof ArpPaket) {
+			return true;
+		}
+		else if (daten instanceof IpPaket) {
+			for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
+				// Sender oder Empfänger gleich einer der IP-Adressen des Interfaces --> true
+				if (((IpPaket) daten).getEmpfaenger().equals(netzwerkInterface.getIp()) ||
+						((IpPaket) daten).getSender().equals(netzwerkInterface.getIp())) {
+					return true;
+				}
+			}
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
+
+	/**
+	 * Diese Methode gibt zu einer Interface-ID und der Nummer eines Frames (im
+	 * Datenaustausch-Fenster) das darunterliegende EthernetFrame zurück, das im
+	 * Lauscher (datenEinheiten) gespeichert ist.
+	 * 
+	 * @author Christoph Irniger
+	 * @param interfaceId MAC-Adresse des Interfaces
+	 * @param frameNumber Nummer des Frames im Datenaustausch-Fenster, beginnt bei 1
+	 * @return Das EthernetFrame zur angegebenen frameNumber
+	 */
+	public EthernetFrame getFrame(String interfaceId, int frameNumber) {
+		Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);
+		return (EthernetFrame) frameMitZeitstempel[1];
+	}
+
+	/**
+	 * Diese Methode gibt zu einer Interface-ID und einem Frame die Nummer des
+	 * Frames (im Datenaustausch-Fenster) zurück.
+	 * 
+	 * @author Christoph Irniger
+	 * @param interfaceId MAC-Adresse des Interfaces
+	 * @param frame       Das EthernetFrame zur angegebenen frameNumber
+	 * @return Nummer des Frames im Datenaustausch-Fenster, beginnt bei 1
+	 */
+	private int getFrameNumber(String interfaceId, EthernetFrame frame) {
+		LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
+		int frameNumber;
+
+		// Gehe die Liste durch und suche nach dem Frame
+		for (frameNumber = 0; frameNumber < framesMitZeitstempel.size() - 1; frameNumber++) {
+			if (((EthernetFrame) framesMitZeitstempel.get(frameNumber)[1]).equals(frame)) {
+				break;
+			}
+		}
+		return frameNumber + 1;
+	}
 }

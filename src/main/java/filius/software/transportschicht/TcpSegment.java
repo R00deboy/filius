@@ -48,7 +48,6 @@ public class TcpSegment extends Segment implements Serializable {
 	private int urgentPointer;
 
 	public TcpSegment() {
-
 	}
 
 	public boolean isAck() {
@@ -146,4 +145,54 @@ public class TcpSegment extends Segment implements Serializable {
 	public void setWindow(int window) {
 		this.window = window;
 	}
+	
+	/**
+	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn seqNummer, ackNummer, reservedField,
+	 * urg, ack, psh, rst, syn, fin, window, urgentPointer
+	 */
+	@Override
+    public boolean equals(Object o) {
+ 
+        if (o == this) {
+            return true;
+        }
+ 
+        if (!(o instanceof TcpSegment)) {
+            return false;
+        }
+        
+     // Zuerst Oberklasse checken
+        if (o instanceof Segment) {
+        	Segment segment = (Segment) o;
+        	
+        	if (segment.equals(this)) {
+        		
+        		// Dann Rest
+        		if (o instanceof TcpSegment) {
+        			TcpSegment tcpSegment = (TcpSegment) o;
+        			
+        			return tcpSegment.seqNummer == this.seqNummer &&
+					tcpSegment.ackNummer == this.ackNummer &&
+					tcpSegment.reservedField == this.reservedField &&
+					tcpSegment.urg == this.urg &&
+					tcpSegment.ack == this.ack &&
+					tcpSegment.psh == this.psh &&
+					tcpSegment.rst == this.rst &&
+					tcpSegment.syn == this.syn &&
+					tcpSegment.fin == this.fin &&
+					tcpSegment.window == this.window &&
+					tcpSegment.urgentPointer == this.urgentPointer;
+                	}
+        		else {
+        			return false;
+        		}
+        	}
+        	else {
+				return false;
+			}
+        }
+        else {
+        	return false;
+        }
+    }
 }

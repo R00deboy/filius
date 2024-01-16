@@ -27,6 +27,9 @@ package filius.software.transportschicht;
 
 import java.io.Serializable;
 
+import filius.software.vermittlungsschicht.IcmpPaket;
+import filius.software.vermittlungsschicht.IpPaket;
+
 public class UdpSegment extends Segment implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -40,4 +43,43 @@ public class UdpSegment extends Segment implements Serializable {
 	public void setLaenge(int laenge) {
 		this.laenge = laenge;
 	}
+	
+	/**
+	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn laenge gleich ist.
+	 */
+	@Override
+    public boolean equals(Object o) {
+ 
+        if (o == this) {
+            return true;
+        }
+ 
+        if (!(o instanceof UdpSegment)) {
+            return false;
+        }
+        
+     // Zuerst Oberklasse checken
+        if (o instanceof Segment) {
+        	Segment segment = (Segment) o;
+        	
+        	if (segment.equals(this)) {
+        		
+        		// Dann Rest
+        		if (o instanceof UdpSegment) {
+        			UdpSegment udpSegment = (UdpSegment) o;
+        			
+        			return udpSegment.laenge == this.laenge;
+                	}
+        		else {
+        			return false;
+        		}
+        	}
+        	else {
+				return false;
+			}
+        }
+        else {
+        	return false;
+        }
+    }
 }

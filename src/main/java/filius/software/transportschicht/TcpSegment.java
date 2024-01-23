@@ -125,9 +125,13 @@ public class TcpSegment extends Segment implements Serializable {
 	public boolean isUrg() {
 		return urg;
 	}
-
+	
 	public void setUrg(boolean urg) {
 		this.urg = urg;
+	}
+	
+	public boolean isPsh() {
+		return psh;
 	}
 
 	public int getUrgentPointer() {
@@ -148,13 +152,13 @@ public class TcpSegment extends Segment implements Serializable {
 	
 	/**
 	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn seqNummer,
-	 * ackNummer, reservedField, urg, ack, psh, rst, syn, fin, window und
-	 * urgentPointer gleich sind.
+	 * ackNummer, dataOffset, reservedField, urg, ack, psh, rst, syn, fin, window
+	 * und urgentPointer gleich sind.
 	 * 
 	 * @author Christoph Irniger
 	 */
 	@Override
-	public boolean equals(Object o) {
+	public boolean gleicherInhalt(Object o) {
 
 		if (o == this) {
 			return true;
@@ -168,23 +172,23 @@ public class TcpSegment extends Segment implements Serializable {
 		if (o instanceof Segment) {
 			Segment segment = (Segment) o;
 
-			if (segment.equals(this)) {
+			if (super.gleicherInhalt(segment)) {
 
 				// Dann Rest
 				if (o instanceof TcpSegment) {
 					TcpSegment tcpSegment = (TcpSegment) o;
         			
-        			return tcpSegment.seqNummer == this.seqNummer &&
-					tcpSegment.ackNummer == this.ackNummer &&
-					tcpSegment.reservedField == this.reservedField &&
-					tcpSegment.urg == this.urg &&
-					tcpSegment.ack == this.ack &&
-					tcpSegment.psh == this.psh &&
-					tcpSegment.rst == this.rst &&
-					tcpSegment.syn == this.syn &&
-					tcpSegment.fin == this.fin &&
-					tcpSegment.window == this.window &&
-					tcpSegment.urgentPointer == this.urgentPointer;
+        			return this.getSeqNummer() == tcpSegment.getSeqNummer() &&
+					this.getAckNummer() == tcpSegment.getAckNummer() &&
+					this.getReservedField() == tcpSegment.getReservedField() &&
+					this.isUrg() == tcpSegment.isUrg() &&
+					this.isAck() == tcpSegment.isAck() &&
+					this.isPsh() == tcpSegment.isPsh() &&
+					this.isRst() == tcpSegment.isRst() &&
+					this.isSyn() == tcpSegment.isSyn() &&
+					this.isFin() == tcpSegment.isFin() &&
+					this.getWindow() == tcpSegment.getWindow() &&
+					this.getUrgentPointer() == tcpSegment.getUrgentPointer();
                 	}
         		else {
         			return false;

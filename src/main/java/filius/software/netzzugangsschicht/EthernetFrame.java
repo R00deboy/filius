@@ -128,51 +128,46 @@ public class EthernetFrame implements Serializable {
 	public EthernetFrame getNextFrame() {
 		return this.nextFrame;
 	}
-	
+
 	/**
-	 * Diese Methode prüft, ob ein Frame bis auf Quelle und Empfänger gleich sind.
+	 * Diese Methode prüft, ob ein Frame vom Typ IP denselben Payload, aber eine
+	 * unterschiedliche TTL hat.
 	 * 
 	 * @author Christoph Irniger
-	 * @param frame Das zu vergleichende Frame.
-	 * @return true oder false
 	 */
-	public boolean equalExceptSourceAndDestination(EthernetFrame frame) {
-
-		if (frame.quellMacAdresse.equals(this.quellMacAdresse) || frame.zielMacAdresse.equals(this.zielMacAdresse)) {
-			return false;
-		}
-
-		if (frame.typ.equals(this.typ)) {
-			Object daten = frame.daten;
-			if (frame.typ.equals(IP)) {
-				if (!(daten instanceof IcmpPaket)) {
-					IpPaket ipPacket1 = (IpPaket) frame.daten;
-					IpPaket ipPacket2 = (IpPaket) this.daten;
-					return ipPacket1.equals(ipPacket2);
-				} else {
-					IcmpPaket icmpPacket1 = (IcmpPaket) frame.daten;
-					IcmpPaket icmpPacket2 = (IcmpPaket) this.daten;
-					return icmpPacket1.equals(icmpPacket2);
-				}
-			} else if (frame.typ.equals(ARP)) {
-				ArpPaket arpPaket1 = (ArpPaket) frame.daten;
-				ArpPaket arpPaket2 = (ArpPaket) this.daten;
-				return arpPaket1.equals(arpPaket2);
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
+	public boolean gleicherInhaltAndereTTL(EthernetFrame frame) {
+		boolean[] boolArray = checkPayloadAndTTL(frame);
+		return boolArray[0] && !boolArray[1];
 	}
 
 	/**
-	 * Gleich, wenn Sender, Empfänger, Typ und Daten gleich sind.
+	 * Diese Methode prüft, ob ein Frame des Typs IP senselben Payload bis auf TTL
+	 * hat (erster Eintrag) und ob TTL übereinstimmt (zweiter Eintrag).
 	 * 
 	 * @author Christoph Irniger
 	 */
-	@Override
-	public boolean equals(Object o) {
+	private boolean[] checkPayloadAndTTL(EthernetFrame frame) {
+		Object daten = frame.getDaten();
+		boolean[] boolArray = new boolean[2];
+		
+		if (!(daten instanceof IcmpPaket)) {
+			IpPaket ipPacket1 = (IpPaket) daten;
+			IpPaket ipPacket2 = (IpPaket) this.getDaten();
+			boolArray = ipPacket1.checkContentAndTTL(ipPacket2);
+		} else {
+			IcmpPaket icmpPacket1 = (IcmpPaket) daten;
+			IcmpPaket icmpPacket2 = (IcmpPaket) this.getDaten();
+			boolArray = icmpPacket1.checkContentAndTTL(icmpPacket2);
+		}
+		return boolArray;
+	}
+
+	/**
+	 * Gleich, wenn Sender, Empfänger, Typ und Daten gleich.
+	 * 
+	 * @author Christoph Irniger
+	 */
+	public boolean gleicherInhalt(Object o) {
 
 		if (o == this) {
 			return true;
@@ -185,26 +180,20 @@ public class EthernetFrame implements Serializable {
 		if (o instanceof EthernetFrame) {
 			EthernetFrame frame = (EthernetFrame) o;
 
-			if (frame.zielMacAdresse.equals(this.zielMacAdresse) &&
-					frame.quellMacAdresse.equals(this.quellMacAdresse) &&
-					frame.typ.equals(this.typ)) {
+			// Header checken
+			if (this.getZielMacAdresse().equals(frame.getZielMacAdresse()) &&
+					this.getQuellMacAdresse().equals(frame.getQuellMacAdresse()) &&
+					this.getTyp().equals(frame.getTyp())) {
 
-				Object daten = frame.daten;
-				if (frame.typ.equals(IP)) {
-					if (!(daten instanceof IcmpPaket)) {
-
-						IpPaket ipPacket1 = (IpPaket) frame.daten;
-						IpPaket ipPacket2 = (IpPaket) this.daten;
-						return ipPacket1.equals(ipPacket2);
-					} else {
-						IcmpPaket icmpPacket1 = (IcmpPaket) frame.daten;
-						IcmpPaket icmpPacket2 = (IcmpPaket) this.daten;
-						return icmpPacket1.equals(icmpPacket2);
-					}
-				} else if (frame.typ.equals(ARP)) {
-					ArpPaket arpPaket1 = (ArpPaket) frame.daten;
-					ArpPaket arpPaket2 = (ArpPaket) this.daten;
-					return arpPaket1.equals(arpPaket2);
+				// Daten checken
+				if (frame.getTyp().equals("0x800")) {
+					boolean[] boolArray = checkPayloadAndTTL(frame);
+					// Payload und TTL müssen übereinstimmen
+					return boolArray[0] && boolArray[1];
+				} else if (frame.getTyp().equals("0x806")) {
+					ArpPaket arpPaket1 = (ArpPaket) frame.getDaten();
+					ArpPaket arpPaket2 = (ArpPaket) this.getDaten();
+					return arpPaket1.gleicherInhalt(arpPaket2);
 				} else {
 					return false;
 				}

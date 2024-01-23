@@ -59,25 +59,16 @@ public class EthernetFrame implements Serializable {
 	/** die Nutzdaten */
 	private Object daten;
 
-	/** Rückverfolgung für die Schichten-Visualisierung */
-	private EthernetFrame previousFrame;
-
-	/** Rückverfolgung für die Schichten-Visualisierung */
-	private EthernetFrame nextFrame;
-
 	private Set<String> readByLauscherForMac = new HashSet<>();
 
 	/** Konstruktor zur Initialisierung der Attribute des Frames */
-	public EthernetFrame(Object daten, String quellMacAdresse, String zielMacAdresse, String typ,
-			EthernetFrame previousFrame, EthernetFrame nextFrame) {
+	public EthernetFrame(Object daten, String quellMacAdresse, String zielMacAdresse, String typ) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (EthernetFrame), constr: EthernetFrame(" + daten
 				+ "," + quellMacAdresse + "," + zielMacAdresse + "," + typ + ")");
 		this.zielMacAdresse = zielMacAdresse;
 		this.quellMacAdresse = quellMacAdresse;
 		this.typ = typ;
 		this.daten = daten;
-		this.previousFrame = previousFrame;
-		this.nextFrame = nextFrame;
 	}
 
 	public void setReadByLauscherForMac(String mac) {
@@ -111,22 +102,6 @@ public class EthernetFrame implements Serializable {
 	public String toString() {
 		return "[" + "src=" + quellMacAdresse + ", " + "dest=" + zielMacAdresse + ", " + "type=" + typ
 				+ (daten != null ? " | " + daten : "") + "]";
-	}
-
-	public void setPreviousFrame(EthernetFrame frame) {
-		this.previousFrame = frame;
-	}
-
-	public void setNextFrame(EthernetFrame frame) {
-		this.nextFrame = frame;
-	}
-
-	public EthernetFrame getPreviousFrame() {
-		return this.previousFrame;
-	}
-
-	public EthernetFrame getNextFrame() {
-		return this.nextFrame;
 	}
 
 	/**

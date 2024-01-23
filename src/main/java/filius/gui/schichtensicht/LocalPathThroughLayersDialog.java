@@ -131,9 +131,15 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
 			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
 					this.selectedFrameNumber, this.systemSoftware);
-			fillMessageDetailsTable(messageDetailsTableSent,
-					(String) interfaceIdAndFrameNumber[0],
-					(int) interfaceIdAndFrameNumber[1]);
+			
+			if (interfaceIdAndFrameNumber[0] == null && interfaceIdAndFrameNumber[1] == null) {
+				System.out.println("No corresponding frame was found.");
+			}
+			else {
+				fillMessageDetailsTable(messageDetailsTableSent,
+						(String) interfaceIdAndFrameNumber[0],
+						(int) interfaceIdAndFrameNumber[1]);
+			}
 		}
 	}
 
@@ -152,9 +158,15 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
 			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
 					this.selectedFrameNumber, this.systemSoftware);
-			fillMessageDetailsTable(messageDetailsTableReceived,
-					(String) interfaceIdAndFrameNumber[0],
-					(int) interfaceIdAndFrameNumber[1]);
+			
+			if (interfaceIdAndFrameNumber[0] == null && interfaceIdAndFrameNumber[1] == null) {
+				System.out.println("No corresponding frame was found.");
+			}
+			else {
+				fillMessageDetailsTable(messageDetailsTableReceived,
+						(String) interfaceIdAndFrameNumber[0],
+						(int) interfaceIdAndFrameNumber[1]);
+			}
 		}
 	}
 

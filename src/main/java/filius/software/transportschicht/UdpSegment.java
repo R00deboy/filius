@@ -51,7 +51,7 @@ public class UdpSegment extends Segment implements Serializable {
 	 * @author Christoph Irniger
 	 */
 	@Override
-	public boolean equals(Object o) {
+	public boolean gleicherInhalt(Object o) {
 
 		if (o == this) {
 			return true;
@@ -65,13 +65,13 @@ public class UdpSegment extends Segment implements Serializable {
 		if (o instanceof Segment) {
 			Segment segment = (Segment) o;
 
-			if (segment.equals(this)) {
+			if (super.gleicherInhalt(segment)) {
 
 				// Dann Rest
 				if (o instanceof UdpSegment) {
 					UdpSegment udpSegment = (UdpSegment) o;
 
-					return udpSegment.laenge == this.laenge;
+					return this.getLaenge() == udpSegment.getLaenge();
 				} else {
 					return false;
 				}

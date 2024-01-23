@@ -185,6 +185,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 				messageDetailsTable[2][1] = new JLabel(daten[i][2].toString());
 				messageDetailsTable[3][1] = new JLabel(daten[i][3].toString());
 				messageDetailsTable[4][1] = new JLabel(daten[i][6].toString());
+				System.out.println("--------------------------------Neues Frame--------------------------------");
+				System.out.println(daten[i][2].toString());
+				System.out.println(daten[i][3].toString());
+				System.out.println(daten[i][6].toString());
 
 				// Vermittlungs-Daten (falls existent)
 				if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberAsString)) {
@@ -192,6 +196,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 					messageDetailsTable[3][3] = new JLabel(daten[i + 1][3].toString());
 					messageDetailsTable[4][3] = new JLabel(daten[i + 1][6].toString());
 					messageDetailsTable[1][3] = new JLabel(daten[i + 1][4].toString());
+					System.out.println(daten[i + 1][2].toString());
+					System.out.println(daten[i + 1][3].toString());
+					System.out.println(daten[i + 1][6].toString());
+					System.out.println(daten[i + 1][4].toString());
 				}
 
 				// Transport-Daten (falls existent)
@@ -200,12 +208,18 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 					messageDetailsTable[3][5] = new JLabel(daten[i + 2][3].toString());
 					messageDetailsTable[4][5] = new JLabel(daten[i + 2][6].toString());
 					messageDetailsTable[1][5] = new JLabel(daten[i + 2][4].toString());
+					System.out.println(daten[i + 2][2].toString());
+					System.out.println(daten[i + 2][3].toString());
+					System.out.println(daten[i + 2][6].toString());
+					System.out.println(daten[i + 2][4].toString());
 				}
 
 				// Anwendungs-Daten (falls existent)
 				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
 					messageDetailsTable[2][6] = new JLabel(daten[i + 3][6].toString());
 					messageDetailsTable[1][6] = new JLabel(daten[i + 3][4].toString());
+					System.out.println(daten[i + 3][6].toString());
+					System.out.println(daten[i + 3][4].toString());
 				}
 				break;
 			}

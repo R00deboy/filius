@@ -73,9 +73,8 @@ public class Segment implements Serializable {
 	 * Gleich, wenn protokollTyp, operation, senderMAC, senderIP, targetMAC und targetIP gleich sind.
 	 * 
 	 * @author Christoph Irniger
-	 */    
-    @Override
-    public boolean equals(Object o) {
+	 */
+    public boolean gleicherInhalt(Object o) {
  
         if (o == this) {
             return true;
@@ -86,11 +85,11 @@ public class Segment implements Serializable {
         }
         else {
         	Segment segment = (Segment) o;
-			
-			return segment.quellPort == this.quellPort &&
-					segment.zielPort == this.zielPort &&
-					segment.pruefSumme == this.pruefSumme &&
-					segment.daten.equals(this.daten);
+        	
+			return this.getQuellPort() == segment.getQuellPort() &&
+					this.getZielPort() == segment.getZielPort() &&
+					this.getPruefSumme() == segment.getPruefSumme() &&
+					this.getDaten().equals(segment.getDaten());
 		}
     }
 }

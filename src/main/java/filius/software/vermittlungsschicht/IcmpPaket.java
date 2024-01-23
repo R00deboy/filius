@@ -108,13 +108,34 @@ public class IcmpPaket extends IpPaket {
     }
     
 	/**
+	 * Diese Methode prüft, ob ein IcmpPaket bis auf TTL dasselbe ist (erster
+	 * Eintrag) und ob TTL übereinstimmt (zweiter Eintrag).
+	 * 
+	 * @author Christoph Irniger
+	 */
+	public boolean[] checkContentAndTTL(IcmpPaket packet) {
+		boolean[] boolArray = new boolean[2];
+		
+		// Inhalt checken
+        boolArray[0] = (this.getSender().equals(packet.getSender()) &&
+        		this.getEmpfaenger().equals(packet.getEmpfaenger()) &&
+        		this.getProtocol() == packet.getProtocol() &&
+				this.getSeqNr() == packet.getSeqNr() &&
+				this.getIcmpType() == packet.getIcmpType() &&
+				this.getIcmpCode() == packet.getIcmpCode());
+		// TTL checken
+		boolArray[1] = (this.getTtl() == packet.getTtl());
+		return boolArray;
+	}
+	
+	/**
 	 * Gleich, wenn darunterliegende IpPakete gleich sind und wenn seqNr, icmpType
 	 * und icmpCode gleich sind.
 	 * 
 	 * @author Christoph Irniger
 	 */
 	@Override
-	public boolean equals(Object o) {
+	public boolean gleicherInhalt(Object o) {
 
 		if (o == this) {
 			return true;
@@ -128,15 +149,15 @@ public class IcmpPaket extends IpPaket {
 		if (o instanceof IpPaket) {
 			IpPaket ipPacket = (IpPaket) o;
 
-        	if (ipPacket.equals(this)) {
+        	if (super.gleicherInhalt(ipPacket)) {
         		
         		// Dann Rest
         		if (o instanceof IcmpPaket) {
         			IcmpPaket icmpPacket = (IcmpPaket) o;
         			
-        			return icmpPacket.seqNr == this.seqNr &&
-        					icmpPacket.icmpType == this.icmpType &&
-        					icmpPacket.icmpCode == this.icmpCode;
+        			return this.getSeqNr() == icmpPacket.getSeqNr() &&
+        					this.getIcmpType() == icmpPacket.getIcmpType() &&
+							this.getIcmpCode() == icmpPacket.getIcmpCode();
                 	}
         		else {
         			return false;

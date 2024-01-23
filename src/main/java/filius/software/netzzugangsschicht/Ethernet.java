@@ -97,23 +97,7 @@ public class Ethernet extends Protokoll {
         EthernetFrame ethernetFrame;
         boolean gesendet = false;
 
-        ethernetFrame = new EthernetFrame(daten, startMAC, zielMAC, typ, null, null);
-        
-        // setze previousFrame und nextFrame für Schichten-Visualisierung
-        if (daten instanceof IcmpPaket) {
-        	EthernetFrame unpackedFromFrame = ((IcmpPaket) daten).getUnpackedFromFrame();
-        	if (unpackedFromFrame != null) {
-        		ethernetFrame.setPreviousFrame(unpackedFromFrame);
-        		unpackedFromFrame.setNextFrame(ethernetFrame);
-        	}
-        }
-        else if (daten instanceof IpPaket) {
-        	EthernetFrame unpackedFromFrame = ((IpPaket) daten).getUnpackedFromFrame();
-        	if (unpackedFromFrame != null) {
-        		ethernetFrame.setPreviousFrame(unpackedFromFrame);
-        		unpackedFromFrame.setNextFrame(ethernetFrame);
-        	}
-        }
+        ethernetFrame = new EthernetFrame(daten, startMAC, zielMAC, typ);
 
         for (NetzwerkInterface nic : ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces()) {
             if (nic.getMac().equalsIgnoreCase(zielMAC)) {

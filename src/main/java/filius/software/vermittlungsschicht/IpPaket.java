@@ -29,6 +29,8 @@ import java.io.Serializable;
 
 import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.transportschicht.Segment;
+import filius.software.transportschicht.TcpSegment;
+import filius.software.transportschicht.UdpSegment;
 
 /**
  * Diese Klasse umfasst die Attribute bzw. Felder eines IP-Pakets
@@ -43,7 +45,7 @@ public class IpPaket implements Serializable, Cloneable {
     private String empfaenger;
     /** Time-to-Live */
     private int ttl;
-    final private int protocol;
+    private final int protocol;
     private Segment data;
     
     /** Rückverfolgung für die Schichten-Visualisierung */
@@ -118,16 +120,51 @@ public class IpPaket implements Serializable, Cloneable {
     }
     
     public EthernetFrame getUnpackedFromFrame() {
-    	return this.unpackedFromFrame;
+    	return unpackedFromFrame;
     }
     
+	/**
+	 * Diese Methode prüft, ob ein IpPaket bis auf TTL dasselbe ist (erster
+	 * Eintrag) und ob TTL übereinstimmt (zweiter Eintrag).
+	 * 
+	 * @author Christoph Irniger
+	 */
+	public boolean[] checkContentAndTTL(IpPaket packet) {
+		boolean[] boolArray = new boolean[2];
+		
+		// --Payload checken--
+		// Header checken
+        if (this.getSender().equals(packet.getSender()) &&
+        		this.getEmpfaenger().equals(packet.getEmpfaenger()) &&
+        		this.getProtocol() == packet.getProtocol()) {
+        	
+			// Daten checken
+			Segment segment1 = packet.getSegment();
+			Segment segment2 = this.getSegment();
+			if (segment1 instanceof TcpSegment && segment2 instanceof TcpSegment) {
+				boolArray[0] = ((TcpSegment) segment1).gleicherInhalt((TcpSegment) segment2);
+			}
+			else if (segment1 instanceof UdpSegment && segment2 instanceof UdpSegment) {
+				boolArray[0] = ((UdpSegment) segment1).gleicherInhalt((UdpSegment) segment2);
+			}
+			else {
+				boolArray[0] = false;
+			}
+		} else {
+			boolArray[0] = false;
+		}
+		// --TTL checken--
+		boolArray[1] = (this.getTtl() == packet.getTtl());
+
+		return boolArray;
+	}
+	
 	/**
 	 * Gleich, wenn Sender, Empfänger, TTL, Protokoll und Daten gleich sind.
 	 * 
 	 * @author Christoph Irniger
 	 */
-	@Override
-	public boolean equals(Object o) {
+	public boolean gleicherInhalt(Object o) {
 
 		if (o == this) {
 			return true;
@@ -136,20 +173,9 @@ public class IpPaket implements Serializable, Cloneable {
 		if (!(o instanceof IpPaket)) {
 			return false;
 		}
-
 		IpPaket packet = (IpPaket) o;
         
-        if (packet.sender.equals(this.sender) &&
-        		packet.empfaenger.equals(this.empfaenger) &&
-        		packet.ttl == this.ttl &&
-        		packet.protocol == this.protocol) {
-        	
-        	Segment data1 = packet.data;
-        	Segment data2 = this.data;
-        	return data1.equals(data2);
-        }
-        else {
-        	return false;
-        }
+		boolean[] boolArray = this.checkContentAndTTL(packet);
+		return boolArray[0] && boolArray[1];
     }
 }

@@ -32,64 +32,74 @@ import filius.software.vermittlungsschicht.ArpPaket;
 @SuppressWarnings("serial")
 public class Segment implements Serializable {
 
-    private int quellPort;
-    private int zielPort;
-    private int pruefSumme;
-    private String daten;
+	private int quellPort;
+	private int zielPort;
+	private int pruefSumme;
+	private String daten;
 
-    public String getDaten() {
-        return daten;
-    }
+	public String getDaten() {
+		return daten;
+	}
 
-    public void setDaten(String daten) {
-        this.daten = daten;
-    }
+	public void setDaten(String daten) {
+		this.daten = daten;
+	}
 
-    public int getPruefSumme() {
-        return pruefSumme;
-    }
+	public int getPruefSumme() {
+		return pruefSumme;
+	}
 
-    public void setPruefSumme(int pruefSumme) {
-        this.pruefSumme = pruefSumme;
-    }
+	public void setPruefSumme(int pruefSumme) {
+		this.pruefSumme = pruefSumme;
+	}
 
-    public int getQuellPort() {
-        return quellPort;
-    }
+	public int getQuellPort() {
+		return quellPort;
+	}
 
-    public void setQuellPort(int quellPort) {
-        this.quellPort = quellPort;
-    }
+	public void setQuellPort(int quellPort) {
+		this.quellPort = quellPort;
+	}
 
-    public int getZielPort() {
-        return zielPort;
-    }
+	public int getZielPort() {
+		return zielPort;
+	}
 
-    public void setZielPort(int zielPort) {
-        this.zielPort = zielPort;
-    }
-    
-    /**
-	 * Gleich, wenn protokollTyp, operation, senderMAC, senderIP, targetMAC und targetIP gleich sind.
+	public void setZielPort(int zielPort) {
+		this.zielPort = zielPort;
+	}
+
+	/**
+	 * Gleich, wenn protokollTyp, operation, senderMAC, senderIP, targetMAC und
+	 * targetIP gleich sind.
 	 * 
 	 * @author Christoph Irniger
 	 */
-    public boolean gleicherInhalt(Object o) {
- 
-        if (o == this) {
-            return true;
-        }
- 
-        if (!(o instanceof Segment)) {
-            return false;
-        }
-        else {
-        	Segment segment = (Segment) o;
-        	
-			return this.getQuellPort() == segment.getQuellPort() &&
-					this.getZielPort() == segment.getZielPort() &&
-					this.getPruefSumme() == segment.getPruefSumme() &&
-					this.getDaten().equals(segment.getDaten());
+	public boolean gleicherInhalt(Object o) {
+
+		if (o == this) {
+			return true;
 		}
-    }
+
+		if (!(o instanceof Segment)) {
+			return false;
+		} else {
+			Segment segment = (Segment) o;
+
+			// Beide Daten null -> kein Anwendungsinhalt
+			if (this.getDaten() == null && segment.getDaten() == null) {
+				return this.getQuellPort() == segment.getQuellPort() &&
+						this.getZielPort() == segment.getZielPort() &&
+						this.getPruefSumme() == segment.getPruefSumme();
+			} else if (!(this.getDaten() == null || segment.getDaten() == null)) {
+				return this.getQuellPort() == segment.getQuellPort() &&
+						this.getZielPort() == segment.getZielPort() &&
+						this.getPruefSumme() == segment.getPruefSumme() &&
+						this.getDaten().equals(segment.getDaten());
+			}
+			else {
+				return false;
+			}
+		}
+	}
 }

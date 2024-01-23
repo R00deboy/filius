@@ -112,8 +112,7 @@ public class ArpPaket implements Serializable {
 	 * 
 	 * @author Christoph Irniger
 	 */    
-    @Override
-    public boolean equals(Object o) {
+    public boolean gleicherInhalt(Object o) {
  
         if (o == this) {
             return true;
@@ -125,12 +124,12 @@ public class ArpPaket implements Serializable {
         else {
 			ArpPaket arpPaket = (ArpPaket) o;
 			
-			return arpPaket.protokollTyp == this.protokollTyp &&
-					arpPaket.operation == this.operation &&
-					arpPaket.senderMAC == this.senderMAC &&
-					arpPaket.senderIP == this.senderIP &&
-					arpPaket.targetMAC == this.targetMAC &&
-					arpPaket.targetIP == this.targetIP;
+			return this.getProtokollTyp() == arpPaket.getProtokollTyp() &&
+					this.getOperation() == arpPaket.getOperation() &&
+					this.getSenderMAC() == arpPaket.getSenderMAC() &&
+					this.getSenderIP() == arpPaket.getSenderIP() &&
+					this.getTargetMAC() == arpPaket.getTargetMAC() &&
+					this.getTargetIP() == arpPaket.getTargetIP();
         }
     }
 }

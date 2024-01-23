@@ -1,8 +1,6 @@
 package filius.gui.schichtensicht;
 
 import java.awt.BorderLayout;
-import java.util.List;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -11,13 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.nachrichtensicht.AggregatedMessageTable;
-import filius.hardware.NetzwerkInterface;
-import filius.hardware.knoten.Gateway;
-import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
-import filius.software.netzzugangsschicht.EthernetFrame;
-import filius.software.system.Betriebssystem;
 import filius.software.system.GatewayFirmware;
 import filius.software.system.SystemSoftware;
 import filius.software.system.VermittlungsrechnerBetriebssystem;
@@ -53,10 +46,6 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	private BorderLayout borderLayout;
 
 	private Lauscher lauscher = Lauscher.getLauscher();
-
-	private JOptionPane optionPane; // Nur für Hilfszwecke
-
-	private String datenImport; // Nur für Hilfszwecke
 
 	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
 			int selectedFrameNumber) {

@@ -47,9 +47,6 @@ public class IpPaket implements Serializable, Cloneable {
     private int ttl;
     private final int protocol;
     private Segment data;
-    
-    /** Rückverfolgung für die Schichten-Visualisierung */
-    private EthernetFrame unpackedFromFrame;
 
     public IpPaket(int protocol) {
         this.protocol = protocol;
@@ -67,7 +64,6 @@ public class IpPaket implements Serializable, Cloneable {
         clone.empfaenger = empfaenger;
         clone.sender = sender;
         clone.data = data;
-        clone.unpackedFromFrame = unpackedFromFrame;
     }
 
     public String getEmpfaenger() {
@@ -113,14 +109,6 @@ public class IpPaket implements Serializable, Cloneable {
 
     public void decrementTtl() {
         ttl--;
-    }
-    
-    public void setUnpackedFromFrame(EthernetFrame frame) {
-    	this.unpackedFromFrame = frame;
-    }
-    
-    public EthernetFrame getUnpackedFromFrame() {
-    	return unpackedFromFrame;
     }
     
 	/**

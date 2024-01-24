@@ -581,7 +581,7 @@ public class Lauscher implements I18n {
 	/**
 	 * Diese Methode gibt zu einer Interface-ID und der Nummer eines Frames (im
 	 * Datenaustausch-Fenster) das dazugehörende EthernetFrame zurück, das im
-	 * Lauscher (datenEinheiten) gespeichert ist.
+	 * Lauscher gespeichert ist (datenEinheiten).
 	 * 
 	 * @author Christoph Irniger
 	 * @param interfaceId MAC-Adresse des Interfaces

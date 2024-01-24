@@ -68,7 +68,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	/**
 	 * Füllt die beiden Tabellen messageDetailsTableSent und
-	 * messageDetailsTableReceived mit allen Einträgen.
+	 * messageDetailsTableReceived mit allen für die Visualisierung benötigten Daten
+	 * des/der Frames.
 	 */
 	private void fillMessageDetailsTables() {
 		if (isFrameReceived()) {
@@ -95,6 +96,10 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getZielMacAdresse()));
 	}
 	
+	/**
+	 * Füllt diejenige Tabelle (messageDetailsTableReceived /
+	 * messageDetailsTableSent) aus, welche noch nicht ausgefüllt wurde.
+	 */
 	private void fillOtherTable() {
 		/*
 		 * Falls der Knoten ein Router (Vermittlungsrechner oder Heimrouter) ist und das

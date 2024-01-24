@@ -185,7 +185,7 @@ public class Lauscher implements I18n {
 			daten = frame.getDaten();
 		}
 		frameMitZeitstempel[1] = new EthernetFrame(daten, frame.getQuellMacAdresse(), frame.getZielMacAdresse(),
-				frame.getTyp(), null, null);
+				frame.getTyp());
 		return frameMitZeitstempel;
 	}
 

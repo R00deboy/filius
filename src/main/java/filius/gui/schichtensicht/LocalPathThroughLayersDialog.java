@@ -42,9 +42,9 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private JLabel[][] messageDetailsTableSent = new JLabel[5][8]; // für die versendete Nachricht
 
-	private boolean frameIsOnlyReceived;
+	private boolean received = false;
 
-	private boolean frameIsOnlySent;
+	private boolean sent = false;
 
 	private BorderLayout borderLayout;
 
@@ -57,122 +57,69 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		this.interfaceId = interfaceId;
 		this.selectedFrameNumber = selectedFrameNumber;
 
+		// Lokaler Weg durch die Schichten
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 
 		borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
 
-		// Zellbezeichnungen laden
-		fillMessageDetailsTableTitles(messageDetailsTableSent);
-		fillMessageDetailsTableTitles(messageDetailsTableReceived);
+		fillMessageDetailsTables();
+	}
 
+	/**
+	 * Füllt die beiden Tabellen messageDetailsTableSent und
+	 * messageDetailsTableReceived mit allen Einträgen.
+	 */
+	private void fillMessageDetailsTables() {
 		if (isFrameReceived()) {
-			fillMessageDetailsTablesReceivedFirst();
+			received = true;
+			fillTitles(messageDetailsTableReceived);
+			fillTableWithFrameData(messageDetailsTableReceived, this.interfaceId, this.selectedFrameNumber);
+			fillOtherTable();
 		}
-		// Wenn nicht, wurde es nicht empfangen, sondern versandt.
 		else {
-			fillMessageDetailsTablesSentFirst();
+			sent = true;
+			fillTitles(messageDetailsTableSent);
+			fillTableWithFrameData(messageDetailsTableSent, this.interfaceId, this.selectedFrameNumber);
+			fillOtherTable();
 		}
-
 		showTables(25);
 	}
 
 	/**
-	 * Diese Methode füllt die Tabelle mit denjenigen Titeln (Spalten- und
-	 * Zellbezeichnungen), die für alle Tabellen gleich sind.
-	 */
-	private void fillMessageDetailsTableTitles(JLabel[][] messageDetailsTable) {
-		// Schicht
-		messageDetailsTable[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
-		// Protokoll
-		messageDetailsTable[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
-		// Daten
-		messageDetailsTable[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
-		// Netzzugang
-		messageDetailsTable[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
-		// Vermittlung
-		messageDetailsTable[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
-		// Transport
-		messageDetailsTable[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
-		// Anwendung
-		messageDetailsTable[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
-		// Ethernet
-		messageDetailsTable[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg5"));
-		// Quelle (Netzzugang)
-		messageDetailsTable[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		// Ziel (Netzzugang)
-		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		// Bemerkungen / Details (Netzzugang)
-		messageDetailsTable[4][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
-		// Quelle (Vermittlung)
-		messageDetailsTable[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		// Ziel (Vermittlung)
-		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		// Bemerkungen / Details (Vermittlung)
-		messageDetailsTable[4][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
-		// Quelle (Transport)
-		messageDetailsTable[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
-		// Ziel (Transport)
-		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		// Bemerkungen / Details (Transport)
-		messageDetailsTable[4][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
-	}
-
-	/**
-	 * Prüft, ob das ausgewählte Frame empfangen oder versandt (nicht empfangen)
+	 * Prüft, ob das ausgewählte Frame empfangen oder versandt (= nicht empfangen)
 	 * wurde.
 	 */
-	private Boolean isFrameReceived() {
+	private boolean isFrameReceived() {
 		return (this.interfaceId
 				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getZielMacAdresse()));
 	}
-
-	/**
-	 * Falls das das ausgewählte Frame empfangen wurde.
-	 */
-	private void fillMessageDetailsTablesReceivedFirst() {
-		fillMessageDetailsTable(messageDetailsTableReceived, this.interfaceId, this.selectedFrameNumber);
-
-		/**
+	
+	private void fillOtherTable() {
+		/*
 		 * Falls der Knoten ein Router (Vermittlungsrechner oder Heimrouter) ist und das
 		 * im ankommenden Frame enthaltene (IP- oder ICMP-)Paket nur "auf dem Vorbeiweg"
 		 * (bzw. nicht für den Knoten bestimmt oder von ihm ursprünglich erstellt) ist,
-		 * muss auch die Tabelle messageDetailsTableSent gefüllt werden.
+		 * muss auch die andere Tabelle mit den Daten des dazugehörenden Frames gefüllt
+		 * werden.
 		 */
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
 			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
 					this.selectedFrameNumber, this.systemSoftware);
-
-			if (interfaceIdAndFrameNumber[0] == null && interfaceIdAndFrameNumber[1] == null) {
-				frameIsOnlyReceived = true;
-			} else {
-				fillMessageDetailsTable(messageDetailsTableSent, (String) interfaceIdAndFrameNumber[0],
-						(int) interfaceIdAndFrameNumber[1]);
-			}
-		}
-	}
-
-	/**
-	 * Falls das das ausgewählte Frame gesendet wurde.
-	 */
-	private void fillMessageDetailsTablesSentFirst() {
-		fillMessageDetailsTable(messageDetailsTableSent, this.interfaceId, this.selectedFrameNumber);
-
-		/**
-		 * Falls der Knoten ein Router (Vermittlungsrechner oder Heimrouter) ist und das
-		 * im ankommenden Frame enthaltene (IP- oder ICMP-)Paket nur "auf dem Vorbeiweg"
-		 * (bzw. nicht für den Knoten bestimmt oder von ihm ursprünglich erstellt) ist,
-		 * muss auch die Tabelle messageDetailsTableReceived gefüllt werden.
-		 */
-		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
-			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
-					this.selectedFrameNumber, this.systemSoftware);
-
-			if (interfaceIdAndFrameNumber[0] == null && interfaceIdAndFrameNumber[1] == null) {
-				frameIsOnlySent = true;
-			} else {
-				fillMessageDetailsTable(messageDetailsTableReceived, (String) interfaceIdAndFrameNumber[0],
-						(int) interfaceIdAndFrameNumber[1]);
+			
+			String interfaceId = (String) interfaceIdAndFrameNumber[0];
+			Integer frameNumber = (Integer) interfaceIdAndFrameNumber[1];
+			if (!(interfaceId == null || frameNumber == null)) {
+				if (received == true) {
+					sent = true;
+					fillTitles(messageDetailsTableSent);
+					fillTableWithFrameData(messageDetailsTableSent, interfaceId, frameNumber);
+				}
+				else if (sent == true) {
+					received = true;
+					fillTitles(messageDetailsTableReceived);
+					fillTableWithFrameData(messageDetailsTableReceived, interfaceId, frameNumber);
+				}
 			}
 		}
 	}
@@ -181,7 +128,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	 * Diese Methode füllt die Tabelle mit den Werten für das ausgewählte Interface
 	 * und frame-Nummer.
 	 */
-	private void fillMessageDetailsTable(JLabel[][] messageDetailsTable, String interfaceId, int selectedFrameNumber) {
+	private void fillTableWithFrameData(JLabel[][] messageDetailsTable, String interfaceId, int selectedFrameNumber) {
 		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
 
 		String selectedFrameNumberAsString = Integer.toString(selectedFrameNumber);
@@ -233,6 +180,47 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
+	 * Diese Methode füllt die Tabelle mit denjenigen Titeln (Spalten- und
+	 * Zellbezeichnungen), die für alle Tabellen gleich sind.
+	 */
+	private void fillTitles(JLabel[][] messageDetailsTable) {
+		// Schicht
+		messageDetailsTable[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
+		// Protokoll
+		messageDetailsTable[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
+		// Daten
+		messageDetailsTable[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
+		// Netzzugang
+		messageDetailsTable[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
+		// Vermittlung
+		messageDetailsTable[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
+		// Transport
+		messageDetailsTable[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
+		// Anwendung
+		messageDetailsTable[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
+		// Ethernet
+		messageDetailsTable[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg5"));
+		// Quelle (Netzzugang)
+		messageDetailsTable[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		// Ziel (Netzzugang)
+		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		// Bemerkungen / Details (Netzzugang)
+		messageDetailsTable[4][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		// Quelle (Vermittlung)
+		messageDetailsTable[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		// Ziel (Vermittlung)
+		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		// Bemerkungen / Details (Vermittlung)
+		messageDetailsTable[4][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		// Quelle (Transport)
+		messageDetailsTable[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		// Ziel (Transport)
+		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		// Bemerkungen / Details (Transport)
+		messageDetailsTable[4][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
+	}
+
+	/**
 	 * Diese Methode ist vorläufig zu Testzwecken da, um auf der Programmausgabe die
 	 * Tabellen anzuzeigen.
 	 * 
@@ -244,12 +232,12 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		System.out.println("-------messageDetailsTableSent-------");
 		showTable(breite, messageDetailsTableSent);
 	}
-	
+
 	/**
 	 * Nur zu Testzwecken (siehe showTables())
 	 * 
 	 * @param breite Anzahl Zeichen pro Zelle
-	 * @param table Die zu füllende Tabelle
+	 * @param table  Die zu füllende Tabelle
 	 */
 	private void showTable(int breite, JLabel[][] table) {
 		for (int i = 0; i < 5; i++) {

@@ -552,7 +552,7 @@ public class Lauscher implements I18n {
 	 * Versendung. Anders ausgedrückt: Sie überprüft, ob das Paket beim Router nur
 	 * "auf dem Vorbeiweg" ist.
 	 * 
-	 * @param frame          Das Frame, das überprüft werden soll.
+	 * @param frame Das Frame, das überprüft werden soll.
 	 * @param systemSoftware Die Systemsoftware, die auf dem Knoten läuft.
 	 * @return true oder false
 	 */
@@ -565,8 +565,6 @@ public class Lauscher implements I18n {
 			return true;
 		} else if (daten instanceof IpPaket) {
 			for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
-				// Sender/Empfänger gleich einer der IP-Adressen des Interfaces oder Broadcast
-				// -> true
 				if (((IpPaket) daten).getEmpfaenger().equals(netzwerkInterface.getIp())
 						|| ((IpPaket) daten).getSender().equals(netzwerkInterface.getIp())
 						|| ((IpPaket) daten).getEmpfaenger().equals("255.255.255.255")) {

@@ -495,11 +495,12 @@ public class Lauscher implements I18n {
 	/**
 	 * Der Lauscher wird auf anderen Netzwerkkarten nach einem Frame abgesucht,
 	 * welches denselben Inhalt weitertransportiert hat oder diesen Inhalt
-	 * ursprünglich zu diesem Knoten transportiert hat. Diese Methode gibt nur für
-	 * Router (Vermittlungsrechner oder Heimrouter) eine Rückgabe ungleich null
-	 * zurück. Dies auch nur dann, wenn es sich tatsächlich um ein weitergeleitetes
-	 * bzw. nicht für den Knoten bestimmtes bzw. nicht vom Knoten versendetes Paket
-	 * handelt.
+	 * ursprünglich zu diesem Knoten transportiert hat. Eine Rückgabe eines
+	 * Object[], wessen Einträge nicht beide den null-Pointer enthalten, gibt es
+	 * nur, wenn es sich beim Host um einen Router (Vermittlungsrechner oder
+	 * Heimrouter) handelt und es sich beim Frame zusätzlich um ein Frame "auf der
+	 * Durchreise" ist (wenn also Ziel-IP und Quell-IP beide nicht der IP des
+	 * Routers entsprechen).
 	 * 
 	 * @author Christoph Irniger
 	 * @param originalInterfaceId ursprüngliche Netzwerkkarte
@@ -537,7 +538,7 @@ public class Lauscher implements I18n {
 								}
 							}								
 							interfaceIdAndFrameNumber[0] = (String) interfaceId;
-							interfaceIdAndFrameNumber[1] = frameNumber + 1;
+							interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
 						}
 					}
 				}

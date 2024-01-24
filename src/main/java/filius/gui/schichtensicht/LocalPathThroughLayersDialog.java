@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +38,13 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private final int selectedFrameNumber; // beginnt bei 1
 
-	private JLabel[][] messageDetailsTableReceived = new JLabel[5][8];  // für die ankommende Nachricht
+	private JLabel[][] messageDetailsTableReceived = new JLabel[5][8]; // für die ankommende Nachricht
 
-	private JLabel[][] messageDetailsTableSent = new JLabel[5][8];  // für die versendete Nachricht
+	private JLabel[][] messageDetailsTableSent = new JLabel[5][8]; // für die versendete Nachricht
+
+	private boolean frameIsOnlyReceived;
+
+	private boolean frameIsOnlySent;
 
 	private BorderLayout borderLayout;
 
@@ -64,12 +67,14 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		fillMessageDetailsTableTitles(messageDetailsTableReceived);
 
 		if (isFrameReceived()) {
-			fillMessageDetailsTablesReceived();
+			fillMessageDetailsTablesReceivedFirst();
 		}
 		// Wenn nicht, wurde es nicht empfangen, sondern versandt.
 		else {
-			fillMessageDetailsTablesSent();
+			fillMessageDetailsTablesSentFirst();
 		}
+
+		showTables(25);
 	}
 
 	/**
@@ -77,23 +82,40 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	 * Zellbezeichnungen), die für alle Tabellen gleich sind.
 	 */
 	private void fillMessageDetailsTableTitles(JLabel[][] messageDetailsTable) {
+		// Schicht
 		messageDetailsTable[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
+		// Protokoll
 		messageDetailsTable[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
+		// Daten
 		messageDetailsTable[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
+		// Netzzugang
 		messageDetailsTable[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
+		// Vermittlung
 		messageDetailsTable[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
+		// Transport
 		messageDetailsTable[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
+		// Anwendung
 		messageDetailsTable[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
-		messageDetailsTable[1][0] = new JLabel(messages.getString("rp_lauscher_msg5"));
+		// Ethernet
+		messageDetailsTable[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg5"));
+		// Quelle (Netzzugang)
 		messageDetailsTable[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		// Ziel (Netzzugang)
 		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		// Bemerkungen / Details (Netzzugang)
+		messageDetailsTable[4][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		// Quelle (Vermittlung)
 		messageDetailsTable[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		// Ziel (Vermittlung)
 		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		// Bemerkungen / Details (Vermittlung)
+		messageDetailsTable[4][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		// Quelle (Transport)
 		messageDetailsTable[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		// Ziel (Transport)
 		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
-		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		// Bemerkungen / Details (Transport)
+		messageDetailsTable[4][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
 	}
 
 	/**
@@ -108,7 +130,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	/**
 	 * Falls das das ausgewählte Frame empfangen wurde.
 	 */
-	private void fillMessageDetailsTablesReceived() {
+	private void fillMessageDetailsTablesReceivedFirst() {
 		fillMessageDetailsTable(messageDetailsTableReceived, this.interfaceId, this.selectedFrameNumber);
 
 		/**
@@ -120,13 +142,11 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
 			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
 					this.selectedFrameNumber, this.systemSoftware);
-			
+
 			if (interfaceIdAndFrameNumber[0] == null && interfaceIdAndFrameNumber[1] == null) {
-				System.out.println("No corresponding frame was found.");
-			}
-			else {
-				fillMessageDetailsTable(messageDetailsTableSent,
-						(String) interfaceIdAndFrameNumber[0],
+				frameIsOnlyReceived = true;
+			} else {
+				fillMessageDetailsTable(messageDetailsTableSent, (String) interfaceIdAndFrameNumber[0],
 						(int) interfaceIdAndFrameNumber[1]);
 			}
 		}
@@ -135,7 +155,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	/**
 	 * Falls das das ausgewählte Frame gesendet wurde.
 	 */
-	private void fillMessageDetailsTablesSent() {
+	private void fillMessageDetailsTablesSentFirst() {
 		fillMessageDetailsTable(messageDetailsTableSent, this.interfaceId, this.selectedFrameNumber);
 
 		/**
@@ -147,13 +167,11 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
 			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
 					this.selectedFrameNumber, this.systemSoftware);
-			
+
 			if (interfaceIdAndFrameNumber[0] == null && interfaceIdAndFrameNumber[1] == null) {
-				System.out.println("No corresponding frame was found.");
-			}
-			else {
-				fillMessageDetailsTable(messageDetailsTableReceived,
-						(String) interfaceIdAndFrameNumber[0],
+				frameIsOnlySent = true;
+			} else {
+				fillMessageDetailsTable(messageDetailsTableReceived, (String) interfaceIdAndFrameNumber[0],
 						(int) interfaceIdAndFrameNumber[1]);
 			}
 		}
@@ -170,48 +188,96 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 		for (int i = 0; i < daten.length; i++) {
 			if (daten[i][0].equals(selectedFrameNumberAsString)) {
-				// Netzzugangs-Daten
+				// -----Netzzugangs-Daten-----
+				// Quelle
 				messageDetailsTable[2][1] = new JLabel(daten[i][2].toString());
+				// Ziel
 				messageDetailsTable[3][1] = new JLabel(daten[i][3].toString());
+				// Bemerkungen / Details
 				messageDetailsTable[4][1] = new JLabel(daten[i][6].toString());
-				System.out.println("--------------------------------Neues Frame--------------------------------");
-				System.out.println(daten[i][2].toString());
-				System.out.println(daten[i][3].toString());
-				System.out.println(daten[i][6].toString());
 
-				// Vermittlungs-Daten (falls existent)
+				// -----Vermittlungs-Daten (falls existent)-----
 				if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberAsString)) {
+					// Quelle
 					messageDetailsTable[2][3] = new JLabel(daten[i + 1][2].toString());
+					// Ziel
 					messageDetailsTable[3][3] = new JLabel(daten[i + 1][3].toString());
+					// Bemerkungen / Details
 					messageDetailsTable[4][3] = new JLabel(daten[i + 1][6].toString());
-					messageDetailsTable[1][3] = new JLabel(daten[i + 1][4].toString());
-					System.out.println(daten[i + 1][2].toString());
-					System.out.println(daten[i + 1][3].toString());
-					System.out.println(daten[i + 1][6].toString());
-					System.out.println(daten[i + 1][4].toString());
+					// Protokoll
+					messageDetailsTable[1][2] = new JLabel(daten[i + 1][4].toString());
 				}
 
-				// Transport-Daten (falls existent)
+				// -----Transport-Daten (falls existent)-----
 				if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberAsString)) {
+					// Quelle
 					messageDetailsTable[2][5] = new JLabel(daten[i + 2][2].toString());
+					// Ziel
 					messageDetailsTable[3][5] = new JLabel(daten[i + 2][3].toString());
+					// Bemerkungen / Details
 					messageDetailsTable[4][5] = new JLabel(daten[i + 2][6].toString());
-					messageDetailsTable[1][5] = new JLabel(daten[i + 2][4].toString());
-					System.out.println(daten[i + 2][2].toString());
-					System.out.println(daten[i + 2][3].toString());
-					System.out.println(daten[i + 2][6].toString());
-					System.out.println(daten[i + 2][4].toString());
+					// Protokoll
+					messageDetailsTable[1][4] = new JLabel(daten[i + 2][4].toString());
 				}
 
-				// Anwendungs-Daten (falls existent)
+				// -----Anwendungs-Daten (falls existent)-----
 				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
+					// Protokoll
 					messageDetailsTable[2][6] = new JLabel(daten[i + 3][6].toString());
+					// Daten
 					messageDetailsTable[1][6] = new JLabel(daten[i + 3][4].toString());
-					System.out.println(daten[i + 3][6].toString());
-					System.out.println(daten[i + 3][4].toString());
 				}
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Diese Methode ist vorläufig zu Testzwecken da, um auf der Programmausgabe die
+	 * Tabellen anzuzeigen.
+	 * 
+	 * @param breite Anzahl Zeichen pro Zelle
+	 */
+	private void showTables(int breite) {
+		System.out.println("-----messageDetailsTableReceived-----");
+		showTable(breite, messageDetailsTableReceived);
+		System.out.println("-------messageDetailsTableSent-------");
+		showTable(breite, messageDetailsTableSent);
+	}
+	
+	/**
+	 * Nur zu Testzwecken (siehe showTables())
+	 * 
+	 * @param breite Anzahl Zeichen pro Zelle
+	 * @param table  Die zu füllende Tabelle
+	 */
+	private void showTable(int breite, JLabel[][] table) {
+		for (int i = 0; i < 5; i++) {
+			String line = "";
+			for (int j = 0; j < 8; j++) {
+				JLabel cell = table[i][j];
+				if (!(cell == null)) {
+					String cellContent = cell.getText();
+					int wordlength = cellContent.length();
+					if (wordlength < breite) {
+						line = line.concat(cellContent);
+						for (int k = 0; k < breite - wordlength; k++) {
+							line = line.concat(" ");
+						}
+					} else {
+						for (int k = 0; k < breite; k++) {
+							line = line.concat(" ");
+						}
+					}
+				} else {
+					for (int k = 0; k < breite; k++) {
+						line = line.concat(" ");
+					}
+				}
+
+			}
+			System.out.println(line);
+		}
+		System.out.println("-------------------------------------");
 	}
 }

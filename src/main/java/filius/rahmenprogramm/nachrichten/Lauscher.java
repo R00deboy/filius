@@ -493,9 +493,9 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * Der Lauscher wird auf anderen Netzwerkkarten nach einem Frame abgesucht,
-	 * welches denselben Inhalt weitertransportiert hat oder diesen Inhalt
-	 * ursprünglich zu diesem Knoten transportiert hat. Eine Rückgabe eines
+	 * Der Lauscher wird auf anderen Netzwerkkarten des Knotens nach einem Frame
+	 * abgesucht, welches denselben Inhalt weitertransportiert hat oder diesen
+	 * Inhalt ursprünglich zu diesem Knoten transportiert hat. Eine Rückgabe eines
 	 * Object[], wessen Einträge nicht beide den null-Pointer enthalten, gibt es
 	 * nur, wenn es sich beim Host um einen Router (Vermittlungsrechner oder
 	 * Heimrouter) handelt und es sich beim Frame zusätzlich um ein Frame "auf der
@@ -580,7 +580,7 @@ public class Lauscher implements I18n {
 
 	/**
 	 * Diese Methode gibt zu einer Interface-ID und der Nummer eines Frames (im
-	 * Datenaustausch-Fenster) das darunterliegende EthernetFrame zurück, das im
+	 * Datenaustausch-Fenster) das dazugehörende EthernetFrame zurück, das im
 	 * Lauscher (datenEinheiten) gespeichert ist.
 	 * 
 	 * @author Christoph Irniger

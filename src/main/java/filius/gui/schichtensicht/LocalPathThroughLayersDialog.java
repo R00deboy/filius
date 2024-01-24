@@ -4,10 +4,6 @@ import java.awt.BorderLayout;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import filius.gui.nachrichtensicht.AggregatedMessageTable;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.system.GatewayFirmware;
@@ -28,10 +24,7 @@ import filius.software.system.VermittlungsrechnerBetriebssystem;
  * 
  * @author Christoph Irniger
  */
-
 public class LocalPathThroughLayersDialog extends JDialog implements I18n {
-	private static Logger LOG = LoggerFactory.getLogger(AggregatedMessageTable.class);
-
 	private final SystemSoftware systemSoftware;
 
 	private final String interfaceId;
@@ -48,7 +41,11 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private BorderLayout borderLayout;
 
-	private Lauscher lauscher = Lauscher.getLauscher();
+	private LocalPathThroughLayersVisualisation visualisation;
+
+	private MessageDetailsTableGraphical messageDetailsTableGraphical;
+
+	private static Lauscher lauscher = Lauscher.getLauscher(); // zugriff auf den Lauscher
 
 	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
 			int selectedFrameNumber) {
@@ -64,6 +61,23 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		setLayout(borderLayout);
 
 		fillMessageDetailsTables();
+
+		// Visualisierung in der Mitte
+		visualisation = new LocalPathThroughLayersVisualisation(this, systemSoftware);
+		add(visualisation, BorderLayout.CENTER);
+
+		// Tabelle unten
+		messageDetailsTableGraphical = new MessageDetailsTableGraphical(messageDetailsTableReceived,
+				messageDetailsTableSent);
+		add(messageDetailsTableGraphical, BorderLayout.SOUTH);
+	}
+
+	public JLabel[][] getMessageDetailsTableReceived() {
+		return messageDetailsTableReceived;
+	}
+
+	public JLabel[][] getMessageDetailsTableSent() {
+		return messageDetailsTableSent;
 	}
 
 	/**
@@ -77,8 +91,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			fillTitles(messageDetailsTableReceived);
 			fillTableWithFrameData(messageDetailsTableReceived, this.interfaceId, this.selectedFrameNumber);
 			fillOtherTable();
-		}
-		else {
+		} else {
 			sent = true;
 			fillTitles(messageDetailsTableSent);
 			fillTableWithFrameData(messageDetailsTableSent, this.interfaceId, this.selectedFrameNumber);
@@ -95,7 +108,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		return (this.interfaceId
 				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getZielMacAdresse()));
 	}
-	
+
 	/**
 	 * Füllt diejenige Tabelle (messageDetailsTableReceived /
 	 * messageDetailsTableSent) aus, welche noch nicht ausgefüllt wurde.
@@ -111,7 +124,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
 			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
 					this.selectedFrameNumber, this.systemSoftware);
-			
+
 			String interfaceId = (String) interfaceIdAndFrameNumber[0];
 			Integer frameNumber = (Integer) interfaceIdAndFrameNumber[1];
 			if (!(interfaceId == null || frameNumber == null)) {
@@ -119,8 +132,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 					sent = true;
 					fillTitles(messageDetailsTableSent);
 					fillTableWithFrameData(messageDetailsTableSent, interfaceId, frameNumber);
-				}
-				else if (sent == true) {
+				} else if (sent == true) {
 					received = true;
 					fillTitles(messageDetailsTableReceived);
 					fillTableWithFrameData(messageDetailsTableReceived, interfaceId, frameNumber);

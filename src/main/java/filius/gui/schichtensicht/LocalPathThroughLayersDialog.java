@@ -249,7 +249,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	 * Nur zu Testzwecken (siehe showTables())
 	 * 
 	 * @param breite Anzahl Zeichen pro Zelle
-	 * @param table  Die zu füllende Tabelle
+	 * @param table Die zu füllende Tabelle
 	 */
 	private void showTable(int breite, JLabel[][] table) {
 		for (int i = 0; i < 5; i++) {

@@ -292,7 +292,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		return menu.getComponentCount();
 	}
 
-	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." aktivieren
+	// activate context menu entries "lokaler Weg ..." and "globaler Weg ..."
 	private void enablePathOptions() {
 		if (!menu.getComponent(0).isEnabled() && !menu.getComponent(1).isEnabled()) {
 			menu.getComponent(0).setEnabled(true);
@@ -300,7 +300,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		}
 	}
 	
-	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." deaktivieren
+	// deactivate context menu entries "lokaler Weg ..." and "globaler Weg ..."
 	private void disablePathOptions() {
 		if (menu.getComponent(0).isEnabled() && menu.getComponent(1).isEnabled()) {
 			menu.getComponent(0).setEnabled(false);
@@ -480,7 +480,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 	
 	/*
-	 *  Die folgende Methode zeigt die lokale Ansicht der Schichten-Visualisierung an.
+	 *  Local view of the path through the layers
 	 */
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware,
 			int selectedFrameNumber) {
@@ -502,15 +502,14 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 	
 	/**
-	 *  Die folgende Methode zeigt die globale Ansicht der Schichten-Visualisierung an.
+	 *  Global view of the path through the layers
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		
 	}
 	
 	/**
-	 *  Überprüfung, ob Nachricht mit der Nummer messageNumber bei der Ziel-IP angekommen ist.
-	 *  (für globalen Weg durch die Schichten)
+	 *  Verification that message has arrived at destination IP address (for global view)
 	 */
 	private Boolean hasMessageArrived(int messageNumber) {
 		return false;

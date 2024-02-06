@@ -145,11 +145,11 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 					
 					// Falls der Rechtsklick im leeren Bereich gemacht wurde
 					if (target.selectedRowByRightclick == -1) {  
-						setPathOptionsDisabled();
+						disablePathOptions();
 					}
 					else {
 						target.setRowSelectionInterval(target.selectedRowByRightclick, target.selectedRowByRightclick);
-						setPathOptionsEnabled();
+						enablePathOptions();
 					}
 					
 					menu.setVisible(true);
@@ -292,16 +292,16 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		return menu.getComponentCount();
 	}
 
-	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." deaktivieren
-	private void setPathOptionsEnabled() {
+	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." aktivieren
+	private void enablePathOptions() {
 		if (!menu.getComponent(0).isEnabled() && !menu.getComponent(1).isEnabled()) {
 			menu.getComponent(0).setEnabled(true);
 			menu.getComponent(1).setEnabled(true);
 		}
 	}
 	
-	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." aktivieren
-	private void setPathOptionsDisabled() {
+	// Kontextmenü-Einträge "lokaler Weg ..." und "globaler Weg ..." deaktivieren
+	private void disablePathOptions() {
 		if (menu.getComponent(0).isEnabled() && menu.getComponent(1).isEnabled()) {
 			menu.getComponent(0).setEnabled(false);
 			menu.getComponent(1).setEnabled(false);

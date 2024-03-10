@@ -41,7 +41,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 
 	private BorderLayout borderLayout;
 
-	private LocalPathThroughLayersVisualisation visualisation;
+	private LocalPathThroughLayersPanel localPathThroughLayersPanel;
 
 	private MessageDetailsTableGraphical messageDetailsTableGraphical;
 
@@ -63,8 +63,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		fillMessageDetailsTables();
 
 		// Visualisierung in der Mitte
-		visualisation = new LocalPathThroughLayersVisualisation(this, systemSoftware);
-		add(visualisation, BorderLayout.CENTER);
+		localPathThroughLayersPanel = new LocalPathThroughLayersPanel(this, systemSoftware);
+		add(localPathThroughLayersPanel, BorderLayout.CENTER);
 
 		// Tabelle unten
 		messageDetailsTableGraphical = new MessageDetailsTableGraphical(messageDetailsTableReceived,

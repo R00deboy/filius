@@ -12,11 +12,11 @@ import net.miginfocom.swing.MigLayout;
  * 
  * @author Christoph Irniger
  */
-public class LocalPathThroughLayersVisualisation extends JPanel {
+public class LocalPathThroughLayersPanel extends JPanel {
 
 	MigLayout migLayout;
 
-	public LocalPathThroughLayersVisualisation(LocalPathThroughLayersDialog localPathThroughLayersDialog,
+	public LocalPathThroughLayersPanel(LocalPathThroughLayersDialog localPathThroughLayersDialog,
 			SystemSoftware systemSoftware) {
 		super();
 

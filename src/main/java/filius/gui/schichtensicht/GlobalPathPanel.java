@@ -5,6 +5,6 @@ import javax.swing.JPanel;
  * @author Christoph Irniger
  * 
  */
-public class GlobalPathThroughLayersPanel extends JPanel {
+public class GlobalPathPanel extends JPanel {
 
 }

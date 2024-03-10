@@ -1,27 +1,15 @@
 package filius.gui.schichtensicht;
 
 import javax.swing.JPanel;
-
 import filius.software.system.Betriebssystem;
 import filius.software.system.GatewayFirmware;
 import filius.software.system.SystemSoftware;
 import filius.software.system.VermittlungsrechnerBetriebssystem;
-import net.miginfocom.swing.MigLayout;
 
-/**
- * 
- * @author Christoph Irniger
- */
-public class LocalPathThroughLayersPanel extends JPanel {
-
-	MigLayout migLayout;
-
-	public LocalPathThroughLayersPanel(LocalPathThroughLayersDialog localPathThroughLayersDialog,
-			SystemSoftware systemSoftware) {
+public class LocalPathVisualisation extends JPanel {
+	
+	public LocalPathVisualisation(SystemSoftware systemSoftware) {
 		super();
-
-		migLayout = new MigLayout();
-		this.setLayout(migLayout);
 		
 		// Visualisierung, falls Host (Rechner, Notebook)
 		if (systemSoftware instanceof Betriebssystem) {
@@ -32,7 +20,7 @@ public class LocalPathThroughLayersPanel extends JPanel {
 			routerVisualisation();
 		}
 	}
-
+	
 	/**
 	 * Visualisierung eines Hosts (Rechner oder Notebook)
 	 */

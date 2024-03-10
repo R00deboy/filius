@@ -21,7 +21,7 @@ import filius.software.vermittlungsschicht.IpPaket;
  * @author Christoph Irniger
  */
 
-public class GlobalPathThroughLayersDialog extends JDialog implements I18n {
+public class GlobalPathDialog extends JDialog implements I18n {
 	
 	/** 
 	 * Diese Ansicht muss auf der Position des Maus-Rechtsklicks in der Wireshark-Ansicht

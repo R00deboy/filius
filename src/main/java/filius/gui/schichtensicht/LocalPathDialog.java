@@ -24,30 +24,28 @@ import filius.software.system.VermittlungsrechnerBetriebssystem;
  * 
  * @author Christoph Irniger
  */
-public class LocalPathThroughLayersDialog extends JDialog implements I18n {
+public class LocalPathDialog extends JDialog implements I18n {
 	private final SystemSoftware systemSoftware;
 
 	private final String interfaceId;
 
 	private final int selectedFrameNumber; // beginnt bei 1
 
-	private JLabel[][] messageDetailsTableReceived = new JLabel[5][8]; // für die ankommende Nachricht
+	private JLabel[][] messageDetailsReceived = new JLabel[5][8]; // für die ankommende Nachricht
 
-	private JLabel[][] messageDetailsTableSent = new JLabel[5][8]; // für die versendete Nachricht
+	private JLabel[][] messageDetailsSent = new JLabel[5][8]; // für die versendete Nachricht
 
 	private boolean received = false;
 
 	private boolean sent = false;
 
-	private BorderLayout borderLayout;
-
-	private LocalPathThroughLayersPanel localPathThroughLayersPanel;
+	private LocalPathPanel localPathPanel;
 
 	private MessageDetailsTableGraphical messageDetailsTableGraphical;
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // zugriff auf den Lauscher
 
-	public LocalPathThroughLayersDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
+	public LocalPathDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
 			int selectedFrameNumber) {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
@@ -57,47 +55,47 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 		// Lokaler Weg durch die Schichten
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 
-		borderLayout = new BorderLayout(10, 10);
+		BorderLayout borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
 
-		fillMessageDetailsTables();
+		fill();
 
-		// Visualisierung in der Mitte
-		localPathThroughLayersPanel = new LocalPathThroughLayersPanel(this, systemSoftware);
-		add(localPathThroughLayersPanel, BorderLayout.CENTER);
+		// Panel in die Mitte
+		localPathPanel = new LocalPathPanel(this);
+		add(localPathPanel, BorderLayout.CENTER);
 
-		// Tabelle unten
-		messageDetailsTableGraphical = new MessageDetailsTableGraphical(messageDetailsTableReceived,
-				messageDetailsTableSent);
+		// Nachrichtendetails tabellarisch für unten
+		messageDetailsTableGraphical = new MessageDetailsTableGraphical(messageDetailsReceived,
+				messageDetailsSent);
 		add(messageDetailsTableGraphical, BorderLayout.SOUTH);
 	}
 
-	public JLabel[][] getMessageDetailsTableReceived() {
-		return messageDetailsTableReceived;
+	public JLabel[][] getMessageDetailsReceived() {
+		return messageDetailsReceived;
 	}
 
-	public JLabel[][] getMessageDetailsTableSent() {
-		return messageDetailsTableSent;
+	public JLabel[][] getMessageDetailsSent() {
+		return messageDetailsSent;
 	}
 
 	/**
-	 * Füllt die beiden Tabellen {@code messageDetailsTableSent} und
-	 * {@code messageDetailsTableReceived} mit allen für die Visualisierung benötigten Daten
+	 * Füllt die Nachrichtendetails {@code messageDetailsSent} und
+	 * {@code messageDetailsReceived} mit allen für die Visualisierung benötigten Daten
 	 * des/der Frames.
 	 */
-	private void fillMessageDetailsTables() {
+	private void fill() {
 		if (isFrameReceived()) {
 			received = true;
-			fillTitles(messageDetailsTableReceived);
-			fillTableWithFrameData(messageDetailsTableReceived, this.interfaceId, this.selectedFrameNumber);
-			fillOtherTable();
+			fillTitles(messageDetailsReceived);
+			fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
+			fillOther();
 		} else {
 			sent = true;
-			fillTitles(messageDetailsTableSent);
-			fillTableWithFrameData(messageDetailsTableSent, this.interfaceId, this.selectedFrameNumber);
-			fillOtherTable();
+			fillTitles(messageDetailsSent);
+			fillMessageDetails(messageDetailsSent, this.interfaceId, this.selectedFrameNumber);
+			fillOther();
 		}
-		showTables(25);
+		show(25);
 	}
 
 	/**
@@ -110,16 +108,16 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
-	 * Füllt diejenige Tabelle ({@code messageDetailsTableReceived} oder
-	 * {@code messageDetailsTableSent}) aus, welche noch nicht ausgefüllt wurde.
+	 * Füllt diejenigen Nachrichtendetails ({@code messageDetailsReceived} oder
+	 * {@code messageDetailsSent}) aus, welche noch nicht ausgefüllt wurde.
 	 */
-	private void fillOtherTable() {
+	private void fillOther() {
 		/*
 		 * Falls der Knoten ein Router (Vermittlungsrechner oder Heimrouter) ist und das
 		 * im ankommenden Frame enthaltene (IP- oder ICMP-)Paket nur "auf dem Vorbeiweg"
 		 * (bzw. nicht für den Knoten bestimmt oder von ihm ursprünglich erstellt) ist,
-		 * muss auch die andere Tabelle mit den Daten des dazugehörenden Frames gefüllt
-		 * werden.
+		 * müssen auch die anderen Nachrichtendetails mit den Daten des dazugehörenden
+		 * Frames gefüllt werden.
 		 */
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
 			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
@@ -130,22 +128,22 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			if (!(interfaceId == null || frameNumber == null)) {
 				if (received == true) {
 					sent = true;
-					fillTitles(messageDetailsTableSent);
-					fillTableWithFrameData(messageDetailsTableSent, interfaceId, frameNumber);
+					fillTitles(messageDetailsSent);
+					fillMessageDetails(messageDetailsSent, interfaceId, frameNumber);
 				} else if (sent == true) {
 					received = true;
-					fillTitles(messageDetailsTableReceived);
-					fillTableWithFrameData(messageDetailsTableReceived, interfaceId, frameNumber);
+					fillTitles(messageDetailsReceived);
+					fillMessageDetails(messageDetailsReceived, interfaceId, frameNumber);
 				}
 			}
 		}
 	}
 
 	/**
-	 * Füllt die Tabelle mit den Werten für das ausgewählte Interface und
-	 * frame-Nummer.
+	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit den
+	 * Werten für das ausgewählte Interface und die frame-Nummer.
 	 */
-	private void fillTableWithFrameData(JLabel[][] messageDetailsTable, String interfaceId, int selectedFrameNumber) {
+	private void fillMessageDetails(JLabel[][] messageDetailsTable, String interfaceId, int selectedFrameNumber) {
 		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
 
 		String selectedFrameNumberAsString = Integer.toString(selectedFrameNumber);
@@ -197,8 +195,9 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
-	 * Füllt die Tabelle mit denjenigen Titeln (Spalten- und Zellbezeichnungen), die
-	 * für alle Tabellen gleich sind.
+	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit
+	 * denjenigen Titeln (Spalten- und Zellbezeichnungen), die für alle gleich
+	 * (konstant) sind.
 	 */
 	private void fillTitles(JLabel[][] messageDetailsTable) {
 		// Schicht
@@ -238,24 +237,24 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
-	 * Nur zu Testzwecken (um auf der Programmausgabe die Tabellen anzuzeigen).
+	 * Nur zu Testzwecken (um auf der Programmausgabe beide Nachrichtendetails anzuzeigen).
 	 * 
 	 * @param breite Anzahl Zeichen pro Zelle
 	 */
-	private void showTables(int breite) {
-		System.out.println("-----messageDetailsTableReceived-----");
-		showTable(breite, messageDetailsTableReceived);
-		System.out.println("-------messageDetailsTableSent-------");
-		showTable(breite, messageDetailsTableSent);
+	private void show(int breite) {
+		System.out.println("-----messageDetailsReceived-----");
+		showDetails(breite, messageDetailsReceived);
+		System.out.println("-------messageDetailsSent-------");
+		showDetails(breite, messageDetailsSent);
 	}
 
 	/**
-	 * Nur zu Testzwecken (siehe showTables())
+	 * Nur zu Testzwecken (siehe show())
 	 * 
 	 * @param breite Anzahl Zeichen pro Zelle
-	 * @param table  Die zu füllende Tabelle
+	 * @param table  Die zu füllenden Nachrichtendetails
 	 */
-	private void showTable(int breite, JLabel[][] table) {
+	private void showDetails(int breite, JLabel[][] table) {
 		for (int i = 0; i < 5; i++) {
 			String line = "";
 			for (int j = 0; j < 8; j++) {
@@ -283,5 +282,9 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 			System.out.println(line);
 		}
 		System.out.println("-------------------------------------");
+	}
+	
+	public SystemSoftware getSystemSoftware() {
+		return this.systemSoftware;
 	}
 }

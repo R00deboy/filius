@@ -62,7 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
-import filius.gui.schichtensicht.LocalPathThroughLayersDialog;
+import filius.gui.schichtensicht.LocalPathDialog;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
@@ -87,7 +87,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	
 	private int selectedRowByRightclick;
 	
-	private LocalPathThroughLayersDialog localPathThroughLayersDialog;
+	private LocalPathDialog localPathDialog;
 
 	private JCheckBoxMenuItem checkbox;
 
@@ -487,18 +487,18 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
         		+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
 		// basic dialog creation and settings
-		localPathThroughLayersDialog = new LocalPathThroughLayersDialog(
+		localPathDialog = new LocalPathDialog(
 				filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId, selectedFrameNumber);
-		localPathThroughLayersDialog.setTitle(messages.getString("schichten_lokaler_weg_msg1"));
+		localPathDialog.setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 		
         // positioning and size
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        localPathThroughLayersDialog.setLocation(screenSize.width / 2 - 300, screenSize.height / 2 - 200);
+        localPathDialog.setLocation(screenSize.width / 2 - 300, screenSize.height / 2 - 200);
 
-        localPathThroughLayersDialog.setSize(750, 530);
-        localPathThroughLayersDialog.setResizable(true);
+        localPathDialog.setSize(750, 530);
+        localPathDialog.setResizable(true);
 
-        localPathThroughLayersDialog.setVisible(true);
+        localPathDialog.setVisible(true);
 	}
 	
 	/**

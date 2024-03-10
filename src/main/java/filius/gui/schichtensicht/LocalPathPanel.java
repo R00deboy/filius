@@ -1,7 +1,10 @@
 package filius.gui.schichtensicht;
 
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -286,7 +289,19 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	private class MessageDetailsTable extends JPanel {
+		private final GridBagLayout gridBagLayout;
+		private GridBagConstraints c;
+		
 		public MessageDetailsTable(JLabel[][] messageDetailsReceived, JLabel[][] messageDetailsSent) {
+			gridBagLayout = new GridBagLayout();
+			c = new GridBagConstraints();
+			this.setLayout(gridBagLayout);
+			
+			// For each component to be added to this container:
+			// ...Create the component...
+			// ...Set instance variables in the GridBagConstraints instance...
+			JButton button = new JButton("HOIIIIII");
+			this.add(button, c);
 		}
 	}
 }

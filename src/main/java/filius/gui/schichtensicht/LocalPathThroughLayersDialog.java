@@ -81,8 +81,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
-	 * Füllt die beiden Tabellen messageDetailsTableSent und
-	 * messageDetailsTableReceived mit allen für die Visualisierung benötigten Daten
+	 * Füllt die beiden Tabellen {@code messageDetailsTableSent} und
+	 * {@code messageDetailsTableReceived} mit allen für die Visualisierung benötigten Daten
 	 * des/der Frames.
 	 */
 	private void fillMessageDetailsTables() {
@@ -110,8 +110,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
-	 * Füllt diejenige Tabelle (messageDetailsTableReceived /
-	 * messageDetailsTableSent) aus, welche noch nicht ausgefüllt wurde.
+	 * Füllt diejenige Tabelle ({@code messageDetailsTableReceived} oder
+	 * {@code messageDetailsTableSent}) aus, welche noch nicht ausgefüllt wurde.
 	 */
 	private void fillOtherTable() {
 		/*
@@ -142,8 +142,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
-	 * Diese Methode füllt die Tabelle mit den Werten für das ausgewählte Interface
-	 * und frame-Nummer.
+	 * Füllt die Tabelle mit den Werten für das ausgewählte Interface und
+	 * frame-Nummer.
 	 */
 	private void fillTableWithFrameData(JLabel[][] messageDetailsTable, String interfaceId, int selectedFrameNumber) {
 		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
@@ -197,8 +197,8 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
-	 * Diese Methode füllt die Tabelle mit denjenigen Titeln (Spalten- und
-	 * Zellbezeichnungen), die für alle Tabellen gleich sind.
+	 * Füllt die Tabelle mit denjenigen Titeln (Spalten- und Zellbezeichnungen), die
+	 * für alle Tabellen gleich sind.
 	 */
 	private void fillTitles(JLabel[][] messageDetailsTable) {
 		// Schicht
@@ -238,8 +238,7 @@ public class LocalPathThroughLayersDialog extends JDialog implements I18n {
 	}
 
 	/**
-	 * Diese Methode ist vorläufig zu Testzwecken da, um auf der Programmausgabe die
-	 * Tabellen anzuzeigen.
+	 * Nur zu Testzwecken (um auf der Programmausgabe die Tabellen anzuzeigen).
 	 * 
 	 * @param breite Anzahl Zeichen pro Zelle
 	 */

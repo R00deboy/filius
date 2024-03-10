@@ -17,6 +17,8 @@ import filius.software.system.SystemSoftware;
 import filius.software.system.VermittlungsrechnerBetriebssystem;
 
 /**
+ * Panel which is embedded in a JDialog window. Consists of a splitPane
+ * (visualisation in the upper part, message details table in the lower part).
  * 
  * @author Christoph Irniger
  */
@@ -25,18 +27,18 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private final String interfaceId;
 
-	private final int selectedFrameNumber;  // beginnt bei 1
+	private final int selectedFrameNumber; // beginnt bei 1
 
-	private JLabel[][] messageDetailsReceived = new JLabel[5][8];  // für die ankommende Nachricht
-	private JLabel[][] messageDetailsSent = new JLabel[5][8];  // für die versendete Nachricht
+	private JLabel[][] messageDetailsReceived = new JLabel[5][8]; // für die ankommende Nachricht
+	private JLabel[][] messageDetailsSent = new JLabel[5][8]; // für die versendete Nachricht
 
 	private boolean received = false;
 	private boolean sent = false;
 
-	private final LocalPathVisualisation visualisation;  // Visualisierung oben
+	private final LocalPathVisualisation visualisation; // Visualisierung oben
 	private final MessageDetailsTable messageDetailsTable; // Nachrichtendetails unten
 
-	private static Lauscher lauscher = Lauscher.getLauscher();  // zugriff auf den Lauscher
+	private static Lauscher lauscher = Lauscher.getLauscher(); // zugriff auf den Lauscher
 
 	public LocalPathPanel(LocalPathDialog localPathDialog) {
 		super();
@@ -291,12 +293,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private class MessageDetailsTable extends JPanel {
 		private final GridBagLayout gridBagLayout;
 		private GridBagConstraints c;
-		
+
 		public MessageDetailsTable(JLabel[][] messageDetailsReceived, JLabel[][] messageDetailsSent) {
 			gridBagLayout = new GridBagLayout();
 			c = new GridBagConstraints();
 			this.setLayout(gridBagLayout);
-			
+
 			// For each component to be added to this container:
 			// ...Create the component...
 			// ...Set instance variables in the GridBagConstraints instance...

@@ -69,6 +69,10 @@ public class LocalPathDialog extends JDialog implements I18n {
 				messageDetailsSent);
 		add(messageDetailsTableGraphical, BorderLayout.SOUTH);
 	}
+	
+	public SystemSoftware getSystemSoftware() {
+		return this.systemSoftware;
+	}
 
 	public JLabel[][] getMessageDetailsReceived() {
 		return messageDetailsReceived;
@@ -282,9 +286,5 @@ public class LocalPathDialog extends JDialog implements I18n {
 			System.out.println(line);
 		}
 		System.out.println("-------------------------------------");
-	}
-	
-	public SystemSoftware getSystemSoftware() {
-		return this.systemSoftware;
 	}
 }

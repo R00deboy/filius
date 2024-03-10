@@ -25,8 +25,6 @@
  */
 package filius.software.vermittlungsschicht;
 
-import filius.software.transportschicht.Segment;
-
 /** Diese Klasse umfasst die Attribute eines ICMP-Pakets */
 @SuppressWarnings("serial")
 public class IcmpPaket extends IpPaket {

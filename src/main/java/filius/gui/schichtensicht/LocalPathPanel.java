@@ -3,9 +3,6 @@ package filius.gui.schichtensicht;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.TextField;
-
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -43,6 +40,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // Zugriff auf den Lauscher
 
+	private static final String IP_BROADCAST = "255.255.255.255";
+	private static final String IP_SOURCE_DHCP = "0.0.0.0";
+
 	public LocalPathPanel(LocalPathDialog localPathDialog) {
 		super();
 
@@ -64,20 +64,21 @@ public class LocalPathPanel extends JPanel implements I18n {
 		JScrollPane messageDetailsScrollPane;
 		visualisationScrollPane = new JScrollPane(visualisation);
 
-		// if this node is the source of the IP packet
 		String node_ip = ((InternetKnoten) systemSoftware.getKnoten()).getNetzwerkInterfaceByMac(interfaceId).getIp();
-
-		if (messageDetailsSent[2][3] != null && messageDetailsSent[2][3].getText().equals("0.0.0.0")
+		// if this node is the source of the IP packet in the case of a DHCP message,
+		// where source IP is 0.0.0.0.
+		if (messageDetailsSent[2][3] != null && messageDetailsSent[2][3].getText().equals(IP_SOURCE_DHCP)
 				&& messageDetailsSent[2][1] != null && messageDetailsSent[2][1].getText().equals(interfaceId)) {
 			messageDetailsScrollPane = new JScrollPane(sentTable);
 			System.out.println("SENT1!");
+			// if this node is the source of the IP packet
 		} else if (messageDetailsSent[2][3] != null && messageDetailsSent[2][3].getText().equals(node_ip)) {
 			messageDetailsScrollPane = new JScrollPane(sentTable);
 			System.out.println("SENT2!");
 		}
 		// if this node is the destination of the IP packet
 		else if (messageDetailsSent[3][3] != null && ((messageDetailsSent[3][3].getText().equals(node_ip))
-				|| messageDetailsSent[3][3].getText().equals("255.255.255.255"))) {
+				|| messageDetailsSent[3][3].getText().equals(IP_BROADCAST))) {
 			messageDetailsScrollPane = new JScrollPane(receivedTable);
 			System.out.println("REC1!");
 		}
@@ -325,13 +326,13 @@ public class LocalPathPanel extends JPanel implements I18n {
 			gridBagLayout = new GridBagLayout();
 			c = new GridBagConstraints();
 			this.setLayout(gridBagLayout);
-			
+
 			setLabel("hoi", 0, 0, 1);
 		}
-	
+
 		private void setLabel(String text, int x_pos, int y_pos, int width) {
 			JLabel label;
-			
+
 			label = new JLabel(text);
 			c.gridx = x_pos;
 			c.gridy = y_pos;

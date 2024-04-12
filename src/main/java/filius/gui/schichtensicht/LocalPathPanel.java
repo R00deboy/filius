@@ -3,6 +3,7 @@ package filius.gui.schichtensicht;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.TextField;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -10,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.system.GatewayFirmware;
@@ -29,16 +31,17 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private final int selectedFrameNumber; // beginnt bei 1
 
-	private JLabel[][] messageDetailsReceived = new JLabel[5][8]; // für die ankommende Nachricht
 	private JLabel[][] messageDetailsSent = new JLabel[5][8]; // für die versendete Nachricht
+	private JLabel[][] messageDetailsReceived = new JLabel[5][8]; // für die ankommende Nachricht
 
-	private boolean received = false;
 	private boolean sent = false;
+	private boolean received = false;
 
 	private final LocalPathVisualisation visualisation; // Visualisierung oben
-	private final MessageDetailsTable messageDetailsTable; // Nachrichtendetails unten
+	private final MessageDetailsTable sentTable; // Nachrichtendetails für versendete Daten
+	private final MessageDetailsTable receivedTable; // Nachrichtendetails für empfangene Daten
 
-	private static Lauscher lauscher = Lauscher.getLauscher(); // zugriff auf den Lauscher
+	private static Lauscher lauscher = Lauscher.getLauscher(); // Zugriff auf den Lauscher
 
 	public LocalPathPanel(LocalPathDialog localPathDialog) {
 		super();
@@ -53,13 +56,37 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		// initialise visualisation and table for message details
 		visualisation = new LocalPathVisualisation(localPathDialog.getSystemSoftware());
-		messageDetailsTable = new MessageDetailsTable(messageDetailsReceived, messageDetailsSent);
+		sentTable = new MessageDetailsTable(messageDetailsSent);
+		receivedTable = new MessageDetailsTable(messageDetailsReceived);
 
 		// scrollPanes
 		JScrollPane visualisationScrollPane;
 		JScrollPane messageDetailsScrollPane;
 		visualisationScrollPane = new JScrollPane(visualisation);
-		messageDetailsScrollPane = new JScrollPane(messageDetailsTable);
+
+		// if this node is the source of the IP packet
+		String node_ip = ((InternetKnoten) systemSoftware.getKnoten()).getNetzwerkInterfaceByMac(interfaceId).getIp();
+
+		if (messageDetailsSent[2][3] != null && messageDetailsSent[2][3].getText().equals("0.0.0.0")
+				&& messageDetailsSent[2][1] != null && messageDetailsSent[2][1].getText().equals(interfaceId)) {
+			messageDetailsScrollPane = new JScrollPane(sentTable);
+			System.out.println("SENT1!");
+		} else if (messageDetailsSent[2][3] != null && messageDetailsSent[2][3].getText().equals(node_ip)) {
+			messageDetailsScrollPane = new JScrollPane(sentTable);
+			System.out.println("SENT2!");
+		}
+		// if this node is the destination of the IP packet
+		else if (messageDetailsSent[3][3] != null && ((messageDetailsSent[3][3].getText().equals(node_ip))
+				|| messageDetailsSent[3][3].getText().equals("255.255.255.255"))) {
+			messageDetailsScrollPane = new JScrollPane(receivedTable);
+			System.out.println("REC1!");
+		}
+		// If this node is forwarding this IP packet (Vermittlungsrechner or
+		// Heimrouter), the view starts with the packet on the incoming (left) side.
+		else {
+			messageDetailsScrollPane = new JScrollPane(receivedTable);
+			System.out.println("REC2!");
+		}
 
 		// splitPane for visualisation in upper and message details in lower part
 		JSplitPane splitPane = new JSplitPane();
@@ -71,7 +98,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		BorderLayout borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
 
-		// splitPane hier einbetten
+		// add splitPane to the current JPanel
 		add(splitPane, BorderLayout.CENTER);
 	}
 
@@ -148,7 +175,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit den
 	 * Werten für das ausgewählte Interface und die frame-Nummer.
 	 */
-	private void fillMessageDetails(JLabel[][] messageDetailsTable, String interfaceId, int selectedFrameNumber) {
+	private void fillMessageDetails(JLabel[][] messageDetails, String interfaceId, int selectedFrameNumber) {
 		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
 
 		String selectedFrameNumberAsString = Integer.toString(selectedFrameNumber);
@@ -157,42 +184,42 @@ public class LocalPathPanel extends JPanel implements I18n {
 			if (daten[i][0].equals(selectedFrameNumberAsString)) {
 				// -----Netzzugangs-Daten-----
 				// Quelle
-				messageDetailsTable[2][1] = new JLabel(daten[i][2].toString());
+				messageDetails[2][1] = new JLabel(daten[i][2].toString());
 				// Ziel
-				messageDetailsTable[3][1] = new JLabel(daten[i][3].toString());
+				messageDetails[3][1] = new JLabel(daten[i][3].toString());
 				// Bemerkungen / Details
-				messageDetailsTable[4][1] = new JLabel(daten[i][6].toString());
+				messageDetails[4][1] = new JLabel(daten[i][6].toString());
 
 				// -----Vermittlungs-Daten (falls existent)-----
 				if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberAsString)) {
 					// Quelle
-					messageDetailsTable[2][3] = new JLabel(daten[i + 1][2].toString());
+					messageDetails[2][3] = new JLabel(daten[i + 1][2].toString());
 					// Ziel
-					messageDetailsTable[3][3] = new JLabel(daten[i + 1][3].toString());
+					messageDetails[3][3] = new JLabel(daten[i + 1][3].toString());
 					// Bemerkungen / Details
-					messageDetailsTable[4][3] = new JLabel(daten[i + 1][6].toString());
+					messageDetails[4][3] = new JLabel(daten[i + 1][6].toString());
 					// Protokoll
-					messageDetailsTable[1][2] = new JLabel(daten[i + 1][4].toString());
+					messageDetails[1][2] = new JLabel(daten[i + 1][4].toString());
 				}
 
 				// -----Transport-Daten (falls existent)-----
 				if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberAsString)) {
 					// Quelle
-					messageDetailsTable[2][5] = new JLabel(daten[i + 2][2].toString());
+					messageDetails[2][5] = new JLabel(daten[i + 2][2].toString());
 					// Ziel
-					messageDetailsTable[3][5] = new JLabel(daten[i + 2][3].toString());
+					messageDetails[3][5] = new JLabel(daten[i + 2][3].toString());
 					// Bemerkungen / Details
-					messageDetailsTable[4][5] = new JLabel(daten[i + 2][6].toString());
+					messageDetails[4][5] = new JLabel(daten[i + 2][6].toString());
 					// Protokoll
-					messageDetailsTable[1][4] = new JLabel(daten[i + 2][4].toString());
+					messageDetails[1][4] = new JLabel(daten[i + 2][4].toString());
 				}
 
 				// -----Anwendungs-Daten (falls existent)-----
 				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
 					// Protokoll
-					messageDetailsTable[2][6] = new JLabel(daten[i + 3][6].toString());
+					messageDetails[2][6] = new JLabel(daten[i + 3][6].toString());
 					// Daten
-					messageDetailsTable[1][6] = new JLabel(daten[i + 3][4].toString());
+					messageDetails[1][6] = new JLabel(daten[i + 3][4].toString());
 				}
 				break;
 			}
@@ -204,41 +231,41 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * denjenigen Titeln (Spalten- und Zellbezeichnungen), die für alle gleich
 	 * (konstant) sind.
 	 */
-	private void fillTitles(JLabel[][] messageDetailsTable) {
+	private void fillTitles(JLabel[][] messageDetails) {
 		// Schicht
-		messageDetailsTable[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
+		messageDetails[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
 		// Protokoll
-		messageDetailsTable[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
+		messageDetails[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
 		// Daten
-		messageDetailsTable[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
+		messageDetails[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
 		// Netzzugang
-		messageDetailsTable[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
+		messageDetails[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
 		// Vermittlung
-		messageDetailsTable[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
+		messageDetails[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
 		// Transport
-		messageDetailsTable[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
+		messageDetails[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
 		// Anwendung
-		messageDetailsTable[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
+		messageDetails[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
 		// Ethernet
-		messageDetailsTable[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg5"));
+		messageDetails[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg5"));
 		// Quelle (Netzzugang)
-		messageDetailsTable[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetails[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
 		// Ziel (Netzzugang)
-		messageDetailsTable[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetails[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
 		// Bemerkungen / Details (Netzzugang)
-		messageDetailsTable[4][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetails[4][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
 		// Quelle (Vermittlung)
-		messageDetailsTable[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetails[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
 		// Ziel (Vermittlung)
-		messageDetailsTable[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetails[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
 		// Bemerkungen / Details (Vermittlung)
-		messageDetailsTable[4][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetails[4][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
 		// Quelle (Transport)
-		messageDetailsTable[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetails[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
 		// Ziel (Transport)
-		messageDetailsTable[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetails[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
 		// Bemerkungen / Details (Transport)
-		messageDetailsTable[4][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetails[4][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
 	}
 
 	/**
@@ -294,16 +321,22 @@ public class LocalPathPanel extends JPanel implements I18n {
 		private final GridBagLayout gridBagLayout;
 		private GridBagConstraints c;
 
-		public MessageDetailsTable(JLabel[][] messageDetailsReceived, JLabel[][] messageDetailsSent) {
+		private MessageDetailsTable(JLabel[][] messageDetails) {
 			gridBagLayout = new GridBagLayout();
 			c = new GridBagConstraints();
 			this.setLayout(gridBagLayout);
-
-			// For each component to be added to this container:
-			// ...Create the component...
-			// ...Set instance variables in the GridBagConstraints instance...
-			JButton button = new JButton("HOIIIIII");
-			this.add(button, c);
+			
+			setLabel("hoi", 0, 0, 1);
+		}
+	
+		private void setLabel(String text, int x_pos, int y_pos, int width) {
+			JLabel label;
+			
+			label = new JLabel(text);
+			c.gridx = x_pos;
+			c.gridy = y_pos;
+			c.gridwidth = width;
+			add(label, c);
 		}
 	}
 }

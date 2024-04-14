@@ -28,8 +28,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private final int selectedFrameNumber; // beginnt bei 1
 
-	private JLabel[][] messageDetailsSent = new JLabel[5][8]; // für die versendete Nachricht
-	private JLabel[][] messageDetailsReceived = new JLabel[5][8]; // für die ankommende Nachricht
+	private String[][] messageDetailsSent = new String[5][8]; // für die versendete Nachricht
+	private String[][] messageDetailsReceived = new String[5][8]; // für die ankommende Nachricht
 
 	private boolean sent = false;
 	private boolean received = false;
@@ -83,11 +83,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 		add(splitPane, BorderLayout.CENTER);
 	}
 
-	public JLabel[][] getMessageDetailsReceived() {
+	public String[][] getMessageDetailsReceived() {
 		return this.messageDetailsReceived;
 	}
 
-	public JLabel[][] getMessageDetailsSent() {
+	public String[][] getMessageDetailsSent() {
 		return this.messageDetailsSent;
 	}
 
@@ -168,7 +168,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit den
 	 * Werten für das ausgewählte Interface und die frame-Nummer.
 	 */
-	private void fillMessageDetails(JLabel[][] messageDetails, String interfaceId, int selectedFrameNumber) {
+	private void fillMessageDetails(String[][] messageDetails, String interfaceId, int selectedFrameNumber) {
 		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
 
 		String selectedFrameNumberAsString = Integer.toString(selectedFrameNumber);
@@ -177,42 +177,42 @@ public class LocalPathPanel extends JPanel implements I18n {
 			if (daten[i][0].equals(selectedFrameNumberAsString)) {
 				// -----Netzzugangs-Daten-----
 				// Quelle
-				messageDetails[2][1] = new JLabel(daten[i][2].toString());
+				messageDetails[2][1] = daten[i][2].toString();
 				// Ziel
-				messageDetails[3][1] = new JLabel(daten[i][3].toString());
+				messageDetails[3][1] = daten[i][3].toString();
 				// Bemerkungen / Details
-				messageDetails[4][1] = new JLabel(daten[i][6].toString());
+				messageDetails[4][1] = daten[i][6].toString();
 
 				// -----Vermittlungs-Daten (falls existent)-----
 				if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberAsString)) {
 					// Quelle
-					messageDetails[2][3] = new JLabel(daten[i + 1][2].toString());
+					messageDetails[2][3] = daten[i + 1][2].toString();
 					// Ziel
-					messageDetails[3][3] = new JLabel(daten[i + 1][3].toString());
+					messageDetails[3][3] = daten[i + 1][3].toString();
 					// Bemerkungen / Details
-					messageDetails[4][3] = new JLabel(daten[i + 1][6].toString());
+					messageDetails[4][3] = daten[i + 1][6].toString();
 					// Protokoll
-					messageDetails[1][2] = new JLabel(daten[i + 1][4].toString());
+					messageDetails[1][2] = daten[i + 1][4].toString();
 				}
 
 				// -----Transport-Daten (falls existent)-----
 				if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberAsString)) {
 					// Quelle
-					messageDetails[2][5] = new JLabel(daten[i + 2][2].toString());
+					messageDetails[2][5] = daten[i + 2][2].toString();
 					// Ziel
-					messageDetails[3][5] = new JLabel(daten[i + 2][3].toString());
+					messageDetails[3][5] = daten[i + 2][3].toString();
 					// Bemerkungen / Details
-					messageDetails[4][5] = new JLabel(daten[i + 2][6].toString());
+					messageDetails[4][5] = daten[i + 2][6].toString();
 					// Protokoll
-					messageDetails[1][4] = new JLabel(daten[i + 2][4].toString());
+					messageDetails[1][4] = daten[i + 2][4].toString();
 				}
 
 				// -----Anwendungs-Daten (falls existent)-----
 				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
 					// Protokoll
-					messageDetails[2][6] = new JLabel(daten[i + 3][6].toString());
+					messageDetails[2][6] = daten[i + 3][6].toString();
 					// Daten
-					messageDetails[1][6] = new JLabel(daten[i + 3][4].toString());
+					messageDetails[1][6] = daten[i + 3][4].toString();
 				}
 				break;
 			}
@@ -224,41 +224,41 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * denjenigen Titeln (Spalten- und Zellbezeichnungen), die für alle gleich
 	 * (konstant) sind.
 	 */
-	private void fillTitles(JLabel[][] messageDetails) {
+	private void fillTitles(String[][] messageDetails) {
 		// Schicht
-		messageDetails[0][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg2"));
+		messageDetails[0][7] = messages.getString("schichten_lokaler_weg_msg2");
 		// Protokoll
-		messageDetails[1][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg3"));
+		messageDetails[1][7] = messages.getString("schichten_lokaler_weg_msg3");
 		// Daten
-		messageDetails[2][7] = new JLabel(messages.getString("schichten_lokaler_weg_msg4"));
+		messageDetails[2][7] = messages.getString("schichten_lokaler_weg_msg4");
 		// Netzzugang
-		messageDetails[0][0] = new JLabel(messages.getString("rp_lauscher_msg8"));
+		messageDetails[0][0] = messages.getString("rp_lauscher_msg8");
 		// Vermittlung
-		messageDetails[0][2] = new JLabel(messages.getString("rp_lauscher_msg9"));
+		messageDetails[0][2] = messages.getString("rp_lauscher_msg9");
 		// Transport
-		messageDetails[0][4] = new JLabel(messages.getString("rp_lauscher_msg10"));
+		messageDetails[0][4] = messages.getString("rp_lauscher_msg10");
 		// Anwendung
-		messageDetails[0][6] = new JLabel(messages.getString("rp_lauscher_msg11"));
+		messageDetails[0][6] = messages.getString("rp_lauscher_msg11");
 		// Ethernet
-		messageDetails[1][0] = new JLabel(messages.getString("schichten_lokaler_weg_msg5"));
+		messageDetails[1][0] = messages.getString("schichten_lokaler_weg_msg5");
 		// Quelle (Netzzugang)
-		messageDetails[2][0] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetails[2][0] = messages.getString("rp_lauscher_msg3");
 		// Ziel (Netzzugang)
-		messageDetails[3][0] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetails[3][0] = messages.getString("rp_lauscher_msg4");
 		// Bemerkungen / Details (Netzzugang)
-		messageDetails[4][0] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetails[4][0] = messages.getString("rp_lauscher_msg7");
 		// Quelle (Vermittlung)
-		messageDetails[2][2] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetails[2][2] = messages.getString("rp_lauscher_msg3");
 		// Ziel (Vermittlung)
-		messageDetails[3][2] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetails[3][2] = messages.getString("rp_lauscher_msg4");
 		// Bemerkungen / Details (Vermittlung)
-		messageDetails[4][2] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetails[4][2] = messages.getString("rp_lauscher_msg7");
 		// Quelle (Transport)
-		messageDetails[2][4] = new JLabel(messages.getString("rp_lauscher_msg3"));
+		messageDetails[2][4] = messages.getString("rp_lauscher_msg3");
 		// Ziel (Transport)
-		messageDetails[3][4] = new JLabel(messages.getString("rp_lauscher_msg4"));
+		messageDetails[3][4] = messages.getString("rp_lauscher_msg4");
 		// Bemerkungen / Details (Transport)
-		messageDetails[4][4] = new JLabel(messages.getString("rp_lauscher_msg7"));
+		messageDetails[4][4] = messages.getString("rp_lauscher_msg7");
 	}
 
 	/**
@@ -280,16 +280,15 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * @param breite Anzahl Zeichen pro Zelle
 	 * @param table  Die zu füllenden Nachrichtendetails
 	 */
-	private void showDetails(int breite, JLabel[][] table) {
+	private void showDetails(int breite, String[][] table) {
 		for (int i = 0; i < 5; i++) {
 			String line = "";
 			for (int j = 0; j < 8; j++) {
-				JLabel cell = table[i][j];
-				if (!(cell == null)) {
-					String cellContent = cell.getText();
-					int wordlength = cellContent.length();
+				String text = table[i][j];
+				if (!(text == null)) {
+					int wordlength = text.length();
 					if (wordlength < breite) {
-						line = line.concat(cellContent);
+						line = line.concat(text);
 						for (int k = 0; k < breite - wordlength; k++) {
 							line = line.concat(" ");
 						}
@@ -314,7 +313,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		private final GridBagLayout gridBagLayout;
 		private GridBagConstraints c;
 
-		private MessageDetailsTable(JLabel[][] messageDetails) {
+		private MessageDetailsTable(String[][] messageDetails) {
 			gridBagLayout = new GridBagLayout();
 			c = new GridBagConstraints();
 			this.setLayout(gridBagLayout);

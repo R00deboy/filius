@@ -494,13 +494,11 @@ public class Lauscher implements I18n {
 
 	/**
 	 * Der Lauscher wird auf anderen Netzwerkkarten des Knotens nach einem Frame
-	 * abgesucht, welches denselben Inhalt weitertransportiert hat oder diesen
-	 * Inhalt ursprünglich zu diesem Knoten transportiert hat. Eine Rückgabe eines
-	 * Object[], wessen Einträge nicht beide den null-Pointer enthalten, gibt es
-	 * nur, wenn es sich beim Host um einen Router (Vermittlungsrechner oder
-	 * Heimrouter) handelt und es sich beim Frame zusätzlich um ein Frame "auf der
-	 * Durchreise" ist (wenn also Ziel-IP und Quell-IP beide nicht der IP des
-	 * Routers entsprechen).
+	 * abgesucht, welches denselben Inhalt (IpPaket) hat. Das return-Objekt gibt die
+	 * Schnittstelle {@code interfaceId} und die Nummer des Frames im Datenaustausch
+	 * {@code frameNumber} zurück oder zweimal den null-Pointer. Letzteres heisst,
+	 * dass das IpPaket von diesem Knoten ursprünglich abgesendet oder für ihn
+	 * bestimmt war.
 	 * 
 	 * @author Christoph Irniger
 	 * @param originalInterfaceId ursprüngliche Netzwerkkarte
@@ -514,9 +512,10 @@ public class Lauscher implements I18n {
 
 		// ARP-Pakete werden nicht weitergeleitet
 		if (!originalFrame.getTyp().equals("0x806")) {
-			
-			// Check, ob Frame für Knoten bestimmt war / von ihm ursprünglich abgesendet wurde
-			if (!frameOnlyReceivedOrOnlySent(originalFrame, systemSoftware)) {
+
+			// Check, ob Inhalt des Frames (IpPaket) für Knoten bestimmt war / von ihm
+			// ursprünglich abgesendet wurde
+			if (!packetOnlyReceivedOrOnlySent(originalFrame, systemSoftware)) {
 				InternetKnoten knoten = (InternetKnoten) systemSoftware.getKnoten();
 				List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
 
@@ -525,18 +524,18 @@ public class Lauscher implements I18n {
 
 					if (!(originalInterfaceId.equals(interfaceId))) {
 						LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
-						
-						if (!(framesMitZeitstempel == null)) {
+
+						if (framesMitZeitstempel != null) {
 							int frameNumber;
-							
+
 							for (frameNumber = 0; frameNumber < framesMitZeitstempel.size() - 1; frameNumber++) {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
-								
+
 								// Nur Pakete vom Typ IP ("0x800") können potentiell weitergeleitet werden
 								if (frame.getTyp().equals("0x800") && originalFrame.gleicherInhaltAndereTTL(frame)) {
 									break;
 								}
-							}								
+							}
 							interfaceIdAndFrameNumber[0] = (String) interfaceId;
 							interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
 						}
@@ -548,16 +547,15 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * Diese Methode überprüft, ob das IpPaket entweder für den Knoten bestimmt war
-	 * oder das IpPaket vom Knoten ursprünglich erstellt worden war für die
-	 * Versendung. Anders ausgedrückt: Sie überprüft, ob das Paket beim Router nur
+	 * Diese Methode überprüft, ob der Knoten der Sender oder der Empfänger des
+	 * IpPakets war. Anders ausgedrückt: Sie überprüft, ob das Paket beim Router nur
 	 * "auf dem Vorbeiweg" ist.
 	 * 
-	 * @param frame Das Frame, das überprüft werden soll.
+	 * @param frame          Das Frame, das überprüft werden soll.
 	 * @param systemSoftware Die Systemsoftware, die auf dem Knoten läuft.
 	 * @return true oder false
 	 */
-	private boolean frameOnlyReceivedOrOnlySent(EthernetFrame frame, SystemSoftware systemSoftware) {
+	private boolean packetOnlyReceivedOrOnlySent(EthernetFrame frame, SystemSoftware systemSoftware) {
 		Object daten = frame.getDaten();
 		InternetKnoten knoten = (InternetKnoten) systemSoftware.getKnoten();
 		List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();

@@ -35,13 +35,13 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private boolean received = false;
 
 	private final LocalPathVisualisation visualisation; // Visualisierung oben
-	private final MessageDetailsTable sentTable; // Nachrichtendetails für versendete Daten
-	private final MessageDetailsTable receivedTable; // Nachrichtendetails für empfangene Daten
+	private final MessageDetailsTable tableSent; // Nachrichtendetails für versendete Daten
+	private final MessageDetailsTable tableReceived; // Nachrichtendetails für empfangene Daten
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // Zugriff auf den Lauscher
 
 	private static final String IP_BROADCAST = "255.255.255.255";
-	private static final String IP_SOURCE_DHCP = "0.0.0.0";
+	private static final String IP_ZEROS = "0.0.0.0";
 
 	public LocalPathPanel(LocalPathDialog localPathDialog) {
 		super();
@@ -51,43 +51,23 @@ public class LocalPathPanel extends JPanel implements I18n {
 		this.interfaceId = localPathDialog.getInterfaceId();
 		this.selectedFrameNumber = localPathDialog.getSelectedFrameNumber();
 
+		if (isFrameSent()) {
+			sent = true;
+		} else {
+			received = true;
+		}
+
 		// fill messageDetailsReceived and messageDetailsSent
 		fill();
 
 		// initialise visualisation and table for message details
 		visualisation = new LocalPathVisualisation(localPathDialog.getSystemSoftware());
-		sentTable = new MessageDetailsTable(messageDetailsSent);
-		receivedTable = new MessageDetailsTable(messageDetailsReceived);
+		tableSent = new MessageDetailsTable(messageDetailsSent);
+		tableReceived = new MessageDetailsTable(messageDetailsReceived);
 
 		// scrollPanes
-		JScrollPane visualisationScrollPane;
-		JScrollPane messageDetailsScrollPane;
-		visualisationScrollPane = new JScrollPane(visualisation);
-
-		String node_ip = ((InternetKnoten) systemSoftware.getKnoten()).getNetzwerkInterfaceByMac(interfaceId).getIp();
-		// if this node is the source of the IP packet in the case of a DHCP message,
-		// where source IP is 0.0.0.0.
-		if (messageDetailsSent[2][3] != null && messageDetailsSent[2][3].getText().equals(IP_SOURCE_DHCP)
-				&& messageDetailsSent[2][1] != null && messageDetailsSent[2][1].getText().equals(interfaceId)) {
-			messageDetailsScrollPane = new JScrollPane(sentTable);
-			System.out.println("SENT1!");
-			// if this node is the source of the IP packet
-		} else if (messageDetailsSent[2][3] != null && messageDetailsSent[2][3].getText().equals(node_ip)) {
-			messageDetailsScrollPane = new JScrollPane(sentTable);
-			System.out.println("SENT2!");
-		}
-		// if this node is the destination of the IP packet
-		else if (messageDetailsSent[3][3] != null && ((messageDetailsSent[3][3].getText().equals(node_ip))
-				|| messageDetailsSent[3][3].getText().equals(IP_BROADCAST))) {
-			messageDetailsScrollPane = new JScrollPane(receivedTable);
-			System.out.println("REC1!");
-		}
-		// If this node is forwarding this IP packet (Vermittlungsrechner or
-		// Heimrouter), the view starts with the packet on the incoming (left) side.
-		else {
-			messageDetailsScrollPane = new JScrollPane(receivedTable);
-			System.out.println("REC2!");
-		}
+		JScrollPane visualisationScrollPane = new JScrollPane(visualisation);
+		JScrollPane messageDetailsScrollPane = determineDefaultMessageDetails();
 
 		// splitPane for visualisation in upper and message details in lower part
 		JSplitPane splitPane = new JSplitPane();
@@ -111,22 +91,32 @@ public class LocalPathPanel extends JPanel implements I18n {
 		return this.messageDetailsSent;
 	}
 
+	/*
+	 * Bestimmt die Standard-Ansicht der Nachrichtendetails im unteren Teil der
+	 * SplitPane: {@code messageDetailsSent} oder {@code messageDetailsReceived}.
+	 */
+	private JScrollPane determineDefaultMessageDetails() {
+		JScrollPane messageDetailsScrollPane = new JScrollPane(tableReceived);
+		if (sent && !received) {
+			messageDetailsScrollPane = new JScrollPane(tableSent);
+		}
+		return messageDetailsScrollPane;
+	}
+
 	/**
 	 * Füllt die Nachrichtendetails {@code messageDetailsSent} und
 	 * {@code messageDetailsReceived} mit allen für die Visualisierung benötigten
 	 * Daten des/der Frames.
 	 */
 	private void fill() {
-		if (isFrameReceived()) {
-			received = true;
-			fillTitles(messageDetailsReceived);
-			fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
-			fillOther();
-		} else {
-			sent = true;
+		if (sent) {
 			fillTitles(messageDetailsSent);
 			fillMessageDetails(messageDetailsSent, this.interfaceId, this.selectedFrameNumber);
-			fillOther();
+			fillOtherIfRouter();
+		} else {
+			fillTitles(messageDetailsReceived);
+			fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
+			fillOtherIfRouter();
 		}
 		show(25);
 	}
@@ -135,16 +125,18 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * Prüft, ob das ausgewählte Frame empfangen oder versandt (= nicht empfangen)
 	 * wurde.
 	 */
-	private boolean isFrameReceived() {
-		return (this.interfaceId
-				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getZielMacAdresse()));
+	private boolean isFrameSent() {
+		return this.interfaceId
+				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
 	}
 
 	/**
-	 * Füllt diejenigen Nachrichtendetails ({@code messageDetailsReceived} oder
-	 * {@code messageDetailsSent}) aus, welche noch nicht ausgefüllt wurde.
+	 * Hat nur eine Wirkung bei Routern, bei denen das IpPaket im Frame "auf der
+	 * Durchreise" ist. Füllt diejenigen Nachrichtendetails
+	 * ({@code messageDetailsReceived} oder {@code messageDetailsSent}) aus, welche
+	 * noch nicht ausgefüllt wurde.
 	 */
-	private void fillOther() {
+	private void fillOtherIfRouter() {
 		/*
 		 * Falls der Knoten ein Router (Vermittlungsrechner oder Heimrouter) ist und das
 		 * im ankommenden Frame enthaltene (IP- oder ICMP-)Paket nur "auf dem Vorbeiweg"

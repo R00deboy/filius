@@ -449,8 +449,8 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		return lineData;
 	}
 	
-	// Colors for the different layers
-	public enum LayerColor {
+	// original Filius colors for the different layers
+	public enum LayerColorOrig {
 		DEFAULT(Color.WHITE, Color.GRAY),
 		LINK(Color.BLACK, new Color(0.9f, 0.9f, 0.9f)),
 		INTERNET(Color.BLACK, new Color(0.3f, 1f, 0.3f)),
@@ -460,11 +460,28 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		public final Color foregroundColor;
 		public final Color backgroundColor;
 		
-		private LayerColor(Color foregroundColor, Color backgroundColor) {
+		private LayerColorOrig(Color foregroundColor, Color backgroundColor) {
 			this.foregroundColor = foregroundColor;
 			this.backgroundColor = backgroundColor;
 		}
 	}
+	
+	// color variants for the different layers
+		public enum LayerColorVar {
+			DEFAULT(Color.BLACK, Color.WHITE),
+			LINK(Color.BLACK, Color.decode("#A5A5A5")),
+			INTERNET(Color.BLACK, Color.decode("#4472C4")),
+			TRANSPORT(Color.BLACK, Color.decode("#ED7D31")),
+			APPLICATION(Color.BLACK, Color.decode("#FFC000"));
+			
+			public final Color foregroundColor;
+			public final Color backgroundColor;
+			
+			private LayerColorVar(Color foregroundColor, Color backgroundColor) {
+				this.foregroundColor = foregroundColor;
+				this.backgroundColor = backgroundColor;
+			}
+		}
 
 	static List<String> splitString(String text, int maxLength) {
 		String normalizedText = StringUtils.normalizeSpace(text);

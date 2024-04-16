@@ -468,18 +468,20 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	
 	// color variants for the different layers
 		public enum LayerColorVar {
-			DEFAULT(Color.BLACK, Color.WHITE),
-			LINK(Color.BLACK, Color.decode("#A5A5A5")),
-			INTERNET(Color.BLACK, Color.decode("#4472C4")),
-			TRANSPORT(Color.BLACK, Color.decode("#ED7D31")),
-			APPLICATION(Color.BLACK, Color.decode("#FFC000"));
+			DEFAULT(Color.BLACK, Color.WHITE, Color.WHITE),
+			LINK(Color.BLACK, Color.decode("#DBDBDB"), Color.decode("#EDEDED")),
+			INTERNET(Color.BLACK, Color.decode("#8FAADC"), Color.decode("#DAE3F3")),
+			TRANSPORT(Color.BLACK, Color.decode("#F4B183"), Color.decode("#FBE5D6")),
+			APPLICATION(Color.BLACK, Color.decode("#FFD966"), Color.decode("#FFF2CC"));
 			
 			public final Color foregroundColor;
 			public final Color backgroundColor;
+			public final Color backgroundColorFine;
 			
-			private LayerColorVar(Color foregroundColor, Color backgroundColor) {
+			private LayerColorVar(Color foregroundColor, Color backgroundColor, Color backgroundColorFine) {
 				this.foregroundColor = foregroundColor;
 				this.backgroundColor = backgroundColor;
+				this.backgroundColorFine = backgroundColorFine;
 			}
 		}
 

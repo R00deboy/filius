@@ -18,6 +18,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.system.GatewayFirmware;
@@ -46,7 +47,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private final LocalPathVisualisation visualisation; // Visualisierung oben
 	private final MessageDetailsTable tableSent; // Nachrichtendetails für versendete Daten
 	private final MessageDetailsTable tableReceived; // Nachrichtendetails für empfangene Daten
-	
+
 	private static final int PREF_MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int PREF_MSG_DETAILS_CELL_HEIGHT = 30;
 
@@ -327,27 +328,46 @@ public class LocalPathPanel extends JPanel implements I18n {
 			c = new GridBagConstraints();
 			this.setLayout(gridBagLayout);
 			JLabel label;
+			JTextArea textArea;
 
 			// first line (from left to right)
 			for (int j = 0; j < 6; j = j + 2) {
 				label = setLabel(messageDetails[0][j], j, 0, 2, 1, 2 / 8, 1 / 5, 1, 1);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
 				setBold(label);
+				if (j == 0 || j == 1) {
+					label.setBackground(LayerColorVar.LINK.backgroundColor);
+				} else if (j == 2 || j == 3) {
+					label.setBackground(LayerColorVar.INTERNET.backgroundColor);
+				} else if (j == 4 || j == 5) {
+					label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
+				}
 			}
 			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 1 / 8, 1 / 5, 2, 1);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
+			label.setBackground(LayerColorVar.APPLICATION.backgroundColor);
 			setBold(label);
 			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 1 / 8, 1 / 5, 1, 1);
+			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
 			setBold(label);
 
 			// second line (from left to right)
 			for (int j = 0; j < 6; j = j + 2) {
 				label = setLabel(messageDetails[1][j], j, 1, 2, 1, 2 / 8, 1 / 5, 1, 1);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
+				if (j == 0 || j == 1) {
+					label.setBackground(LayerColorVar.LINK.backgroundColor);
+				} else if (j == 2 || j == 3) {
+					label.setBackground(LayerColorVar.INTERNET.backgroundColor);
+				} else if (j == 4 || j == 5) {
+					label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
+				}
 			}
 			label = setLabel(messageDetails[1][6], 6, 1, 1, 1, 1 / 8, 1 / 5, 2, 1);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
+			label.setBackground(LayerColorVar.APPLICATION.backgroundColor);
 			label = setLabel(messageDetails[1][7], 7, 1, 1, 1, 1 / 8, 1 / 5, 1, 1);
+			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
 			setBold(label);
 
 			// third and fourth line, first to sixth columns (from left to right)
@@ -357,24 +377,47 @@ public class LocalPathPanel extends JPanel implements I18n {
 					if (j % 2 == 0) {
 						label.setHorizontalAlignment(SwingConstants.RIGHT);
 					}
+					if (j == 0 || j == 1) {
+						label.setBackground(LayerColorVar.LINK.backgroundColor);
+					} else if (j == 2 || j == 3) {
+						label.setBackground(LayerColorVar.INTERNET.backgroundColor);
+					} else if (j == 4 || j == 5) {
+						label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
+					}
 				}
 			}
-			
+
 			// fifth line, first to sixth columns (from left to right)
 			for (int j = 0; j < 6; j++) {
 				if (j % 2 == 0) {
 					label = setLabel(messageDetails[4][j], j, 4, 1, 1, 1 / 8, 1 / 5, 1, 7);
 					label.setHorizontalAlignment(SwingConstants.RIGHT);
 					label.setVerticalAlignment(SwingConstants.TOP);
+					if (j == 0) {
+						label.setBackground(LayerColorVar.LINK.backgroundColor);
+					} else if (j == 2) {
+						label.setBackground(LayerColorVar.INTERNET.backgroundColor);
+					} else if (j == 4) {
+						label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
+					}
 				} else {
-					setTextArea(messageDetails[4][j], j, 4, 1, 1, 1 / 8, 1 / 5, 1, 7);
+					textArea = setTextArea(messageDetails[4][j], j, 4, 1, 1, 1 / 8, 1 / 5, 1, 7);
+					if (j == 1) {
+						textArea.setBackground(LayerColorVar.LINK.backgroundColor);
+					} else if (j == 3) {
+						textArea.setBackground(LayerColorVar.INTERNET.backgroundColor);
+					} else if (j == 5) {
+						textArea.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
+					}
 				}
 			}
 
 			// last two cells on the bottom right with height 3
-			setTextArea(messageDetails[2][6], 6, 2, 1, 3, 1 / 8, 3 / 5, 2, 3);
+			textArea = setTextArea(messageDetails[2][6], 6, 2, 1, 3, 1 / 8, 3 / 5, 2, 3);
+			textArea.setBackground(LayerColorVar.APPLICATION.backgroundColor);
 			label = setLabel(messageDetails[2][7], 7, 2, 1, 3, 1 / 8, 1 / 5, 1, 3);
 			label.setVerticalAlignment(SwingConstants.TOP);
+			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
 			setBold(label);
 		}
 
@@ -383,10 +426,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 				double weighty, int width_multiplier, int height_multiplier) {
 			JLabel label = new JLabel(text);
 
-			label.setPreferredSize(new Dimension(width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH, height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT));
+			label.setPreferredSize(new Dimension(width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH,
+					height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT));
+			label.setOpaque(true);
 
 			setPlain(label);
-			
+
 			c.gridx = x_pos;
 			c.gridy = y_pos;
 			c.gridwidth = width;
@@ -397,23 +442,24 @@ public class LocalPathPanel extends JPanel implements I18n {
 			Border margin = new EmptyBorder(5, 5, 5, 5);
 			label.setBorder(new CompoundBorder(border, margin));
 			add(label, c);
-			
+
 			return label;
 		}
-		
+
 		// Cells with potential long content are JTextAreas
 		private JTextArea setTextArea(String text, int x_pos, int y_pos, int width, int height, double weightx,
 				double weighty, int width_multiplier, int height_multiplier) {
 			JTextArea textArea = new JTextArea(text);
 
-			textArea.setPreferredSize(new Dimension(width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH, height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT));
+			textArea.setPreferredSize(new Dimension(width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH,
+					height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT));
 
 			textArea.setWrapStyleWord(true);
-		    textArea.setLineWrap(true);
-		    textArea.setOpaque(false);
-		    textArea.setEditable(false);
-		    textArea.setFocusable(false);
-			
+			textArea.setLineWrap(true);
+			textArea.setOpaque(true);
+			textArea.setEditable(false);
+			textArea.setFocusable(false);
+
 			c.gridx = x_pos;
 			c.gridy = y_pos;
 			c.gridwidth = width;
@@ -424,15 +470,15 @@ public class LocalPathPanel extends JPanel implements I18n {
 			Border margin = new EmptyBorder(5, 5, 5, 5);
 			textArea.setBorder(new CompoundBorder(border, margin));
 			add(textArea, c);
-			
+
 			return textArea;
 		}
-		
+
 		private void setBold(Component comp) {
 			Font boldFont = new Font(comp.getFont().getName(), Font.BOLD, comp.getFont().getSize());
 			comp.setFont(boldFont);
 		}
-		
+
 		private void setPlain(Component comp) {
 			Font boldFont = new Font(comp.getFont().getName(), Font.PLAIN, comp.getFont().getSize());
 			comp.setFont(boldFont);

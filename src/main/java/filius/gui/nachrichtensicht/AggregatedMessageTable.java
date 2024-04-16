@@ -448,6 +448,23 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		}
 		return lineData;
 	}
+	
+	// Colors for the different layers
+	public enum LayersColor {
+		DEFAULT(Color.WHITE, Color.GRAY),
+		LINK(Color.BLACK, new Color(0.9f, 0.9f, 0.9f)),
+		INTERNET(Color.BLACK, new Color(0.3f, 1f, 0.3f)),
+		TRANSPORT(Color.BLACK, Color.CYAN),
+		APPLICATION(Color.WHITE, Color.BLUE);
+		
+		public final Color foregroundColor;
+		public final Color backgroundColor;
+		
+		private LayersColor(Color foregroundColor, Color backgroundColor) {
+			this.foregroundColor = foregroundColor;
+			this.backgroundColor = backgroundColor;
+		}
+	}
 
 	static List<String> splitString(String text, int maxLength) {
 		String normalizedText = StringUtils.normalizeSpace(text);
@@ -502,7 +519,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 	
 	/**
-	 *  Global view of the path through the layers
+	 *  Global view of the path through the layersF
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		

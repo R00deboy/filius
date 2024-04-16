@@ -450,7 +450,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 	
 	// Colors for the different layers
-	public enum LayersColor {
+	public enum LayerColor {
 		DEFAULT(Color.WHITE, Color.GRAY),
 		LINK(Color.BLACK, new Color(0.9f, 0.9f, 0.9f)),
 		INTERNET(Color.BLACK, new Color(0.3f, 1f, 0.3f)),
@@ -460,7 +460,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		public final Color foregroundColor;
 		public final Color backgroundColor;
 		
-		private LayersColor(Color foregroundColor, Color backgroundColor) {
+		private LayerColor(Color foregroundColor, Color backgroundColor) {
 			this.foregroundColor = foregroundColor;
 			this.backgroundColor = backgroundColor;
 		}

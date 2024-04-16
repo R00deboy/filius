@@ -32,7 +32,7 @@ import java.awt.Font;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import filius.gui.nachrichtensicht.AggregatedMessageTable.LayersColor;
+import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColor;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 
 public class LauscherTableCellRenderer extends DefaultTableCellRenderer {
@@ -69,31 +69,31 @@ public class LauscherTableCellRenderer extends DefaultTableCellRenderer {
 		Color color2;
 		switch (schicht) {
 		case 0:
-			color1 = LayersColor.LINK.foregroundColor;
+			color1 = LayerColor.LINK.foregroundColor;
 			// if (lfdNr%2==0)
-			color2 = LayersColor.LINK.backgroundColor;
+			color2 = LayerColor.LINK.backgroundColor;
 			// else setBackground(new Color(0.8f, 0.8f, 0.8f));
 			break;
 		case 1:
-			color1 = LayersColor.INTERNET.foregroundColor;
+			color1 = LayerColor.INTERNET.foregroundColor;
 			// if (lfdNr % 2 == 0)
-			color2 = LayersColor.INTERNET.backgroundColor;
+			color2 = LayerColor.INTERNET.backgroundColor;
 			// else
 			// setBackground(new Color(0.2f, 1f, 0.2f));
 			break;
 		case 2:
-			color1 = LayersColor.TRANSPORT.foregroundColor;
-			color2 = LayersColor.TRANSPORT.backgroundColor;
+			color1 = LayerColor.TRANSPORT.foregroundColor;
+			color2 = LayerColor.TRANSPORT.backgroundColor;
 			// setFont(new Font(Font.MONOSPACED, Font.PLAIN, 10));
 			break;
 		case 3:
-			color1 = LayersColor.APPLICATION.foregroundColor;
-			color2 = LayersColor.APPLICATION.backgroundColor;
+			color1 = LayerColor.APPLICATION.foregroundColor;
+			color2 = LayerColor.APPLICATION.backgroundColor;
 			// setFont(new Font(Font.DIALOG, Font.BOLD, 12));
 			break;
 		default:
-			color1 = LayersColor.DEFAULT.foregroundColor;
-			color2 = LayersColor.DEFAULT.backgroundColor;
+			color1 = LayerColor.DEFAULT.foregroundColor;
+			color2 = LayerColor.DEFAULT.backgroundColor;
 		}
 
 		if (!isSelected) {

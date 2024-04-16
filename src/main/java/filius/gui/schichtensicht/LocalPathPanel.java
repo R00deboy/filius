@@ -1,14 +1,23 @@
 package filius.gui.schichtensicht;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Font;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 
-import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.system.GatewayFirmware;
@@ -37,11 +46,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private final LocalPathVisualisation visualisation; // Visualisierung oben
 	private final MessageDetailsTable tableSent; // Nachrichtendetails für versendete Daten
 	private final MessageDetailsTable tableReceived; // Nachrichtendetails für empfangene Daten
+	
+	private static final int PREF_MSG_DETAILS_CELL_WIDTH = 150;
+	private static final int PREF_MSG_DETAILS_CELL_HEIGHT = 30;
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // Zugriff auf den Lauscher
-
-	private static final String IP_BROADCAST = "255.255.255.255";
-	private static final String IP_ZEROS = "0.0.0.0";
 
 	public LocalPathPanel(LocalPathDialog localPathDialog) {
 		super();
@@ -210,9 +219,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 				// -----Anwendungs-Daten (falls existent)-----
 				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
 					// Protokoll
-					messageDetails[2][6] = daten[i + 3][6].toString();
-					// Daten
 					messageDetails[1][6] = daten[i + 3][4].toString();
+					// Daten
+					messageDetails[2][6] = daten[i + 3][6].toString();
 				}
 				break;
 			}
@@ -242,23 +251,23 @@ public class LocalPathPanel extends JPanel implements I18n {
 		// Ethernet
 		messageDetails[1][0] = messages.getString("schichten_lokaler_weg_msg5");
 		// Quelle (Netzzugang)
-		messageDetails[2][0] = messages.getString("rp_lauscher_msg3");
+		messageDetails[2][0] = messages.getString("rp_lauscher_msg3") + ":";
 		// Ziel (Netzzugang)
-		messageDetails[3][0] = messages.getString("rp_lauscher_msg4");
+		messageDetails[3][0] = messages.getString("rp_lauscher_msg4") + ":";
 		// Bemerkungen / Details (Netzzugang)
-		messageDetails[4][0] = messages.getString("rp_lauscher_msg7");
+		messageDetails[4][0] = messages.getString("rp_lauscher_msg7") + ":";
 		// Quelle (Vermittlung)
-		messageDetails[2][2] = messages.getString("rp_lauscher_msg3");
+		messageDetails[2][2] = messages.getString("rp_lauscher_msg3") + ":";
 		// Ziel (Vermittlung)
-		messageDetails[3][2] = messages.getString("rp_lauscher_msg4");
+		messageDetails[3][2] = messages.getString("rp_lauscher_msg4") + ":";
 		// Bemerkungen / Details (Vermittlung)
-		messageDetails[4][2] = messages.getString("rp_lauscher_msg7");
+		messageDetails[4][2] = messages.getString("rp_lauscher_msg7") + ":";
 		// Quelle (Transport)
-		messageDetails[2][4] = messages.getString("rp_lauscher_msg3");
+		messageDetails[2][4] = messages.getString("rp_lauscher_msg3") + ":";
 		// Ziel (Transport)
-		messageDetails[3][4] = messages.getString("rp_lauscher_msg4");
+		messageDetails[3][4] = messages.getString("rp_lauscher_msg4") + ":";
 		// Bemerkungen / Details (Transport)
-		messageDetails[4][4] = messages.getString("rp_lauscher_msg7");
+		messageDetails[4][4] = messages.getString("rp_lauscher_msg7") + ":";
 	}
 
 	/**
@@ -317,18 +326,116 @@ public class LocalPathPanel extends JPanel implements I18n {
 			gridBagLayout = new GridBagLayout();
 			c = new GridBagConstraints();
 			this.setLayout(gridBagLayout);
-
-			setLabel("hoi", 0, 0, 1);
-		}
-
-		private void setLabel(String text, int x_pos, int y_pos, int width) {
 			JLabel label;
 
-			label = new JLabel(text);
+			// first line (from left to right)
+			for (int j = 0; j < 6; j = j + 2) {
+				label = setLabel(messageDetails[0][j], j, 0, 2, 1, 2 / 8, 1 / 5, 1, 1);
+				label.setHorizontalAlignment(SwingConstants.CENTER);
+				setBold(label);
+			}
+			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 1 / 8, 1 / 5, 2, 1);
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+			setBold(label);
+			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 1 / 8, 1 / 5, 1, 1);
+			setBold(label);
+
+			// second line (from left to right)
+			for (int j = 0; j < 6; j = j + 2) {
+				label = setLabel(messageDetails[1][j], j, 1, 2, 1, 2 / 8, 1 / 5, 1, 1);
+				label.setHorizontalAlignment(SwingConstants.CENTER);
+			}
+			label = setLabel(messageDetails[1][6], 6, 1, 1, 1, 1 / 8, 1 / 5, 2, 1);
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+			label = setLabel(messageDetails[1][7], 7, 1, 1, 1, 1 / 8, 1 / 5, 1, 1);
+			setBold(label);
+
+			// third and fourth line, first to sixth columns (from left to right)
+			for (int i = 2; i < 4; i++) {
+				for (int j = 0; j < 6; j++) {
+					label = setLabel(messageDetails[i][j], j, i, 1, 1, 1 / 8, 1 / 5, 1, 1);
+					if (j % 2 == 0) {
+						label.setHorizontalAlignment(SwingConstants.RIGHT);
+					}
+				}
+			}
+			
+			// fifth line, first to sixth columns (from left to right)
+			for (int j = 0; j < 6; j++) {
+				if (j % 2 == 0) {
+					label = setLabel(messageDetails[4][j], j, 4, 1, 1, 1 / 8, 1 / 5, 1, 7);
+					label.setHorizontalAlignment(SwingConstants.RIGHT);
+					label.setVerticalAlignment(SwingConstants.TOP);
+				} else {
+					setTextArea(messageDetails[4][j], j, 4, 1, 1, 1 / 8, 1 / 5, 1, 7);
+				}
+			}
+
+			// last two cells on the bottom right with height 3
+			setTextArea(messageDetails[2][6], 6, 2, 1, 3, 1 / 8, 3 / 5, 2, 3);
+			label = setLabel(messageDetails[2][7], 7, 2, 1, 3, 1 / 8, 1 / 5, 1, 3);
+			label.setVerticalAlignment(SwingConstants.TOP);
+			setBold(label);
+		}
+
+		// Cells with short content are JLabels
+		private JLabel setLabel(String text, int x_pos, int y_pos, int width, int height, double weightx,
+				double weighty, int width_multiplier, int height_multiplier) {
+			JLabel label = new JLabel(text);
+
+			label.setPreferredSize(new Dimension(width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH, height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT));
+
+			setPlain(label);
+			
 			c.gridx = x_pos;
 			c.gridy = y_pos;
 			c.gridwidth = width;
+			c.gridheight = height;
+			c.weightx = weightx;
+			c.weighty = weighty;
+			Border border = BorderFactory.createLineBorder(Color.BLACK);
+			Border margin = new EmptyBorder(5, 5, 5, 5);
+			label.setBorder(new CompoundBorder(border, margin));
 			add(label, c);
+			
+			return label;
+		}
+		
+		// Cells with potential long content are JTextAreas
+		private JTextArea setTextArea(String text, int x_pos, int y_pos, int width, int height, double weightx,
+				double weighty, int width_multiplier, int height_multiplier) {
+			JTextArea textArea = new JTextArea(text);
+
+			textArea.setPreferredSize(new Dimension(width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH, height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT));
+
+			textArea.setWrapStyleWord(true);
+		    textArea.setLineWrap(true);
+		    textArea.setOpaque(false);
+		    textArea.setEditable(false);
+		    textArea.setFocusable(false);
+			
+			c.gridx = x_pos;
+			c.gridy = y_pos;
+			c.gridwidth = width;
+			c.gridheight = height;
+			c.weightx = weightx;
+			c.weighty = weighty;
+			Border border = BorderFactory.createLineBorder(Color.BLACK);
+			Border margin = new EmptyBorder(5, 5, 5, 5);
+			textArea.setBorder(new CompoundBorder(border, margin));
+			add(textArea, c);
+			
+			return textArea;
+		}
+		
+		private void setBold(Component comp) {
+			Font boldFont = new Font(comp.getFont().getName(), Font.BOLD, comp.getFont().getSize());
+			comp.setFont(boldFont);
+		}
+		
+		private void setPlain(Component comp) {
+			Font boldFont = new Font(comp.getFont().getName(), Font.PLAIN, comp.getFont().getSize());
+			comp.setFont(boldFont);
 		}
 	}
 }

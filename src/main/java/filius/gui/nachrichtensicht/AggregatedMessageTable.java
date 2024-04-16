@@ -493,9 +493,9 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		
         // positioning and size
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        localPathDialog.setLocation(screenSize.width / 2 - 300, screenSize.height / 2 - 200);
+        localPathDialog.setLocation(screenSize.width / 6, screenSize.height / 6);
 
-        localPathDialog.setSize(750, 530);
+        localPathDialog.setSize(1400, 700);
         localPathDialog.setResizable(true);
 
         localPathDialog.setVisible(true);

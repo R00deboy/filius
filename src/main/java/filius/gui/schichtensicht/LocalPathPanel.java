@@ -336,16 +336,16 @@ public class LocalPathPanel extends JPanel implements I18n {
 				label.setHorizontalAlignment(SwingConstants.CENTER);
 				setBold(label);
 				if (j == 0 || j == 1) {
-					label.setBackground(LayerColorVar.LINK.backgroundColor);
+					label.setBackground(LayerColorVar.LINK.backgroundColorFine);
 				} else if (j == 2 || j == 3) {
-					label.setBackground(LayerColorVar.INTERNET.backgroundColor);
+					label.setBackground(LayerColorVar.INTERNET.backgroundColorFine);
 				} else if (j == 4 || j == 5) {
-					label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
+					label.setBackground(LayerColorVar.TRANSPORT.backgroundColorFine);
 				}
 			}
 			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 1 / 8, 1 / 5, 2, 1);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(LayerColorVar.APPLICATION.backgroundColor);
+			label.setBackground(LayerColorVar.APPLICATION.backgroundColorFine);
 			setBold(label);
 			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 1 / 8, 1 / 5, 1, 1);
 			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);

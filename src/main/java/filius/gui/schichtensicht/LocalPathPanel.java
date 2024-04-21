@@ -41,12 +41,14 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private String[][] messageDetailsSent = new String[5][8]; // für die versendete Nachricht
 	private String[][] messageDetailsReceived = new String[5][8]; // für die ankommende Nachricht
 
-	private boolean sent = false;
-	private boolean received = false;
+	private boolean sent = false; // if the node sent the frame, otherwise the node received the frame
+	private boolean forwarding = false; // if the node is only forwarding an IP or ICMP packet
 
 	private final LocalPathVisualisation visualisation; // Visualisierung oben
 	private final MessageDetailsTable tableSent; // Nachrichtendetails für versendete Daten
 	private final MessageDetailsTable tableReceived; // Nachrichtendetails für empfangene Daten
+
+	Object[] correspondingFrameData;
 
 	private static final int PREF_MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int PREF_MSG_DETAILS_CELL_HEIGHT = 30;
@@ -63,11 +65,10 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		if (isFrameSent()) {
 			sent = true;
-		} else {
-			received = true;
 		}
 
 		// fill messageDetailsReceived and messageDetailsSent
+
 		fill();
 
 		// initialise visualisation and table for message details
@@ -101,18 +102,15 @@ public class LocalPathPanel extends JPanel implements I18n {
 		return this.messageDetailsSent;
 	}
 
-	/*
-	 * Bestimmt die Standard-Ansicht der Nachrichtendetails im unteren Teil der
-	 * SplitPane: {@code messageDetailsSent} oder {@code messageDetailsReceived}.
+	/**
+	 * Prüft, ob das ausgewählte Frame empfangen oder versandt (= nicht empfangen)
+	 * wurde.
 	 */
-	private JScrollPane determineDefaultMessageDetails() {
-		JScrollPane messageDetailsScrollPane = new JScrollPane(tableReceived);
-		if (sent && !received) {
-			messageDetailsScrollPane = new JScrollPane(tableSent);
-		}
-		return messageDetailsScrollPane;
+	private boolean isFrameSent() {
+		return this.interfaceId
+				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
 	}
-
+	
 	/**
 	 * Füllt die Nachrichtendetails {@code messageDetailsSent} und
 	 * {@code messageDetailsReceived} mit allen für die Visualisierung benötigten
@@ -122,54 +120,53 @@ public class LocalPathPanel extends JPanel implements I18n {
 		if (sent) {
 			fillTitles(messageDetailsSent);
 			fillMessageDetails(messageDetailsSent, this.interfaceId, this.selectedFrameNumber);
-			fillOtherIfRouter();
+			fillOtherIfForwarding();
 		} else {
 			fillTitles(messageDetailsReceived);
 			fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
-			fillOtherIfRouter();
+			fillOtherIfForwarding();
 		}
 		show(25);
 	}
 
-	/**
-	 * Prüft, ob das ausgewählte Frame empfangen oder versandt (= nicht empfangen)
-	 * wurde.
+	/*
+	 * Füllt die andere Nachrichtentabelle aus, falls der Knoten ein Router ist und
+	 * das IP- oder ICMP-Paket von ihm nur weitergeleitet wird.
 	 */
-	private boolean isFrameSent() {
-		return this.interfaceId
-				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
+	private void fillOtherIfForwarding() {
+		correspondingFrameData = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
+				this.systemSoftware);
+		String corrInterfaceId = (String) correspondingFrameData[0];
+		Integer corrFrameNumber = (Integer) correspondingFrameData[1];
+		setForwarding(corrInterfaceId, corrFrameNumber);
+		fillOtherIfForwarding(corrInterfaceId, corrFrameNumber);
 	}
 
 	/**
-	 * Hat nur eine Wirkung bei Routern, bei denen das IpPaket im Frame "auf der
-	 * Durchreise" ist. Füllt diejenigen Nachrichtendetails
-	 * ({@code messageDetailsReceived} oder {@code messageDetailsSent}) aus, welche
-	 * noch nicht ausgefüllt wurde.
+	 * Setzt {@code forwarding} auf wahr, falls das IP- oder ICMP-Paket beim Router
+	 * nur weitergeleitet wird.
 	 */
-	private void fillOtherIfRouter() {
-		/*
-		 * Falls der Knoten ein Router (Vermittlungsrechner oder Heimrouter) ist und das
-		 * im ankommenden Frame enthaltene (IP- oder ICMP-)Paket nur "auf dem Vorbeiweg"
-		 * (bzw. nicht für den Knoten bestimmt oder von ihm ursprünglich erstellt) ist,
-		 * müssen auch die anderen Nachrichtendetails mit den Daten des dazugehörenden
-		 * Frames gefüllt werden.
-		 */
+	private void setForwarding(String corrInterfaceId, Integer corrFrameNumber) {
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
-			Object[] interfaceIdAndFrameNumber = lauscher.getCorrespondingFrame(this.interfaceId,
-					this.selectedFrameNumber, this.systemSoftware);
+			if (corrInterfaceId != null && corrFrameNumber != null) {
+				forwarding = true;
+			}
+		}
+	}
 
-			String interfaceId = (String) interfaceIdAndFrameNumber[0];
-			Integer frameNumber = (Integer) interfaceIdAndFrameNumber[1];
-			if (!(interfaceId == null || frameNumber == null)) {
-				if (received == true) {
-					sent = true;
-					fillTitles(messageDetailsSent);
-					fillMessageDetails(messageDetailsSent, interfaceId, frameNumber);
-				} else if (sent == true) {
-					received = true;
-					fillTitles(messageDetailsReceived);
-					fillMessageDetails(messageDetailsReceived, interfaceId, frameNumber);
-				}
+	/**
+	 * Falls {@code forwarding} wahr ist, füllt diese Methode diejenigen
+	 * {@code messageDetailsSent}) aus, welche noch nicht ausgefüllt wurden, da für
+	 * die Visualisierung beide benötigt werden.
+	 */
+	private void fillOtherIfForwarding(String corrInterfaceId, Integer corrFrameNumber) {
+		if (forwarding == true) {
+			if (sent) {
+				fillTitles(messageDetailsReceived);
+				fillMessageDetails(messageDetailsReceived, corrInterfaceId, corrFrameNumber);
+			} else {
+				fillTitles(messageDetailsSent);
+				fillMessageDetails(messageDetailsSent, corrInterfaceId, corrFrameNumber);
 			}
 		}
 	}
@@ -271,6 +268,24 @@ public class LocalPathPanel extends JPanel implements I18n {
 		messageDetails[4][4] = messages.getString("rp_lauscher_msg7") + ":";
 	}
 
+	/*
+	 * Bestimmt, welche Nachrichtendetails standardmässig beim erstmaligen Öffnen
+	 * des Fensters im unteren Teil der SplitPane zu sehen sind: {@code
+	 * messageDetailsSent} oder {@code messageDetailsReceived}.
+	 */
+	private JScrollPane determineDefaultMessageDetails() {
+		JScrollPane messageDetailsScrollPane;
+		if (sent) {
+			// for the sender a message
+			messageDetailsScrollPane = new JScrollPane(tableSent);
+		} else {
+			// for the receiver of a message
+			// for a router, which is only forwarding an IP or ICMP packet
+			messageDetailsScrollPane = new JScrollPane(tableReceived);
+		}
+		return messageDetailsScrollPane;
+	}
+	
 	/**
 	 * Nur zu Testzwecken (um auf der Programmausgabe beide Nachrichtendetails
 	 * anzuzeigen).
@@ -319,6 +334,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 		System.out.println("-------------------------------------");
 	}
 
+	/*
+	 * Class for the table at the bottom of the SplitPane for the message details.
+	 */
 	private class MessageDetailsTable extends JPanel {
 		private final GridBagLayout gridBagLayout;
 		private GridBagConstraints c;

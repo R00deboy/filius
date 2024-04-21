@@ -32,7 +32,7 @@ import filius.software.system.VermittlungsrechnerBetriebssystem;
  * @author Christoph Irniger
  */
 public class LocalPathPanel extends JPanel implements I18n {
-	private final SystemSoftware systemSoftware;
+	public final SystemSoftware systemSoftware;
 
 	private final String interfaceId;
 
@@ -44,9 +44,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private boolean sent = false; // if the node sent the frame, otherwise the node received the frame
 	private boolean forwarding = false; // if the node is only forwarding an IP or ICMP packet
 
-	private final LocalPathVisualisation visualisation; // Visualisierung oben
-	private final MessageDetailsTable tableSent; // Nachrichtendetails für versendete Daten
-	private final MessageDetailsTable tableReceived; // Nachrichtendetails für empfangene Daten
+	private final LocalPathVisualisation visualisation; // Visualisierung (oben)
+	private final MessageDetailsTable tableSent; // Nachrichtendetails für versendete Daten (unten)
+	private final MessageDetailsTable tableReceived; // Nachrichtendetails für empfangene Daten (unten)
+
+	public JSplitPane splitPane;
 
 	Object[] correspondingFrameData;
 
@@ -72,19 +74,18 @@ public class LocalPathPanel extends JPanel implements I18n {
 		setForwardingAndFillOther();
 
 		// initialise visualisation and table for message details
-		visualisation = new LocalPathVisualisation(localPathDialog.getSystemSoftware());
+		visualisation = new LocalPathVisualisation(this, sent, forwarding);
 		tableSent = new MessageDetailsTable(messageDetailsSent);
 		tableReceived = new MessageDetailsTable(messageDetailsReceived);
 
+		// splitPane for visualisation in upper and message details in lower part
+		splitPane = new JSplitPane();
+		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+
 		// scrollPanes
 		JScrollPane visualisationScrollPane = new JScrollPane(visualisation);
-		JScrollPane messageDetailsScrollPane = determineDefaultMessageDetails();
-
-		// splitPane for visualisation in upper and message details in lower part
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPane.setTopComponent(visualisationScrollPane);
-		splitPane.setBottomComponent(messageDetailsScrollPane);
+		splitPane.setBottomComponent(setDefaultMessageDetails());
 
 		// layout manager for this panel
 		BorderLayout borderLayout = new BorderLayout(10, 10);
@@ -110,7 +111,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		return this.interfaceId
 				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
 	}
-	
+
 	/**
 	 * Füllt die Nachrichtendetails {@code messageDetailsSent} und
 	 * {@code messageDetailsReceived} mit allen für die Visualisierung benötigten
@@ -127,7 +128,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		show(25);
 	}
 
-	/*
+	/**
 	 * Füllt die andere Nachrichtentabelle aus, falls der Knoten ein Router ist und
 	 * das IP- oder ICMP-Paket von ihm nur weitergeleitet wird.
 	 */
@@ -266,24 +267,36 @@ public class LocalPathPanel extends JPanel implements I18n {
 		messageDetails[4][4] = messages.getString("rp_lauscher_msg7") + ":";
 	}
 
-	/*
+	/**
 	 * Bestimmt, welche Nachrichtendetails standardmässig beim erstmaligen Öffnen
 	 * des Fensters im unteren Teil der SplitPane zu sehen sind: {@code
 	 * messageDetailsSent} oder {@code messageDetailsReceived}.
 	 */
-	private JScrollPane determineDefaultMessageDetails() {
-		JScrollPane messageDetailsScrollPane;
+	private JScrollPane setDefaultMessageDetails() {
 		if (sent) {
 			// for the sender a message
-			messageDetailsScrollPane = new JScrollPane(tableSent);
+			return updateMessageDetails(true);
 		} else {
 			// for the receiver of a message
 			// for a router, which is only forwarding an IP or ICMP packet
+			return updateMessageDetails(false);
+		}
+	}
+
+	/**
+	 * Aktualisiert die Nachrichtendetails (z.B. wenn in der Visualisierung "zurück"
+	 * oder "vorwärts" gedrückt wurde.
+	 */
+	public JScrollPane updateMessageDetails(boolean senderSideIsActive) {
+		JScrollPane messageDetailsScrollPane;
+		if (senderSideIsActive) {
+			messageDetailsScrollPane = new JScrollPane(tableSent);
+		} else {
 			messageDetailsScrollPane = new JScrollPane(tableReceived);
 		}
 		return messageDetailsScrollPane;
 	}
-	
+
 	/**
 	 * Nur zu Testzwecken (um auf der Programmausgabe beide Nachrichtendetails
 	 * anzuzeigen).

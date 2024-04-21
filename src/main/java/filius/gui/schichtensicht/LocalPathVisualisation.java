@@ -28,8 +28,8 @@ public class LocalPathVisualisation extends JPanel {
 	// (for smaller on receiver side)
 	private int pointInTimeForSenderSide;
 
-	private final JButton BACK_IN_TIME = new JButton("back in time");
-	private final JButton FORTH_IN_TIME = new JButton("forth in time");
+	private final JButton BACK_IN_TIME = new JButton("zurück");
+	private final JButton FORTH_IN_TIME = new JButton("vorwärts");
 
 	public LocalPathVisualisation(LocalPathPanel localPathPanel, boolean sent, boolean forwarding) {
 		super();
@@ -111,10 +111,6 @@ public class LocalPathVisualisation extends JPanel {
 					} else {
 						FORTH_IN_TIME.setEnabled(true);
 					}
-					System.out.println("minPointInTime = " + minPointInTime);
-					System.out.println("maxPointInTime = " + maxPointInTime);
-					System.out.println("pointInTime = " + pointInTime);
-					System.out.println("pointInTimeForSenderSide = " + pointInTimeForSenderSide);
 					setSenderSide();
 					localPathPanel.splitPane
 							.setBottomComponent(localPathPanel.updateMessageDetails(senderSideIsActive));
@@ -133,10 +129,6 @@ public class LocalPathVisualisation extends JPanel {
 					} else {
 						BACK_IN_TIME.setEnabled(true);
 					}
-					System.out.println("minPointInTime = " + minPointInTime);
-					System.out.println("maxPointInTime = " + maxPointInTime);
-					System.out.println("pointInTime = " + pointInTime);
-					System.out.println("pointInTimeForSenderSide = " + pointInTimeForSenderSide);
 					setSenderSide();
 					localPathPanel.splitPane
 							.setBottomComponent(localPathPanel.updateMessageDetails(senderSideIsActive));

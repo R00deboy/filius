@@ -2,6 +2,8 @@ package filius.gui.schichtensicht;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -14,38 +16,120 @@ public class LocalPathVisualisation extends JPanel {
 	private final GridBagLayout gridBagLayout;
 	private GridBagConstraints c;
 
-	public LocalPathVisualisation(SystemSoftware systemSoftware) {
+	private LocalPathPanel localPathPanel;
+
+	private int pointInTime = 0;
+	private static int maxPointInTime;
+	private static int minPointInTime;
+
+	// visualisation is on the sender side (otherwise receiver side)
+	private boolean senderSideIsActive = false;
+	// for this and all greater points in time visualisation is on the sender side
+	// (for smaller on receiver side)
+	private static int pointInTimeForSenderSide;
+
+	private static final JButton BACK_IN_TIME = new JButton("back in time");
+	private static final JButton FORTH_IN_TIME = new JButton("forth in time");
+
+	public LocalPathVisualisation(LocalPathPanel localPathPanel, boolean sent, boolean forwarding) {
 		super();
+		this.localPathPanel = localPathPanel;
+		SystemSoftware systemSoftware = localPathPanel.systemSoftware;
 		gridBagLayout = new GridBagLayout();
 		c = new GridBagConstraints();
 		this.setLayout(gridBagLayout);
 
-		// Visualisierung, falls Host (Rechner, Notebook)
+		if (sent) {
+			senderSideIsActive = true;
+		}
+
+		// Falls Host (Rechner, Notebook)
 		if (systemSoftware instanceof Betriebssystem) {
+			minPointInTime = 0;
+			maxPointInTime = 4;
+			if (sent) {
+				pointInTimeForSenderSide = 0;
+			} else {
+				pointInTimeForSenderSide = 5;
+			}
 			hostVisualisation();
 		}
-		// Visualisierung, falls Router (Vermittlungsrechner, Heimrouter)
+		// Falls Router (Vermittlungsrechner, Heimrouter)
 		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem
 				|| systemSoftware instanceof GatewayFirmware) {
+			if (forwarding) {
+				minPointInTime = 0;
+				maxPointInTime = 5;
+			} else if (sent) {
+				minPointInTime = 3;
+				maxPointInTime = 5;
+			} else {
+				minPointInTime = 0;
+				maxPointInTime = 2;
+			}
+			pointInTimeForSenderSide = 3;
 			routerVisualisation();
 		}
+
+		backAndForth();
 	}
 
 	/**
 	 * Visualisierung eines Hosts (Rechner oder Notebook)
 	 */
 	private void hostVisualisation() {
-		// For each component to be added to this container:
-		// ...Create the component...
-		// ...Set instance variables in the GridBagConstraints instance...
-		JButton button = new JButton("HOIIIIII");
-		this.add(button, c);
+		basicConfiguration();
 	}
 
 	/**
 	 * Visualisierung eines Routers (Vermittlungsrechner oder Heimrouter)
 	 */
 	private void routerVisualisation() {
-		// MigLayout: Es wird für einen Router brauchen: 15 Zeilen, 13 Spalten.
+		basicConfiguration();
+	}
+
+	private void basicConfiguration() {
+		c.gridx = 0;
+		c.gridy = 0;
+		this.add(BACK_IN_TIME, c);
+		c.gridx = 1;
+		c.gridy = 0;
+		this.add(FORTH_IN_TIME, c);
+	}
+
+	private void backAndForth() {
+		BACK_IN_TIME.addActionListener(new ActionListener() {
+			// back in time
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (pointInTime > minPointInTime) {
+					pointInTime--;
+					setSenderSide();
+					localPathPanel.splitPane
+							.setBottomComponent(localPathPanel.updateMessageDetails(senderSideIsActive));
+				}
+			}
+		});
+
+		FORTH_IN_TIME.addActionListener(new ActionListener() {
+			// forth in time
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (pointInTime < maxPointInTime) {
+					pointInTime++;
+					setSenderSide();
+					localPathPanel.splitPane
+							.setBottomComponent(localPathPanel.updateMessageDetails(senderSideIsActive));
+				}
+			}
+		});
+	}
+
+	private void setSenderSide() {
+		if (pointInTime >= pointInTimeForSenderSide) {
+			senderSideIsActive = true;
+		} else {
+			senderSideIsActive = false;
+		}
 	}
 }

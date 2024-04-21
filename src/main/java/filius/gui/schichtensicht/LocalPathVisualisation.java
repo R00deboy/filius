@@ -19,17 +19,17 @@ public class LocalPathVisualisation extends JPanel {
 	private LocalPathPanel localPathPanel;
 
 	private int pointInTime = 0;
-	private static int maxPointInTime;
-	private static int minPointInTime;
+	private int maxPointInTime;
+	private int minPointInTime;
 
 	// visualisation is on the sender side (otherwise receiver side)
 	private boolean senderSideIsActive = false;
 	// for this and all greater points in time visualisation is on the sender side
 	// (for smaller on receiver side)
-	private static int pointInTimeForSenderSide;
+	private int pointInTimeForSenderSide;
 
-	private static final JButton BACK_IN_TIME = new JButton("back in time");
-	private static final JButton FORTH_IN_TIME = new JButton("forth in time");
+	private final JButton BACK_IN_TIME = new JButton("back in time");
+	private final JButton FORTH_IN_TIME = new JButton("forth in time");
 
 	public LocalPathVisualisation(LocalPathPanel localPathPanel, boolean sent, boolean forwarding) {
 		super();
@@ -38,6 +38,8 @@ public class LocalPathVisualisation extends JPanel {
 		gridBagLayout = new GridBagLayout();
 		c = new GridBagConstraints();
 		this.setLayout(gridBagLayout);
+		
+		BACK_IN_TIME.setEnabled(false);
 
 		if (sent) {
 			senderSideIsActive = true;
@@ -104,6 +106,15 @@ public class LocalPathVisualisation extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				if (pointInTime > minPointInTime) {
 					pointInTime--;
+					if (pointInTime == minPointInTime) {
+						BACK_IN_TIME.setEnabled(false);
+					} else {
+						FORTH_IN_TIME.setEnabled(true);
+					}
+					System.out.println("minPointInTime = " + minPointInTime);
+					System.out.println("maxPointInTime = " + maxPointInTime);
+					System.out.println("pointInTime = " + pointInTime);
+					System.out.println("pointInTimeForSenderSide = " + pointInTimeForSenderSide);
 					setSenderSide();
 					localPathPanel.splitPane
 							.setBottomComponent(localPathPanel.updateMessageDetails(senderSideIsActive));
@@ -117,6 +128,15 @@ public class LocalPathVisualisation extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				if (pointInTime < maxPointInTime) {
 					pointInTime++;
+					if (pointInTime == maxPointInTime) {
+						FORTH_IN_TIME.setEnabled(false);
+					} else {
+						BACK_IN_TIME.setEnabled(true);
+					}
+					System.out.println("minPointInTime = " + minPointInTime);
+					System.out.println("maxPointInTime = " + maxPointInTime);
+					System.out.println("pointInTime = " + pointInTime);
+					System.out.println("pointInTimeForSenderSide = " + pointInTimeForSenderSide);
 					setSenderSide();
 					localPathPanel.splitPane
 							.setBottomComponent(localPathPanel.updateMessageDetails(senderSideIsActive));

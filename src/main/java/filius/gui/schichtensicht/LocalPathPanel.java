@@ -120,11 +120,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 		if (sent) {
 			fillTitles(messageDetailsSent);
 			fillMessageDetails(messageDetailsSent, this.interfaceId, this.selectedFrameNumber);
-			fillOtherIfForwarding();
+			setForwardingAndFillOther();
 		} else {
 			fillTitles(messageDetailsReceived);
 			fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
-			fillOtherIfForwarding();
+			setForwardingAndFillOther();
 		}
 		show(25);
 	}
@@ -133,7 +133,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * Füllt die andere Nachrichtentabelle aus, falls der Knoten ein Router ist und
 	 * das IP- oder ICMP-Paket von ihm nur weitergeleitet wird.
 	 */
-	private void fillOtherIfForwarding() {
+	private void setForwardingAndFillOther() {
 		correspondingFrameData = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
 				this.systemSoftware);
 		String corrInterfaceId = (String) correspondingFrameData[0];
@@ -156,7 +156,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	/**
 	 * Falls {@code forwarding} wahr ist, füllt diese Methode diejenigen
-	 * {@code messageDetailsSent}) aus, welche noch nicht ausgefüllt wurden, da für
+	 * {@code messageDetailsSent} aus, welche noch nicht ausgefüllt wurden, da für
 	 * die Visualisierung beide benötigt werden.
 	 */
 	private void fillOtherIfForwarding(String corrInterfaceId, Integer corrFrameNumber) {

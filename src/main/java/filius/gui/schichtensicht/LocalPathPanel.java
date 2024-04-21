@@ -68,8 +68,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 		}
 
 		// fill messageDetailsReceived and messageDetailsSent
-
 		fill();
+		setForwardingAndFillOther();
 
 		// initialise visualisation and table for message details
 		visualisation = new LocalPathVisualisation(localPathDialog.getSystemSoftware());
@@ -120,11 +120,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 		if (sent) {
 			fillTitles(messageDetailsSent);
 			fillMessageDetails(messageDetailsSent, this.interfaceId, this.selectedFrameNumber);
-			setForwardingAndFillOther();
 		} else {
 			fillTitles(messageDetailsReceived);
 			fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
-			setForwardingAndFillOther();
 		}
 		show(25);
 	}

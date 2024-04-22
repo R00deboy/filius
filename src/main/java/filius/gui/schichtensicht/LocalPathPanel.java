@@ -309,25 +309,19 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * 1 = network access
 	 * 2 = internet
 	 * 3 = transport
-	 * 4 = application
 	 * 
 	 * @param code number for layer
 	 * @throws NoSuchAlgorithmException 
 	 */
-	private void hideLayerData(int layerNumber) throws NoSuchElementException {
-		if (layerNumber > 4 || layerNumber < 1) {
-			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 4.");
+	private void showLayerData(int layerNumber) throws NoSuchElementException {
+		if (layerNumber > 3 || layerNumber < 1) {
+			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
 		} else {
 			// determine columns to hide
 			Set<Integer> columns = new HashSet<>();
-			if (layerNumber >= 1 && layerNumber <= 3) {
-				int firstColumn = (layerNumber - 1) * 2;
-				columns.add(firstColumn);
-				columns.add(firstColumn + 1);
-			} else if (layerNumber == 4) {
-				columns.add(6);
-				columns.add(6);
-			}
+			int firstColumn = (layerNumber - 1) * 2;
+			columns.add(firstColumn);
+			columns.add(firstColumn + 1);
 			// hide columns
 			GridBagLayout gridBagLayout = tableSent.gridBagLayout;
 			Component[] components = tableSent.getComponents();
@@ -344,7 +338,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			}
 		}
 	}
-
+	
 	/**
 	 * Nur zu Testzwecken (um auf der Programmausgabe beide Nachrichtendetails
 	 * anzuzeigen).

@@ -6,6 +6,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.awt.Font;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -41,14 +45,17 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private String[][] messageDetailsSent = new String[5][8]; // für die versendete Nachricht
 	private String[][] messageDetailsReceived = new String[5][8]; // für die ankommende Nachricht
 
+	MessageDetailsTable tableSent;
+	MessageDetailsTable tableReceived;
+
 	private boolean sent = false; // if the node sent the frame, otherwise the node received the frame
 	private boolean forwarding = false; // if the node is only forwarding an IP or ICMP packet
 
-	private final LocalPathVisualisation visualisation; // Visualisierung (oben)
-	private final MessageDetailsTable tableSent; // Nachrichtendetails für versendete Daten (unten)
-	private final MessageDetailsTable tableReceived; // Nachrichtendetails für empfangene Daten (unten)
-
 	public JSplitPane splitPane;
+
+	private final JScrollPane visualisationScrollPane; // upper ScrollPane (visualisation)
+	private final JScrollPane messageDetailsSentScrollPane; // lower ScrollPane (message details for sent data)
+	private final JScrollPane messageDetailsReceivedScrollPane; // lower ScrollPane (message details for received data)
 
 	Object[] correspondingFrameData;
 
@@ -73,19 +80,21 @@ public class LocalPathPanel extends JPanel implements I18n {
 		fill();
 		setForwardingAndFillOther();
 
-		// initialise visualisation and table for message details
-		visualisation = new LocalPathVisualisation(this, sent, forwarding);
+		// initialise visualisation and tables for message details
+		LocalPathVisualisation visualisation = new LocalPathVisualisation(this, sent, forwarding);
 		tableSent = new MessageDetailsTable(messageDetailsSent);
 		tableReceived = new MessageDetailsTable(messageDetailsReceived);
+		messageDetailsSentScrollPane = new JScrollPane(tableSent);
+		messageDetailsReceivedScrollPane = new JScrollPane(tableReceived);
 
-		// splitPane for visualisation in upper and message details in lower part
+		// SplitPane (for visualisation in upper and message details in lower part)
 		splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 
-		// scrollPanes
-		JScrollPane visualisationScrollPane = new JScrollPane(visualisation);
+		// ScrollPanes
+		visualisationScrollPane = new JScrollPane(visualisation);
 		splitPane.setTopComponent(visualisationScrollPane);
-		splitPane.setBottomComponent(setDefaultMessageDetails());
+		setDefaultMessageDetails();
 
 		// layout manager for this panel
 		BorderLayout borderLayout = new BorderLayout(10, 10);
@@ -125,7 +134,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			fillTitles(messageDetailsReceived);
 			fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
 		}
-		show(25);
+		// show(25);
 	}
 
 	/**
@@ -272,14 +281,14 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * des Fensters im unteren Teil der SplitPane zu sehen sind: {@code
 	 * messageDetailsSent} oder {@code messageDetailsReceived}.
 	 */
-	private JScrollPane setDefaultMessageDetails() {
+	private void setDefaultMessageDetails() {
 		if (sent) {
 			// for the sender a message
-			return updateMessageDetails(true);
+			updateMessageDetails(true);
 		} else {
 			// for the receiver of a message
 			// for a router, which is only forwarding an IP or ICMP packet
-			return updateMessageDetails(false);
+			updateMessageDetails(false);
 		}
 	}
 
@@ -287,14 +296,53 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * Aktualisiert die Nachrichtendetails (z.B. wenn in der Visualisierung "zurück"
 	 * oder "vorwärts" gedrückt wurde.
 	 */
-	public JScrollPane updateMessageDetails(boolean senderSideIsActive) {
-		JScrollPane messageDetailsScrollPane;
+	public void updateMessageDetails(boolean senderSideIsActive) {
 		if (senderSideIsActive) {
-			messageDetailsScrollPane = new JScrollPane(tableSent);
+			splitPane.setBottomComponent(messageDetailsSentScrollPane);
 		} else {
-			messageDetailsScrollPane = new JScrollPane(tableReceived);
+			splitPane.setBottomComponent(messageDetailsReceivedScrollPane);
 		}
-		return messageDetailsScrollPane;
+	}
+	
+	/**
+	 * Hide data of a layer in the message details.
+	 * 1 = network access
+	 * 2 = internet
+	 * 3 = transport
+	 * 4 = application
+	 * 
+	 * @param code number for layer
+	 * @throws NoSuchAlgorithmException 
+	 */
+	private void hideLayerData(int layerNumber) throws NoSuchElementException {
+		if (layerNumber > 4 || layerNumber < 1) {
+			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 4.");
+		} else {
+			// determine columns to hide
+			Set<Integer> columns = new HashSet<>();
+			if (layerNumber >= 1 && layerNumber <= 3) {
+				int firstColumn = (layerNumber - 1) * 2;
+				columns.add(firstColumn);
+				columns.add(firstColumn + 1);
+			} else if (layerNumber == 4) {
+				columns.add(6);
+				columns.add(6);
+			}
+			// hide columns
+			GridBagLayout gridBagLayout = tableSent.gridBagLayout;
+			Component[] components = tableSent.getComponents();
+			for (Component component : components) {
+				if (columns.contains(gridBagLayout.getConstraints(component).gridx)) {
+					component.setBackground(tableSent.getParent().getBackground());
+					component.setForeground(tableSent.getParent().getBackground());
+					if (component instanceof JTextArea) {
+						((JTextArea) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
+					} else if (component instanceof JLabel) {
+						((JLabel) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
+					}
+				}
+			}
+		}
 	}
 
 	/**

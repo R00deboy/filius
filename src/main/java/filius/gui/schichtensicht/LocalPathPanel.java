@@ -57,7 +57,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private final JScrollPane messageDetailsSentScrollPane; // lower ScrollPane (message details for sent data)
 	private final JScrollPane messageDetailsReceivedScrollPane; // lower ScrollPane (message details for received data)
 
-	Object[] correspondingFrameData;
+	private final Object[] correspondingFrameData;
+
+	private int hiddenLayers;
 
 	private static final int PREF_MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int PREF_MSG_DETAILS_CELL_HEIGHT = 30;
@@ -78,6 +80,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		// fill messageDetailsReceived and messageDetailsSent
 		fill();
+		correspondingFrameData = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
+				this.systemSoftware);
 		setForwardingAndFillOther();
 
 		// initialise visualisation and tables for message details
@@ -142,8 +146,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * das IP- oder ICMP-Paket von ihm nur weitergeleitet wird.
 	 */
 	private void setForwardingAndFillOther() {
-		correspondingFrameData = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
-				this.systemSoftware);
 		String corrInterfaceId = (String) correspondingFrameData[0];
 		Integer corrFrameNumber = (Integer) correspondingFrameData[1];
 		setForwarding(corrInterfaceId, corrFrameNumber);
@@ -303,17 +305,15 @@ public class LocalPathPanel extends JPanel implements I18n {
 			splitPane.setBottomComponent(messageDetailsReceivedScrollPane);
 		}
 	}
-	
+
 	/**
-	 * Hide data of a layer in the message details.
-	 * 1 = network access
-	 * 2 = internet
-	 * 3 = transport
+	 * Hide data of a layer in the message details. 1 = network access, 2 =
+	 * internet, 3 = transport
 	 * 
 	 * @param code number for layer
-	 * @throws NoSuchAlgorithmException 
+	 * @throws NoSuchAlgorithmException
 	 */
-	private void showLayerData(int layerNumber) throws NoSuchElementException {
+	private void hideLayerData(int layerNumber) throws NoSuchElementException {
 		if (layerNumber > 3 || layerNumber < 1) {
 			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
 		} else {
@@ -338,7 +338,28 @@ public class LocalPathPanel extends JPanel implements I18n {
 			}
 		}
 	}
-	
+
+	/**
+	 * Hide data of the next higher layer in the message details.
+	 */
+	private void hideNextHigherLayer() {
+		if (hiddenLayers > 2) {
+			throw new NoSuchElementException("All hideable layers are already hidden.");
+		} else {
+			switch (hiddenLayers) {
+			case 0:
+				hideLayerData(1);
+				break;
+			case 1:
+				hideLayerData(2);
+				break;
+			case 2:
+				hideLayerData(3);
+				break;
+			}
+		}
+	}
+
 	/**
 	 * Nur zu Testzwecken (um auf der Programmausgabe beide Nachrichtendetails
 	 * anzuzeigen).

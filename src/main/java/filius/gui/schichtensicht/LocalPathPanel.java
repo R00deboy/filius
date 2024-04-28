@@ -308,7 +308,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	/**
 	 * Hide data of a layer in the message details. 1 = network access, 2 =
-	 * internet, 3 = transport
+	 * internet, 3 = transport.
 	 * 
 	 * @param code number for layer
 	 * @throws NoSuchAlgorithmException
@@ -340,23 +340,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Hide data of the next higher layer in the message details.
+	 * Hide data of the next higher layer in the message details. Hideable layers
+	 * are 1 = network access, 2 = internet, 3 = transport.
 	 */
 	private void hideNextHigherLayer() {
-		if (hiddenLayers > 2) {
-			throw new NoSuchElementException("All hideable layers are already hidden.");
-		} else {
-			switch (hiddenLayers) {
-			case 0:
-				hideLayerData(1);
-				break;
-			case 1:
-				hideLayerData(2);
-				break;
-			case 2:
-				hideLayerData(3);
-				break;
-			}
+		if (hiddenLayers <= 2 && hiddenLayers >= 0) {
+			hideLayerData(hiddenLayers + 1);
 		}
 	}
 

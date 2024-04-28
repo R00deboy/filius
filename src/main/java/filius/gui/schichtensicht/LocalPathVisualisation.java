@@ -112,8 +112,7 @@ public class LocalPathVisualisation extends JPanel {
 						FORTH_IN_TIME.setEnabled(true);
 					}
 					setSenderSide();
-					localPathPanel.splitPane
-							.setBottomComponent(localPathPanel.updateMessageDetails(senderSideIsActive));
+					localPathPanel.updateMessageDetails(senderSideIsActive);
 				}
 			}
 		});
@@ -130,8 +129,7 @@ public class LocalPathVisualisation extends JPanel {
 						BACK_IN_TIME.setEnabled(true);
 					}
 					setSenderSide();
-					localPathPanel.splitPane
-							.setBottomComponent(localPathPanel.updateMessageDetails(senderSideIsActive));
+					localPathPanel.updateMessageDetails(senderSideIsActive);
 				}
 			}
 		});

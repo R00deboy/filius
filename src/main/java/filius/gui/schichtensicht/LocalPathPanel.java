@@ -100,9 +100,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 		splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 
-		// ScrollPanes
+		// ScrollPane for top of SplitPane
 		visualisationScrollPane = new JScrollPane(visualisation);
 		splitPane.setTopComponent(visualisationScrollPane);
+
+		// ScrollPane for bottom of SplitPane
 		setDefaultMessageDetails();
 
 		// layout manager for this panel
@@ -413,14 +415,15 @@ public class LocalPathPanel extends JPanel implements I18n {
 			gridBagLayout = new GridBagLayout();
 			c = new GridBagConstraints();
 			this.setLayout(gridBagLayout);
+			this.setBackground(Color.WHITE);
 			JLabel label;
 			JTextArea textArea;
 
 			// first line (from left to right)
 			for (int j = 0; j < 6; j = j + 2) {
-				label = setLabel(messageDetails[0][j], j, 0, 2, 1, 1, 1);
+				label = setLabel(messageDetails[0][j], j, 0, 2, 1, 1, 1, false);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
-				setBold(label);
+				setBoldAndItalic(label);
 				if (j == 0 || j == 1) {
 					label.setBackground(LayerColorVar.LINK.backgroundColorFine);
 				} else if (j == 2 || j == 3) {
@@ -429,24 +432,26 @@ public class LocalPathPanel extends JPanel implements I18n {
 					label.setBackground(LayerColorVar.TRANSPORT.backgroundColorFine);
 				}
 			}
-			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 2, 1);
+			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 2, 1, false);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
 			label.setBackground(LayerColorVar.APPLICATION.backgroundColorFine);
-			setBold(label);
-			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 1, 1);
+			setBoldAndItalic(label);
+			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 0.5, 1, false);
+			label.setHorizontalAlignment(JLabel.CENTER);
+			label.setVerticalAlignment(JLabel.CENTER);;
 			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
-			setBold(label);
+			setBoldAndItalic(label);
 
-			// second line (from left to right)
+			// second empty line, which is transparent (from left to right)
 			for (int j = 0; j < 6; j = j + 2) {
-				label = setEmptyCell(j, 1, 2, 1, 1, 1);
+				label = setEmptyCell(j, 1, 2, 1, 1, 0.8);
 			}
-			label = setEmptyCell(6, 1, 1, 1, 2, 1);
-			label = setEmptyCell(7, 1, 1, 1, 1, 1);
+			label = setEmptyCell(6, 1, 1, 1, 2, 0.8);
+			label = setEmptyCell(7, 1, 1, 1, 0.5, 0.8);
 
 			// third line (from left to right)
 			for (int j = 0; j < 6; j = j + 2) {
-				label = setLabel(messageDetails[2][j], j, 2, 2, 1, 1, 1);
+				label = setLabel(messageDetails[2][j], j, 2, 2, 1, 1, 1, true);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
 				if (j == 0 || j == 1) {
 					label.setBackground(LayerColorVar.LINK.backgroundColor);
@@ -456,17 +461,19 @@ public class LocalPathPanel extends JPanel implements I18n {
 					label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
 				}
 			}
-			label = setLabel(messageDetails[2][6], 6, 2, 1, 1, 2, 1);
+			label = setLabel(messageDetails[2][6], 6, 2, 1, 1, 2, 1, true);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
 			label.setBackground(LayerColorVar.APPLICATION.backgroundColor);
-			label = setLabel(messageDetails[2][7], 7, 2, 1, 1, 1, 1);
+			label = setLabel(messageDetails[2][7], 7, 2, 1, 1, 0.5, 1, false);
+			label.setHorizontalAlignment(JLabel.CENTER);
+			label.setVerticalAlignment(JLabel.CENTER);
 			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
-			setBold(label);
+			setBoldAndItalic(label);
 
 			// fourth and fifth line, first to sixth columns (from left to right)
 			for (int i = 3; i < 5; i++) {
 				for (int j = 0; j < 6; j++) {
-					label = setLabel(messageDetails[i][j], j, i, 1, 1, 1, 1);
+					label = setLabel(messageDetails[i][j], j, i, 1, 1, 1, 1, true);
 					if (j % 2 == 0) {
 						label.setHorizontalAlignment(SwingConstants.RIGHT);
 					}
@@ -483,7 +490,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			// sixth line, first to sixth columns (from left to right)
 			for (int j = 0; j < 6; j++) {
 				if (j % 2 == 0) {
-					label = setLabel(messageDetails[5][j], j, 5, 1, 1, 1, 3);
+					label = setLabel(messageDetails[5][j], j, 5, 1, 1, 1, 3, true);
 					label.setHorizontalAlignment(SwingConstants.RIGHT);
 					label.setVerticalAlignment(SwingConstants.TOP);
 					if (j == 0) {
@@ -508,23 +515,27 @@ public class LocalPathPanel extends JPanel implements I18n {
 			// last two cells on the bottom right with height 3
 			textArea = setTextArea(messageDetails[3][6], 6, 3, 1, 3, 2, 5 / 3.0);
 			textArea.setBackground(LayerColorVar.APPLICATION.backgroundColor);
-			label = setLabel(messageDetails[3][7], 7, 3, 1, 3, 1, 5 / 3.0);
-			label.setVerticalAlignment(SwingConstants.TOP);
+			label = setLabel(messageDetails[3][7], 7, 3, 1, 3, 0.5, 5 / 3.0, false);
+			label.setHorizontalAlignment(JLabel.CENTER);
+			label.setVerticalAlignment(JLabel.CENTER);
 			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
-			setBold(label);
+			setBoldAndItalic(label);
 		}
 
 		// Cells with short content are JLabels
-		private JLabel setLabel(String text, int x_pos, int y_pos, int width, int height, double width_multiplier, double height_multiplier) {
+		private JLabel setLabel(String text, int x_pos, int y_pos, int width, int height, double width_multiplier,
+				double height_multiplier, boolean needsBorder) {
 			JLabel label = new JLabel(text);
 
 			setStandards(label, x_pos, y_pos, width, height, width_multiplier, height_multiplier);
 			label.setOpaque(true);
 			setPlain(label);
 
-			Border border = BorderFactory.createLineBorder(Color.BLACK);
-			Border margin = new EmptyBorder(5, 5, 5, 5);
-			label.setBorder(new CompoundBorder(border, margin));
+			if (needsBorder) {
+				Border border = BorderFactory.createLineBorder(Color.BLACK);
+				Border margin = new EmptyBorder(5, 5, 5, 5);
+				label.setBorder(new CompoundBorder(border, margin));
+			}
 			add(label, c);
 
 			return label;
@@ -574,11 +585,13 @@ public class LocalPathPanel extends JPanel implements I18n {
 			c.gridheight = height;
 		}
 
-		private void setBold(Component comp) {
-			Font boldFont = new Font(comp.getFont().getName(), Font.BOLD, comp.getFont().getSize());
+		// bold and italic Font
+		private void setBoldAndItalic(Component comp) {
+			Font boldFont = new Font(comp.getFont().getName(), Font.BOLD + Font.ITALIC, comp.getFont().getSize());
 			comp.setFont(boldFont);
 		}
 
+		// normal Font
 		private void setPlain(Component comp) {
 			Font boldFont = new Font(comp.getFont().getName(), Font.PLAIN, comp.getFont().getSize());
 			comp.setFont(boldFont);

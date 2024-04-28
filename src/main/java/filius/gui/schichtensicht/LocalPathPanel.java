@@ -42,8 +42,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private final int selectedFrameNumber; // beginnt bei 1
 
-	private String[][] messageDetailsSent = new String[5][8]; // für die versendete Nachricht
-	private String[][] messageDetailsReceived = new String[5][8]; // für die ankommende Nachricht
+	private String[][] messageDetailsSent = new String[6][8]; // für die versendete Nachricht
+	private String[][] messageDetailsReceived = new String[6][8]; // für die ankommende Nachricht
 
 	MessageDetailsTable tableSent;
 	MessageDetailsTable tableReceived;
@@ -78,7 +78,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 			sent = true;
 		}
 
-		// fill messageDetailsReceived and messageDetailsSent
+		/*
+		 * Fill matrices messageDetailsReceived and messageDetailsSent. Both have an
+		 * empty second line (e.g. messageDetailsReceived[1][...] is empty), such that
+		 * it will match row and column numbers of the MessageDetailsTable, which will
+		 * be the visible element.
+		 */
 		fill();
 		correspondingFrameData = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
 				this.systemSoftware);
@@ -142,6 +147,103 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
+	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit den
+	 * Werten für das ausgewählte Interface und die frame-Nummer.
+	 */
+	private void fillMessageDetails(String[][] messageDetails, String interfaceId, int selectedFrameNumber) {
+		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
+
+		String selectedFrameNumberAsString = Integer.toString(selectedFrameNumber);
+
+		for (int i = 0; i < daten.length; i++) {
+			if (daten[i][0].equals(selectedFrameNumberAsString)) {
+				// -----Netzzugangs-Daten-----
+				// Quelle
+				messageDetails[3][1] = daten[i][2].toString();
+				// Ziel
+				messageDetails[4][1] = daten[i][3].toString();
+				// Bemerkungen / Details
+				messageDetails[5][1] = daten[i][6].toString();
+
+				// -----Vermittlungs-Daten (falls existent)-----
+				if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberAsString)) {
+					// Quelle
+					messageDetails[3][3] = daten[i + 1][2].toString();
+					// Ziel
+					messageDetails[4][3] = daten[i + 1][3].toString();
+					// Bemerkungen / Details
+					messageDetails[5][3] = daten[i + 1][6].toString();
+					// Protokoll
+					messageDetails[2][2] = daten[i + 1][4].toString();
+				}
+
+				// -----Transport-Daten (falls existent)-----
+				if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberAsString)) {
+					// Quelle
+					messageDetails[3][5] = daten[i + 2][2].toString();
+					// Ziel
+					messageDetails[4][5] = daten[i + 2][3].toString();
+					// Bemerkungen / Details
+					messageDetails[5][5] = daten[i + 2][6].toString();
+					// Protokoll
+					messageDetails[2][4] = daten[i + 2][4].toString();
+				}
+
+				// -----Anwendungs-Daten (falls existent)-----
+				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
+					// Protokoll
+					messageDetails[2][6] = daten[i + 3][4].toString();
+					// Daten
+					messageDetails[3][6] = daten[i + 3][6].toString();
+				}
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit
+	 * denjenigen Titeln (Spalten- und Zellbezeichnungen), die für alle gleich
+	 * (konstant) sind.
+	 */
+	private void fillTitles(String[][] messageDetails) {
+		// Schicht
+		messageDetails[0][7] = messages.getString("schichten_lokaler_weg_msg2");
+		// Protokoll
+		messageDetails[2][7] = messages.getString("schichten_lokaler_weg_msg3");
+		// Daten
+		messageDetails[3][7] = messages.getString("schichten_lokaler_weg_msg4");
+		// Netzzugang
+		messageDetails[0][0] = messages.getString("rp_lauscher_msg8");
+		// Vermittlung
+		messageDetails[0][2] = messages.getString("rp_lauscher_msg9");
+		// Transport
+		messageDetails[0][4] = messages.getString("rp_lauscher_msg10");
+		// Anwendung
+		messageDetails[0][6] = messages.getString("rp_lauscher_msg11");
+		// Ethernet
+		messageDetails[2][0] = messages.getString("schichten_lokaler_weg_msg5");
+		// Quelle (Netzzugang)
+		messageDetails[3][0] = messages.getString("rp_lauscher_msg3") + ":";
+		// Ziel (Netzzugang)
+		messageDetails[4][0] = messages.getString("rp_lauscher_msg4") + ":";
+		// Bemerkungen / Details (Netzzugang)
+		messageDetails[5][0] = messages.getString("rp_lauscher_msg7") + ":";
+		// Quelle (Vermittlung)
+		messageDetails[3][2] = messages.getString("rp_lauscher_msg3") + ":";
+		// Ziel (Vermittlung)
+		messageDetails[4][2] = messages.getString("rp_lauscher_msg4") + ":";
+		// Bemerkungen / Details (Vermittlung)
+		messageDetails[5][2] = messages.getString("rp_lauscher_msg7") + ":";
+		// Quelle (Transport)
+		messageDetails[3][4] = messages.getString("rp_lauscher_msg3") + ":";
+		// Ziel (Transport)
+		messageDetails[4][4] = messages.getString("rp_lauscher_msg4") + ":";
+		// Bemerkungen / Details (Transport)
+		messageDetails[5][4] = messages.getString("rp_lauscher_msg7") + ":";
+	}
+
+	/**
 	 * Füllt die andere Nachrichtentabelle aus, falls der Knoten ein Router ist und
 	 * das IP- oder ICMP-Paket von ihm nur weitergeleitet wird.
 	 */
@@ -182,103 +284,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit den
-	 * Werten für das ausgewählte Interface und die frame-Nummer.
-	 */
-	private void fillMessageDetails(String[][] messageDetails, String interfaceId, int selectedFrameNumber) {
-		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
-
-		String selectedFrameNumberAsString = Integer.toString(selectedFrameNumber);
-
-		for (int i = 0; i < daten.length; i++) {
-			if (daten[i][0].equals(selectedFrameNumberAsString)) {
-				// -----Netzzugangs-Daten-----
-				// Quelle
-				messageDetails[2][1] = daten[i][2].toString();
-				// Ziel
-				messageDetails[3][1] = daten[i][3].toString();
-				// Bemerkungen / Details
-				messageDetails[4][1] = daten[i][6].toString();
-
-				// -----Vermittlungs-Daten (falls existent)-----
-				if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberAsString)) {
-					// Quelle
-					messageDetails[2][3] = daten[i + 1][2].toString();
-					// Ziel
-					messageDetails[3][3] = daten[i + 1][3].toString();
-					// Bemerkungen / Details
-					messageDetails[4][3] = daten[i + 1][6].toString();
-					// Protokoll
-					messageDetails[1][2] = daten[i + 1][4].toString();
-				}
-
-				// -----Transport-Daten (falls existent)-----
-				if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberAsString)) {
-					// Quelle
-					messageDetails[2][5] = daten[i + 2][2].toString();
-					// Ziel
-					messageDetails[3][5] = daten[i + 2][3].toString();
-					// Bemerkungen / Details
-					messageDetails[4][5] = daten[i + 2][6].toString();
-					// Protokoll
-					messageDetails[1][4] = daten[i + 2][4].toString();
-				}
-
-				// -----Anwendungs-Daten (falls existent)-----
-				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
-					// Protokoll
-					messageDetails[1][6] = daten[i + 3][4].toString();
-					// Daten
-					messageDetails[2][6] = daten[i + 3][6].toString();
-				}
-				break;
-			}
-		}
-	}
-
-	/**
-	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit
-	 * denjenigen Titeln (Spalten- und Zellbezeichnungen), die für alle gleich
-	 * (konstant) sind.
-	 */
-	private void fillTitles(String[][] messageDetails) {
-		// Schicht
-		messageDetails[0][7] = messages.getString("schichten_lokaler_weg_msg2");
-		// Protokoll
-		messageDetails[1][7] = messages.getString("schichten_lokaler_weg_msg3");
-		// Daten
-		messageDetails[2][7] = messages.getString("schichten_lokaler_weg_msg4");
-		// Netzzugang
-		messageDetails[0][0] = messages.getString("rp_lauscher_msg8");
-		// Vermittlung
-		messageDetails[0][2] = messages.getString("rp_lauscher_msg9");
-		// Transport
-		messageDetails[0][4] = messages.getString("rp_lauscher_msg10");
-		// Anwendung
-		messageDetails[0][6] = messages.getString("rp_lauscher_msg11");
-		// Ethernet
-		messageDetails[1][0] = messages.getString("schichten_lokaler_weg_msg5");
-		// Quelle (Netzzugang)
-		messageDetails[2][0] = messages.getString("rp_lauscher_msg3") + ":";
-		// Ziel (Netzzugang)
-		messageDetails[3][0] = messages.getString("rp_lauscher_msg4") + ":";
-		// Bemerkungen / Details (Netzzugang)
-		messageDetails[4][0] = messages.getString("rp_lauscher_msg7") + ":";
-		// Quelle (Vermittlung)
-		messageDetails[2][2] = messages.getString("rp_lauscher_msg3") + ":";
-		// Ziel (Vermittlung)
-		messageDetails[3][2] = messages.getString("rp_lauscher_msg4") + ":";
-		// Bemerkungen / Details (Vermittlung)
-		messageDetails[4][2] = messages.getString("rp_lauscher_msg7") + ":";
-		// Quelle (Transport)
-		messageDetails[2][4] = messages.getString("rp_lauscher_msg3") + ":";
-		// Ziel (Transport)
-		messageDetails[3][4] = messages.getString("rp_lauscher_msg4") + ":";
-		// Bemerkungen / Details (Transport)
-		messageDetails[4][4] = messages.getString("rp_lauscher_msg7") + ":";
-	}
-
-	/**
 	 * Bestimmt, welche Nachrichtendetails standardmässig beim erstmaligen Öffnen
 	 * des Fensters im unteren Teil der SplitPane zu sehen sind: {@code
 	 * messageDetailsSent} oder {@code messageDetailsReceived}.
@@ -307,8 +312,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Hide data of a layer in the message details. 1 = network access, 2 =
-	 * internet, 3 = transport.
+	 * Hide data of a layer in the message details. 1 = link, 2 = internet, 3 =
+	 * transport.
 	 * 
 	 * @param code number for layer
 	 * @throws NoSuchAlgorithmException
@@ -341,7 +346,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	/**
 	 * Hide data of the next higher layer in the message details. Hideable layers
-	 * are 1 = network access, 2 = internet, 3 = transport.
+	 * are 1 = link, 2 = internet, 3 = transport.
 	 */
 	private void hideNextHigherLayer() {
 		if (hiddenLayers <= 2 && hiddenLayers >= 0) {
@@ -413,7 +418,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 			// first line (from left to right)
 			for (int j = 0; j < 6; j = j + 2) {
-				label = setLabel(messageDetails[0][j], j, 0, 2, 1, 2 / 8, 1 / 5, 1, 1);
+				label = setLabel(messageDetails[0][j], j, 0, 2, 1, 1, 1);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
 				setBold(label);
 				if (j == 0 || j == 1) {
@@ -424,17 +429,24 @@ public class LocalPathPanel extends JPanel implements I18n {
 					label.setBackground(LayerColorVar.TRANSPORT.backgroundColorFine);
 				}
 			}
-			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 1 / 8, 1 / 5, 2, 1);
+			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 2, 1);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
 			label.setBackground(LayerColorVar.APPLICATION.backgroundColorFine);
 			setBold(label);
-			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 1 / 8, 1 / 5, 1, 1);
+			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 1, 1);
 			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
 			setBold(label);
 
 			// second line (from left to right)
 			for (int j = 0; j < 6; j = j + 2) {
-				label = setLabel(messageDetails[1][j], j, 1, 2, 1, 2 / 8, 1 / 5, 1, 1);
+				label = setEmptyCell(j, 1, 2, 1, 1, 1);
+			}
+			label = setEmptyCell(6, 1, 1, 1, 2, 1);
+			label = setEmptyCell(7, 1, 1, 1, 1, 1);
+
+			// third line (from left to right)
+			for (int j = 0; j < 6; j = j + 2) {
+				label = setLabel(messageDetails[2][j], j, 2, 2, 1, 1, 1);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
 				if (j == 0 || j == 1) {
 					label.setBackground(LayerColorVar.LINK.backgroundColor);
@@ -444,17 +456,17 @@ public class LocalPathPanel extends JPanel implements I18n {
 					label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
 				}
 			}
-			label = setLabel(messageDetails[1][6], 6, 1, 1, 1, 1 / 8, 1 / 5, 2, 1);
+			label = setLabel(messageDetails[2][6], 6, 2, 1, 1, 2, 1);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
 			label.setBackground(LayerColorVar.APPLICATION.backgroundColor);
-			label = setLabel(messageDetails[1][7], 7, 1, 1, 1, 1 / 8, 1 / 5, 1, 1);
+			label = setLabel(messageDetails[2][7], 7, 2, 1, 1, 1, 1);
 			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
 			setBold(label);
 
-			// third and fourth line, first to sixth columns (from left to right)
-			for (int i = 2; i < 4; i++) {
+			// fourth and fifth line, first to sixth columns (from left to right)
+			for (int i = 3; i < 5; i++) {
 				for (int j = 0; j < 6; j++) {
-					label = setLabel(messageDetails[i][j], j, i, 1, 1, 1 / 8, 1 / 5, 1, 1);
+					label = setLabel(messageDetails[i][j], j, i, 1, 1, 1, 1);
 					if (j % 2 == 0) {
 						label.setHorizontalAlignment(SwingConstants.RIGHT);
 					}
@@ -468,10 +480,10 @@ public class LocalPathPanel extends JPanel implements I18n {
 				}
 			}
 
-			// fifth line, first to sixth columns (from left to right)
+			// sixth line, first to sixth columns (from left to right)
 			for (int j = 0; j < 6; j++) {
 				if (j % 2 == 0) {
-					label = setLabel(messageDetails[4][j], j, 4, 1, 1, 1 / 8, 1 / 5, 1, 7);
+					label = setLabel(messageDetails[5][j], j, 5, 1, 1, 1, 3);
 					label.setHorizontalAlignment(SwingConstants.RIGHT);
 					label.setVerticalAlignment(SwingConstants.TOP);
 					if (j == 0) {
@@ -482,7 +494,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 						label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
 					}
 				} else {
-					textArea = setTextArea(messageDetails[4][j], j, 4, 1, 1, 1 / 8, 1 / 5, 1, 7);
+					textArea = setTextArea(messageDetails[5][j], j, 5, 1, 1, 1, 3);
 					if (j == 1) {
 						textArea.setBackground(LayerColorVar.LINK.backgroundColor);
 					} else if (j == 3) {
@@ -494,31 +506,22 @@ public class LocalPathPanel extends JPanel implements I18n {
 			}
 
 			// last two cells on the bottom right with height 3
-			textArea = setTextArea(messageDetails[2][6], 6, 2, 1, 3, 1 / 8, 3 / 5, 2, 3);
+			textArea = setTextArea(messageDetails[3][6], 6, 3, 1, 3, 2, 5 / 3.0);
 			textArea.setBackground(LayerColorVar.APPLICATION.backgroundColor);
-			label = setLabel(messageDetails[2][7], 7, 2, 1, 3, 1 / 8, 1 / 5, 1, 3);
+			label = setLabel(messageDetails[3][7], 7, 3, 1, 3, 1, 5 / 3.0);
 			label.setVerticalAlignment(SwingConstants.TOP);
 			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
 			setBold(label);
 		}
 
 		// Cells with short content are JLabels
-		private JLabel setLabel(String text, int x_pos, int y_pos, int width, int height, double weightx,
-				double weighty, int width_multiplier, int height_multiplier) {
+		private JLabel setLabel(String text, int x_pos, int y_pos, int width, int height, double width_multiplier, double height_multiplier) {
 			JLabel label = new JLabel(text);
 
-			label.setPreferredSize(new Dimension(width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH,
-					height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT));
+			setStandards(label, x_pos, y_pos, width, height, width_multiplier, height_multiplier);
 			label.setOpaque(true);
-
 			setPlain(label);
 
-			c.gridx = x_pos;
-			c.gridy = y_pos;
-			c.gridwidth = width;
-			c.gridheight = height;
-			c.weightx = weightx;
-			c.weighty = weighty;
 			Border border = BorderFactory.createLineBorder(Color.BLACK);
 			Border margin = new EmptyBorder(5, 5, 5, 5);
 			label.setBorder(new CompoundBorder(border, margin));
@@ -528,31 +531,47 @@ public class LocalPathPanel extends JPanel implements I18n {
 		}
 
 		// Cells with potential long content are JTextAreas
-		private JTextArea setTextArea(String text, int x_pos, int y_pos, int width, int height, double weightx,
-				double weighty, int width_multiplier, int height_multiplier) {
+		private JTextArea setTextArea(String text, int x_pos, int y_pos, int width, int height, double width_multiplier,
+				double height_multiplier) {
 			JTextArea textArea = new JTextArea(text);
 
-			textArea.setPreferredSize(new Dimension(width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH,
-					height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT));
-
+			setStandards(textArea, x_pos, y_pos, width, height, width_multiplier, height_multiplier);
+			textArea.setOpaque(true);
 			textArea.setWrapStyleWord(true);
 			textArea.setLineWrap(true);
-			textArea.setOpaque(true);
 			textArea.setEditable(false);
 			textArea.setFocusable(false);
 
-			c.gridx = x_pos;
-			c.gridy = y_pos;
-			c.gridwidth = width;
-			c.gridheight = height;
-			c.weightx = weightx;
-			c.weighty = weighty;
 			Border border = BorderFactory.createLineBorder(Color.BLACK);
 			Border margin = new EmptyBorder(5, 5, 5, 5);
 			textArea.setBorder(new CompoundBorder(border, margin));
 			add(textArea, c);
 
 			return textArea;
+		}
+
+		// Empty cells form the gap between the first and the third row
+		private JLabel setEmptyCell(int x_pos, int y_pos, int width, int height, double width_multiplier,
+				double height_multiplier) {
+			JLabel label = new JLabel();
+
+			setStandards(label, x_pos, y_pos, width, height, width_multiplier, height_multiplier);
+			label.setOpaque(false);
+
+			label.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+			add(label, c);
+
+			return label;
+		}
+
+		private void setStandards(Component component, int x_pos, int y_pos, int width, int height,
+				double width_multiplier, double height_multiplier) {
+			component.setPreferredSize(new Dimension((int) (width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH),
+					(int) (height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT)));
+			c.gridx = x_pos;
+			c.gridy = y_pos;
+			c.gridwidth = width;
+			c.gridheight = height;
 		}
 
 		private void setBold(Component comp) {

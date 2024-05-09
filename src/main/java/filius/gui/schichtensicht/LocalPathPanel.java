@@ -42,12 +42,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private final int selectedFrameNumber; // beginnt bei 1
 
-	private String[][] messageDetailsSent = new String[6][8]; // für die versendete Nachricht
-	private String[][] messageDetailsReceived = new String[6][8]; // für die ankommende Nachricht
-
-	MessageDetailsTable tableSent;
-	MessageDetailsTable tableReceived;
-
 	private boolean sent = false; // if the node sent the frame, otherwise the node received the frame
 	private boolean forwarding = false; // if the node is only forwarding an IP or ICMP packet
 
@@ -56,6 +50,14 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private final JScrollPane visualisationScrollPane; // upper ScrollPane (visualisation)
 	private final JScrollPane messageDetailsSentScrollPane; // lower ScrollPane (message details for sent data)
 	private final JScrollPane messageDetailsReceivedScrollPane; // lower ScrollPane (message details for received data)
+
+	private String[][] messageDetailsSent = new String[6][8]; // für die versendete Nachricht
+	private String[][] messageDetailsReceived = new String[6][8]; // für die ankommende Nachricht
+
+	private MessageDetailsTable tableSent;
+	private MessageDetailsTable tableReceived;
+	
+	private LocalPathVisualisation visualisation;
 
 	private final Object[] correspondingFrameData;
 
@@ -90,7 +92,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		setForwardingAndFillOther();
 
 		// initialise visualisation and tables for message details
-		LocalPathVisualisation visualisation = new LocalPathVisualisation(this, sent, forwarding);
+		visualisation = new LocalPathVisualisation(this, sent, forwarding);
 		tableSent = new MessageDetailsTable(messageDetailsSent);
 		tableReceived = new MessageDetailsTable(messageDetailsReceived);
 		messageDetailsSentScrollPane = new JScrollPane(tableSent);
@@ -317,10 +319,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * Hide data of a layer in the message details. 1 = link, 2 = internet, 3 =
 	 * transport.
 	 * 
-	 * @param code number for layer
-	 * @throws NoSuchAlgorithmException
+	 * @param code  number for layer
+	 * @param table in which layer data should be hidden
+	 * @throws NoSuchElementException
 	 */
-	private void hideLayerData(int layerNumber) throws NoSuchElementException {
+	private void hideLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
 		if (layerNumber > 3 || layerNumber < 1) {
 			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
 		} else {
@@ -330,14 +333,63 @@ public class LocalPathPanel extends JPanel implements I18n {
 			columns.add(firstColumn);
 			columns.add(firstColumn + 1);
 			// hide columns
-			for (Component component : tableSent.getComponents()) {
+			for (Component component : table.getComponents()) {
 				if (columns.contains(tableSent.gridBagLayout.getConstraints(component).gridx)) {
-					component.setBackground(tableSent.getParent().getBackground());
-					component.setForeground(tableSent.getParent().getBackground());
+					component.setBackground(table.getParent().getBackground());
+					component.setForeground(table.getParent().getBackground());
 					if (component instanceof JTextArea) {
 						((JTextArea) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
 					} else if (component instanceof JLabel) {
 						((JLabel) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Show data of a layer in the message details. 1 = link, 2 = internet, 3 =
+	 * transport.
+	 * 
+	 * @param code  number for layer
+	 * @param table in which layer data should be shown
+	 * @throws NoSuchElementException
+	 */
+	private void showLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
+		if (layerNumber > 3 || layerNumber < 1) {
+			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
+		} else {
+			// determine columns to hide
+			Set<Integer> columns = new HashSet<>();
+			int firstColumn = (layerNumber - 1) * 2;
+			columns.add(firstColumn);
+			columns.add(firstColumn + 1);
+			// determine colors
+			Color backgroundColor = null;
+			Color foregroundColor = null;
+			if (layerNumber == 1) {
+				backgroundColor = LayerColorVar.LINK.backgroundColor;
+				foregroundColor = LayerColorVar.LINK.foregroundColor;
+			} else if (layerNumber == 2) {
+				backgroundColor = LayerColorVar.INTERNET.backgroundColor;
+				foregroundColor = LayerColorVar.INTERNET.foregroundColor;
+			} else if (layerNumber == 3) {
+				backgroundColor = LayerColorVar.TRANSPORT.backgroundColor;
+				foregroundColor = LayerColorVar.TRANSPORT.foregroundColor;
+			}
+			// hide columns
+			for (Component component : table.getComponents()) {
+				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
+					// set colors
+					component.setBackground(backgroundColor);
+					component.setForeground(foregroundColor);
+					// set border
+					Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
+					Border marginBorder = new EmptyBorder(5, 5, 5, 5);
+					if (component instanceof JTextArea) {
+						((JTextArea) component).setBorder(new CompoundBorder(lineBorder, marginBorder));
+					} else if (component instanceof JLabel) {
+						((JLabel) component).setBorder(new CompoundBorder(lineBorder, marginBorder));
 					}
 				}
 			}
@@ -350,7 +402,19 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 */
 	private void hideNextHigherLayer() {
 		if (hiddenLayers <= 2 && hiddenLayers >= 0) {
-			hideLayerData(hiddenLayers + 1);
+			showLayerData(hiddenLayers + 1, tableSent);
+			showLayerData(hiddenLayers + 1, tableReceived);
+		}
+	}
+	
+	/**
+	 * Hide data of the next higher layer in the message details. Hideable layers
+	 * are 1 = link, 2 = internet, 3 = transport.
+	 */
+	private void showNextLowerLayer() {
+		if (hiddenLayers <= 3 && hiddenLayers >= 1) {
+			showLayerData(hiddenLayers - 1, tableSent);
+			showLayerData(hiddenLayers - 1, tableReceived);
 		}
 	}
 
@@ -436,7 +500,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 			setBoldAndItalic(label);
 			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 0.5, 1, false);
 			label.setHorizontalAlignment(JLabel.CENTER);
-			label.setVerticalAlignment(JLabel.CENTER);;
+			label.setVerticalAlignment(JLabel.CENTER);
+			;
 			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
 			setBoldAndItalic(label);
 
@@ -530,9 +595,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 			setPlain(label);
 
 			if (needsBorder) {
-				Border border = BorderFactory.createLineBorder(Color.BLACK);
-				Border margin = new EmptyBorder(5, 5, 5, 5);
-				label.setBorder(new CompoundBorder(border, margin));
+				Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
+				Border marginBorder = new EmptyBorder(5, 5, 5, 5);
+				label.setBorder(new CompoundBorder(lineBorder, marginBorder));
 			}
 			add(label, c);
 
@@ -551,9 +616,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 			textArea.setEditable(false);
 			textArea.setFocusable(false);
 
-			Border border = BorderFactory.createLineBorder(Color.BLACK);
-			Border margin = new EmptyBorder(5, 5, 5, 5);
-			textArea.setBorder(new CompoundBorder(border, margin));
+			Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
+			Border marginBorder = new EmptyBorder(5, 5, 5, 5);
+			textArea.setBorder(new CompoundBorder(lineBorder, marginBorder));
 			add(textArea, c);
 
 			return textArea;

@@ -56,12 +56,16 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private MessageDetailsTable tableSent;
 	private MessageDetailsTable tableReceived;
-	
+
 	private LocalPathVisualisation visualisation;
 
 	private final Object[] correspondingFrameData;
 
 	private int hiddenLayers;
+
+	// highest layer that appears
+	// 1 = link, 2 = internet, 3 = transport, 4 = application
+	private int maxLayer;
 
 	private static final int PREF_MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int PREF_MSG_DETAILS_CELL_HEIGHT = 30;
@@ -125,6 +129,10 @@ public class LocalPathPanel extends JPanel implements I18n {
 		return this.messageDetailsSent;
 	}
 
+	public int getMaxLayer() {
+		return this.maxLayer;
+	}
+	
 	/**
 	 * Prüft, ob das ausgewählte Frame empfangen oder versandt (= nicht empfangen)
 	 * wurde.
@@ -171,32 +179,44 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 				// -----Vermittlungs-Daten (falls existent)-----
 				if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberAsString)) {
+					// Protokoll
+					messageDetails[2][2] = daten[i + 1][4].toString();
+					// set maxLayer, can increase later in this method
+					if (messageDetails[2][2] != null) {
+						maxLayer = 2;
+					}
 					// Quelle
 					messageDetails[3][3] = daten[i + 1][2].toString();
 					// Ziel
 					messageDetails[4][3] = daten[i + 1][3].toString();
 					// Bemerkungen / Details
 					messageDetails[5][3] = daten[i + 1][6].toString();
-					// Protokoll
-					messageDetails[2][2] = daten[i + 1][4].toString();
 				}
 
 				// -----Transport-Daten (falls existent)-----
 				if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberAsString)) {
+					// Protokoll
+					messageDetails[2][4] = daten[i + 2][4].toString();
+					// set maxLayer, can increase later in this method
+					if (messageDetails[2][4] != null) {
+						maxLayer = 3;
+					}
 					// Quelle
 					messageDetails[3][5] = daten[i + 2][2].toString();
 					// Ziel
 					messageDetails[4][5] = daten[i + 2][3].toString();
 					// Bemerkungen / Details
 					messageDetails[5][5] = daten[i + 2][6].toString();
-					// Protokoll
-					messageDetails[2][4] = daten[i + 2][4].toString();
 				}
 
 				// -----Anwendungs-Daten (falls existent)-----
 				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
 					// Protokoll
 					messageDetails[2][6] = daten[i + 3][4].toString();
+					// set maxLayer
+					if (messageDetails[2][6] != null) {
+						maxLayer = 4;
+					}
 					// Daten
 					messageDetails[3][6] = daten[i + 3][6].toString();
 				}
@@ -406,7 +426,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			showLayerData(hiddenLayers + 1, tableReceived);
 		}
 	}
-	
+
 	/**
 	 * Hide data of the next higher layer in the message details. Hideable layers
 	 * are 1 = link, 2 = internet, 3 = transport.
@@ -459,7 +479,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 						line = line.concat(" ");
 					}
 				}
-
 			}
 			System.out.println(line);
 		}

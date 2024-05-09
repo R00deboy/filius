@@ -330,10 +330,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 			columns.add(firstColumn);
 			columns.add(firstColumn + 1);
 			// hide columns
-			GridBagLayout gridBagLayout = tableSent.gridBagLayout;
-			Component[] components = tableSent.getComponents();
-			for (Component component : components) {
-				if (columns.contains(gridBagLayout.getConstraints(component).gridx)) {
+			for (Component component : tableSent.getComponents()) {
+				if (columns.contains(tableSent.gridBagLayout.getConstraints(component).gridx)) {
 					component.setBackground(tableSent.getParent().getBackground());
 					component.setForeground(tableSent.getParent().getBackground());
 					if (component instanceof JTextArea) {

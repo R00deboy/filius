@@ -18,7 +18,7 @@ public class LocalPathVisualisation extends JPanel {
 
 	private LocalPathPanel localPathPanel;
 
-	private int pointInTime = 0;
+	private int pointInTime;
 	private int maxPointInTime;
 	private int minPointInTime;
 
@@ -47,12 +47,13 @@ public class LocalPathVisualisation extends JPanel {
 
 		// Falls Host (Rechner, Notebook)
 		if (systemSoftware instanceof Betriebssystem) {
-			minPointInTime = 0;
-			maxPointInTime = 4;
+			minPointInTime = 4 - localPathPanel.getMaxLayer();
+			maxPointInTime = 3;
+			pointInTime = minPointInTime;
 			if (sent) {
-				pointInTimeForSenderSide = 0;
+				pointInTimeForSenderSide = -1;  // should never be reached, since only sent
 			} else {
-				pointInTimeForSenderSide = 5;
+				pointInTimeForSenderSide = 4;  // should never be reached, since only received
 			}
 			hostVisualisation();
 		}
@@ -61,15 +62,18 @@ public class LocalPathVisualisation extends JPanel {
 				|| systemSoftware instanceof GatewayFirmware) {
 			if (forwarding) {
 				minPointInTime = 0;
-				maxPointInTime = 5;
+				maxPointInTime = 3;
+				pointInTime = minPointInTime;
 			} else if (sent) {
-				minPointInTime = 3;
-				maxPointInTime = 5;
+				minPointInTime = 2;
+				maxPointInTime = 3;
+				pointInTime = minPointInTime;
 			} else {
 				minPointInTime = 0;
-				maxPointInTime = 2;
+				maxPointInTime = 1;
+				pointInTime = minPointInTime;
 			}
-			pointInTimeForSenderSide = 3;
+			pointInTimeForSenderSide = 2;
 			routerVisualisation();
 		}
 

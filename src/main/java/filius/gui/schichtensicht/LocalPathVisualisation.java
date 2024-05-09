@@ -142,8 +142,4 @@ public class LocalPathVisualisation extends JPanel {
 			senderSideIsActive = false;
 		}
 	}
-	
-	public boolean getSenderSideIsActive() {
-		return this.senderSideIsActive;
-	}
 }

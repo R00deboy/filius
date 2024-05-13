@@ -25,6 +25,7 @@ import javax.swing.border.EmptyBorder;
 import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
+import filius.software.system.Betriebssystem;
 import filius.software.system.GatewayFirmware;
 import filius.software.system.SystemSoftware;
 import filius.software.system.VermittlungsrechnerBetriebssystem;
@@ -61,6 +62,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private final Object[] correspondingFrameData;
 
+	// number of hidden layers
+	// 1 = Link, 2 = Link & Internet, 3 = Link & Internet & Transport
 	private int hiddenLayers;
 
 	// highest layer that appears
@@ -96,9 +99,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 		setForwardingAndFillOther();
 
 		// initialise visualisation and tables for message details
-		visualisation = new LocalPathVisualisation(this, sent, forwarding);
+		visualisation = new LocalPathVisualisation(this);
 		tableSent = new MessageDetailsTable(messageDetailsSent);
 		tableReceived = new MessageDetailsTable(messageDetailsReceived);
+		setLayersInTablesInvisible();
+
+		// in ScrollPane einbetten
 		messageDetailsSentScrollPane = new JScrollPane(tableSent);
 		messageDetailsReceivedScrollPane = new JScrollPane(tableReceived);
 
@@ -132,7 +138,15 @@ public class LocalPathPanel extends JPanel implements I18n {
 	public int getMaxLayer() {
 		return this.maxLayer;
 	}
-	
+
+	public boolean isSent() {
+		return this.sent;
+	}
+
+	public boolean isForwarding() {
+		return this.forwarding;
+	}
+
 	/**
 	 * Prüft, ob das ausgewählte Frame empfangen oder versandt (= nicht empfangen)
 	 * wurde.
@@ -313,9 +327,19 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * messageDetailsSent} oder {@code messageDetailsReceived}.
 	 */
 	private void setDefaultMessageDetails() {
-		if (sent) {
+		if (sent && !forwarding) {
 			// for the sender a message
 			updateMessageDetails(true);
+			if (systemSoftware instanceof Betriebssystem) {
+				for (int i = 1; i < maxLayer; i++) {
+					hideLayerData(i, tableSent);
+				}
+				hiddenLayers = maxLayer - 1;
+			} else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem
+					|| systemSoftware instanceof GatewayFirmware) {
+				hideLayerData(1, tableSent);
+				hiddenLayers = 1;
+			}
 		} else {
 			// for the receiver of a message
 			// for a router, which is only forwarding an IP or ICMP packet
@@ -325,7 +349,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	/**
 	 * Aktualisiert die Nachrichtendetails (z.B. wenn in der Visualisierung "zurück"
-	 * oder "vorwärts" gedrückt wurde.
+	 * oder "vorwärts" gedrückt wurde).
 	 */
 	public void updateMessageDetails(boolean senderSideIsActive) {
 		if (senderSideIsActive) {
@@ -336,11 +360,40 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
+	 * Sets the layers in {@code tableSent} and {@code tableReceived} which are not
+	 * needed invisible according to {@code maxLayer}.
+	 */
+	private void setLayersInTablesInvisible() {
+		// determine columns to deactivate
+		Set<Integer> columns = new HashSet<>();
+		if (maxLayer == 4) {
+			return;
+		} else if (maxLayer == 3) {
+			columns.add(6);
+		} else if (maxLayer == 2) {
+			columns.add(4);
+			columns.add(5);
+			columns.add(6);
+		}
+		// deactivate columns
+		Set<MessageDetailsTable> tables = new HashSet<>();
+		tables.add(tableSent);
+		tables.add(tableReceived);
+		for (MessageDetailsTable table : tables) {
+			for (Component component : table.getComponents()) {
+				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
+					component.setVisible(false);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Hide data of a layer in the message details. 1 = link, 2 = internet, 3 =
 	 * transport.
 	 * 
-	 * @param code  number for layer
-	 * @param table in which layer data should be hidden
+	 * @param layerNumber number for layer
+	 * @param table       in which layer data should be hidden
 	 * @throws NoSuchElementException
 	 */
 	private void hideLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
@@ -354,9 +407,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 			columns.add(firstColumn + 1);
 			// hide columns
 			for (Component component : table.getComponents()) {
-				if (columns.contains(tableSent.gridBagLayout.getConstraints(component).gridx)) {
-					component.setBackground(table.getParent().getBackground());
-					component.setForeground(table.getParent().getBackground());
+				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
+					component.setBackground(table.getBackground());
+					component.setForeground(table.getBackground());
 					if (component instanceof JTextArea) {
 						((JTextArea) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
 					} else if (component instanceof JLabel) {
@@ -371,8 +424,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * Show data of a layer in the message details. 1 = link, 2 = internet, 3 =
 	 * transport.
 	 * 
-	 * @param code  number for layer
-	 * @param table in which layer data should be shown
+	 * @param layerNumber number for layer
+	 * @param table       in which layer data should be shown
 	 * @throws NoSuchElementException
 	 */
 	private void showLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
@@ -385,31 +438,42 @@ public class LocalPathPanel extends JPanel implements I18n {
 			columns.add(firstColumn);
 			columns.add(firstColumn + 1);
 			// determine colors
-			Color backgroundColor = null;
 			Color foregroundColor = null;
+			Color backgroundColor = null;
+			Color backgroundColorFine = null;
 			if (layerNumber == 1) {
-				backgroundColor = LayerColorVar.LINK.backgroundColor;
 				foregroundColor = LayerColorVar.LINK.foregroundColor;
+				backgroundColor = LayerColorVar.LINK.backgroundColor;
+				backgroundColorFine = LayerColorVar.LINK.backgroundColorFine;
 			} else if (layerNumber == 2) {
-				backgroundColor = LayerColorVar.INTERNET.backgroundColor;
 				foregroundColor = LayerColorVar.INTERNET.foregroundColor;
+				backgroundColor = LayerColorVar.INTERNET.backgroundColor;
+				backgroundColorFine = LayerColorVar.INTERNET.backgroundColorFine;
 			} else if (layerNumber == 3) {
-				backgroundColor = LayerColorVar.TRANSPORT.backgroundColor;
 				foregroundColor = LayerColorVar.TRANSPORT.foregroundColor;
+				backgroundColor = LayerColorVar.TRANSPORT.backgroundColor;
+				backgroundColorFine = LayerColorVar.TRANSPORT.backgroundColorFine;
 			}
 			// hide columns
 			for (Component component : table.getComponents()) {
 				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
-					// set colors
-					component.setBackground(backgroundColor);
-					component.setForeground(foregroundColor);
-					// set border
-					Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
-					Border marginBorder = new EmptyBorder(5, 5, 5, 5);
-					if (component instanceof JTextArea) {
-						((JTextArea) component).setBorder(new CompoundBorder(lineBorder, marginBorder));
-					} else if (component instanceof JLabel) {
-						((JLabel) component).setBorder(new CompoundBorder(lineBorder, marginBorder));
+					int gridy = table.gridBagLayout.getConstraints(component).gridy;
+					if (gridy != 1) {
+						// set colors
+						component.setForeground(foregroundColor);
+						if (gridy == 0) {
+							component.setBackground(backgroundColorFine);
+						} else {
+							component.setBackground(backgroundColor);
+							// set border
+							Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
+							Border marginBorder = new EmptyBorder(5, 5, 5, 5);
+							if (component instanceof JTextArea) {
+								((JTextArea) component).setBorder(new CompoundBorder(lineBorder, marginBorder));
+							} else if (component instanceof JLabel) {
+								((JLabel) component).setBorder(new CompoundBorder(lineBorder, marginBorder));
+							}
+						}
 					}
 				}
 			}
@@ -420,69 +484,24 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * Hide data of the next higher layer in the message details. Hideable layers
 	 * are 1 = link, 2 = internet, 3 = transport.
 	 */
-	private void hideNextHigherLayer() {
+	public void hideNextHigherLayer() {
 		if (hiddenLayers <= 2 && hiddenLayers >= 0) {
-			showLayerData(hiddenLayers + 1, tableSent);
-			showLayerData(hiddenLayers + 1, tableReceived);
+			hideLayerData(hiddenLayers + 1, tableSent);
+			hideLayerData(hiddenLayers + 1, tableReceived);
+			hiddenLayers++;
 		}
 	}
 
 	/**
-	 * Hide data of the next higher layer in the message details. Hideable layers
-	 * are 1 = link, 2 = internet, 3 = transport.
+	 * Show data of the next lower layer in the message details. Hideable layers are
+	 * 1 = link, 2 = internet, 3 = transport.
 	 */
-	private void showNextLowerLayer() {
+	public void showNextLowerLayer() {
 		if (hiddenLayers <= 3 && hiddenLayers >= 1) {
-			showLayerData(hiddenLayers - 1, tableSent);
-			showLayerData(hiddenLayers - 1, tableReceived);
+			showLayerData(hiddenLayers, tableSent);
+			showLayerData(hiddenLayers, tableReceived);
+			hiddenLayers--;
 		}
-	}
-
-	/**
-	 * Nur zu Testzwecken (um auf der Programmausgabe beide Nachrichtendetails
-	 * anzuzeigen).
-	 * 
-	 * @param breite Anzahl Zeichen pro Zelle
-	 */
-	private void show(int breite) {
-		System.out.println("-----messageDetailsReceived-----");
-		showDetails(breite, messageDetailsReceived);
-		System.out.println("-------messageDetailsSent-------");
-		showDetails(breite, messageDetailsSent);
-	}
-
-	/**
-	 * Nur zu Testzwecken (siehe show())
-	 * 
-	 * @param breite Anzahl Zeichen pro Zelle
-	 * @param table  Die zu füllenden Nachrichtendetails
-	 */
-	private void showDetails(int breite, String[][] table) {
-		for (int i = 0; i < 5; i++) {
-			String line = "";
-			for (int j = 0; j < 8; j++) {
-				String text = table[i][j];
-				if (!(text == null)) {
-					int wordlength = text.length();
-					if (wordlength < breite) {
-						line = line.concat(text);
-						for (int k = 0; k < breite - wordlength; k++) {
-							line = line.concat(" ");
-						}
-					} else {
-						for (int k = 0; k < breite; k++) {
-							line = line.concat(" ");
-						}
-					}
-				} else {
-					for (int k = 0; k < breite; k++) {
-						line = line.concat(" ");
-					}
-				}
-			}
-			System.out.println(line);
-		}
-		System.out.println("-------------------------------------");
 	}
 
 	/*
@@ -657,6 +676,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			return label;
 		}
 
+		// set standard parameters
 		private void setStandards(Component component, int x_pos, int y_pos, int width, int height,
 				double width_multiplier, double height_multiplier) {
 			component.setPreferredSize(new Dimension((int) (width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH),

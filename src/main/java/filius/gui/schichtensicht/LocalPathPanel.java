@@ -407,7 +407,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 			columns.add(firstColumn + 1);
 			// hide columns
 			for (Component component : table.getComponents()) {
-				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
+				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)
+						&& table.gridBagLayout.getConstraints(component).gridy > 1) {
 					component.setBackground(table.getBackground());
 					component.setForeground(table.getBackground());
 					if (component instanceof JTextArea) {
@@ -458,7 +459,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			for (Component component : table.getComponents()) {
 				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
 					int gridy = table.gridBagLayout.getConstraints(component).gridy;
-					if (gridy != 1) {
+					if (gridy > 1) {
 						// set colors
 						component.setForeground(foregroundColor);
 						if (gridy == 0) {

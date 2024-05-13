@@ -122,7 +122,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Functionality of the two buttons
+	 * Functionality of the two buttons to go back and forth in time.
 	 */
 	private void backAndForth() {
 		FORTH_IN_TIME.addActionListener(new ActionListener() {

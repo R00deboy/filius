@@ -7,12 +7,14 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+
+import filius.rahmenprogramm.I18n;
 import filius.software.system.Betriebssystem;
 import filius.software.system.GatewayFirmware;
 import filius.software.system.SystemSoftware;
 import filius.software.system.VermittlungsrechnerBetriebssystem;
 
-public class LocalPathVisualisation extends JPanel {
+public class LocalPathVisualisation extends JPanel implements I18n {
 	private final GridBagLayout gridBagLayout;
 	private GridBagConstraints c;
 
@@ -28,20 +30,24 @@ public class LocalPathVisualisation extends JPanel {
 	// (for smaller on receiver side)
 	private int pointInTimeForSenderSide;
 
-	private final JButton BACK_IN_TIME = new JButton("zurück");
-	private final JButton FORTH_IN_TIME = new JButton("vorwärts");
+	// buttons "vorwärts" and "zurück"
+	private final JButton FORTH_IN_TIME;
+	private final JButton BACK_IN_TIME;
 
-	public LocalPathVisualisation(LocalPathPanel localPathPanel, boolean sent, boolean forwarding) {
+	public LocalPathVisualisation(LocalPathPanel localPathPanel) {
 		super();
 		this.localPathPanel = localPathPanel;
 		SystemSoftware systemSoftware = localPathPanel.systemSoftware;
 		gridBagLayout = new GridBagLayout();
 		c = new GridBagConstraints();
 		this.setLayout(gridBagLayout);
-		
+
+		// create buttons
+		FORTH_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg1"));
+		BACK_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg2"));
 		BACK_IN_TIME.setEnabled(false);
 
-		if (sent) {
+		if (localPathPanel.isSent()) {
 			senderSideIsActive = true;
 		}
 
@@ -50,21 +56,21 @@ public class LocalPathVisualisation extends JPanel {
 			minPointInTime = 4 - localPathPanel.getMaxLayer();
 			maxPointInTime = 3;
 			pointInTime = minPointInTime;
-			if (sent) {
-				pointInTimeForSenderSide = -1;  // should never be reached, since only sent
+			if (localPathPanel.isSent()) {
+				pointInTimeForSenderSide = -1; // should never be reached, since only sent
 			} else {
-				pointInTimeForSenderSide = 4;  // should never be reached, since only received
+				pointInTimeForSenderSide = 4; // should never be reached, since only received
 			}
 			hostVisualisation();
 		}
 		// Falls Router (Vermittlungsrechner, Heimrouter)
 		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem
 				|| systemSoftware instanceof GatewayFirmware) {
-			if (forwarding) {
+			if (localPathPanel.isForwarding()) {
 				minPointInTime = 0;
 				maxPointInTime = 3;
 				pointInTime = minPointInTime;
-			} else if (sent) {
+			} else if (localPathPanel.isSent()) {
 				minPointInTime = 2;
 				maxPointInTime = 3;
 				pointInTime = minPointInTime;
@@ -78,6 +84,18 @@ public class LocalPathVisualisation extends JPanel {
 		}
 
 		backAndForth();
+	}
+
+	public int getPointInTime() {
+		return this.pointInTime;
+	}
+
+	public int getMaxPointInTime() {
+		return this.maxPointInTime;
+	}
+
+	public int getMinPointInTime() {
+		return this.minPointInTime;
 	}
 
 	/**
@@ -103,43 +121,81 @@ public class LocalPathVisualisation extends JPanel {
 		this.add(FORTH_IN_TIME, c);
 	}
 
+	/**
+	 * Functionality of the two buttons
+	 */
 	private void backAndForth() {
-		BACK_IN_TIME.addActionListener(new ActionListener() {
-			// back in time
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (pointInTime > minPointInTime) {
-					pointInTime--;
-					if (pointInTime == minPointInTime) {
-						BACK_IN_TIME.setEnabled(false);
-					} else {
-						FORTH_IN_TIME.setEnabled(true);
-					}
-					setSenderSide();
-					localPathPanel.updateMessageDetails(senderSideIsActive);
-				}
-			}
-		});
-
 		FORTH_IN_TIME.addActionListener(new ActionListener() {
 			// forth in time
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (pointInTime < maxPointInTime) {
 					pointInTime++;
+					BACK_IN_TIME.setEnabled(true);
 					if (pointInTime == maxPointInTime) {
 						FORTH_IN_TIME.setEnabled(false);
-					} else {
-						BACK_IN_TIME.setEnabled(true);
 					}
-					setSenderSide();
+					updateSenderSide();
 					localPathPanel.updateMessageDetails(senderSideIsActive);
+
+					// hide or show layers
+					if (!localPathPanel.isForwarding()) {
+						if (localPathPanel.isSent()) {
+							localPathPanel.showNextLowerLayer();
+						} else {
+							localPathPanel.hideNextHigherLayer();
+						}
+					} else {
+						switch (pointInTime) {
+						case 1:
+							localPathPanel.hideNextHigherLayer();
+							break;
+						case 3:
+							localPathPanel.showNextLowerLayer();
+							break;
+						}
+					}
+				}
+			}
+		});
+
+		BACK_IN_TIME.addActionListener(new ActionListener() {
+			// back in time
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (pointInTime > minPointInTime) {
+					pointInTime--;
+					FORTH_IN_TIME.setEnabled(true);
+					if (pointInTime == minPointInTime) {
+						BACK_IN_TIME.setEnabled(false);
+					}
+					updateSenderSide();
+					localPathPanel.updateMessageDetails(senderSideIsActive);
+
+					// hide or show layers
+					if (!localPathPanel.isForwarding()) {
+						if (localPathPanel.isSent()) {
+							localPathPanel.hideNextHigherLayer();
+						} else {
+							localPathPanel.showNextLowerLayer();
+						}
+					} else {
+						switch (pointInTime) {
+						case 2:
+							localPathPanel.hideNextHigherLayer();
+							break;
+						case 0:
+							localPathPanel.showNextLowerLayer();
+							break;
+						}
+					}
 				}
 			}
 		});
 	}
 
-	private void setSenderSide() {
+	// only has an effect for routers and home routers
+	private void updateSenderSide() {
 		if (pointInTime >= pointInTimeForSenderSide) {
 			senderSideIsActive = true;
 		} else {

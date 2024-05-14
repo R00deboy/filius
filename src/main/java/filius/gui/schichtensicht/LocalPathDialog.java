@@ -35,10 +35,12 @@ public class LocalPathDialog extends JDialog implements I18n {
 		this.systemSoftware = systemSoftware;
 		this.interfaceId = interfaceId;
 		this.selectedFrameNumber = selectedFrameNumber;
-
-		// Lokaler Weg durch die Schichten
+		
+		// "Lokaler Weg durch die Schichten"
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
+		setResizable(true);
 
+		// BorderLayout initialisieren
 		BorderLayout borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
 

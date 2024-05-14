@@ -48,10 +48,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	public JSplitPane splitPane;
 
-	private final JScrollPane visualisationScrollPane; // upper ScrollPane (visualisation)
-	private final JScrollPane messageDetailsSentScrollPane; // lower ScrollPane (message details for sent data)
-	private final JScrollPane messageDetailsReceivedScrollPane; // lower ScrollPane (message details for received data)
-
 	private String[][] messageDetailsSent = new String[6][8]; // für die versendete Nachricht
 	private String[][] messageDetailsReceived = new String[6][8]; // für die ankommende Nachricht
 
@@ -70,8 +66,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	// 1 = link, 2 = internet, 3 = transport, 4 = application
 	private int maxLayer;
 
-	private static final int PREF_MSG_DETAILS_CELL_WIDTH = 150;
-	private static final int PREF_MSG_DETAILS_CELL_HEIGHT = 30;
+	public static final int PREF_MSG_DETAILS_CELL_WIDTH = 150;
+	public static final int PREF_MSG_DETAILS_CELL_HEIGHT = 30;
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // Zugriff auf den Lauscher
 
@@ -104,17 +100,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 		tableReceived = new MessageDetailsTable(messageDetailsReceived);
 		setLayersInTablesInvisible();
 
-		// in ScrollPane einbetten
-		messageDetailsSentScrollPane = new JScrollPane(tableSent);
-		messageDetailsReceivedScrollPane = new JScrollPane(tableReceived);
-
 		// SplitPane (for visualisation in upper and message details in lower part)
 		splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 
 		// ScrollPane for top of SplitPane
-		visualisationScrollPane = new JScrollPane(visualisation);
-		splitPane.setTopComponent(visualisationScrollPane);
+		splitPane.setTopComponent(new JScrollPane(visualisation));
 
 		// ScrollPane for bottom of SplitPane
 		setDefaultMessageDetails();
@@ -353,9 +344,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 */
 	public void updateMessageDetails(boolean senderSideIsActive) {
 		if (senderSideIsActive) {
-			splitPane.setBottomComponent(messageDetailsSentScrollPane);
+			splitPane.setBottomComponent(new JScrollPane(tableSent));
 		} else {
-			splitPane.setBottomComponent(messageDetailsReceivedScrollPane);
+			splitPane.setBottomComponent(new JScrollPane(tableReceived));
 		}
 	}
 

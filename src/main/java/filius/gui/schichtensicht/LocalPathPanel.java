@@ -116,6 +116,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		// add splitPane to the current JPanel
 		add(splitPane, BorderLayout.CENTER);
+		localPathDialog.pack();
 	}
 
 	public String[][] getMessageDetailsReceived() {
@@ -319,7 +320,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 */
 	private void setDefaultMessageDetails() {
 		if (sent && !forwarding) {
-			// for the sender a message
+			// for the sender of a message
 			updateMessageDetails(true);
 			if (systemSoftware instanceof Betriebssystem) {
 				for (int i = 1; i < maxLayer; i++) {
@@ -506,8 +507,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 		private MessageDetailsTable(String[][] messageDetails) {
 			gridBagLayout = new GridBagLayout();
 			c = new GridBagConstraints();
-			this.setLayout(gridBagLayout);
-			this.setBackground(Color.WHITE);
+			setLayout(gridBagLayout);
+			setBackground(Color.WHITE);
+			setMinimumSize(new Dimension(9 * LocalPathPanel.PREF_MSG_DETAILS_CELL_WIDTH,
+					8 * LocalPathPanel.PREF_MSG_DETAILS_CELL_HEIGHT));
+
+			// Storage for creating the Labes and TextAreas
 			JLabel label;
 			JTextArea textArea;
 

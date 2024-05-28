@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import filius.rahmenprogramm.I18n;
 import filius.software.system.Betriebssystem;
@@ -103,6 +104,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 */
 	private void hostVisualisation() {
 		basicConfiguration();
+		System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
 	}
 
 	/**

@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -66,8 +67,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	// 1 = link, 2 = internet, 3 = transport, 4 = application
 	private int maxLayer;
 
-	public static final int PREF_MSG_DETAILS_CELL_WIDTH = 150;
-	public static final int PREF_MSG_DETAILS_CELL_HEIGHT = 30;
+	public static final int MSG_DETAILS_CELL_WIDTH = 150;
+	public static final int MSG_DETAILS_CELL_HEIGHT = 30;
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // Zugriff auf den Lauscher
 
@@ -116,7 +117,14 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		// add splitPane to the current JPanel
 		add(splitPane, BorderLayout.CENTER);
-		localPathDialog.pack();
+
+		// set size and positioning properties of outer JDialog
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		localPathDialog.setLocation(screenSize.width / 6, screenSize.height / 6);
+		localPathDialog.setPreferredSize(
+				new Dimension(tableSent.getPreferredSize().width, tableSent.getPreferredSize().height + 300));
+		localPathDialog.setMinimumSize(
+				new Dimension(tableSent.getMinimumSize().width, tableSent.getMinimumSize().height + 300));
 	}
 
 	public String[][] getMessageDetailsReceived() {
@@ -509,8 +517,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 			c = new GridBagConstraints();
 			setLayout(gridBagLayout);
 			setBackground(Color.WHITE);
-			setMinimumSize(new Dimension(9 * LocalPathPanel.PREF_MSG_DETAILS_CELL_WIDTH,
-					8 * LocalPathPanel.PREF_MSG_DETAILS_CELL_HEIGHT));
 
 			// Storage for creating the Labes and TextAreas
 			JLabel label;
@@ -620,6 +626,21 @@ public class LocalPathPanel extends JPanel implements I18n {
 			setBoldAndItalic(label);
 		}
 
+		@Override
+		public Dimension getPreferredSize() {
+			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);
+		}
+
+		@Override
+		public Dimension getMinimumSize() {
+			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);
+		}
+
+		@Override
+		public Dimension getMaximumSize() {
+			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);
+		}
+
 		// Cells with short content are JLabels
 		private JLabel setLabel(String text, int x_pos, int y_pos, int width, int height, double width_multiplier,
 				double height_multiplier, boolean needsBorder) {
@@ -676,8 +697,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 		// set standard parameters
 		private void setStandards(Component component, int x_pos, int y_pos, int width, int height,
 				double width_multiplier, double height_multiplier) {
-			component.setPreferredSize(new Dimension((int) (width_multiplier * width * PREF_MSG_DETAILS_CELL_WIDTH),
-					(int) (height_multiplier * height * PREF_MSG_DETAILS_CELL_HEIGHT)));
+			component.setPreferredSize(new Dimension((int) (width_multiplier * width * MSG_DETAILS_CELL_WIDTH),
+					(int) (height_multiplier * height * MSG_DETAILS_CELL_HEIGHT)));
 			c.gridx = x_pos;
 			c.gridy = y_pos;
 			c.gridwidth = width;

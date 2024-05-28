@@ -522,14 +522,6 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		// basic dialog creation and settings
 		localPathDialog = new LocalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
 				selectedFrameNumber);
-		localPathDialog.setTitle(messages.getString("schichten_lokaler_weg_msg1"));
-
-		// positioning and size
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		localPathDialog.setLocation(screenSize.width / 6, screenSize.height / 6);
-		localPathDialog.setSize(9 * LocalPathPanel.PREF_MSG_DETAILS_CELL_WIDTH,
-				8 * LocalPathPanel.PREF_MSG_DETAILS_CELL_HEIGHT + 500);
-		localPathDialog.setVisible(true);
 	}
 
 	/**

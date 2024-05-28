@@ -47,6 +47,7 @@ public class LocalPathDialog extends JDialog implements I18n {
 		// Panel in die Mitte
 		localPathPanel = new LocalPathPanel(this);
 		add(localPathPanel, BorderLayout.CENTER);
+		setVisible(true);
 	}
 	
 	public SystemSoftware getSystemSoftware() {

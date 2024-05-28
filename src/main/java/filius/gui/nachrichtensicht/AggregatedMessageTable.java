@@ -29,7 +29,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,7 +62,6 @@ import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
 import filius.gui.schichtensicht.LocalPathDialog;
-import filius.gui.schichtensicht.LocalPathPanel;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
@@ -87,8 +85,6 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private String interfaceId;
 
 	private int selectedRowByRightclick;
-
-	private LocalPathDialog localPathDialog;
 
 	private JCheckBoxMenuItem checkbox;
 
@@ -519,8 +515,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		// basic dialog creation and settings
-		localPathDialog = new LocalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
+		new LocalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
 				selectedFrameNumber);
 	}
 

@@ -47,6 +47,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private boolean forwarding = false; // if the node is only forwarding an IP or ICMP packet
 
 	public JSplitPane splitPane;
+	private static final int DIVIDER_LOCATION = 350;
 
 	private String[][] messageDetailsSent = new String[6][8]; // für die versendete Nachricht
 	private String[][] messageDetailsReceived = new String[6][8]; // für die ankommende Nachricht
@@ -66,8 +67,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	// 1 = link, 2 = internet, 3 = transport, 4 = application
 	private int maxLayer;
 
-	public static final int MSG_DETAILS_CELL_WIDTH = 150;
-	public static final int MSG_DETAILS_CELL_HEIGHT = 30;
+	private static final int MSG_DETAILS_CELL_WIDTH = 150;
+	private static final int MSG_DETAILS_CELL_HEIGHT = 30;
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // Zugriff auf den Lauscher
 
@@ -103,6 +104,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		// SplitPane (for visualisation in upper and message details in lower part)
 		splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		splitPane.setDividerLocation(DIVIDER_LOCATION);
 
 		// ScrollPane for top of SplitPane
 		splitPane.setTopComponent(new JScrollPane(visualisation));
@@ -111,8 +113,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		setDefaultMessageDetails();
 
 		// layout manager for this panel
-		BorderLayout borderLayout = new BorderLayout(10, 10);
-		setLayout(borderLayout);
+		setLayout(new BorderLayout(10, 10));
 
 		// add splitPane to the current JPanel
 		add(splitPane, BorderLayout.CENTER);
@@ -120,30 +121,31 @@ public class LocalPathPanel extends JPanel implements I18n {
 		// set size and positioning properties of outer JDialog
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		localPathDialog.setLocation(screenSize.width / 6, screenSize.height / 6);
-		localPathDialog.setPreferredSize(
-				new Dimension(tableSent.getPreferredSize().width, tableSent.getPreferredSize().height + 300));
-		localPathDialog.setMinimumSize(
-				new Dimension(tableSent.getMinimumSize().width, tableSent.getMinimumSize().height + 300));
+		int dialogWidth = MessageDetailsTable.getSizeOfMessageDetailsTable().width;
+		int dialogHeight = MessageDetailsTable.getSizeOfMessageDetailsTable().height + DIVIDER_LOCATION + 100;
+		Dimension dialogDimension = new Dimension(dialogWidth, dialogHeight);
+		localPathDialog.setPreferredSize(dialogDimension);
+		localPathDialog.setMinimumSize(dialogDimension);
 	}
 
 	public String[][] getMessageDetailsReceived() {
-		return this.messageDetailsReceived;
+		return messageDetailsReceived;
 	}
 
 	public String[][] getMessageDetailsSent() {
-		return this.messageDetailsSent;
+		return messageDetailsSent;
 	}
 
 	public int getMaxLayer() {
-		return this.maxLayer;
+		return maxLayer;
 	}
 
 	public boolean isSent() {
-		return this.sent;
+		return sent;
 	}
 
 	public boolean isForwarding() {
-		return this.forwarding;
+		return forwarding;
 	}
 
 	/**
@@ -151,8 +153,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * wurde.
 	 */
 	private boolean isFrameSent() {
-		return this.interfaceId
+		return interfaceId
 				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
+	}
+	
+	public String getInterfaceId() {
+		return interfaceId;
 	}
 
 	/**
@@ -352,9 +358,19 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 */
 	public void updateMessageDetails(boolean senderSideIsActive) {
 		if (senderSideIsActive) {
+			// save old divider location
+			int currentDividerLocation = splitPane.getDividerLocation();
+			// set new table
 			splitPane.setBottomComponent(new JScrollPane(tableSent));
+			// set old divider location
+			splitPane.setDividerLocation(currentDividerLocation);
 		} else {
+			// save old divider location
+			int currentDividerLocation = splitPane.getDividerLocation();
+			// set new table
 			splitPane.setBottomComponent(new JScrollPane(tableReceived));
+			// set old divider location
+			splitPane.setDividerLocation(currentDividerLocation);
 		}
 	}
 
@@ -517,7 +533,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 			setLayout(gridBagLayout);
 			setBackground(Color.WHITE);
 
-			// Storage for creating the Labes and TextAreas
+			// Storage for creating the Labels (cells with little content) and
+			// TextAreas (cells with potential large content)
 			JLabel label;
 			JTextArea textArea;
 
@@ -627,20 +644,25 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);
+			return getSizeOfMessageDetailsTable();
 		}
 
 		@Override
 		public Dimension getMinimumSize() {
-			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);
+			return getSizeOfMessageDetailsTable();
 		}
 
 		@Override
 		public Dimension getMaximumSize() {
+			return getSizeOfMessageDetailsTable();
+		}
+		
+		// size of the whole table
+		private static Dimension getSizeOfMessageDetailsTable() {
 			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);
 		}
 
-		// Cells with short content are JLabels
+		// Cells with one line content are JLabels
 		private JLabel setLabel(String text, int x_pos, int y_pos, int width, int height, double width_multiplier,
 				double height_multiplier, boolean needsBorder) {
 			JLabel label = new JLabel(text);
@@ -659,7 +681,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			return label;
 		}
 
-		// Cells with potential long content are JTextAreas
+		// Cells with multi line content are JTextAreas
 		private JTextArea setTextArea(String text, int x_pos, int y_pos, int width, int height, double width_multiplier,
 				double height_multiplier) {
 			JTextArea textArea = new JTextArea(text);
@@ -696,8 +718,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 		// set standard parameters
 		private void setStandards(Component component, int x_pos, int y_pos, int width, int height,
 				double width_multiplier, double height_multiplier) {
-			component.setPreferredSize(new Dimension((int) (width_multiplier * width * MSG_DETAILS_CELL_WIDTH),
-					(int) (height_multiplier * height * MSG_DETAILS_CELL_HEIGHT)));
+			Dimension dimensionOfComponent = new Dimension((int) (width_multiplier * width * MSG_DETAILS_CELL_WIDTH),
+					(int) (height_multiplier * height * MSG_DETAILS_CELL_HEIGHT));
+			component.setPreferredSize(dimensionOfComponent);
+			component.setMinimumSize(dimensionOfComponent);
+			component.setMaximumSize(dimensionOfComponent);
 			c.gridx = x_pos;
 			c.gridy = y_pos;
 			c.gridwidth = width;

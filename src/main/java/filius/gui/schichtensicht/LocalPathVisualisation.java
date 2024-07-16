@@ -52,7 +52,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private static final double RECTANGLE_HEIGHT = RECTANGLE_WIDTH / RECTANGLE_RATIO;
 
 	// vertical gap between cells with content
-	private static final int VGAP_BETWEEN_CELLS = 10;
+	private static final int VGAP_BETWEEN_CELLS = 12;
 
 	// shrink factor for nested messages
 	private static final double SHRINK_FACTOR = 0.85;
@@ -174,12 +174,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		InternetKnoten node = ((InternetKnoten) localPathPanel.systemSoftware.getKnoten());
 		NetzwerkInterface ni = node.getNetzwerkInterfaceByMac(localPathPanel.getInterfaceId());
 		String[] clientInfos = new String[5];
-		clientInfos[0] = "<b>" + messages.getString("schichten_lokaler_weg_msg6") + "</b> " + ni.getIp()
-				+ "<br />";
+		clientInfos[0] = "<b>" + messages.getString("schichten_lokaler_weg_msg6") + "</b> " + ni.getIp() + "<br />";
 		clientInfos[1] = "<b>" + messages.getString("schichten_lokaler_weg_msg7") + "</b> " + ni.getSubnetzMaske()
 				+ "<br />";
-		clientInfos[2] = "<b>" + messages.getString("schichten_lokaler_weg_msg8") + "</b> " + ni.getMac()
-				+ "<br />";
+		clientInfos[2] = "<b>" + messages.getString("schichten_lokaler_weg_msg8") + "</b> " + ni.getMac() + "<br />";
 		clientInfos[3] = "<b>" + messages.getString("schichten_lokaler_weg_msg9") + "</b> " + ni.getGateway()
 				+ "<br />";
 		clientInfos[4] = "<b>" + messages.getString("schichten_lokaler_weg_msg10") + "</b> " + ni.getDns();
@@ -192,11 +190,16 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		label = setEmptyCell(mainPanel, 0, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
+		// create visualisation of nested messages
 		for (int i = 1; i < 5; i++) {
-			label = new nestedMessagesVisualisation(5 - i);
+			label = new NestedMessagesVisualisation(5 - i);
 			setFinishedLabel(mainPanel, label, 0, 5 + 2 * (i - 1), 1, 1);
-			label = setEmptyCell(mainPanel, 0, 6 + 2 * (i - 1), 1, 1);
-			setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+		}
+
+		// create vertical arrows
+		for (int i = 1; i < 4; i++) {
+			label = new Arrow();
+			setFinishedLabel(mainPanel, label, 0, 6 + 2 * (i - 1), 1, 1);
 		}
 
 		add(mainPanel, BorderLayout.CENTER);
@@ -224,8 +227,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		sidePanel.setBackground(Color.WHITE);
 
 		JLabel label;
-		String[] layers = { messages.getString("rp_lauscher_msg8"), messages.getString("rp_lauscher_msg9"),
-				messages.getString("rp_lauscher_msg10"), messages.getString("rp_lauscher_msg11") };
+		String[] layers = { messages.getString("rp_lauscher_msg11"), messages.getString("rp_lauscher_msg10"),
+				messages.getString("rp_lauscher_msg9"), messages.getString("rp_lauscher_msg8") };
 		for (int i = 0; i < 4; i++) {
 			label = setEmptyCell(sidePanel, 0, 1 + i * 2, 1, 1);
 			setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
@@ -430,11 +433,11 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	/**
 	 * class for the visualisation of nested messages
 	 */
-	private class nestedMessagesVisualisation extends JLabel {
+	private class NestedMessagesVisualisation extends JLabel {
 
 		private int layerNumber;
 
-		private nestedMessagesVisualisation(int layerNumber) {
+		private NestedMessagesVisualisation(int layerNumber) {
 			this.layerNumber = layerNumber;
 			setBackground(Color.WHITE);
 		}
@@ -443,9 +446,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			return new Dimension(RECTANGLE_WIDTH, (int) RECTANGLE_HEIGHT);
 		}
 
-		/**
-		 * Just for testing
-		 */
 		public void paintComponent(Graphics g) {
 			// Let UI Delegate paint first, which
 			// includes background filling since
@@ -492,7 +492,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * A filled rectangle for painting.
+	 * filled rectangle for painting.
 	 */
 	private class FilledRectangle {
 
@@ -516,6 +516,35 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			int height = (int) Math.round(width / RECTANGLE_RATIO);
 			g.setColor(fillColor);
 			g.fillRect(xPos, yPos, width, height);
+		}
+	}
+
+	/**
+	 * class for the arrows between the visualisations of nested messages
+	 */
+	private class Arrow extends JLabel {
+
+		private Arrow() {
+			setBackground(Color.WHITE);
+		}
+
+		public Dimension getPreferredSize() {
+			return new Dimension(RECTANGLE_WIDTH, (int) VGAP_BETWEEN_CELLS);
+		}
+
+		public void paintComponent(Graphics g) {
+			// Let UI Delegate paint first, which
+			// includes background filling since
+			// this component is opaque.
+			super.paintComponent(g);
+
+			int xPos = (int) (RECTANGLE_WIDTH / 2.0);
+			int length = (int) (VGAP_BETWEEN_CELLS);
+			int lineWidth = 4;
+			int headHeight = 6;
+			g.fillRect(xPos - lineWidth / 2, 0, lineWidth, length - headHeight);
+			g.fillPolygon(new int[] { xPos - headHeight, xPos + headHeight, xPos },
+					new int[] { length - headHeight, length - headHeight, length }, 3);
 		}
 	}
 }

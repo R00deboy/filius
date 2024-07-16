@@ -50,12 +50,12 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private static final int RECTANGLE_WIDTH = 180;
 	private static final double RECTANGLE_RATIO = 3;
 	private static final double RECTANGLE_HEIGHT = RECTANGLE_WIDTH / RECTANGLE_RATIO;
+	private static final double SHRINK_FACTOR = 0.8;
+	private static final double HEIGHT_DIFF = RECTANGLE_HEIGHT * (1 - SHRINK_FACTOR) * 0.5;
+	private static final double SQUARE_SIDE_LENGTH = RECTANGLE_HEIGHT;
 
 	// vertical gap between cells with content
 	private static final int VGAP_BETWEEN_CELLS = 12;
-
-	// shrink factor for nested messages
-	private static final double SHRINK_FACTOR = 0.85;
 
 	// buttons "vorwärts" and "zurück"
 	private final JButton FORTH_IN_TIME;
@@ -192,7 +192,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		// create visualisation of nested messages
 		for (int i = 1; i < 5; i++) {
-			label = new NestedMessagesVisualisation(5 - i);
+			label = new NestedMessagesVisualisation(5 - i, RECTANGLE_WIDTH, (int) (RECTANGLE_WIDTH / RECTANGLE_RATIO));
 			setFinishedLabel(mainPanel, label, 0, 5 + 2 * (i - 1), 1, 1);
 		}
 
@@ -201,6 +201,18 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			label = new Arrow();
 			setFinishedLabel(mainPanel, label, 0, 6 + 2 * (i - 1), 1, 1);
 		}
+
+		// create first wire
+		label = new Wire();
+		setFinishedLabel(mainPanel, label, 1, 11, 1, 1);
+		
+		// create square nested messages
+		label = new NestedMessagesVisualisation(1, (int) SQUARE_SIDE_LENGTH, (int) SQUARE_SIDE_LENGTH);
+		setFinishedLabel(mainPanel, label, 2, 11, 1, 1);
+		
+		// create second wire
+		label = new Wire();
+		setFinishedLabel(mainPanel, label, 3, 11, 1, 1);
 
 		add(mainPanel, BorderLayout.CENTER);
 	}
@@ -398,7 +410,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		setStandards(label, x_pos, y_pos, width, height);
 		label.setOpaque(false);
 
-		label.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		container.add(label, c);
 	}
 
@@ -436,20 +447,26 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private class NestedMessagesVisualisation extends JLabel {
 
 		private int layerNumber;
+		private int width;
+		private int height;
 
-		private NestedMessagesVisualisation(int layerNumber) {
+		private NestedMessagesVisualisation(int layerNumber, int width, int height) {
 			this.layerNumber = layerNumber;
+			this.width = width;
+			this.height = height;
 			setBackground(Color.WHITE);
+//			Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
+//			Border marginBorder = new EmptyBorder(5, 5, 5, 5);
+//			setBorder(new CompoundBorder(lineBorder, marginBorder));
 		}
 
 		public Dimension getPreferredSize() {
-			return new Dimension(RECTANGLE_WIDTH, (int) RECTANGLE_HEIGHT);
+			return new Dimension(width, height);
 		}
 
 		public void paintComponent(Graphics g) {
-			// Let UI Delegate paint first, which
-			// includes background filling since
-			// this component is opaque.
+			// Let UI Delegate paint first, which includes background filling since this
+			// component is opaque.
 			super.paintComponent(g);
 
 			double xPos = 0;
@@ -460,20 +477,19 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			rect.setX((int) xPos);
 			rect.setY((int) yPos);
 			setColorAccordingToLayer(layerNumber, rect);
-			rect.paintFilledRectangle(g, RECTANGLE_WIDTH);
+			rect.paintFilledRectangle(g, width, height);
 
 			// set other layer rectangles
 			int exp = 0;
 			for (int i = layerNumber + 1; i <= 4; i++) {
-				double reducedHeight = RECTANGLE_HEIGHT * (1 - SHRINK_FACTOR) * 0.5;
-				xPos = Math.round(xPos + Math.pow(SHRINK_FACTOR, exp)
-						* (RECTANGLE_WIDTH - (RECTANGLE_WIDTH * SHRINK_FACTOR + reducedHeight)));
-				yPos = Math.round(yPos + Math.pow(SHRINK_FACTOR, exp) * reducedHeight);
+				xPos = Math
+						.round(xPos + Math.pow(SHRINK_FACTOR, exp) * (width - (width * SHRINK_FACTOR + HEIGHT_DIFF)));
+				yPos = Math.round(yPos + Math.pow(SHRINK_FACTOR, exp) * HEIGHT_DIFF);
 
 				rect.setX((int) xPos);
 				rect.setY((int) yPos);
 				setColorAccordingToLayer(i, rect);
-				rect.paintFilledRectangle(g, (int) Math.round(RECTANGLE_WIDTH * Math.pow(SHRINK_FACTOR, exp + 1)));
+				rect.paintFilledRectangle(g, (int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * width), (int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * height));
 				exp++;
 			}
 		}
@@ -512,8 +528,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			this.fillColor = fillColor;
 		}
 
-		public void paintFilledRectangle(Graphics g, int width) {
-			int height = (int) Math.round(width / RECTANGLE_RATIO);
+		public void paintFilledRectangle(Graphics g, int width, int height) {
 			g.setColor(fillColor);
 			g.fillRect(xPos, yPos, width, height);
 		}
@@ -533,18 +548,53 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		}
 
 		public void paintComponent(Graphics g) {
-			// Let UI Delegate paint first, which
-			// includes background filling since
-			// this component is opaque.
+			// Let UI Delegate paint first, which includes background filling since this
+			// component is opaque.
 			super.paintComponent(g);
 
 			int xPos = (int) (RECTANGLE_WIDTH / 2.0);
 			int length = (int) (VGAP_BETWEEN_CELLS);
-			int lineWidth = 4;
+			int width = 4;
 			int headHeight = 6;
-			g.fillRect(xPos - lineWidth / 2, 0, lineWidth, length - headHeight);
+			g.fillRect(xPos - width / 2, 0, width, length - headHeight);
 			g.fillPolygon(new int[] { xPos - headHeight, xPos + headHeight, xPos },
 					new int[] { length - headHeight, length - headHeight, length }, 3);
+		}
+	}
+
+	/**
+	 * visualisation of a grey wire (link layer) and an arrow
+	 */
+	private class Wire extends JLabel {
+
+		private Wire() {
+			setBackground(Color.WHITE);
+		}
+
+		public Dimension getPreferredSize() {
+			return new Dimension((int) SQUARE_SIDE_LENGTH, (int) SQUARE_SIDE_LENGTH);
+		}
+
+		public void paintComponent(Graphics g) {
+			// Let UI Delegate paint first, which includes background filling since this
+			// component is opaque.
+			super.paintComponent(g);
+
+			int halfSquareSideLength = (int) (SQUARE_SIDE_LENGTH / 2);
+			int height = 4;
+			int headWidth = 6;
+
+			// arrow
+			g.fillRect(0, halfSquareSideLength - height / 2, (int) (SQUARE_SIDE_LENGTH - headWidth), height);
+			g.fillPolygon(
+					new int[] { (int) (SQUARE_SIDE_LENGTH - headWidth), (int) (SQUARE_SIDE_LENGTH - headWidth),
+							(int) SQUARE_SIDE_LENGTH },
+					new int[] { halfSquareSideLength - headWidth, halfSquareSideLength + headWidth,
+							halfSquareSideLength },
+					3);
+
+			g.setColor(AggregatedMessageTable.LayerColorVar.LINK.backgroundColor);
+			g.fillRect(0, (int) (SQUARE_SIDE_LENGTH - HEIGHT_DIFF) + 1, (int) SQUARE_SIDE_LENGTH, (int) HEIGHT_DIFF);
 		}
 	}
 }

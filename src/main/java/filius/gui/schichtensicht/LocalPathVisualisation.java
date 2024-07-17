@@ -90,14 +90,16 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		// Falls Host (Rechner, Notebook)
 		if (systemSoftware instanceof Betriebssystem) {
-			minPointInTime = 4 - MAX_LAYER;
-			maxPointInTime = 3;
-			pointInTime = minPointInTime;
 			if (localPathPanel.isSent()) {
+				minPointInTime = 4 - MAX_LAYER;
+				maxPointInTime = 4;
 				pointInTimeForSenderSide = -1; // should never be reached, since only sent
 			} else {
-				pointInTimeForSenderSide = 4; // should never be reached, since only received
+				minPointInTime = 0;
+				maxPointInTime = MAX_LAYER;
+				pointInTimeForSenderSide = 5; // should never be reached, since only received
 			}
+			pointInTime = minPointInTime;
 			if (localPathPanel.isSent()) {
 				hostVisualisationSent();
 			} else {
@@ -110,18 +112,17 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				|| systemSoftware instanceof GatewayFirmware) {
 			if (localPathPanel.isForwarding()) {
 				minPointInTime = 0;
-				maxPointInTime = 3;
-				pointInTime = minPointInTime;
+				maxPointInTime = 5;
 			} else if (localPathPanel.isSent()) {
-				minPointInTime = 2;
-				maxPointInTime = 3;
-				pointInTime = minPointInTime;
+				minPointInTime = 3;
+				maxPointInTime = 4;
 			} else {
-				minPointInTime = 0;
-				maxPointInTime = 1;
-				pointInTime = minPointInTime;
+				minPointInTime = 1;
+				maxPointInTime = 2;
+				
 			}
-			pointInTimeForSenderSide = 2;
+			pointInTime = minPointInTime;
+			pointInTimeForSenderSide = 3;
 			routerVisualisation();
 		}
 		backAndForth();
@@ -288,18 +289,23 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
 
 					// hide or show layers
+					// if not forwarding (means hosts or routers which are sending or receiving)
 					if (!LOCAL_PATH_PANEL.isForwarding()) {
-						if (LOCAL_PATH_PANEL.isSent()) {
+						if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime) {
 							LOCAL_PATH_PANEL.showNextLowerLayer();
-						} else {
+						} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 1) {
+							System.out.println("pointInTime = " + pointInTime);
+							System.out.println("minPointInTime = " + minPointInTime);
+							System.out.println("maxPointInTime = " + maxPointInTime);
 							LOCAL_PATH_PANEL.hideNextHigherLayer();
 						}
+						// if forwarding (for routers)
 					} else {
 						switch (pointInTime) {
-						case 1:
+						case 2:
 							LOCAL_PATH_PANEL.hideNextHigherLayer();
 							break;
-						case 3:
+						case 4:
 							LOCAL_PATH_PANEL.showNextLowerLayer();
 							break;
 						}
@@ -323,17 +329,17 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 					// hide or show layers
 					if (!LOCAL_PATH_PANEL.isForwarding()) {
-						if (LOCAL_PATH_PANEL.isSent()) {
+						if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime - 1) {
 							LOCAL_PATH_PANEL.hideNextHigherLayer();
-						} else {
+						} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 0) {
 							LOCAL_PATH_PANEL.showNextLowerLayer();
 						}
 					} else {
 						switch (pointInTime) {
-						case 2:
+						case 3:
 							LOCAL_PATH_PANEL.hideNextHigherLayer();
 							break;
-						case 0:
+						case 1:
 							LOCAL_PATH_PANEL.showNextLowerLayer();
 							break;
 						}

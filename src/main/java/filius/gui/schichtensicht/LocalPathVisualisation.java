@@ -32,7 +32,11 @@ import filius.software.system.SystemSoftware;
 import filius.software.system.VermittlungsrechnerBetriebssystem;
 
 public class LocalPathVisualisation extends JPanel implements I18n {
-	private LocalPathPanel localPathPanel;
+	private final LocalPathPanel LOCAL_PATH_PANEL;
+
+	// maximum layer involved
+	// (1 = link, 2 = internet, 3 = transport, 4 = application)
+	private final int MAX_LAYER;
 
 	private int pointInTime;
 	private int maxPointInTime;
@@ -64,7 +68,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 	public LocalPathVisualisation(LocalPathPanel localPathPanel) {
 		super();
-		this.localPathPanel = localPathPanel;
+		LOCAL_PATH_PANEL = localPathPanel;
+		MAX_LAYER = LOCAL_PATH_PANEL.getMaxLayer();
 		SystemSoftware systemSoftware = localPathPanel.systemSoftware;
 		BorderLayout borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
@@ -163,15 +168,15 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// client name cell
 		label = setEmptyCell(mainPanel, 0, 0, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		label = setLabel(mainPanel, localPathPanel.systemSoftware.getKnoten().holeAnzeigeName(), 0, 1, 1, 1, true);
+		label = setLabel(mainPanel, LOCAL_PATH_PANEL.systemSoftware.getKnoten().holeAnzeigeName(), 0, 1, 1, 1, true);
 		setSize(label, RECTANGLE_WIDTH, (int) (0.3 * RECTANGLE_HEIGHT));
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label = setEmptyCell(mainPanel, 0, 2, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
 		// client info cell
-		InternetKnoten node = ((InternetKnoten) localPathPanel.systemSoftware.getKnoten());
-		NetzwerkInterface ni = node.getNetzwerkInterfaceByMac(localPathPanel.getInterfaceId());
+		InternetKnoten node = ((InternetKnoten) LOCAL_PATH_PANEL.systemSoftware.getKnoten());
+		NetzwerkInterface ni = node.getNetzwerkInterfaceByMac(LOCAL_PATH_PANEL.getInterfaceId());
 		String[] clientInfos = new String[5];
 		clientInfos[0] = "<b>" + messages.getString("schichten_lokaler_weg_msg6") + "</b> " + ni.getIp() + "<br />";
 		clientInfos[1] = "<b>" + messages.getString("schichten_lokaler_weg_msg7") + "</b> " + ni.getSubnetzMaske()
@@ -195,10 +200,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			setFinishedLabel(mainPanel, label, 0, 5 + 2 * (i - 1), 1, 1);
 		}
 
-		// create vertical arrows
-		for (int i = 1; i < 4; i++) {
+		// create vertical arrows below the nested messages rectangles
+		for (int layer = 2; layer <= MAX_LAYER; layer++) {
 			label = new Arrow();
-			setFinishedLabel(mainPanel, label, 0, 6 + 2 * (i - 1), 1, 1);
+			setFinishedLabel(mainPanel, label, 0, 10 - 2 * (layer - 2), 1, 1);
 		}
 
 		// create first wire
@@ -280,22 +285,22 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 						FORTH_IN_TIME.setEnabled(false);
 					}
 					updateSenderSide();
-					localPathPanel.updateMessageDetails(senderSideIsActive);
+					LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
 
 					// hide or show layers
-					if (!localPathPanel.isForwarding()) {
-						if (localPathPanel.isSent()) {
-							localPathPanel.showNextLowerLayer();
+					if (!LOCAL_PATH_PANEL.isForwarding()) {
+						if (LOCAL_PATH_PANEL.isSent()) {
+							LOCAL_PATH_PANEL.showNextLowerLayer();
 						} else {
-							localPathPanel.hideNextHigherLayer();
+							LOCAL_PATH_PANEL.hideNextHigherLayer();
 						}
 					} else {
 						switch (pointInTime) {
 						case 1:
-							localPathPanel.hideNextHigherLayer();
+							LOCAL_PATH_PANEL.hideNextHigherLayer();
 							break;
 						case 3:
-							localPathPanel.showNextLowerLayer();
+							LOCAL_PATH_PANEL.showNextLowerLayer();
 							break;
 						}
 					}
@@ -314,22 +319,22 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 						BACK_IN_TIME.setEnabled(false);
 					}
 					updateSenderSide();
-					localPathPanel.updateMessageDetails(senderSideIsActive);
+					LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
 
 					// hide or show layers
-					if (!localPathPanel.isForwarding()) {
-						if (localPathPanel.isSent()) {
-							localPathPanel.hideNextHigherLayer();
+					if (!LOCAL_PATH_PANEL.isForwarding()) {
+						if (LOCAL_PATH_PANEL.isSent()) {
+							LOCAL_PATH_PANEL.hideNextHigherLayer();
 						} else {
-							localPathPanel.showNextLowerLayer();
+							LOCAL_PATH_PANEL.showNextLowerLayer();
 						}
 					} else {
 						switch (pointInTime) {
 						case 2:
-							localPathPanel.hideNextHigherLayer();
+							LOCAL_PATH_PANEL.hideNextHigherLayer();
 							break;
 						case 0:
-							localPathPanel.showNextLowerLayer();
+							LOCAL_PATH_PANEL.showNextLowerLayer();
 							break;
 						}
 					}
@@ -517,6 +522,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// component is opaque.
 			super.paintComponent(g);
 
+			// draw origin is at top left
 			double xPos = 0;
 			double yPos = 0;
 
@@ -524,22 +530,28 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			FilledRectangle rect = new FilledRectangle();
 			rect.setX((int) xPos);
 			rect.setY((int) yPos);
-			setColorAccordingToLayer(layerNumber, rect);
-			rect.paintFilledRectangle(g, width, height);
 
-			// set other layer rectangles
-			int exp = 0;
-			for (int i = layerNumber + 1; i <= 4; i++) {
-				xPos = Math
-						.round(xPos + Math.pow(SHRINK_FACTOR, exp) * (width - (width * SHRINK_FACTOR + HEIGHT_DIFF)));
-				yPos = Math.round(yPos + Math.pow(SHRINK_FACTOR, exp) * HEIGHT_DIFF);
+			// Only draw nested messages if the layer is involved. Otherwise the rectangle
+			// stays white (not visible).
+			if (layerNumber <= MAX_LAYER) {
+				setColorAccordingToLayer(layerNumber, rect);
+				rect.paintFilledRectangle(g, width, height);
+				if (layerNumber < MAX_LAYER) {
+					// set other layer rectangles
+					int exp = 0;
+					for (int i = layerNumber + 1; i <= MAX_LAYER; i++) {
+						xPos = Math.round(
+								xPos + Math.pow(SHRINK_FACTOR, exp) * (width - (width * SHRINK_FACTOR + HEIGHT_DIFF)));
+						yPos = Math.round(yPos + Math.pow(SHRINK_FACTOR, exp) * HEIGHT_DIFF);
 
-				rect.setX((int) xPos);
-				rect.setY((int) yPos);
-				setColorAccordingToLayer(i, rect);
-				rect.paintFilledRectangle(g, (int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * width),
-						(int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * height));
-				exp++;
+						rect.setX((int) xPos);
+						rect.setY((int) yPos);
+						setColorAccordingToLayer(i, rect);
+						rect.paintFilledRectangle(g, (int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * width),
+								(int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * height));
+						exp++;
+					}
+				}
 			}
 		}
 

@@ -153,10 +153,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * wurde.
 	 */
 	private boolean isFrameSent() {
-		return interfaceId
-				.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
+		return interfaceId.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
 	}
-	
+
 	public String getInterfaceId() {
 		return interfaceId;
 	}
@@ -408,7 +407,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * transport.
 	 * 
 	 * @param layerNumber number for layer
-	 * @param table       in which layer data should be hidden
+	 * @param table       table in which layer data should be hidden (either the
+	 *                    table for the sent or the received message)
 	 * @throws NoSuchElementException
 	 */
 	private void hideLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
@@ -656,7 +656,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		public Dimension getMaximumSize() {
 			return getSizeOfMessageDetailsTable();
 		}
-		
+
 		// size of the whole table
 		private static Dimension getSizeOfMessageDetailsTable() {
 			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);

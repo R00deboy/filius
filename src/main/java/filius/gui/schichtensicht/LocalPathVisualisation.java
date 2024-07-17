@@ -90,7 +90,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		// Falls Host (Rechner, Notebook)
 		if (systemSoftware instanceof Betriebssystem) {
-			minPointInTime = 4 - localPathPanel.getMaxLayer();
+			minPointInTime = 4 - MAX_LAYER;
 			maxPointInTime = 3;
 			pointInTime = minPointInTime;
 			if (localPathPanel.isSent()) {

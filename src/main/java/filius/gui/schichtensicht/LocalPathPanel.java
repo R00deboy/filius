@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -41,16 +42,16 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private final String interfaceId;
 
-	private final int selectedFrameNumber; // beginnt bei 1
+	private final int selectedFrameNumber; // starts with 1
 
 	private boolean sent = false; // if the node sent the frame, otherwise the node received the frame
-	private boolean forwarding = false; // if the node is only forwarding an IP or ICMP packet
+	private boolean forwarding = false; // if the node is forwarding an IP or ICMP packet
 
 	public JSplitPane splitPane;
 	private static final int DIVIDER_LOCATION = 350;
 
-	private String[][] messageDetailsSent = new String[6][8]; // für die versendete Nachricht
-	private String[][] messageDetailsReceived = new String[6][8]; // für die ankommende Nachricht
+	private String[][] messageDetailsSent = new String[6][8]; // for the sent message
+	private String[][] messageDetailsReceived = new String[6][8]; // for the received message
 
 	private MessageDetailsTable tableSent;
 	private MessageDetailsTable tableReceived;
@@ -70,7 +71,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private static final int MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int MSG_DETAILS_CELL_HEIGHT = 30;
 
-	private static Lauscher lauscher = Lauscher.getLauscher(); // Zugriff auf den Lauscher
+	private static Lauscher lauscher = Lauscher.getLauscher(); // Access to Lauscher
 
 	public LocalPathPanel(LocalPathDialog localPathDialog) {
 		super();
@@ -86,9 +87,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		/*
 		 * Fill matrices messageDetailsReceived and messageDetailsSent. Both have an
-		 * empty second line (e.g. messageDetailsReceived[1][...] is empty), such that
-		 * it will match row and column numbers of the MessageDetailsTable, which will
-		 * be the visible element.
+		 * empty second line (e.g. messageDetailsReceived[1][...] is Null), such that it
+		 * will match row and column numbers of the MessageDetailsTable, which will be
+		 * the visible element.
 		 */
 		fill();
 		correspondingFrameData = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
@@ -149,8 +150,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Prüft, ob das ausgewählte Frame empfangen oder versandt (= nicht empfangen)
-	 * wurde.
+	 * Checks if the selected frame is sent or received (= not sent).
+	 * 
+	 * @return true if sent, false if received
 	 */
 	private boolean isFrameSent() {
 		return interfaceId.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
@@ -161,9 +163,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Füllt die Nachrichtendetails {@code messageDetailsSent} und
-	 * {@code messageDetailsReceived} mit allen für die Visualisierung benötigten
-	 * Daten des/der Frames.
+	 * Fills {@code messageDetailsSent} and {@code messageDetailsReceived} with all
+	 * data of the frame(s) which is needed for the visualisation.
 	 */
 	private void fill() {
 		if (sent) {
@@ -173,12 +174,16 @@ public class LocalPathPanel extends JPanel implements I18n {
 			fillTitles(messageDetailsReceived);
 			fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
 		}
-		// show(25);
 	}
 
 	/**
-	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit den
-	 * Werten für das ausgewählte Interface und die frame-Nummer.
+	 * Fills either {@code messageDetailsSent} or {@code messageDetailsReceived}
+	 * with the values of the selected interface and frame number.
+	 * 
+	 * @param messageDetails      Either {@code messageDetailsSent} or
+	 *                            {@code messageDetailsReceived}
+	 * @param interfaceId
+	 * @param selectedFrameNumber
 	 */
 	private void fillMessageDetails(String[][] messageDetails, String interfaceId, int selectedFrameNumber) {
 		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
@@ -244,9 +249,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Füllt die Nachrichtendetails, die als Parameter mitgegeben werden, mit
-	 * denjenigen Titeln (Spalten- und Zellbezeichnungen), die für alle gleich
-	 * (konstant) sind.
+	 * Fills either {@code messageDetailsSent} or {@code messageDetailsReceived}
+	 * with the titles (column and cell labels) that are the same for both tables.
+	 * 
+	 * @param messageDetails Either {@code messageDetailsSent} or
+	 *                       {@code messageDetailsReceived}
 	 */
 	private void fillTitles(String[][] messageDetails) {
 		// Schicht
@@ -286,8 +293,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Füllt die andere Nachrichtentabelle aus, falls der Knoten ein Router ist und
-	 * das IP- oder ICMP-Paket von ihm nur weitergeleitet wird.
+	 * This method calls {@code setForwarding()} and
+	 * {@code fillOtherIfForwarding()}.
 	 */
 	private void setForwardingAndFillOther() {
 		String corrInterfaceId = (String) correspondingFrameData[0];
@@ -297,8 +304,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Setzt {@code forwarding} auf wahr, falls das IP- oder ICMP-Paket beim Router
-	 * nur weitergeleitet wird.
+	 * Only has an effect if the node is a router (or home router). If the IP or
+	 * ICMP packet is forwarded, this method sets {@code forwarding} to true.
+	 * 
+	 * @param corrInterfaceId
+	 * @param corrFrameNumber
 	 */
 	private void setForwarding(String corrInterfaceId, Integer corrFrameNumber) {
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
@@ -309,9 +319,13 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Falls {@code forwarding} wahr ist, füllt diese Methode diejenigen
-	 * {@code messageDetailsSent} aus, welche noch nicht ausgefüllt wurden, da für
-	 * die Visualisierung beide benötigt werden.
+	 * Only has an effect if the node is a router (or home router). If
+	 * {@code forwarding} is true, sets the message details of the table which is
+	 * not yet filled ({@code messageDetailsSent} or
+	 * {@code messageDetailsReceived}).
+	 * 
+	 * @param corrInterfaceId
+	 * @param corrFrameNumber
 	 */
 	private void fillOtherIfForwarding(String corrInterfaceId, Integer corrFrameNumber) {
 		if (forwarding == true) {
@@ -326,9 +340,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Bestimmt, welche Nachrichtendetails standardmässig beim erstmaligen Öffnen
-	 * des Fensters im unteren Teil der SplitPane zu sehen sind: {@code
-	 * messageDetailsSent} oder {@code messageDetailsReceived}.
+	 * Determines which message details ({@code messageDetailsSent} or
+	 * {@code messageDetailsReceived}) are visible when opening the whole window of
+	 * the local path for the first time.
 	 */
 	private void setDefaultMessageDetails() {
 		if (sent && !forwarding) {
@@ -346,14 +360,17 @@ public class LocalPathPanel extends JPanel implements I18n {
 			}
 		} else {
 			// for the receiver of a message
-			// for a router, which is only forwarding an IP or ICMP packet
+			// for a router, which is forwarding an IP or ICMP packet
 			updateMessageDetails(false);
 		}
 	}
 
 	/**
-	 * Aktualisiert die Nachrichtendetails (z.B. wenn in der Visualisierung "zurück"
-	 * oder "vorwärts" gedrückt wurde).
+	 * Updates the message details (e.g. if one of the buttons "vorwärts" or
+	 * "zurück" is pressed).
+	 * 
+	 * @param senderSideIsActive If true, the visualisation is on the sender side,
+	 *                           otherwise on the receiver side.
 	 */
 	public void updateMessageDetails(boolean senderSideIsActive) {
 		if (senderSideIsActive) {
@@ -453,6 +470,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			int firstColumn = (layerNumber - 1) * 2;
 			columns.add(firstColumn);
 			columns.add(firstColumn + 1);
+
 			// determine colors
 			Color foregroundColor = null;
 			Color backgroundColor = null;
@@ -470,17 +488,20 @@ public class LocalPathPanel extends JPanel implements I18n {
 				backgroundColor = LayerColorVar.TRANSPORT.backgroundColor;
 				backgroundColorFine = LayerColorVar.TRANSPORT.backgroundColorFine;
 			}
+
 			// hide columns
 			for (Component component : table.getComponents()) {
 				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
 					int gridy = table.gridBagLayout.getConstraints(component).gridy;
 					if (gridy > 1) {
+
 						// set colors
 						component.setForeground(foregroundColor);
 						if (gridy == 0) {
 							component.setBackground(backgroundColorFine);
 						} else {
 							component.setBackground(backgroundColor);
+
 							// set border
 							Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
 							Border marginBorder = new EmptyBorder(5, 5, 5, 5);
@@ -657,12 +678,21 @@ public class LocalPathPanel extends JPanel implements I18n {
 			return getSizeOfMessageDetailsTable();
 		}
 
-		// size of the whole table
+		/**
+		 * size of the whole table
+		 * 
+		 * @return Dimension of the whole MessageDetailsTable
+		 */
 		private static Dimension getSizeOfMessageDetailsTable() {
 			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);
 		}
 
-		// Cells with one line content are JLabels
+		/**
+		 * Helper method to create a new JLabel in the GridBagLayout. JLabels are needed
+		 * for one line content.
+		 * 
+		 * @return The JLabel
+		 */
 		private JLabel setLabel(String text, int x_pos, int y_pos, int width, int height, double width_multiplier,
 				double height_multiplier, boolean needsBorder) {
 			JLabel label = new JLabel(text);
@@ -681,7 +711,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 			return label;
 		}
 
-		// Cells with multi line content are JTextAreas
+		/**
+		 * Helper method to create a new JTextArea in the GridBagLayout. JTextAreas are
+		 * needed for multiline content.
+		 * 
+		 * @return The JTextArea
+		 */
 		private JTextArea setTextArea(String text, int x_pos, int y_pos, int width, int height, double width_multiplier,
 				double height_multiplier) {
 			JTextArea textArea = new JTextArea(text);
@@ -701,7 +736,18 @@ public class LocalPathPanel extends JPanel implements I18n {
 			return textArea;
 		}
 
-		// Empty cells form the gap between the first and the third row
+		/**
+		 * Helper method to create a visually empty cell, which is a JLabel, into the
+		 * GridBagLayout. Empty cells form the gap between the first and the third row.
+		 * 
+		 * @param x_pos
+		 * @param y_pos
+		 * @param width
+		 * @param height
+		 * @param width_multiplier
+		 * @param height_multiplier
+		 * @return The JLabel
+		 */
 		private JLabel setEmptyCell(int x_pos, int y_pos, int width, int height, double width_multiplier,
 				double height_multiplier) {
 			JLabel label = new JLabel();
@@ -715,7 +761,17 @@ public class LocalPathPanel extends JPanel implements I18n {
 			return label;
 		}
 
-		// set standard parameters
+		/**
+		 * Helper method to set standard GridBagLayout constraints.
+		 * 
+		 * @param component
+		 * @param x_pos
+		 * @param y_pos
+		 * @param width
+		 * @param height
+		 * @param width_multiplier
+		 * @param height_multiplier
+		 */
 		private void setStandards(Component component, int x_pos, int y_pos, int width, int height,
 				double width_multiplier, double height_multiplier) {
 			Dimension dimensionOfComponent = new Dimension((int) (width_multiplier * width * MSG_DETAILS_CELL_WIDTH),

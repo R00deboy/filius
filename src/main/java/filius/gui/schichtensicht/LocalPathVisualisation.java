@@ -16,9 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -101,6 +99,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				hostVisualisationReceived();
 			}
 		}
+
 		// Falls Router (Vermittlungsrechner, Heimrouter)
 		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem
 				|| systemSoftware instanceof GatewayFirmware) {
@@ -120,7 +119,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			pointInTimeForSenderSide = 2;
 			routerVisualisation();
 		}
-
 		backAndForth();
 	}
 
@@ -151,7 +149,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Visualisation of a host (Rechner or Notebook) if the frame was sent
 	 */
 	private void hostVisualisationSent() {
-		System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
+		// System.out.println("Created GUI on EDT? " +
+		// SwingUtilities.isEventDispatchThread());
 		JPanel mainPanel = new JPanel();
 
 		mainPanel.setLayout(new GridBagLayout());
@@ -205,11 +204,11 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// create first wire
 		label = new Wire();
 		setFinishedLabel(mainPanel, label, 1, 11, 1, 1);
-		
+
 		// create square nested messages
 		label = new NestedMessagesVisualisation(1, (int) SQUARE_SIDE_LENGTH, (int) SQUARE_SIDE_LENGTH);
 		setFinishedLabel(mainPanel, label, 2, 11, 1, 1);
-		
+
 		// create second wire
 		label = new Wire();
 		setFinishedLabel(mainPanel, label, 3, 11, 1, 1);
@@ -221,16 +220,22 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Visualisation of a host (Rechner or Notebook) if the frame was received
 	 */
 	private void hostVisualisationReceived() {
-		System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
+		// System.out.println("Created GUI on EDT? " +
+		// SwingUtilities.isEventDispatchThread());
 	}
 
 	/**
 	 * Visualisierung eines Routers (Vermittlungsrechner oder Heimrouter)
 	 */
 	private void routerVisualisation() {
-		System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
+		// System.out.println("Created GUI on EDT? " +
+		// SwingUtilities.isEventDispatchThread());
 	}
 
+	/**
+	 * Right and left side of the visualisation, indicating the layers and showing
+	 * the buttons "vorwärts" and "zurück".
+	 */
 	private void sideConfiguration(JButton backOrForthButton, String position) {
 		JPanel sidePanel = new JPanel(new GridBagLayout());
 		c = new GridBagConstraints();
@@ -257,7 +262,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				label.setBackground(LayerColorVar.LINK.backgroundColorFine);
 			}
 		}
-
 		add(sidePanel, position);
 	}
 
@@ -334,7 +338,12 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		});
 	}
 
-	// only has an effect for routers and home routers
+	/**
+	 * Updates the variable {@code senderSideIsActive}. Only has an effect if the
+	 * node is a router (of home router), since they can forward IP packets. Thus
+	 * they have a different frame (containing the packet) on the sender and on the
+	 * receiver side.
+	 */
 	private void updateSenderSide() {
 		if (pointInTime >= pointInTimeForSenderSide) {
 			senderSideIsActive = true;
@@ -343,7 +352,19 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		}
 	}
 
-	// Cells with one line content are JLabels
+	/**
+	 * Helper method to create a new JLabel in the GridBagLayout. JLabels are needed
+	 * for one line content.
+	 * 
+	 * @param container
+	 * @param text
+	 * @param x_pos
+	 * @param y_pos
+	 * @param width
+	 * @param height
+	 * @param needsBorder
+	 * @return The JLabel
+	 */
 	private JLabel setLabel(JPanel container, String text, int x_pos, int y_pos, int width, int height,
 			boolean needsBorder) {
 		JLabel label = new JLabel(text);
@@ -361,7 +382,19 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		return label;
 	}
 
-	// Cells with multiline content are JEditorPanes
+	/**
+	 * Helper method to create a new JEditorPane in the GridBagLayout. JEditorPanes
+	 * are needed for multiline content.
+	 * 
+	 * @param container
+	 * @param text
+	 * @param x_pos
+	 * @param y_pos
+	 * @param width
+	 * @param height
+	 * @param needsBorder
+	 * @return The JEditorPane
+	 */
 	private JEditorPane setEditorPane(JPanel container, String text, int x_pos, int y_pos, int width, int height,
 			boolean needsBorder) {
 		JEditorPane editorPane = new JEditorPane("text/html", text);
@@ -385,27 +418,16 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		return editorPane;
 	}
 
-	// Cells with multiline content are JTextAreas
-	private JTextArea setTextArea(JPanel container, String text, int x_pos, int y_pos, int width, int height,
-			boolean needsBorder) {
-		JTextArea textArea = new JTextArea(text);
-
-		setStandards(textArea, x_pos, y_pos, width, height);
-		textArea.setOpaque(true);
-		textArea.setEditable(false);
-		textArea.setFocusable(false);
-
-		if (needsBorder) {
-			Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
-			Border marginBorder = new EmptyBorder(5, 5, 5, 5);
-			textArea.setBorder(new CompoundBorder(lineBorder, marginBorder));
-		}
-		container.add(textArea, c);
-
-		return textArea;
-	}
-
-	// Already finished JLabel
+	/**
+	 * Helper method to include a JLabel into the GridBagLayout.
+	 * 
+	 * @param container
+	 * @param label
+	 * @param x_pos
+	 * @param y_pos
+	 * @param width
+	 * @param height
+	 */
 	private void setFinishedLabel(JPanel container, JLabel label, int x_pos, int y_pos, int width, int height) {
 		setStandards(label, x_pos, y_pos, width, height);
 		label.setOpaque(false);
@@ -413,7 +435,18 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		container.add(label, c);
 	}
 
-	// empty cell
+	/**
+	 * Helper method to create a visually empty cell, which is a JLabel, into the
+	 * GridBagLayout. Empty cells form the gaps between the rectangles for the
+	 * nested messages.
+	 * 
+	 * @param container
+	 * @param x_pos
+	 * @param y_pos
+	 * @param width
+	 * @param height
+	 * @return The JLabel
+	 */
 	private JLabel setEmptyCell(JPanel container, int x_pos, int y_pos, int width, int height) {
 		JLabel label = new JLabel();
 
@@ -426,7 +459,15 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		return label;
 	}
 
-	// set standard GridBagConstraints parameters
+	/**
+	 * Helper method to set standard GridBagLayout constraints.
+	 * 
+	 * @param component
+	 * @param x_pos
+	 * @param y_pos
+	 * @param width
+	 * @param height
+	 */
 	private void setStandards(Component component, int x_pos, int y_pos, int width, int height) {
 		c.gridx = x_pos;
 		c.gridy = y_pos;
@@ -489,7 +530,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				rect.setX((int) xPos);
 				rect.setY((int) yPos);
 				setColorAccordingToLayer(i, rect);
-				rect.paintFilledRectangle(g, (int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * width), (int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * height));
+				rect.paintFilledRectangle(g, (int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * width),
+						(int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * height));
 				exp++;
 			}
 		}
@@ -508,7 +550,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * filled rectangle for painting.
+	 * Filled rectangle for painting
 	 */
 	private class FilledRectangle {
 
@@ -535,7 +577,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * class for the arrows between the visualisations of nested messages
+	 * Class for the arrows between the visualisations of nested messages
 	 */
 	private class Arrow extends JLabel {
 
@@ -563,7 +605,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * visualisation of a grey wire (link layer) and an arrow
+	 * Visualisation of a grey wire (link layer) and an arrow
 	 */
 	private class Wire extends JLabel {
 

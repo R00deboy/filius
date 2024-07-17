@@ -475,6 +475,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		c.gridheight = height;
 	}
 
+	/**
+	 * Helper method to set the preferrend, minimum and maximum size of a component.
+	 * 
+	 * @param component
+	 * @param width
+	 * @param height
+	 */
 	private void setSize(Component component, int width, int height) {
 		Dimension dimensionOfComponent = new Dimension(width, height);
 		component.setPreferredSize(dimensionOfComponent);

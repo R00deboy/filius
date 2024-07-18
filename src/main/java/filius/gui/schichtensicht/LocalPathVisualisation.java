@@ -34,7 +34,7 @@ import filius.software.system.VermittlungsrechnerBetriebssystem;
 public class LocalPathVisualisation extends JPanel implements I18n {
 	private final LocalPathPanel LOCAL_PATH_PANEL;
 
-	private static final JPanel MAIN_PANEL = new JPanel();
+	private final JPanel MAIN_PANEL = new JPanel();
 
 	// maximum layer involved
 	// (1 = link, 2 = internet, 3 = transport, 4 = application)

@@ -97,40 +97,25 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		sideConfiguration(BACK_IN_TIME, BorderLayout.WEST); // left side
 		sideConfiguration(FORTH_IN_TIME, BorderLayout.EAST); // right side
 
-		// if the selected node is a host (Rechner or Notebook)
-		if (systemSoftware instanceof Betriebssystem) {
+		// if the frame was not forwarded (i.e. sent or received)
+		if (!localPathPanel.isForwarded()) {
 			if (localPathPanel.isSent()) {
 				minPointInTime = 4 - MAX_LAYER;
 				maxPointInTime = 4;
 				pointInTimeForSenderSide = -1; // should never be reached, since only sent
+				pointInTime = minPointInTime;
+				visualisationSent();
 			} else {
 				minPointInTime = 0;
 				maxPointInTime = MAX_LAYER;
 				pointInTimeForSenderSide = 5; // should never be reached, since only received
-			}
-			pointInTime = minPointInTime;
-			if (localPathPanel.isSent()) {
-				visualisationSent();
-			} else {
+				pointInTime = minPointInTime;
 				visualisationReceived();
 			}
-		}
-
-		// if the selected node is a router (Vermittlungsrechner or Heimrouter)
-		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem
-				|| systemSoftware instanceof GatewayFirmware) {
-			if (localPathPanel.isForwarded()) {
-				minPointInTime = 0;
-				maxPointInTime = 5;
-			} else if (localPathPanel.isSent()) {
-				minPointInTime = 3;
-				maxPointInTime = 4;
-				visualisationSent();
-			} else {
-				minPointInTime = 1;
-				maxPointInTime = 2;
-				visualisationReceived();
-			}
+		// if the frame was forwarded (only for routers)
+		} else {
+			minPointInTime = 0;
+			maxPointInTime = 5;
 			pointInTime = minPointInTime;
 			pointInTimeForSenderSide = 3;
 			visualisationForwarded();
@@ -237,7 +222,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Visualisation of a router (Vermittlungsrechner oder Heimrouter) which forwarded the frame
+	 * Visualisation of a router (Vermittlungsrechner oder Heimrouter) which
+	 * forwarded the frame
 	 */
 	private void visualisationForwarded() {
 		// System.out.println("Created GUI on EDT? " +
@@ -462,7 +448,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Hide or show layers in message details if button "vorwärts" was pressed
 	 */
 	private void hideOrShowLayersIfForth() {
-		// if not forwarded (means hosts or routers which have sent or received the frame)
+		// if not forwarded (means hosts or routers which have sent or received the
+		// frame)
 		if (!LOCAL_PATH_PANEL.isForwarded()) {
 			if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime) {
 				LOCAL_PATH_PANEL.showNextLowerLayer();
@@ -498,7 +485,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Hide or show layers in message details if button "zurück" was pressed
 	 */
 	private void hideOrShowLayersIfBack() {
-		// if not forwarded (means hosts or routers which have sent or received the frame)
+		// if not forwarded (means hosts or routers which have sent or received the
+		// frame)
 		if (!LOCAL_PATH_PANEL.isForwarded()) {
 			if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime - 1) {
 				LOCAL_PATH_PANEL.hideNextHigherLayer();

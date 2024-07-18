@@ -98,7 +98,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		sideConfiguration(BACK_IN_TIME, BorderLayout.WEST); // left side
 		sideConfiguration(FORTH_IN_TIME, BorderLayout.EAST); // right side
 
-		// Falls Host (Rechner, Notebook)
+		// if the selected node is a host (Rechner or Notebook)
 		if (systemSoftware instanceof Betriebssystem) {
 			if (localPathPanel.isSent()) {
 				minPointInTime = 4 - MAX_LAYER;
@@ -117,7 +117,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			}
 		}
 
-		// Falls Router (Vermittlungsrechner, Heimrouter)
+		// if the selected node is a router (Vermittlungsrechner or Heimrouter)
 		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem
 				|| systemSoftware instanceof GatewayFirmware) {
 			if (localPathPanel.isForwarding()) {
@@ -129,7 +129,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			} else {
 				minPointInTime = 1;
 				maxPointInTime = 2;
-
 			}
 			pointInTime = minPointInTime;
 			pointInTimeForSenderSide = 3;

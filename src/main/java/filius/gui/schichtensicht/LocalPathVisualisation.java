@@ -48,13 +48,20 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// (for smaller on receiver side)
 	private int pointInTimeForSenderSide;
 
-	// width, ratio of width to height of a standard rectangle, resulting height
+	// width, , 
 	private static final int RECTANGLE_WIDTH = 180;
+	// ratio of width to height of a standard rectangle
 	private static final double RECTANGLE_RATIO = 3;
+	// resulting height
 	private static final double RECTANGLE_HEIGHT = RECTANGLE_WIDTH / RECTANGLE_RATIO;
+	// shrink factor of visualisation of nested messages
 	private static final double SHRINK_FACTOR = 0.8;
+	// half of height difference after shrinking
 	private static final double HEIGHT_DIFF = RECTANGLE_HEIGHT * (1 - SHRINK_FACTOR) * 0.5;
+	// side length of squares needed for visualisation of a frame on cable (layer 1)
 	private static final double SQUARE_SIDE_LENGTH = RECTANGLE_HEIGHT;
+	// client info cell ratio of width to height
+	private static final double CLIENT_INFO_CELL_RATIO = (double) 180 / 93;
 
 	// vertical gap between cells with content
 	private static final int VGAP_BETWEEN_CELLS = 12;
@@ -191,7 +198,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			clientInfo = clientInfo + clientInfos[i];
 		}
 		editorPane = setEditorPane(mainPanel, clientInfo, 0, 3, 1, 1, true);
-		setSize(editorPane, RECTANGLE_WIDTH, (int) (1.55 * RECTANGLE_HEIGHT));
+		setSize(editorPane, RECTANGLE_WIDTH, (int) (RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
+		System.out.println((int) (1.55 * RECTANGLE_HEIGHT));
 		label = setEmptyCell(mainPanel, 0, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 

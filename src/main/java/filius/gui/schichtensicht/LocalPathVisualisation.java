@@ -17,6 +17,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -34,6 +35,8 @@ import filius.software.system.VermittlungsrechnerBetriebssystem;
 public class LocalPathVisualisation extends JPanel implements I18n {
 	private final LocalPathPanel LOCAL_PATH_PANEL;
 
+	private static final JPanel MAIN_PANEL = new JPanel();
+
 	// maximum layer involved
 	// (1 = link, 2 = internet, 3 = transport, 4 = application)
 	private final int MAX_LAYER;
@@ -48,7 +51,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// (for smaller on receiver side)
 	private int pointInTimeForSenderSide;
 
-	// width, , 
+	// width, ,
 	private static final int RECTANGLE_WIDTH = 180;
 	// ratio of width to height of a standard rectangle
 	private static final double RECTANGLE_RATIO = 3;
@@ -126,7 +129,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			} else {
 				minPointInTime = 1;
 				maxPointInTime = 2;
-				
+
 			}
 			pointInTime = minPointInTime;
 			pointInTimeForSenderSide = 3;
@@ -162,24 +165,20 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Visualisation of a host (Rechner or Notebook) if the frame was sent
 	 */
 	private void hostVisualisationSent() {
-		// System.out.println("Created GUI on EDT? " +
-		// SwingUtilities.isEventDispatchThread());
-		JPanel mainPanel = new JPanel();
-
-		mainPanel.setLayout(new GridBagLayout());
-		mainPanel.setBackground(Color.WHITE);
+		MAIN_PANEL.setLayout(new GridBagLayout());
+		MAIN_PANEL.setBackground(Color.WHITE);
 		c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
 		JLabel label;
 		JEditorPane editorPane;
 
 		// client name cell
-		label = setEmptyCell(mainPanel, 0, 0, 1, 1);
+		label = setEmptyCell(MAIN_PANEL, 0, 0, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		label = setLabel(mainPanel, LOCAL_PATH_PANEL.systemSoftware.getKnoten().holeAnzeigeName(), 0, 1, 1, 1, true);
+		label = setLabel(MAIN_PANEL, LOCAL_PATH_PANEL.systemSoftware.getKnoten().holeAnzeigeName(), 0, 1, 1, 1, true);
 		setSize(label, RECTANGLE_WIDTH, (int) (0.3 * RECTANGLE_HEIGHT));
 		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label = setEmptyCell(mainPanel, 0, 2, 1, 1);
+		label = setEmptyCell(MAIN_PANEL, 0, 2, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
 		// client info cell
@@ -197,37 +196,37 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		for (int i = 0; i < clientInfos.length; i++) {
 			clientInfo = clientInfo + clientInfos[i];
 		}
-		editorPane = setEditorPane(mainPanel, clientInfo, 0, 3, 1, 1, true);
+		editorPane = setEditorPane(MAIN_PANEL, clientInfo, 0, 3, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, (int) (RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
 		System.out.println((int) (1.55 * RECTANGLE_HEIGHT));
-		label = setEmptyCell(mainPanel, 0, 4, 1, 1);
+		label = setEmptyCell(MAIN_PANEL, 0, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
-		// create visualisation of nested messages
+		// create visualisations of nested messages
 		for (int i = 1; i < 5; i++) {
 			label = new NestedMessagesVisualisation(5 - i, RECTANGLE_WIDTH, (int) (RECTANGLE_WIDTH / RECTANGLE_RATIO));
-			setFinishedLabel(mainPanel, label, 0, 5 + 2 * (i - 1), 1, 1);
+			setFinishedLabel(MAIN_PANEL, label, 0, 5 + 2 * (i - 1), 1, 1);
 		}
 
 		// create vertical arrows below the nested messages rectangles
 		for (int layer = 2; layer <= MAX_LAYER; layer++) {
 			label = new Arrow();
-			setFinishedLabel(mainPanel, label, 0, 10 - 2 * (layer - 2), 1, 1);
+			setFinishedLabel(MAIN_PANEL, label, 0, 10 - 2 * (layer - 2), 1, 1);
 		}
 
 		// create first wire
 		label = new Wire();
-		setFinishedLabel(mainPanel, label, 1, 11, 1, 1);
+		setFinishedLabel(MAIN_PANEL, label, 1, 11, 1, 1);
 
 		// create square nested messages
 		label = new NestedMessagesVisualisation(1, (int) SQUARE_SIDE_LENGTH, (int) SQUARE_SIDE_LENGTH);
-		setFinishedLabel(mainPanel, label, 2, 11, 1, 1);
+		setFinishedLabel(MAIN_PANEL, label, 2, 11, 1, 1);
 
 		// create second wire
 		label = new Wire();
-		setFinishedLabel(mainPanel, label, 3, 11, 1, 1);
+		setFinishedLabel(MAIN_PANEL, label, 3, 11, 1, 1);
 
-		add(mainPanel, BorderLayout.CENTER);
+		add(MAIN_PANEL, BorderLayout.CENTER);
 	}
 
 	/**
@@ -277,98 +276,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			}
 		}
 		add(sidePanel, position);
-	}
-
-	/**
-	 * Functionality of the two buttons to go back and forth in time.
-	 */
-	private void backAndForth() {
-		FORTH_IN_TIME.addActionListener(new ActionListener() {
-			// forth in time
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (pointInTime < maxPointInTime) {
-					pointInTime++;
-					BACK_IN_TIME.setEnabled(true);
-					if (pointInTime == maxPointInTime) {
-						FORTH_IN_TIME.setEnabled(false);
-					}
-					updateSenderSide();
-					LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
-
-					// hide or show layers
-					// if not forwarding (means hosts or routers which are sending or receiving)
-					if (!LOCAL_PATH_PANEL.isForwarding()) {
-						if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime) {
-							LOCAL_PATH_PANEL.showNextLowerLayer();
-						} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 1) {
-							System.out.println("pointInTime = " + pointInTime);
-							System.out.println("minPointInTime = " + minPointInTime);
-							System.out.println("maxPointInTime = " + maxPointInTime);
-							LOCAL_PATH_PANEL.hideNextHigherLayer();
-						}
-						// if forwarding (for routers)
-					} else {
-						switch (pointInTime) {
-						case 2:
-							LOCAL_PATH_PANEL.hideNextHigherLayer();
-							break;
-						case 4:
-							LOCAL_PATH_PANEL.showNextLowerLayer();
-							break;
-						}
-					}
-				}
-			}
-		});
-
-		BACK_IN_TIME.addActionListener(new ActionListener() {
-			// back in time
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (pointInTime > minPointInTime) {
-					pointInTime--;
-					FORTH_IN_TIME.setEnabled(true);
-					if (pointInTime == minPointInTime) {
-						BACK_IN_TIME.setEnabled(false);
-					}
-					updateSenderSide();
-					LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
-
-					// hide or show layers
-					if (!LOCAL_PATH_PANEL.isForwarding()) {
-						if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime - 1) {
-							LOCAL_PATH_PANEL.hideNextHigherLayer();
-						} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 0) {
-							LOCAL_PATH_PANEL.showNextLowerLayer();
-						}
-					} else {
-						switch (pointInTime) {
-						case 3:
-							LOCAL_PATH_PANEL.hideNextHigherLayer();
-							break;
-						case 1:
-							LOCAL_PATH_PANEL.showNextLowerLayer();
-							break;
-						}
-					}
-				}
-			}
-		});
-	}
-
-	/**
-	 * Updates the variable {@code senderSideIsActive}. Only has an effect if the
-	 * node is a router (of home router), since they can forward IP packets. Thus
-	 * they have a different frame (containing the packet) on the sender and on the
-	 * receiver side.
-	 */
-	private void updateSenderSide() {
-		if (pointInTime >= pointInTimeForSenderSide) {
-			senderSideIsActive = true;
-		} else {
-			senderSideIsActive = false;
-		}
 	}
 
 	/**
@@ -509,7 +416,135 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * class for the visualisation of nested messages
+	 * Functionality of the two buttons to go back ("zurück") and forth (vorwärts")
+	 * in time.
+	 */
+	private void backAndForth() {
+		FORTH_IN_TIME.addActionListener(new ActionListener() {
+			// forth in time
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (pointInTime < maxPointInTime) {
+					pointInTime++;
+					updateButtonsIfForth();
+					hideOrShowLayersIfForth();
+					updateActiveBorderIfForth();
+				}
+			}
+		});
+
+		BACK_IN_TIME.addActionListener(new ActionListener() {
+			// back in time
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (pointInTime > minPointInTime) {
+					pointInTime--;
+					updateButtonsIfBack();
+					hideOrShowLayersIfBack();
+					updateActiveBorderIfBack();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Updates Buttons "vorwärts" and "zurück" if button "vorwärts" was pressed
+	 */
+	private void updateButtonsIfForth() {
+		BACK_IN_TIME.setEnabled(true);
+		if (pointInTime == maxPointInTime) {
+			FORTH_IN_TIME.setEnabled(false);
+		}
+		updateSenderSide();
+		LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
+	}
+
+	/**
+	 * Hide or show layers in message details if button "vorwärts" was pressed
+	 */
+	private void hideOrShowLayersIfForth() {
+		// if not forwarding (means hosts or routers which are sending or receiving)
+		if (!LOCAL_PATH_PANEL.isForwarding()) {
+			if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime) {
+				LOCAL_PATH_PANEL.showNextLowerLayer();
+			} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 1) {
+				System.out.println("pointInTime = " + pointInTime);
+				System.out.println("minPointInTime = " + minPointInTime);
+				System.out.println("maxPointInTime = " + maxPointInTime);
+				LOCAL_PATH_PANEL.hideNextHigherLayer();
+			}
+			// if forwarding (for routers)
+		} else {
+			switch (pointInTime) {
+			case 2:
+				LOCAL_PATH_PANEL.hideNextHigherLayer();
+				break;
+			case 4:
+				LOCAL_PATH_PANEL.showNextLowerLayer();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Updates Buttons "vorwärts" and "zurück" if button "zurück" was pressed
+	 */
+	private void updateButtonsIfBack() {
+		FORTH_IN_TIME.setEnabled(true);
+		if (pointInTime == minPointInTime) {
+			BACK_IN_TIME.setEnabled(false);
+		}
+		updateSenderSide();
+		LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
+	}
+
+	/**
+	 * Hide or show layers in message details if button "zurück" was pressed
+	 */
+	private void hideOrShowLayersIfBack() {
+		// if not forwarding (means hosts or routers which are sending or receiving)
+		if (!LOCAL_PATH_PANEL.isForwarding()) {
+			if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime - 1) {
+				LOCAL_PATH_PANEL.hideNextHigherLayer();
+			} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 0) {
+				LOCAL_PATH_PANEL.showNextLowerLayer();
+			}
+		} else {
+			switch (pointInTime) {
+			case 3:
+				LOCAL_PATH_PANEL.hideNextHigherLayer();
+				break;
+			case 1:
+				LOCAL_PATH_PANEL.showNextLowerLayer();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Updates the variable {@code senderSideIsActive}. Only has an effect if the
+	 * node is a router (of home router), since they can forward IP packets. Thus
+	 * they have a different frame (containing the packet) on the sender and on the
+	 * receiver side.
+	 */
+	private void updateSenderSide() {
+		if (pointInTime >= pointInTimeForSenderSide) {
+			senderSideIsActive = true;
+		} else {
+			senderSideIsActive = false;
+		}
+	}
+
+	private void updateActiveBorderIfForth() {
+
+	}
+
+	private void updateActiveBorderIfBack() {
+
+	}
+
+	/**
+	 * Class for the visualisation of nested messages.
 	 */
 	private class NestedMessagesVisualisation extends JLabel {
 
@@ -583,7 +618,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Filled rectangle for painting
+	 * Filled rectangle for painting.
 	 */
 	private class FilledRectangle {
 
@@ -610,7 +645,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Class for the arrows between the visualisations of nested messages
+	 * Class for the arrows between the visualisations of nested messages.
 	 */
 	private class Arrow extends JLabel {
 

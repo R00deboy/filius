@@ -464,7 +464,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		if (layerNumber > 3 || layerNumber < 1) {
 			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
 		} else {
-			// determine columns to hide
+			// determine columns to show
 			Set<Integer> columns = new HashSet<>();
 			int firstColumn = (layerNumber - 1) * 2;
 			columns.add(firstColumn);
@@ -488,12 +488,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 				backgroundColorFine = LayerColorVar.TRANSPORT.backgroundColorFine;
 			}
 
-			// hide columns
+			// show columns
 			for (Component component : table.getComponents()) {
 				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
 					int gridy = table.gridBagLayout.getConstraints(component).gridy;
 					if (gridy > 1) {
-
 						// set colors
 						component.setForeground(foregroundColor);
 						if (gridy == 0) {

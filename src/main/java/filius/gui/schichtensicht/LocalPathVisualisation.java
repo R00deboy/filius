@@ -17,7 +17,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -120,7 +119,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// if the selected node is a router (Vermittlungsrechner or Heimrouter)
 		else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem
 				|| systemSoftware instanceof GatewayFirmware) {
-			if (localPathPanel.isForwarding()) {
+			if (localPathPanel.isForwarded()) {
 				minPointInTime = 0;
 				maxPointInTime = 5;
 			} else if (localPathPanel.isSent()) {
@@ -462,8 +461,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Hide or show layers in message details if button "vorwärts" was pressed
 	 */
 	private void hideOrShowLayersIfForth() {
-		// if not forwarding (means hosts or routers which are sending or receiving)
-		if (!LOCAL_PATH_PANEL.isForwarding()) {
+		// if not forwarded (means hosts or routers which have sent or received the frame)
+		if (!LOCAL_PATH_PANEL.isForwarded()) {
 			if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime) {
 				LOCAL_PATH_PANEL.showNextLowerLayer();
 			} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 1) {
@@ -472,7 +471,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				System.out.println("maxPointInTime = " + maxPointInTime);
 				LOCAL_PATH_PANEL.hideNextHigherLayer();
 			}
-			// if forwarding (for routers)
+			// if forwarded (for routers)
 		} else {
 			switch (pointInTime) {
 			case 2:
@@ -501,8 +500,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Hide or show layers in message details if button "zurück" was pressed
 	 */
 	private void hideOrShowLayersIfBack() {
-		// if not forwarding (means hosts or routers which are sending or receiving)
-		if (!LOCAL_PATH_PANEL.isForwarding()) {
+		// if not forwarded (means hosts or routers which have sent or received the frame)
+		if (!LOCAL_PATH_PANEL.isForwarded()) {
 			if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime - 1) {
 				LOCAL_PATH_PANEL.hideNextHigherLayer();
 			} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 0) {

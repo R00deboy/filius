@@ -18,7 +18,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -45,7 +44,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private final int selectedFrameNumber; // starts with 1
 
 	private boolean sent = false; // if the node sent the frame, otherwise the node received the frame
-	private boolean forwarding = false; // if the node is forwarding an IP or ICMP packet
+	private boolean forwarded = false; // if the node forwarded an IP or ICMP packet
 
 	public JSplitPane splitPane;
 	private static final int DIVIDER_LOCATION = 350;
@@ -145,8 +144,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 		return sent;
 	}
 
-	public boolean isForwarding() {
-		return forwarding;
+	public boolean isForwarded() {
+		return forwarded;
 	}
 
 	/**
@@ -305,7 +304,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	/**
 	 * Only has an effect if the node is a router (or home router). If the IP or
-	 * ICMP packet is forwarded, this method sets {@code forwarding} to true.
+	 * ICMP packet was forwarded, this method sets {@code forwarded} to true.
 	 * 
 	 * @param corrInterfaceId
 	 * @param corrFrameNumber
@@ -313,14 +312,14 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private void setForwarding(String corrInterfaceId, Integer corrFrameNumber) {
 		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
 			if (corrInterfaceId != null && corrFrameNumber != null) {
-				forwarding = true;
+				forwarded = true;
 			}
 		}
 	}
 
 	/**
 	 * Only has an effect if the node is a router (or home router). If
-	 * {@code forwarding} is true, sets the message details of the table which is
+	 * {@code forwarded} is true, sets the message details of the table which is
 	 * not yet filled ({@code messageDetailsSent} or
 	 * {@code messageDetailsReceived}).
 	 * 
@@ -328,7 +327,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * @param corrFrameNumber
 	 */
 	private void fillOtherIfForwarding(String corrInterfaceId, Integer corrFrameNumber) {
-		if (forwarding == true) {
+		if (forwarded == true) {
 			if (sent) {
 				fillTitles(messageDetailsReceived);
 				fillMessageDetails(messageDetailsReceived, corrInterfaceId, corrFrameNumber);
@@ -345,7 +344,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * the local path for the first time.
 	 */
 	private void setDefaultMessageDetails() {
-		if (sent && !forwarding) {
+		if (sent && !forwarded) {
 			// for the sender of a message
 			updateMessageDetails(true);
 			if (systemSoftware instanceof Betriebssystem) {
@@ -360,7 +359,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			}
 		} else {
 			// for the receiver of a message
-			// for a router, which is forwarding an IP or ICMP packet
+			// for a router, which has forwarded an IP or ICMP packet
 			updateMessageDetails(false);
 		}
 	}

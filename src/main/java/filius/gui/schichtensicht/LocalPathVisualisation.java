@@ -110,9 +110,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			}
 			pointInTime = minPointInTime;
 			if (localPathPanel.isSent()) {
-				hostVisualisationSent();
+				visualisationSent();
 			} else {
-				hostVisualisationReceived();
+				visualisationReceived();
 			}
 		}
 
@@ -125,13 +125,15 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			} else if (localPathPanel.isSent()) {
 				minPointInTime = 3;
 				maxPointInTime = 4;
+				visualisationSent();
 			} else {
 				minPointInTime = 1;
 				maxPointInTime = 2;
+				visualisationReceived();
 			}
 			pointInTime = minPointInTime;
 			pointInTimeForSenderSide = 3;
-			routerVisualisation();
+			visualisationForwarded();
 		}
 		backAndForth();
 	}
@@ -160,9 +162,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 */
 
 	/**
-	 * Visualisation of a host (Rechner or Notebook) if the frame was sent
+	 * Visualisation of a node if the frame was sent
 	 */
-	private void hostVisualisationSent() {
+	private void visualisationSent() {
 		MAIN_PANEL.setLayout(new GridBagLayout());
 		MAIN_PANEL.setBackground(Color.WHITE);
 		c = new GridBagConstraints();
@@ -196,7 +198,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		}
 		editorPane = setEditorPane(MAIN_PANEL, clientInfo, 0, 3, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, (int) (RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
-		System.out.println((int) (1.55 * RECTANGLE_HEIGHT));
 		label = setEmptyCell(MAIN_PANEL, 0, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
@@ -228,17 +229,17 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Visualisation of a host (Rechner or Notebook) if the frame was received
+	 * Visualisation of a node if the frame was received
 	 */
-	private void hostVisualisationReceived() {
+	private void visualisationReceived() {
 		// System.out.println("Created GUI on EDT? " +
 		// SwingUtilities.isEventDispatchThread());
 	}
 
 	/**
-	 * Visualisierung eines Routers (Vermittlungsrechner oder Heimrouter)
+	 * Visualisation of a router (Vermittlungsrechner oder Heimrouter) which forwarded the frame
 	 */
-	private void routerVisualisation() {
+	private void visualisationForwarded() {
 		// System.out.println("Created GUI on EDT? " +
 		// SwingUtilities.isEventDispatchThread());
 	}
@@ -466,9 +467,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			if (LOCAL_PATH_PANEL.isSent() && pointInTime < maxPointInTime) {
 				LOCAL_PATH_PANEL.showNextLowerLayer();
 			} else if (!LOCAL_PATH_PANEL.isSent() && pointInTime > 1) {
-				System.out.println("pointInTime = " + pointInTime);
-				System.out.println("minPointInTime = " + minPointInTime);
-				System.out.println("maxPointInTime = " + maxPointInTime);
 				LOCAL_PATH_PANEL.hideNextHigherLayer();
 			}
 			// if forwarded (for routers)

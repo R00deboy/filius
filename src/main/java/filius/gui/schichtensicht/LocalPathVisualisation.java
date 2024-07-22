@@ -20,6 +20,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+
+import org.apache.batik.svggen.font.table.Coverage;
 
 import filius.gui.nachrichtensicht.AggregatedMessageTable;
 import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
@@ -50,23 +53,29 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// (for smaller on receiver side)
 	private int pointInTimeForSenderSide;
 
-	// width, ,
+	// vertical gap between cells with content
+	private static final int VGAP_BETWEEN_CELLS = 12;
+
+	// width of rectangle including border
 	private static final int RECTANGLE_WIDTH = 180;
-	// ratio of width to height of a standard rectangle
+	// ratio of width to height of a rectangle including border
 	private static final double RECTANGLE_RATIO = 3;
-	// resulting height
+	// resulting height of a rectangle including border
 	private static final double RECTANGLE_HEIGHT = RECTANGLE_WIDTH / RECTANGLE_RATIO;
+
+	// instance variables for nested messages visualisation:
+	// border width around nested messages
+	private static final int BORDER_WIDTH = 3;
+	// height of rectangle inside border
+	private static final double INNER_RECTANGLE_HEIGHT = RECTANGLE_HEIGHT - 2 * BORDER_WIDTH;
 	// shrink factor of visualisation of nested messages
 	private static final double SHRINK_FACTOR = 0.8;
 	// half of height difference after shrinking
-	private static final double HEIGHT_DIFF = RECTANGLE_HEIGHT * (1 - SHRINK_FACTOR) * 0.5;
+	private static final double HEIGHT_DIFF = INNER_RECTANGLE_HEIGHT * (1 - SHRINK_FACTOR) * 0.5;
 	// side length of squares needed for visualisation of a frame on cable (layer 1)
-	private static final double SQUARE_SIDE_LENGTH = RECTANGLE_HEIGHT;
+	private static final double SQUARE_SIDE_LENGTH = INNER_RECTANGLE_HEIGHT;
 	// client info cell ratio of width to height
-	private static final double CLIENT_INFO_CELL_RATIO = (double) 180 / 93;
-
-	// vertical gap between cells with content
-	private static final int VGAP_BETWEEN_CELLS = 12;
+	private static final double CLIENT_INFO_CELL_RATIO = (double) 60 / 31;
 
 	// buttons "vorwärts" and "zurück"
 	private final JButton FORTH_IN_TIME;
@@ -112,7 +121,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				pointInTime = minPointInTime;
 				visualisationReceived();
 			}
-		// if the frame was forwarded (only for routers)
+			// if the frame was forwarded (only for routers)
 		} else {
 			minPointInTime = 0;
 			maxPointInTime = 5;
@@ -188,7 +197,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		// create visualisations of nested messages
 		for (int i = 1; i < 5; i++) {
-			label = new NestedMessagesVisualisation(5 - i, RECTANGLE_WIDTH, (int) (RECTANGLE_WIDTH / RECTANGLE_RATIO));
+			label = new NestedMessagesVisualisation(5 - i, RECTANGLE_WIDTH, RECTANGLE_RATIO);
 			setFinishedLabel(MAIN_PANEL, label, 0, 5 + 2 * (i - 1), 1, 1);
 		}
 
@@ -203,7 +212,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		setFinishedLabel(MAIN_PANEL, label, 1, 11, 1, 1);
 
 		// create square nested messages
-		label = new NestedMessagesVisualisation(1, (int) SQUARE_SIDE_LENGTH, (int) SQUARE_SIDE_LENGTH);
+		label = new NestedMessagesVisualisation(1, (int) SQUARE_SIDE_LENGTH, 1);
 		setFinishedLabel(MAIN_PANEL, label, 2, 11, 1, 1);
 
 		// create second wire
@@ -520,7 +529,11 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	private void updateActiveBorderIfForth() {
-
+//		for (Component component : MAIN_PANEL.getComponents()) {
+//			if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
+//				component.setVisible(false);
+//			}
+//		}
 	}
 
 	private void updateActiveBorderIfBack() {
@@ -533,21 +546,28 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private class NestedMessagesVisualisation extends JLabel {
 
 		private int layerNumber;
-		private int width;
-		private int height;
+		private int overallWidth;
+		private double overallHeight;
+		private int widthInsideBorder;
+		private double heightInsideBorder;
 
-		private NestedMessagesVisualisation(int layerNumber, int width, int height) {
+		private NestedMessagesVisualisation(int layerNumber, int overallWidth, double overallRatio) {
 			this.layerNumber = layerNumber;
-			this.width = width;
-			this.height = height;
+			this.overallWidth = overallWidth;
+			this.overallHeight = Math.round(overallWidth / overallRatio);
+			this.widthInsideBorder = overallWidth - 2 * BORDER_WIDTH;
+			// take border width into account for calculation of the ratio inside the border
+			this.heightInsideBorder = (widthInsideBorder + 2 * BORDER_WIDTH - 2 * overallRatio * BORDER_WIDTH)
+					/ overallRatio;
 			setBackground(Color.WHITE);
-//			Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
-//			Border marginBorder = new EmptyBorder(5, 5, 5, 5);
-//			setBorder(new CompoundBorder(lineBorder, marginBorder));
+//			System.out.println("overallWidth: " + this.overallWidth);
+//			System.out.println("overallHeight: " + overallHeight);
+//			System.out.println("widthInsideBorder: " + widthInsideBorder);
+//			System.out.println("heightInsideBorder: " + heightInsideBorder);
 		}
 
 		public Dimension getPreferredSize() {
-			return new Dimension(width, height);
+			return new Dimension(overallWidth, (int) overallHeight);
 		}
 
 		public void paintComponent(Graphics g) {
@@ -555,9 +575,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// component is opaque.
 			super.paintComponent(g);
 
-			// draw origin is at top left
-			double xPos = 0;
-			double yPos = 0;
+			// origin with respect to border width
+			double xPos = BORDER_WIDTH;
+			double yPos = BORDER_WIDTH;
 
 			// set basic layer rectangle
 			FilledRectangle rect = new FilledRectangle();
@@ -566,25 +586,36 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 			// Only draw nested messages if the layer is involved. Otherwise the rectangle
 			// stays white (not visible).
+			boolean startingActiveBorderDone = false;
 			if (layerNumber <= MAX_LAYER) {
+				// draw the active border around the message with the lowest point in time
+				if (layerNumber == MAX_LAYER && !startingActiveBorderDone) {
+					Border lineBorder = BorderFactory.createMatteBorder(BORDER_WIDTH, BORDER_WIDTH, BORDER_WIDTH,
+							BORDER_WIDTH, Color.RED);
+					setBorder(lineBorder);
+					startingActiveBorderDone = true;
+				}
 				setColorAccordingToLayer(layerNumber, rect);
-				rect.paintFilledRectangle(g, width, height);
+				rect.paintFilledRectangle(g, widthInsideBorder, (int) heightInsideBorder);
 				if (layerNumber < MAX_LAYER) {
 					// set other layer rectangles
 					int exp = 0;
 					for (int i = layerNumber + 1; i <= MAX_LAYER; i++) {
-						xPos = Math.round(
-								xPos + Math.pow(SHRINK_FACTOR, exp) * (width - (width * SHRINK_FACTOR + HEIGHT_DIFF)));
+						xPos = Math.round(xPos + Math.pow(SHRINK_FACTOR, exp)
+								* (widthInsideBorder - (widthInsideBorder * SHRINK_FACTOR + HEIGHT_DIFF)));
 						yPos = Math.round(yPos + Math.pow(SHRINK_FACTOR, exp) * HEIGHT_DIFF);
 
 						rect.setX((int) xPos);
 						rect.setY((int) yPos);
 						setColorAccordingToLayer(i, rect);
-						rect.paintFilledRectangle(g, (int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * width),
-								(int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * height));
+
+						rect.paintFilledRectangle(g,
+								(int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * widthInsideBorder),
+								(int) Math.round(Math.pow(SHRINK_FACTOR, exp + 1) * heightInsideBorder));
 						exp++;
 					}
 				}
+				System.out.println();
 			}
 		}
 

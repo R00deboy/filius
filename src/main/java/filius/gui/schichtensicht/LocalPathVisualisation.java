@@ -20,19 +20,12 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-
-import org.apache.batik.svggen.font.table.Coverage;
-
 import filius.gui.nachrichtensicht.AggregatedMessageTable;
 import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
-import filius.software.system.Betriebssystem;
-import filius.software.system.GatewayFirmware;
 import filius.software.system.SystemSoftware;
-import filius.software.system.VermittlungsrechnerBetriebssystem;
 
 public class LocalPathVisualisation extends JPanel implements I18n {
 	private final LocalPathPanel LOCAL_PATH_PANEL;
@@ -57,7 +50,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private static final int VGAP_BETWEEN_CELLS = 12;
 
 	// width of rectangle including border
-	private static final int RECTANGLE_WIDTH = 180;
+	// [RECTANGLE_WIDTH / RECTANGLE_RATIO - 2 * BORDER_WIDTH should be divisible by 8 = 2^3]
+	private static final int RECTANGLE_WIDTH = 186;
 	// ratio of width to height of a rectangle including border
 	private static final double RECTANGLE_RATIO = 3;
 	// resulting height of a rectangle including border
@@ -66,14 +60,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// instance variables for nested messages visualisation:
 	// border width around nested messages
 	private static final int BORDER_WIDTH = 3;
-	// height of rectangle inside border
-	private static final double INNER_RECTANGLE_HEIGHT = RECTANGLE_HEIGHT - 2 * BORDER_WIDTH;
 	// shrink factor of visualisation of nested messages
 	private static final double SHRINK_FACTOR = 0.8;
-	// half of height difference after shrinking
-	private static final double HEIGHT_DIFF = INNER_RECTANGLE_HEIGHT * (1 - SHRINK_FACTOR) * 0.5;
 	// side length of squares needed for visualisation of a frame on cable (layer 1)
-	private static final double SQUARE_SIDE_LENGTH = INNER_RECTANGLE_HEIGHT;
+	private static final int SQUARE_SIDE_LENGTH = (int) Math.round(RECTANGLE_HEIGHT);
 	// client info cell ratio of width to height
 	private static final double CLIENT_INFO_CELL_RATIO = (double) 60 / 31;
 
@@ -208,7 +198,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		}
 
 		// create first wire
-		label = new Wire();
+		label = new WireWithArrow();
 		setFinishedLabel(MAIN_PANEL, label, 1, 11, 1, 1);
 
 		// create square nested messages
@@ -216,7 +206,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		setFinishedLabel(MAIN_PANEL, label, 2, 11, 1, 1);
 
 		// create second wire
-		label = new Wire();
+		label = new WireWithArrow();
 		setFinishedLabel(MAIN_PANEL, label, 3, 11, 1, 1);
 
 		add(MAIN_PANEL, BorderLayout.CENTER);
@@ -549,6 +539,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		private int overallWidth;
 		private double overallHeight;
 		private int widthInsideBorder;
+		private double heightDifference;
 		private double heightInsideBorder;
 
 		private NestedMessagesVisualisation(int layerNumber, int overallWidth, double overallRatio) {
@@ -559,11 +550,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// take border width into account for calculation of the ratio inside the border
 			this.heightInsideBorder = (widthInsideBorder + 2 * BORDER_WIDTH - 2 * overallRatio * BORDER_WIDTH)
 					/ overallRatio;
+			this.heightDifference = heightInsideBorder * (1 - SHRINK_FACTOR) * 0.5;
 			setBackground(Color.WHITE);
-//			System.out.println("overallWidth: " + this.overallWidth);
-//			System.out.println("overallHeight: " + overallHeight);
-//			System.out.println("widthInsideBorder: " + widthInsideBorder);
-//			System.out.println("heightInsideBorder: " + heightInsideBorder);
 		}
 
 		public Dimension getPreferredSize() {
@@ -583,6 +571,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			FilledRectangle rect = new FilledRectangle();
 			rect.setX((int) xPos);
 			rect.setY((int) yPos);
+			Border lineBorder2 = BorderFactory.createMatteBorder(BORDER_WIDTH, BORDER_WIDTH, BORDER_WIDTH, BORDER_WIDTH,
+					Color.RED);
+			setBorder(lineBorder2);
 
 			// Only draw nested messages if the layer is involved. Otherwise the rectangle
 			// stays white (not visible).
@@ -602,8 +593,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					int exp = 0;
 					for (int i = layerNumber + 1; i <= MAX_LAYER; i++) {
 						xPos = Math.round(xPos + Math.pow(SHRINK_FACTOR, exp)
-								* (widthInsideBorder - (widthInsideBorder * SHRINK_FACTOR + HEIGHT_DIFF)));
-						yPos = Math.round(yPos + Math.pow(SHRINK_FACTOR, exp) * HEIGHT_DIFF);
+								* (widthInsideBorder - (widthInsideBorder * SHRINK_FACTOR + heightDifference)));
+						yPos = Math.round(yPos + Math.pow(SHRINK_FACTOR, exp) * heightDifference);
 
 						rect.setX((int) xPos);
 						rect.setY((int) yPos);
@@ -690,14 +681,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	/**
 	 * Visualisation of a grey wire (link layer) and an arrow
 	 */
-	private class Wire extends JLabel {
+	private class WireWithArrow extends JLabel {
 
-		private Wire() {
+		private WireWithArrow() {
 			setBackground(Color.WHITE);
 		}
 
 		public Dimension getPreferredSize() {
-			return new Dimension((int) SQUARE_SIDE_LENGTH, (int) SQUARE_SIDE_LENGTH);
+			return new Dimension(SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
 		}
 
 		public void paintComponent(Graphics g) {
@@ -705,21 +696,21 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// component is opaque.
 			super.paintComponent(g);
 
-			int halfSquareSideLength = (int) (SQUARE_SIDE_LENGTH / 2);
-			int height = 4;
-			int headWidth = 6;
+			int halfSquareSideLength = (int) Math.round(SQUARE_SIDE_LENGTH / 2.0);
+			int height = (int) Math.round(SQUARE_SIDE_LENGTH / 13.0);
+			int headWidth = (int) Math.round(SQUARE_SIDE_LENGTH / 9.0);
 
 			// arrow
-			g.fillRect(0, halfSquareSideLength - height / 2, (int) (SQUARE_SIDE_LENGTH - headWidth), height);
+			g.fillRect(0, halfSquareSideLength - height / 2, SQUARE_SIDE_LENGTH - headWidth, height);
 			g.fillPolygon(
-					new int[] { (int) (SQUARE_SIDE_LENGTH - headWidth), (int) (SQUARE_SIDE_LENGTH - headWidth),
-							(int) SQUARE_SIDE_LENGTH },
+					new int[] { SQUARE_SIDE_LENGTH - headWidth, SQUARE_SIDE_LENGTH - headWidth, SQUARE_SIDE_LENGTH },
 					new int[] { halfSquareSideLength - headWidth, halfSquareSideLength + headWidth,
 							halfSquareSideLength },
 					3);
 
+			// wire
 			g.setColor(AggregatedMessageTable.LayerColorVar.LINK.backgroundColor);
-			g.fillRect(0, (int) (SQUARE_SIDE_LENGTH - HEIGHT_DIFF) + 1, (int) SQUARE_SIDE_LENGTH, (int) HEIGHT_DIFF);
+			g.fillRect(0, SQUARE_SIDE_LENGTH - 2 * BORDER_WIDTH, SQUARE_SIDE_LENGTH, 2 * BORDER_WIDTH);
 		}
 	}
 }

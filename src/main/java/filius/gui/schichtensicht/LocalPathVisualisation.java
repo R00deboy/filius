@@ -234,7 +234,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		label = new WireWithArrow();
 		setFinishedLabel(MAIN_PANEL, label, xCoord1, 11, 1, 1);
 
-		// create square nested messages and if frame was sent, create active (red) border
+		// create square nested messages and if frame was sent, create active (red)
+		// border
 		activeBorder = !LOCAL_PATH_PANEL.isSent();
 		label = new NestedMessagesVisualisation(1, (int) SQUARE_SIDE_LENGTH, 1, activeBorder);
 		setFinishedLabel(MAIN_PANEL, label, xCoord2, 11, 1, 1);
@@ -438,7 +439,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					pointInTime++;
 					updateButtonsIfForth();
 					hideOrShowLayersIfForth();
-					updateActiveBorderIfForth();
+					updateActiveBorder(true);
 				}
 			}
 		});
@@ -451,7 +452,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					pointInTime--;
 					updateButtonsIfBack();
 					hideOrShowLayersIfBack();
-					updateActiveBorderIfBack();
+					updateActiveBorder(false);
 				}
 			}
 		});
@@ -540,7 +541,16 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		senderSideIsActive = (pointInTime >= pointInTimeForSenderSide);
 	}
 
-	private void updateActiveBorderIfForth() {
+	/**
+	 * Updates the active (red) border according to {@code pointInTime} and resets
+	 * the old one to black.
+	 * 
+	 * @param isForth true if the "forth" button was pressed, false if the "back"
+	 *                button was pressed
+	 */
+	private void updateActiveBorder(boolean isForth) {
+		int lastPointInTime = isForth ? pointInTime - 1 : pointInTime + 1;
+
 		// list with all the coordinates of the components with a possible active border
 		List<int[]> gridBagCoordsWithBorders;
 		if (!LOCAL_PATH_PANEL.isForwarded()) {
@@ -573,8 +583,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				} catch (Exception e) {
 					System.out.println("component is not an instance of NestedMessagesVisualisation");
 				}
-			} else if (gridx == gridBagCoordsWithBorders.get(pointInTime - 1)[0]
-					&& gridy == gridBagCoordsWithBorders.get(pointInTime - 1)[1]) {
+			} else if (gridx == gridBagCoordsWithBorders.get(lastPointInTime)[0]
+					&& gridy == gridBagCoordsWithBorders.get(lastPointInTime)[1]) {
 				// make previous active border black
 				try {
 					((NestedMessagesVisualisation) component).setActiveBorder(false);
@@ -584,10 +594,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				}
 			}
 		}
-	}
-
-	private void updateActiveBorderIfBack() {
-
 	}
 
 	/**

@@ -537,11 +537,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * receiver side.
 	 */
 	private void updateSenderSide() {
-		if (pointInTime >= pointInTimeForSenderSide) {
-			senderSideIsActive = true;
-		} else {
-			senderSideIsActive = false;
-		}
+		senderSideIsActive = (pointInTime >= pointInTimeForSenderSide);
 	}
 
 	private void updateActiveBorderIfForth() {

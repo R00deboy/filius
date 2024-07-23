@@ -43,8 +43,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private final int selectedFrameNumber; // starts with 1
 
-	private boolean sent = false; // if the node sent the frame, otherwise the node received the frame
-	private boolean forwarded = false; // if the node forwarded an IP or ICMP packet
+	private final boolean sent; // if the node sent the frame, otherwise the node received the frame
+	private final boolean forwarded; // if the node forwarded an IP or ICMP packet
 
 	public JSplitPane splitPane;
 	private static final int DIVIDER_LOCATION = 350;
@@ -80,9 +80,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 		this.interfaceId = localPathDialog.getInterfaceId();
 		this.selectedFrameNumber = localPathDialog.getSelectedFrameNumber();
 
-		if (isFrameSent()) {
-			sent = true;
-		}
+		// determine if frame was sent or received
+		sent = isFrameSent();
 
 		/*
 		 * Fill matrices messageDetailsReceived and messageDetailsSent. Both have an
@@ -91,9 +90,14 @@ public class LocalPathPanel extends JPanel implements I18n {
 		 * the visible element.
 		 */
 		fill();
+		
+		// determine if frame was forwarded
 		correspondingFrameData = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
 				this.systemSoftware);
-		setForwardingAndFillOther();
+		String corrInterfaceId = (String) correspondingFrameData[0];
+		Integer corrFrameNumber = (Integer) correspondingFrameData[1];
+		this.forwarded = isFrameForwarded(corrInterfaceId, corrFrameNumber);
+		fillOtherIfForwarded(corrInterfaceId, corrFrameNumber);
 
 		// initialise visualisation and tables for message details
 		visualisation = new LocalPathVisualisation(this);
@@ -292,41 +296,27 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * This method calls {@code setForwarding()} and
-	 * {@code fillOtherIfForwarding()}.
-	 */
-	private void setForwardingAndFillOther() {
-		String corrInterfaceId = (String) correspondingFrameData[0];
-		Integer corrFrameNumber = (Integer) correspondingFrameData[1];
-		setForwarding(corrInterfaceId, corrFrameNumber);
-		fillOtherIfForwarding(corrInterfaceId, corrFrameNumber);
-	}
-
-	/**
 	 * Only has an effect if the node is a router (or home router). If the IP or
 	 * ICMP packet was forwarded, this method sets {@code forwarded} to true.
 	 * 
-	 * @param corrInterfaceId
-	 * @param corrFrameNumber
+	 * @param corrInterfaceId corresponding interface ID
+	 * @param corrFrameNumber corresponding frame number
 	 */
-	private void setForwarding(String corrInterfaceId, Integer corrFrameNumber) {
-		if (systemSoftware instanceof VermittlungsrechnerBetriebssystem || systemSoftware instanceof GatewayFirmware) {
-			if (corrInterfaceId != null && corrFrameNumber != null) {
-				forwarded = true;
-			}
-		}
+	private boolean isFrameForwarded(String corrInterfaceId, Integer corrFrameNumber) {
+		return ((systemSoftware instanceof VermittlungsrechnerBetriebssystem
+				|| systemSoftware instanceof GatewayFirmware) &&
+				(corrInterfaceId != null && corrFrameNumber != null));
 	}
 
 	/**
 	 * Only has an effect if the node is a router (or home router). If
-	 * {@code forwarded} is true, sets the message details of the table which is
-	 * not yet filled ({@code messageDetailsSent} or
-	 * {@code messageDetailsReceived}).
+	 * {@code forwarded} is true, sets the message details of the table which is not
+	 * yet filled ({@code messageDetailsSent} or {@code messageDetailsReceived}).
 	 * 
 	 * @param corrInterfaceId
 	 * @param corrFrameNumber
 	 */
-	private void fillOtherIfForwarding(String corrInterfaceId, Integer corrFrameNumber) {
+	private void fillOtherIfForwarded(String corrInterfaceId, Integer corrFrameNumber) {
 		if (forwarded == true) {
 			if (sent) {
 				fillTitles(messageDetailsReceived);

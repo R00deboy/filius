@@ -27,13 +27,13 @@ import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
-import filius.software.system.SystemSoftware;
 
 public class LocalPathVisualisation extends JPanel implements I18n {
 	private final LocalPathPanel LOCAL_PATH_PANEL;
 
 	private final JPanel MAIN_PANEL = new JPanel();
 	private final GridBagLayout mainPanelGridBagLayout = new GridBagLayout();
+	private GridBagConstraints c;
 
 	// maximum layer involved
 	// (1 = link, 2 = internet, 3 = transport, 4 = application)
@@ -44,7 +44,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private int maxPointInTime;
 
 	// visualisation is on the sender side (otherwise receiver side)
-	private boolean senderSideIsActive = false;
+	private boolean senderSideIsActive;
 	// for this and all greater points in time visualisation is on the sender side
 	// (for smaller on receiver side)
 	private int pointInTimeForSenderSide;
@@ -75,45 +75,48 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private final JButton FORTH_IN_TIME;
 	private final JButton BACK_IN_TIME;
 
-	// constraints for a GridBagLayout
-	private GridBagConstraints c;
-
 	public LocalPathVisualisation(LocalPathPanel localPathPanel) {
 		super();
 		LOCAL_PATH_PANEL = localPathPanel;
 		MAX_LAYER = LOCAL_PATH_PANEL.getMaxLayer();
-		SystemSoftware systemSoftware = localPathPanel.systemSoftware;
+//		SystemSoftware systemSoftware = LOCAL_PATH_PANEL.systemSoftware;
+
+		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
 		setBackground(Color.WHITE);
+
+		// set GridBagLayout for MAIN_PANEL
+		MAIN_PANEL.setLayout(mainPanelGridBagLayout);
+		MAIN_PANEL.setBackground(Color.WHITE);
+		c = new GridBagConstraints();
 
 		// create buttons
 		FORTH_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg1"));
 		BACK_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg2"));
 		BACK_IN_TIME.setEnabled(false);
 
-		if (localPathPanel.isSent()) {
-			senderSideIsActive = true;
-		}
+		// set initial value for senderSideIsActive
+		senderSideIsActive = LOCAL_PATH_PANEL.isSent();
 
 		// configure left and right side
 		sideConfiguration(BACK_IN_TIME, BorderLayout.WEST); // left side
 		sideConfiguration(FORTH_IN_TIME, BorderLayout.EAST); // right side
 
 		// if the frame was not forwarded (i.e. sent or received)
-		if (!localPathPanel.isForwarded()) {
-			if (localPathPanel.isSent()) {
+		if (!LOCAL_PATH_PANEL.isForwarded()) {
+			if (LOCAL_PATH_PANEL.isSent()) {
 				minPointInTime = 4 - MAX_LAYER;
 				maxPointInTime = 4;
 				pointInTimeForSenderSide = -1; // should never be reached, since only sent
 				pointInTime = minPointInTime;
-				visualisationSent();
+				visualisationSentOrReceived();
 			} else {
 				minPointInTime = 0;
 				maxPointInTime = MAX_LAYER;
 				pointInTimeForSenderSide = 5; // should never be reached, since only received
 				pointInTime = minPointInTime;
-				visualisationReceived();
+				visualisationSentOrReceived();
 			}
 			// if the frame was forwarded (only for routers)
 		} else {
@@ -150,23 +153,39 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 */
 
 	/**
-	 * Visualisation of a node if the frame was sent
+	 * Visualisation of a node if the frame was sent or received
 	 */
-	private void visualisationSent() {
-		MAIN_PANEL.setLayout(mainPanelGridBagLayout);
-		MAIN_PANEL.setBackground(Color.WHITE);
+	private void visualisationSentOrReceived() {
 		c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
 		JLabel label;
 		JEditorPane editorPane;
 
+		// coordinates for the placement inside the GridBagLayout
+		int xCoord0;
+		int xCoord1;
+		int xCoord2;
+		int xCoord3;
+
+		if (LOCAL_PATH_PANEL.isSent()) {
+			xCoord0 = 0;
+			xCoord1 = 1;
+			xCoord2 = 2;
+			xCoord3 = 3;
+		} else {
+			xCoord0 = 3;
+			xCoord1 = 2;
+			xCoord2 = 1;
+			xCoord3 = 0;
+		}
+
 		// client name cell
-		label = setEmptyCell(MAIN_PANEL, 0, 0, 1, 1);
+		label = setEmptyCell(MAIN_PANEL, xCoord0, 0, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		label = setLabel(MAIN_PANEL, LOCAL_PATH_PANEL.systemSoftware.getKnoten().holeAnzeigeName(), 0, 1, 1, 1, true);
+		label = setLabel(MAIN_PANEL, LOCAL_PATH_PANEL.systemSoftware.getKnoten().holeAnzeigeName(), xCoord0, 1, 1, 1,
+				true);
 		setSize(label, RECTANGLE_WIDTH, (int) (0.3 * RECTANGLE_HEIGHT));
 		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label = setEmptyCell(MAIN_PANEL, 0, 2, 1, 1);
+		label = setEmptyCell(MAIN_PANEL, xCoord0, 2, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
 		// client info cell
@@ -184,45 +203,47 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		for (int i = 0; i < clientInfos.length; i++) {
 			clientInfo = clientInfo + clientInfos[i];
 		}
-		editorPane = setEditorPane(MAIN_PANEL, clientInfo, 0, 3, 1, 1, true);
+		editorPane = setEditorPane(MAIN_PANEL, clientInfo, xCoord0, 3, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, (int) (RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
-		label = setEmptyCell(MAIN_PANEL, 0, 4, 1, 1);
+		label = setEmptyCell(MAIN_PANEL, xCoord0, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
 		// create visualisations of nested messages
+		boolean activeBorder;
 		for (int i = 0; i < 4; i++) {
-			boolean activeBorder = (i == 4 - MAX_LAYER) ? true : false;
+			// active (red) border around the first message in time for the "sent"
+			// visualisation
+			if (LOCAL_PATH_PANEL.isSent()) {
+				activeBorder = (i == 4 - MAX_LAYER) ? true : false;
+			} else {
+				// active (red) border will be around the square message for the "received"
+				// visualisation
+				activeBorder = false;
+			}
 			label = new NestedMessagesVisualisation(4 - i, RECTANGLE_WIDTH, RECTANGLE_RATIO, activeBorder);
-			setFinishedLabel(MAIN_PANEL, label, 0, 5 + 2 * i, 1, 1);
+			setFinishedLabel(MAIN_PANEL, label, xCoord0, 5 + 2 * i, 1, 1);
 		}
 
-		// create vertical arrows below the nested messages rectangles
+		// create vertical arrows below every nested messages rectangle
 		for (int layer = 2; layer <= MAX_LAYER; layer++) {
 			label = new Arrow();
-			setFinishedLabel(MAIN_PANEL, label, 0, 10 - 2 * (layer - 2), 1, 1);
+			setFinishedLabel(MAIN_PANEL, label, xCoord0, 10 - 2 * (layer - 2), 1, 1);
 		}
 
 		// create first wire
 		label = new WireWithArrow();
-		setFinishedLabel(MAIN_PANEL, label, 1, 11, 1, 1);
+		setFinishedLabel(MAIN_PANEL, label, xCoord1, 11, 1, 1);
 
-		// create square nested messages
-		label = new NestedMessagesVisualisation(1, (int) SQUARE_SIDE_LENGTH, 1, false);
-		setFinishedLabel(MAIN_PANEL, label, 2, 11, 1, 1);
+		// create square nested messages and if frame was sent, create active (red) border
+		activeBorder = !LOCAL_PATH_PANEL.isSent();
+		label = new NestedMessagesVisualisation(1, (int) SQUARE_SIDE_LENGTH, 1, activeBorder);
+		setFinishedLabel(MAIN_PANEL, label, xCoord2, 11, 1, 1);
 
 		// create second wire
 		label = new WireWithArrow();
-		setFinishedLabel(MAIN_PANEL, label, 3, 11, 1, 1);
+		setFinishedLabel(MAIN_PANEL, label, xCoord3, 11, 1, 1);
 
 		add(MAIN_PANEL, BorderLayout.CENTER);
-	}
-
-	/**
-	 * Visualisation of a node if the frame was received
-	 */
-	private void visualisationReceived() {
-		// System.out.println("Created GUI on EDT? " +
-		// SwingUtilities.isEventDispatchThread());
 	}
 
 	/**
@@ -525,8 +546,20 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 	private void updateActiveBorderIfForth() {
 		// list with all the coordinates of the components with a possible active border
-		List<int[]> gridBagCoordsWithBorders = Collections.unmodifiableList(Arrays.asList(new int[] { 0, 5 },
-				new int[] { 0, 7 }, new int[] { 0, 9 }, new int[] { 0, 11 }, new int[] { 2, 11 }));
+		List<int[]> gridBagCoordsWithBorders;
+		if (!LOCAL_PATH_PANEL.isForwarded()) {
+			if (LOCAL_PATH_PANEL.isSent()) {
+				gridBagCoordsWithBorders = Collections.unmodifiableList(Arrays.asList(new int[] { 0, 5 },
+						new int[] { 0, 7 }, new int[] { 0, 9 }, new int[] { 0, 11 }, new int[] { 2, 11 }));
+			} else {
+				gridBagCoordsWithBorders = Collections.unmodifiableList(Arrays.asList(new int[] { 1, 11 },
+						new int[] { 3, 11 }, new int[] { 3, 9 }, new int[] { 3, 7 }, new int[] { 3, 5 }));
+			}
+		} else {
+			gridBagCoordsWithBorders = Collections
+					.unmodifiableList(Arrays.asList(new int[] { 1, 11 }, new int[] { 3, 11 }, new int[] { 3, 9 },
+							new int[] { 5, 9 }, new int[] { 5, 11 }, new int[] { 7, 11 }));
+		}
 
 		// active border --> black, next active border --> red
 		// go through all components
@@ -538,16 +571,20 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			if (gridx == gridBagCoordsWithBorders.get(pointInTime)[0]
 					&& gridy == gridBagCoordsWithBorders.get(pointInTime)[1]) {
 				// make current active border red
-				if (component instanceof NestedMessagesVisualisation) {
+				try {
 					((NestedMessagesVisualisation) component).setActiveBorder(true);
 					((NestedMessagesVisualisation) component).repaint();
+				} catch (Exception e) {
+					System.out.println("component is not an instance of NestedMessagesVisualisation");
 				}
 			} else if (gridx == gridBagCoordsWithBorders.get(pointInTime - 1)[0]
 					&& gridy == gridBagCoordsWithBorders.get(pointInTime - 1)[1]) {
 				// make previous active border black
-				if (component instanceof NestedMessagesVisualisation) {
+				try {
 					((NestedMessagesVisualisation) component).setActiveBorder(false);
 					((NestedMessagesVisualisation) component).repaint();
+				} catch (Exception e) {
+					System.out.println("component is not an instance of NestedMessagesVisualisation");
 				}
 			}
 		}
@@ -587,7 +624,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		public Dimension getPreferredSize() {
 			return new Dimension(overallWidth, (int) overallHeight);
 		}
-		
+
 		public void setActiveBorder(boolean activeBorder) {
 			this.activeBorder = activeBorder;
 		}

@@ -57,7 +57,10 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private LocalPathVisualisation visualisation;
 
-	private final Object[] correspondingFrameData;
+	// info about the corresponding frame
+	private final Object[] CORR_FRAME_DATA;
+	private final String CORR_INTERFACE_ID;
+	private final Integer CORR_FRAME_NUMBER;
 
 	// number of hidden layers
 	// 1 = Link, 2 = Link & Internet, 3 = Link & Internet & Transport
@@ -92,12 +95,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 		fill();
 		
 		// determine if frame was forwarded
-		correspondingFrameData = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
+		CORR_FRAME_DATA = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
 				this.systemSoftware);
-		String corrInterfaceId = (String) correspondingFrameData[0];
-		Integer corrFrameNumber = (Integer) correspondingFrameData[1];
-		this.forwarded = isFrameForwarded(corrInterfaceId, corrFrameNumber);
-		fillOtherIfForwarded(corrInterfaceId, corrFrameNumber);
+		this.CORR_INTERFACE_ID = (String) CORR_FRAME_DATA[0];
+		this.CORR_FRAME_NUMBER = (Integer) CORR_FRAME_DATA[1];
+		this.forwarded = isFrameForwarded(CORR_INTERFACE_ID, CORR_FRAME_NUMBER);
+		fillOtherIfForwarded(CORR_INTERFACE_ID, CORR_FRAME_NUMBER);
 
 		// initialise visualisation and tables for message details
 		visualisation = new LocalPathVisualisation(this);
@@ -142,6 +145,10 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	public int getMaxLayer() {
 		return maxLayer;
+	}
+	
+	public String getCorrInterfaceId() {
+		return CORR_INTERFACE_ID;
 	}
 
 	public boolean isSent() {

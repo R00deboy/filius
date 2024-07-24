@@ -54,8 +54,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// vertical gap between GridBag cells with content
 	private static final int VGAP_BETWEEN_CELLS = 12;
 
-	// width of rectangle including border (has to be divisible by 3)
-	private static final int RECTANGLE_WIDTH = 184;
+	// width of rectangle including border (must be divisible by 3)
+	private static final int RECTANGLE_WIDTH = 180;
 	// ratio of width to height of a rectangle including border
 	private static final int RECTANGLE_RATIO = 3;
 	// resulting height of a rectangle including border
@@ -65,9 +65,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// border width around nested messages
 	private static final int MAIN_BORDER_WIDTH = 2;
 	// left gap around a nested message
-	private static final int INDENT_NESTED_MSGS = 5;
+	private static final int INDENT_NESTED_MSGS = 20;
 	// upper, lower and right gap around a nested message
-	private static final int BORDER_NESTED_MSGS = 3;
+	private static final int BORDER_NESTED_MSGS = 5;
 	// side length of squares needed for visualisation of a frame on cable (layer 1)
 	private static final int SQUARE_SIDE_LENGTH = RECTANGLE_HEIGHT;
 	// client info cell ratio of width to height
@@ -735,29 +735,28 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 */
 	private class NestedMessagesVisualisation extends JLabel {
 		
-		private FilledRectangle rect = new FilledRectangle();
 		private int layerNumber;
 		private boolean isSquare;
-		private int widthInclBorder;
-		private int heightInclBorder;
-		private int width;
-		private int height;
+		private int widthWithBorder;
+		private int heightWithBorder;
+		private int widthInsideBorder;
+		private int heightInsideBorder;
 		private boolean activeBorder;
 
-		private NestedMessagesVisualisation(int layerNumber, int widthInclBorder, int ratio, boolean activeBorder) {
+		private NestedMessagesVisualisation(int layerNumber, int widthWithBorder, int ratio, boolean activeBorder) {
 			this.layerNumber = layerNumber;
 			this.isSquare = (ratio == 1);
-			this.widthInclBorder = widthInclBorder;
-			this.heightInclBorder = widthInclBorder / ratio;
-			this.width = widthInclBorder - 2 * MAIN_BORDER_WIDTH;
-			this.height = heightInclBorder - 2 * MAIN_BORDER_WIDTH;
+			this.widthWithBorder = widthWithBorder;
+			this.heightWithBorder = widthWithBorder / ratio;
+			this.widthInsideBorder = widthWithBorder - 2 * MAIN_BORDER_WIDTH;
+			this.heightInsideBorder = heightWithBorder - 2 * MAIN_BORDER_WIDTH;
 			this.activeBorder = activeBorder;
 			setBackground(Color.WHITE);
 		}
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(widthInclBorder, heightInclBorder);
+			return new Dimension(widthWithBorder, heightWithBorder);
 		}
 
 		public void setActiveBorder(boolean activeBorder) {
@@ -769,14 +768,15 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
-			System.out.println("HOI");
 
 			// origin with respect to border width
 			int xPos = MAIN_BORDER_WIDTH;
 			int yPos = MAIN_BORDER_WIDTH;
+			int width = this.widthInsideBorder;
+			int height = this.heightInsideBorder;
 
 			// set basic layer rectangle
-			
+			FilledRectangle rect = new FilledRectangle();
 			rect.setX(xPos);
 			rect.setY(yPos);
 

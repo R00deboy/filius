@@ -19,6 +19,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -118,8 +119,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				pointInTime = minPointInTime;
 				visualisationSentOrReceived();
 			}
-			// if the packet was forwarded (only for routers)
-		} else {
+		}
+		// if the packet was forwarded (only for routers)
+		else {
 			minPointInTime = 0;
 			maxPointInTime = 5;
 			pointInTime = LOCAL_PATH_PANEL.isSent() ? minPointInTime + 3 : minPointInTime;
@@ -156,6 +158,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Visualisation of a node if the packet was sent or received
 	 */
 	private void visualisationSentOrReceived() {
+		System.out.println(SwingUtilities.isEventDispatchThread());
 		c = new GridBagConstraints();
 		JLabel label;
 		JEditorPane editorPane;
@@ -223,6 +226,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * created from the left and right side to the middle at the same time.
 	 */
 	private void visualisationForwarded() {
+		System.out.println(SwingUtilities.isEventDispatchThread());
 		c = new GridBagConstraints();
 		JLabel label;
 		JEditorPane editorPane;
@@ -601,6 +605,18 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
+	 * Updates Buttons "vorwärts" and "zurück" if button "zurück" was pressed
+	 */
+	private void updateButtonsIfBack() {
+		FORTH_IN_TIME.setEnabled(true);
+		if (pointInTime == minPointInTime) {
+			BACK_IN_TIME.setEnabled(false);
+		}
+		updateSenderSide();
+		LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
+	}
+	
+	/**
 	 * Hide or show layers in message details if button "vorwärts" was pressed
 	 */
 	private void hideOrShowLayersIfForth() {
@@ -623,18 +639,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				break;
 			}
 		}
-	}
-
-	/**
-	 * Updates Buttons "vorwärts" and "zurück" if button "zurück" was pressed
-	 */
-	private void updateButtonsIfBack() {
-		FORTH_IN_TIME.setEnabled(true);
-		if (pointInTime == minPointInTime) {
-			BACK_IN_TIME.setEnabled(false);
-		}
-		updateSenderSide();
-		LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
 	}
 
 	/**
@@ -730,8 +734,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Class for a rectangular visualisation of nested messages.
 	 */
 	private class NestedMessagesVisualisation extends JLabel {
-
+		
+		private FilledRectangle rect = new FilledRectangle();
 		private int layerNumber;
+		private boolean isSquare;
 		private int widthInclBorder;
 		private int heightInclBorder;
 		private int width;
@@ -740,15 +746,16 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		private NestedMessagesVisualisation(int layerNumber, int widthInclBorder, int ratio, boolean activeBorder) {
 			this.layerNumber = layerNumber;
+			this.isSquare = (ratio == 1);
 			this.widthInclBorder = widthInclBorder;
 			this.heightInclBorder = widthInclBorder / ratio;
 			this.width = widthInclBorder - 2 * MAIN_BORDER_WIDTH;
-			// take border width into account for calculation of the ratio inside the border
-			this.height = width / ratio - 2 * MAIN_BORDER_WIDTH;
+			this.height = heightInclBorder - 2 * MAIN_BORDER_WIDTH;
 			this.activeBorder = activeBorder;
 			setBackground(Color.WHITE);
 		}
 
+		@Override
 		public Dimension getPreferredSize() {
 			return new Dimension(widthInclBorder, heightInclBorder);
 		}
@@ -757,17 +764,19 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			this.activeBorder = activeBorder;
 		}
 
+		@Override
 		public void paintComponent(Graphics g) {
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
+			System.out.println("HOI");
 
 			// origin with respect to border width
 			int xPos = MAIN_BORDER_WIDTH;
 			int yPos = MAIN_BORDER_WIDTH;
 
 			// set basic layer rectangle
-			FilledRectangle rect = new FilledRectangle();
+			
 			rect.setX(xPos);
 			rect.setY(yPos);
 
@@ -789,12 +798,17 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				if (layerNumber < MAX_LAYER) {
 					// set other layer rectangles
 					for (int i = layerNumber + 1; i <= MAX_LAYER; i++) {
-						System.out.println("i = " + i);
-						width = width - INDENT_NESTED_MSGS - BORDER_NESTED_MSGS;
-						height = height - 2 * BORDER_NESTED_MSGS;
-						xPos = xPos + INDENT_NESTED_MSGS;
-						yPos = yPos + BORDER_NESTED_MSGS;
-
+						if (!isSquare) {
+							width = width - INDENT_NESTED_MSGS - BORDER_NESTED_MSGS;
+							height = height - 2 * BORDER_NESTED_MSGS;
+							xPos = xPos + INDENT_NESTED_MSGS;
+							yPos = yPos + BORDER_NESTED_MSGS;
+						} else {
+							width = width - 2 * BORDER_NESTED_MSGS;
+							height = height - 2 * BORDER_NESTED_MSGS;
+							xPos = xPos + BORDER_NESTED_MSGS;
+							yPos = yPos + BORDER_NESTED_MSGS;
+						}
 						rect.setX(xPos);
 						rect.setY(yPos);
 						setColorAccordingToLayer(i, rect);
@@ -853,11 +867,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		private Arrow() {
 			setBackground(Color.WHITE);
 		}
-
+		
+		@Override
 		public Dimension getPreferredSize() {
 			return new Dimension(RECTANGLE_WIDTH, (int) VGAP_BETWEEN_CELLS);
 		}
 
+		@Override
 		public void paintComponent(Graphics g) {
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
@@ -886,6 +902,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			return new Dimension(SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
 		}
 
+		@Override
 		public void paintComponent(Graphics g) {
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.

@@ -93,7 +93,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		 */
 		fill();
 		
-		// determine if frame was forwarded
+		// determine if the packet (inside the frame) was forwarded
 		CORR_FRAME_DATA = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
 				this.systemSoftware);
 		this.CORR_INTERFACE_ID = (String) CORR_FRAME_DATA[0];

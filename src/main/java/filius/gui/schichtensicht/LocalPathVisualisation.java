@@ -715,8 +715,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					&& gridy == gridBagCoordsWithBorders.get(pointInTime)[1]) {
 				// make current active border red
 				try {
-					((NestedMessagesVisualisation) component).setActiveBorder(true);
-					((NestedMessagesVisualisation) component).repaint();
+					((NestedMessagesVisualisation) component).createBorder(true);
 				} catch (Exception e) {
 					System.out.println("component is not an instance of NestedMessagesVisualisation");
 				}
@@ -724,8 +723,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					&& gridy == gridBagCoordsWithBorders.get(lastPointInTime)[1]) {
 				// make previous active border black
 				try {
-					((NestedMessagesVisualisation) component).setActiveBorder(false);
-					((NestedMessagesVisualisation) component).repaint();
+					((NestedMessagesVisualisation) component).createBorder(false);
 				} catch (Exception e) {
 					System.out.println("component is not an instance of NestedMessagesVisualisation");
 				}
@@ -744,7 +742,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		private int heightWithBorder;
 		private int widthInsideBorder;
 		private int heightInsideBorder;
-		private boolean activeBorder;
+		private final int MAX_LAYER_OF_OPERATION = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
 
 		private NestedMessagesVisualisation(int layerNumber, int widthWithBorder, int ratio, boolean activeBorder) {
 			this.layerNumber = layerNumber;
@@ -753,8 +751,12 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			this.heightWithBorder = widthWithBorder / ratio;
 			this.widthInsideBorder = widthWithBorder - 2 * MAIN_BORDER_WIDTH;
 			this.heightInsideBorder = heightWithBorder - 2 * MAIN_BORDER_WIDTH;
-			this.activeBorder = activeBorder;
 			setBackground(Color.WHITE);
+			
+			// create border only if layer message is actually painted
+			if (layerNumber <= MAX_LAYER_INSIDE_FRAME && layerNumber <= MAX_LAYER_OF_OPERATION) {
+				createBorder(activeBorder);
+			}
 		}
 
 		@Override
@@ -762,23 +764,17 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			return new Dimension(widthWithBorder, heightWithBorder);
 		}
 
-		public void setActiveBorder(boolean activeBorder) {
-			this.activeBorder = activeBorder;
-		}
-
 		@Override
 		public void paintComponent(Graphics g) {
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
-			System.out.println("UNENDLICHE UNENDLICHE UNENDLICHE");
 
 			// origin with respect to border width
 			int xPos = MAIN_BORDER_WIDTH;
 			int yPos = MAIN_BORDER_WIDTH;
 			int width = this.widthInsideBorder;
 			int height = this.heightInsideBorder;
-			int maxLayerOfOperation = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
 
 			// set basic layer rectangle
 			FilledRectangle rect = new FilledRectangle();
@@ -787,17 +783,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 			// Only draw nested messages if a message of the layer is in the frame.
 			// Otherwise the rectangle stays white (not visible).
-			if (layerNumber <= MAX_LAYER_INSIDE_FRAME && layerNumber <= maxLayerOfOperation) {
-				if (activeBorder) {
-					// draw the active (red) border around the message
-					Border lineBorder = BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
-							MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, Color.RED);
-					setBorder(lineBorder);
-				} else {
-					Border lineBorder = BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
-							MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, Color.BLACK);
-					setBorder(lineBorder);
-				}
+			if (layerNumber <= MAX_LAYER_INSIDE_FRAME && layerNumber <= MAX_LAYER_OF_OPERATION) {
 				setColorAccordingToLayer(layerNumber, rect);
 				rect.paintFilledRectangle(g, width, height);
 				if (layerNumber < MAX_LAYER_INSIDE_FRAME) {
@@ -834,6 +820,21 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			} else if (layerNumber == 4) {
 				rect.setFillColor(AggregatedMessageTable.LayerColorVar.APPLICATION.backgroundColor);
 			}
+		}
+		
+		private void createBorder(boolean activeBorder) {
+			if (activeBorder) {
+				// draw the active (red) border around the message
+				setBorder(getMatteBorder(Color.RED));
+			} else {
+				// draw the inactive (black) border around the message
+				setBorder(getMatteBorder(Color.BLACK));
+			}
+		}
+		
+		private Border getMatteBorder(Color color) {
+			return BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
+					MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, color);
 		}
 	}
 

@@ -37,9 +37,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
 	private GridBagConstraints c;
 
-	// maximum layer involved
+	// maximum layer inside the frame
 	// (1 = link, 2 = internet, 3 = transport, 4 = application)
-	private final int MAX_LAYER;
+	private final int MAX_LAYER_INSIDE_FRAME;
 
 	private int pointInTime;
 	private int minPointInTime;
@@ -80,7 +80,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	public LocalPathVisualisation(LocalPathPanel localPathPanel) {
 		super();
 		LOCAL_PATH_PANEL = localPathPanel;
-		MAX_LAYER = LOCAL_PATH_PANEL.getMaxLayer();
+		MAX_LAYER_INSIDE_FRAME = LOCAL_PATH_PANEL.getMaxLayer();
 
 		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout(10, 10);
@@ -107,14 +107,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// if the packet was not forwarded (i.e. sent or received)
 		if (!LOCAL_PATH_PANEL.isForwarded()) {
 			if (LOCAL_PATH_PANEL.isSent()) {
-				minPointInTime = 4 - MAX_LAYER;
+				minPointInTime = 4 - MAX_LAYER_INSIDE_FRAME;
 				maxPointInTime = 4;
 				pointInTimeForSenderSide = -1; // should never be reached, since only sent
 				pointInTime = minPointInTime;
 				visualisationSentOrReceived();
 			} else {
 				minPointInTime = 0;
-				maxPointInTime = MAX_LAYER;
+				maxPointInTime = MAX_LAYER_INSIDE_FRAME;
 				pointInTimeForSenderSide = 5; // should never be reached, since only received
 				pointInTime = minPointInTime;
 				visualisationSentOrReceived();
@@ -132,15 +132,15 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	public int getPointInTime() {
-		return this.pointInTime;
+		return pointInTime;
 	}
 
 	public int getMaxPointInTime() {
-		return this.maxPointInTime;
+		return maxPointInTime;
 	}
 
 	public int getMinPointInTime() {
-		return this.minPointInTime;
+		return minPointInTime;
 	}
 
 	/*
@@ -158,7 +158,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Visualisation of a node if the packet was sent or received
 	 */
 	private void visualisationSentOrReceived() {
-		System.out.println(SwingUtilities.isEventDispatchThread());
 		c = new GridBagConstraints();
 		JLabel label;
 		JEditorPane editorPane;
@@ -185,8 +184,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// node name cell
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 0, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.systemSoftware.getKnoten().holeAnzeigeName(), xCoord0, 1, 1, 1,
-				true);
+		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), xCoord0, 1, 1, 1, true);
 		setSize(label, RECTANGLE_WIDTH, (int) (0.3 * RECTANGLE_HEIGHT));
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 2, 1, 1);
@@ -226,7 +224,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * created from the left and right side to the middle at the same time.
 	 */
 	private void visualisationForwarded() {
-		System.out.println(SwingUtilities.isEventDispatchThread());
 		c = new GridBagConstraints();
 		JLabel label;
 		JEditorPane editorPane;
@@ -256,7 +253,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// with GridBag width of 3: node name cell with empty cell above and below
 		label = setEmptyCell(CENTER_PANEL, 3, 0, 3, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.systemSoftware.getKnoten().holeAnzeigeName(), 3, 1, 3, 1, true);
+		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), 3, 1, 3, 1, true);
 		setSize(label, 2 * RECTANGLE_WIDTH + VGAP_BETWEEN_CELLS, (int) (0.3 * RECTANGLE_HEIGHT));
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label = setEmptyCell(CENTER_PANEL, 3, 2, 3, 1);
@@ -316,7 +313,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * @return String with the resulting client info
 	 */
 	private String createClientInfoByMac(String interfaceId) {
-		InternetKnoten node = ((InternetKnoten) LOCAL_PATH_PANEL.systemSoftware.getKnoten());
+		InternetKnoten node = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten());
 		NetzwerkInterface ni = node.getNetzwerkInterfaceByMac(interfaceId);
 		String[] clientInfos = new String[5];
 		clientInfos[0] = "<b>" + messages.getString("schichten_lokaler_weg_msg6") + "</b> " + ni.getIp() + "<br />";
@@ -336,23 +333,24 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	/**
 	 * This method creates the visualisation of the rectangular nested messages.
 	 * 
-	 * @param xCoord                  x coordinate of the position in the
-	 *                                GridBagLayout
-	 * @param isSenderSideOfForwarded Indicates if it is the "receiver" (false) or
-	 *                                the "sender" (true) side of the visualisation.
-	 *                                Has no effect if the packet was just sent or
-	 *                                received.
+	 * @param xCoord                    x coordinate of the position in the
+	 *                                  GridBagLayout
+	 * @param isSenderSideWhenForwarded Indicates if it is the "receiver" (false) or
+	 *                                  the "sender" (true) side of the
+	 *                                  visualisation. Has no effect if the packet
+	 *                                  was just sent or received.
 	 */
-	private void createRectangularNestedMessages(int xCoord, Boolean isSenderSideOfForwarded) {
+	private void createRectangularNestedMessages(int xCoord, Boolean isSenderSideWhenForwarded) {
 		JLabel label;
 		boolean activeBorder;
-		for (int i = 0; i < 4; i++) {
+		// starting with layer i = 4 (application), ending with layer i = 1 (link)
+		for (int i = 4; i >= 1; i--) {
 			// visualisation if the packet was sent or received
 			if (!LOCAL_PATH_PANEL.isForwarded()) {
 				if (LOCAL_PATH_PANEL.isSent()) {
 					// if the packet was sent, the first message (depending on which layers are
 					// involved) gets an active (red) border
-					activeBorder = (i == 4 - MAX_LAYER) ? true : false;
+					activeBorder = (i == MAX_LAYER_INSIDE_FRAME) ? true : false;
 				} else {
 					// active (red) border will not be here (but around the square message for the
 					// "received" visualisation)
@@ -362,31 +360,28 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// visualisation if the packet was forwarded
 			else {
 				// "receiver" side
-				if (!isSenderSideOfForwarded) {
+				if (!isSenderSideWhenForwarded) {
 					activeBorder = false;
 				}
 				// "sender" side
 				else {
 					// if the packet was sent, create an active (red) border for the first message
 					// (depending on which layers are involved)
-					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((i == 4 - MAX_LAYER) ? true : false) : false;
+					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((i == MAX_LAYER_INSIDE_FRAME) ? true : false) : false;
 				}
 			}
-			label = new NestedMessagesVisualisation(4 - i, RECTANGLE_WIDTH, RECTANGLE_RATIO, activeBorder);
-			setFinishedLabel(CENTER_PANEL, label, xCoord, 5 + 2 * i, 1, 1);
+			label = new NestedMessagesVisualisation(i, RECTANGLE_WIDTH, RECTANGLE_RATIO, activeBorder);
+			setFinishedLabel(CENTER_PANEL, label, xCoord, 5 + 2 * (4 - i), 1, 1);
 		}
 
 		// create vertical arrows below every nested messages rectangle
-		for (int layer = 2; layer <= MAX_LAYER; layer++) {
+		int maxLayerOfOperation = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
+		for (int layer = Math.min(MAX_LAYER_INSIDE_FRAME, maxLayerOfOperation); layer >= 2; layer--) {
 			label = new Arrow();
-			setFinishedLabel(CENTER_PANEL, label, xCoord, 10 - 2 * (layer - 2), 1, 1);
+			setFinishedLabel(CENTER_PANEL, label, xCoord, 6 + 2 * (4 - layer), 1, 1);
 		}
 	}
 
-	/**
-	 * Right and left side of the visualisation, indicating the layers and showing
-	 * the buttons "vorwärts" and "zurück".
-	 */
 	/**
 	 * Right and left side of the visualisation, indicating the layers and showing
 	 * the buttons "vorwärts" and "zurück".
@@ -615,7 +610,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		updateSenderSide();
 		LOCAL_PATH_PANEL.updateMessageDetails(senderSideIsActive);
 	}
-	
+
 	/**
 	 * Hide or show layers in message details if button "vorwärts" was pressed
 	 */
@@ -734,7 +729,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Class for a rectangular visualisation of nested messages.
 	 */
 	private class NestedMessagesVisualisation extends JLabel {
-		
+
 		private int layerNumber;
 		private boolean isSquare;
 		private int widthWithBorder;
@@ -774,15 +769,16 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			int yPos = MAIN_BORDER_WIDTH;
 			int width = this.widthInsideBorder;
 			int height = this.heightInsideBorder;
+			int maxLayerOfOperation = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
 
 			// set basic layer rectangle
 			FilledRectangle rect = new FilledRectangle();
 			rect.setX(xPos);
 			rect.setY(yPos);
 
-			// Only draw nested messages if the layer is involved. Otherwise the rectangle
-			// stays white (not visible).
-			if (layerNumber <= MAX_LAYER) {
+			// Only draw nested messages if a message of the layer is in the frame.
+			// Otherwise the rectangle stays white (not visible).
+			if (layerNumber <= MAX_LAYER_INSIDE_FRAME && layerNumber <= maxLayerOfOperation) {
 				if (activeBorder) {
 					// draw the active (red) border around the message
 					Border lineBorder = BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
@@ -795,9 +791,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				}
 				setColorAccordingToLayer(layerNumber, rect);
 				rect.paintFilledRectangle(g, width, height);
-				if (layerNumber < MAX_LAYER) {
+				if (layerNumber < MAX_LAYER_INSIDE_FRAME) {
 					// set other layer rectangles
-					for (int i = layerNumber + 1; i <= MAX_LAYER; i++) {
+					for (int i = layerNumber + 1; i <= MAX_LAYER_INSIDE_FRAME; i++) {
 						if (!isSquare) {
 							width = width - INDENT_NESTED_MSGS - BORDER_NESTED_MSGS;
 							height = height - 2 * BORDER_NESTED_MSGS;
@@ -867,7 +863,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		private Arrow() {
 			setBackground(Color.WHITE);
 		}
-		
+
 		@Override
 		public Dimension getPreferredSize() {
 			return new Dimension(RECTANGLE_WIDTH, (int) VGAP_BETWEEN_CELLS);

@@ -38,7 +38,7 @@ public abstract class Host extends InternetKnoten {
     private boolean useIPAsName = false;
 
     private boolean useMACAsName = false;
-
+	
     public boolean isUseIPAsName() {
         return useIPAsName;
     }
@@ -57,6 +57,7 @@ public abstract class Host extends InternetKnoten {
 
     public Host() {
         super();
+        setMaxLayerOfOperation(4);
         LOG.trace("INVOKED-2 (" + this.hashCode() + ") " + getClass() + " (Host), constr: Host()");
 
         this.setzeAnzahlAnschluesse(1);

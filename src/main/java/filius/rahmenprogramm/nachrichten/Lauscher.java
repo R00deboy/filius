@@ -45,7 +45,6 @@ import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.Information;
 import filius.software.netzzugangsschicht.EthernetFrame;
-import filius.software.system.SystemSoftware;
 import filius.software.transportschicht.TcpSegment;
 import filius.software.transportschicht.UdpSegment;
 import filius.software.vermittlungsschicht.ArpPaket;
@@ -493,20 +492,22 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * Der Lauscher wird auf anderen Netzwerkkarten des Knotens nach einem Frame
-	 * abgesucht, welches denselben Inhalt (IpPaket) hat. Das return-Objekt gibt die
-	 * Schnittstelle {@code interfaceId} und die Nummer des Frames im Datenaustausch
-	 * {@code frameNumber} zurück oder zweimal den null-Pointer. Letzteres heisst,
-	 * dass das IpPaket von diesem Knoten ursprünglich abgesendet oder für ihn
-	 * bestimmt war.
+	 * The Lauscher will be searched on other network interfaces for a frame which
+	 * has the same content (in the layer 2 message, so in the IP or ICMP packet).
+	 * The first entry of the returned array indicated the network interface ID
+	 * {@code interfaceId} and the number of the frame {@code frameNumber} in the
+	 * Aggregated Message Table (Datenaustausch) or two entries with a null pointer.
+	 * Two null pointers mean that the layer 2 (IP or ICMP) packet was originally
+	 * sent or received by this node.
 	 * 
-	 * @author Christoph Irniger
-	 * @param originalInterfaceId ursprüngliche Netzwerkkarte
-	 * @param originalFrameNumber Nummer des ursprünglichen Frames
-	 * @return Array mit erstem Eintrag interfaceId und zweitem Eintrag frameNumber
+	 * @param originalInterfaceId MAC address of the network interface
+	 * @param originalFrameNumber number of the frame in the aggregated message
+	 *                            table (Datenaustausch)
+	 * @param node
+	 * @return Array with first entry {@code interfaceId} and second entry
+	 *         {@code frameNumber}
 	 */
-	public Object[] getCorrespondingFrame(String originalInterfaceId, int originalFrameNumber,
-			SystemSoftware systemSoftware) {
+	public Object[] getCorrespondingFrame(String originalInterfaceId, int originalFrameNumber, InternetKnoten node) {
 		Object[] interfaceIdAndFrameNumber = new Object[2];
 		EthernetFrame originalFrame = getFrame(originalInterfaceId, originalFrameNumber);
 
@@ -515,9 +516,8 @@ public class Lauscher implements I18n {
 
 			// Check, ob Inhalt des Frames (IpPaket) für Knoten bestimmt war / von ihm
 			// ursprünglich abgesendet wurde
-			if (!packetOnlyReceivedOrOnlySent(originalFrame, systemSoftware)) {
-				InternetKnoten knoten = (InternetKnoten) systemSoftware.getKnoten();
-				List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
+			if (!packetOnlyReceivedOrOnlySent(originalFrame, node)) {
+				List<NetzwerkInterface> netzwerkInterfaces = node.getNetzwerkInterfaces();
 
 				for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
 					String interfaceId = netzwerkInterface.getMac();
@@ -547,18 +547,18 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * Diese Methode überprüft, ob der Knoten der Sender oder der Empfänger des
-	 * IpPakets war. Anders ausgedrückt: Sie überprüft, ob das Paket beim Router nur
-	 * "auf dem Vorbeiweg" ist.
+	 * This method checks if the node was the sender or receiver of the layer 2 (IP
+	 * or ICMP) packet of the frame. If this is not the case, we know that the
+	 * packet was forwarded by this node.
 	 * 
-	 * @param frame          Das Frame, das überprüft werden soll.
-	 * @param systemSoftware Die Systemsoftware, die auf dem Knoten läuft.
+	 * @param frame The frame of which the layer 2 (IP or ICMP) packet should be
+	 *              checked.
+	 * @param node  The originally selected node.
 	 * @return true oder false
 	 */
-	private boolean packetOnlyReceivedOrOnlySent(EthernetFrame frame, SystemSoftware systemSoftware) {
+	private boolean packetOnlyReceivedOrOnlySent(EthernetFrame frame, InternetKnoten node) {
 		Object daten = frame.getDaten();
-		InternetKnoten knoten = (InternetKnoten) systemSoftware.getKnoten();
-		List<NetzwerkInterface> netzwerkInterfaces = knoten.getNetzwerkInterfaces();
+		List<NetzwerkInterface> netzwerkInterfaces = node.getNetzwerkInterfaces();
 
 		if (daten instanceof ArpPaket) {
 			return true;
@@ -577,14 +577,14 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * Diese Methode gibt zu einer Interface-ID und der Nummer eines Frames (im
-	 * Datenaustausch-Fenster) das dazugehörende EthernetFrame zurück, das im
-	 * Lauscher gespeichert ist (datenEinheiten).
+	 * This method returns the frame that belongs to the network interface indicated
+	 * in the first parameter and the frame number in the aggregated message table
+	 * (Datenaustausch) in the second parameter.
 	 * 
-	 * @author Christoph Irniger
-	 * @param interfaceId MAC-Adresse des Interfaces
-	 * @param frameNumber Nummer des Frames im Datenaustausch-Fenster, beginnt bei 1
-	 * @return Das EthernetFrame zur angegebenen frameNumber
+	 * @param interfaceId MAC address of the network interface
+	 * @param frameNumber number of the frame in the aggregated message table
+	 *                    (Datenaustausch)
+	 * @return frame which belongs to the parameters
 	 */
 	public EthernetFrame getFrame(String interfaceId, int frameNumber) {
 		Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);

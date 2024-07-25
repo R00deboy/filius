@@ -23,12 +23,12 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
 import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
+import filius.hardware.knoten.Gateway;
+import filius.hardware.knoten.InternetKnoten;
+import filius.hardware.knoten.Knoten;
+import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
-import filius.software.system.Betriebssystem;
-import filius.software.system.GatewayFirmware;
-import filius.software.system.SystemSoftware;
-import filius.software.system.VermittlungsrechnerBetriebssystem;
 
 /**
  * Panel which is embedded in a JDialog window. Consists of a splitPane
@@ -37,7 +37,7 @@ import filius.software.system.VermittlungsrechnerBetriebssystem;
  * @author Christoph Irniger
  */
 public class LocalPathPanel extends JPanel implements I18n {
-	public final SystemSoftware systemSoftware;
+	public final Knoten node;
 
 	private final String interfaceId;
 
@@ -78,7 +78,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		super();
 
 		// inherit instance variables from super container (localPathDialog)
-		this.systemSoftware = localPathDialog.getSystemSoftware();
+		this.node = localPathDialog.getSystemSoftware().getKnoten();
 		this.interfaceId = localPathDialog.getInterfaceId();
 		this.selectedFrameNumber = localPathDialog.getSelectedFrameNumber();
 
@@ -95,7 +95,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		
 		// determine if the packet (inside the frame) was forwarded
 		CORR_FRAME_DATA = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
-				this.systemSoftware);
+				(InternetKnoten) this.node);
 		this.CORR_INTERFACE_ID = (String) CORR_FRAME_DATA[0];
 		Integer corrFrameNumber   = (Integer) CORR_FRAME_DATA[1];
 		this.forwarded = isFrameForwarded(CORR_INTERFACE_ID, corrFrameNumber);
@@ -133,13 +133,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 		localPathDialog.setPreferredSize(dialogDimension);
 		localPathDialog.setMinimumSize(dialogDimension);
 	}
-
-	public String[][] getMessageDetailsReceived() {
-		return messageDetailsReceived;
-	}
-
-	public String[][] getMessageDetailsSent() {
-		return messageDetailsSent;
+	
+	public Knoten getKnoten() {
+		return node;
 	}
 
 	public int getMaxLayer() {
@@ -309,8 +305,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * @param corrFrameNumber corresponding frame number
 	 */
 	private boolean isFrameForwarded(String corrInterfaceId, Integer corrFrameNumber) {
-		return ((systemSoftware instanceof VermittlungsrechnerBetriebssystem
-				|| systemSoftware instanceof GatewayFirmware) &&
+		return ((node instanceof Vermittlungsrechner
+				|| node instanceof Gateway) &&
 				(corrInterfaceId != null && corrFrameNumber != null));
 	}
 
@@ -343,13 +339,13 @@ public class LocalPathPanel extends JPanel implements I18n {
 		if (sent && !forwarded) {
 			// for the sender of a message
 			updateMessageDetails(true);
-			if (systemSoftware instanceof Betriebssystem) {
+			if (node instanceof Vermittlungsrechner) {
 				for (int i = 1; i < maxLayer; i++) {
 					hideLayerData(i, tableSent);
 				}
 				hiddenLayers = maxLayer - 1;
-			} else if (systemSoftware instanceof VermittlungsrechnerBetriebssystem
-					|| systemSoftware instanceof GatewayFirmware) {
+			} else if (node instanceof Vermittlungsrechner
+					|| node instanceof Gateway) {
 				hideLayerData(1, tableSent);
 				hiddenLayers = 1;
 			}

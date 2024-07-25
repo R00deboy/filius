@@ -46,6 +46,7 @@ public class Gateway extends InternetKnoten implements I18n {
 
     public Gateway() {
         super();
+        setMaxLayerOfOperation(2);
 
         setzeAnzahlAnschluesse(2);
         holeWANInterface().setIp("42.0.0.10");

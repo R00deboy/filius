@@ -51,7 +51,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private int pointInTimeForSenderSide;
 
 	// vertical gap between GridBag cells with content (must be divisible by 2)
-	private static final int VGAP_BETWEEN_CELLS = 20;
+	private static final int VGAP_BETWEEN_CELLS = 12;
 
 	// width of rectangle including border (must be divisible by 2 * RECTANGLE_RATIO)
 	private static final int RECTANGLE_WIDTH = 180;
@@ -898,7 +898,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			int yMiddle = rectangleHeight / 2;
 			int overallLength = (pointsDown != null && (pointsDown || !pointsDown)) ? rectangleHeight : rectangleWidth;
 			int arrowRectangleWidth = 4; // must be divisible by 2
-			int headHeight = 8;
+			int headHeight = 6;
 			int halfOfHeadWidth = headHeight;
 			
 			if (pointsDown != null && pointsDown) {

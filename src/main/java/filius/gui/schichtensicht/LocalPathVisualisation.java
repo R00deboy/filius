@@ -771,6 +771,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
+			System.out.println("UNENDLICHE UNENDLICHE UNENDLICHE");
 
 			// origin with respect to border width
 			int xPos = MAIN_BORDER_WIDTH;
@@ -913,16 +914,17 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				int y3 = overallLength;
 				g.fillPolygon(new int[] { x1, x2, x3 }, new int[] { y1, y2, y3 }, 3);
 			} else if (pointsDown != null && !pointsDown) {
+				int correction = 1;
 				// up arrow
-				g.fillRect(xMiddle - arrowRectangleWidth / 2, headHeight, arrowRectangleWidth,
-						overallLength - headHeight);
+				g.fillRect(xMiddle - arrowRectangleWidth / 2, headHeight - 1, arrowRectangleWidth,
+						overallLength - headHeight + correction);
 				// head
 				int x1 = xMiddle - halfOfHeadWidth;
 				int x2 = xMiddle + halfOfHeadWidth;
 				int x3 = xMiddle;
-				int y1 = headHeight;
-				int y2 = headHeight;
-				int y3 = 0;
+				int y1 = headHeight - correction;
+				int y2 = headHeight - correction;
+				int y3 = -1;
 				g.fillPolygon(new int[] { x1, x2, x3 }, new int[] { y1, y2, y3 }, 3);
 			} else if (pointsRight != null && pointsRight) {
 				// right arrow

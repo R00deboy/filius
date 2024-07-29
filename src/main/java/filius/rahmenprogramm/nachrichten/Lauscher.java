@@ -492,30 +492,38 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * The Lauscher will be searched on other network interfaces for a frame which
-	 * has the same content (in the layer 2 message, so in the IP or ICMP packet).
-	 * The first entry of the returned array indicated the network interface ID
-	 * {@code interfaceId} and the number of the frame {@code frameNumber} in the
-	 * Aggregated Message Table (Datenaustausch) or two entries with a null pointer.
-	 * Two null pointers mean that the layer 2 (IP or ICMP) packet was originally
-	 * sent or received by this node.
+	 * General: If a frame was forwarded by the node, given a (received / sent)
+	 * frame, the method finds the (sent / received) frame with the same content.
+	 * 
+	 * Specific: Given an interface ID and the frame number in the aggregated
+	 * message table (Datenaustausch), the Lauscher will be searched on other
+	 * network interfaces of the same node for a frame which has the same content
+	 * (except for TTL). <br \> The first entry of the returned array indicates the
+	 * network interface ID {@code interfaceId} and the second entry the number of
+	 * the frame {@code frameNumber} in the Aggregated Message Table
+	 * (Datenaustausch). If the two entries are the null pointer each, it means that
+	 * the layer 2 (IP or ICMP) packet was originally sent or received by this node,
+	 * i.e. that there is no corresponding frame.
 	 * 
 	 * @param originalInterfaceId MAC address of the network interface
 	 * @param originalFrameNumber number of the frame in the aggregated message
 	 *                            table (Datenaustausch)
-	 * @param node
+	 * @param node                The node whose message details table
+	 *                            (Datenaustausch) we are on
 	 * @return Array with first entry {@code interfaceId} and second entry
-	 *         {@code frameNumber}
+	 *         {@code frameNumber}. If no corresponding frame exists, the two
+	 *         entries are the null pointer each.
+	 * @author Christoph Irniger
 	 */
 	public Object[] getCorrespondingFrame(String originalInterfaceId, int originalFrameNumber, InternetKnoten node) {
 		Object[] interfaceIdAndFrameNumber = new Object[2];
 		EthernetFrame originalFrame = getFrame(originalInterfaceId, originalFrameNumber);
 
-		// ARP-Pakete werden nicht weitergeleitet
+		// ARP packets (instance variable {@code typ} is "0x806") cannot be forwarded
 		if (!originalFrame.getTyp().equals("0x806")) {
 
-			// Check, ob Inhalt des Frames (IpPaket) für Knoten bestimmt war / von ihm
-			// ursprünglich abgesendet wurde
+			// Only execute if the content of the frame (the IpPaket) was either originally
+			// sent or received by the node
 			if (!packetOnlyReceivedOrOnlySent(originalFrame, node)) {
 				List<NetzwerkInterface> netzwerkInterfaces = node.getNetzwerkInterfaces();
 
@@ -531,7 +539,8 @@ public class Lauscher implements I18n {
 							for (frameNumber = 0; frameNumber < framesMitZeitstempel.size() - 1; frameNumber++) {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
-								// Nur Pakete vom Typ IP ("0x800") können potentiell weitergeleitet werden
+								// check payload if frame payload is an IP packet (instance variable {@code typ}
+								// is "0x800")
 								if (frame.getTyp().equals("0x800") && originalFrame.gleicherInhaltAndereTTL(frame)) {
 									break;
 								}

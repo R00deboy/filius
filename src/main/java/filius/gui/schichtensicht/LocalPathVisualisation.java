@@ -35,6 +35,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private final JPanel CENTER_PANEL = new JPanel();
 	private final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
 	private GridBagConstraints c;
+	// x offset of center visualisation in GridBag layout
+	private final static int X_OFFSET = 4;
 
 	private int pointInTime;
 	private int minPointInTime;
@@ -76,7 +78,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	public LocalPathVisualisation(LocalPathPanel localPathPanel) {
 		super();
 		LOCAL_PATH_PANEL = localPathPanel;
-		
+
 		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
@@ -173,21 +175,22 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		int xCoord3;
 
 		if (LOCAL_PATH_PANEL.isSent()) {
-			xCoord0 = 0;
-			xCoord1 = 1;
-			xCoord2 = 2;
-			xCoord3 = 3;
+			xCoord0 = X_OFFSET + 0;
+			xCoord1 = X_OFFSET + 1;
+			xCoord2 = X_OFFSET + 2;
+			xCoord3 = X_OFFSET + 3;
 		} else {
-			xCoord0 = 3;
-			xCoord1 = 2;
-			xCoord2 = 1;
-			xCoord3 = 0;
+			xCoord0 = X_OFFSET + 3;
+			xCoord1 = X_OFFSET + 2;
+			xCoord2 = X_OFFSET + 1;
+			xCoord3 = X_OFFSET + 0;
 		}
 
 		// node name cell
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 0, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), xCoord0, 1, 1, 1, true);
+		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), xCoord0, 1, 1, 1,
+				true);
 		setSize(label, RECTANGLE_WIDTH, (int) (0.3 * RECTANGLE_HEIGHT));
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 2, 1, 1);
@@ -233,33 +236,33 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		// create first wire on the left
 		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
-		setFinishedLabel(CENTER_PANEL, label, 0, 11, 1, 1);
+		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 0, 11, 1, 1);
 		// create last (fourth) wire on the right
 		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
-		setFinishedLabel(CENTER_PANEL, label, 8, 11, 1, 1);
+		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 8, 11, 1, 1);
 
 		// create left side square nested messages and if packet was received, create
 		// active (red) border
 		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, !LOCAL_PATH_PANEL.isSent());
-		setFinishedLabel(CENTER_PANEL, label, 1, 11, 1, 1);
+		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 1, 11, 1, 1);
 		// create right side square nested messages
 		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, false);
-		setFinishedLabel(CENTER_PANEL, label, 7, 11, 1, 1);
+		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 7, 11, 1, 1);
 
 		// create second wire on the left
 		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
-		setFinishedLabel(CENTER_PANEL, label, 2, 11, 1, 1);
+		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 2, 11, 1, 1);
 		// create second last (third) wire on the right
 		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
-		setFinishedLabel(CENTER_PANEL, label, 6, 11, 1, 1);
+		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 6, 11, 1, 1);
 
 		// with GridBag width of 3: node name cell with empty cell above and below
-		label = setEmptyCell(CENTER_PANEL, 3, 0, 3, 1);
+		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 0, 3, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), 3, 1, 3, 1, true);
+		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), X_OFFSET + 3, 1, 3, 1, true);
 		setSize(label, 2 * RECTANGLE_WIDTH + VGAP_BETWEEN_CELLS, (int) (0.3 * RECTANGLE_HEIGHT));
 		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label = setEmptyCell(CENTER_PANEL, 3, 2, 3, 1);
+		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 2, 3, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
 		// left and right node info cell with empty cell below
@@ -272,39 +275,39 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			clientInfoLeft = createClientInfoByMac(LOCAL_PATH_PANEL.getInterfaceId());
 			clientInfoRight = createClientInfoByMac(LOCAL_PATH_PANEL.getCorrInterfaceId());
 		}
-		editorPane = setEditorPane(CENTER_PANEL, clientInfoLeft, 3, 3, 1, 1, true);
+		editorPane = setEditorPane(CENTER_PANEL, clientInfoLeft, X_OFFSET + 3, 3, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, (int) Math.round(RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
-		label = setEmptyCell(CENTER_PANEL, 3, 4, 1, 1);
+		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		editorPane = setEditorPane(CENTER_PANEL, clientInfoRight, 5, 3, 1, 1, true);
+		editorPane = setEditorPane(CENTER_PANEL, clientInfoRight, X_OFFSET + 5, 3, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, (int) Math.round(RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
-		label = setEmptyCell(CENTER_PANEL, 5, 4, 1, 1);
+		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 5, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
 		// visualisations of rectangular nested messages including the arrows
 		// in between
-		createRectangularNestedMessages(3, false);
-		createRectangularNestedMessages(5, true);
+		createRectangularNestedMessages(X_OFFSET + 3, false);
+		createRectangularNestedMessages(X_OFFSET + 5, true);
 
 		// set right arrow
 		label = new Arrow(null, true, VGAP_BETWEEN_CELLS, VGAP_BETWEEN_CELLS);
-		setFinishedLabel(CENTER_PANEL, label, 4, 9, 1, 1);
+		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 4, 9, 1, 1);
 
 		// set empty cells in the exact middle (x coordinate 4)
 		// first the ones with even y coordinates
 		for (int i = 4; i <= 10; i = i + 2) {
-			label = setEmptyCell(CENTER_PANEL, 4, i, 1, 1);
+			label = setEmptyCell(CENTER_PANEL, X_OFFSET + 4, i, 1, 1);
 			setSize(label, VGAP_BETWEEN_CELLS, VGAP_BETWEEN_CELLS);
 			label.setBackground(Color.BLUE);
 		}
 		// Now the rest. For y Coordinates 0, 1, 2 no empty cells are required because
 		// they are already occupied by the labels with width 3 (see above).
-		label = setEmptyCell(CENTER_PANEL, 4, 3, 1, 1);
+		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 4, 3, 1, 1);
 		setSize(label, VGAP_BETWEEN_CELLS, (int) Math.round(RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
 		label.setBackground(Color.BLUE);
 		// The right arrow is located at y coordinate 9 (see above). Thus skip i = 9.
 		for (int i = 5; i <= 11 && i != 9; i = i + 2) {
-			label = setEmptyCell(CENTER_PANEL, 4, i, 1, 1);
+			label = setEmptyCell(CENTER_PANEL, X_OFFSET + 4, i, 1, 1);
 			setSize(label, VGAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
 			label.setBackground(Color.BLUE);
 		}
@@ -352,8 +355,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		JLabel label;
 		boolean activeBorder;
 		boolean arrowPointsDown;
-		int layerOfActiveBorder = Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(), LOCAL_PATH_PANEL.getMaxLayerOfOperation());
-		
+		int layerOfActiveBorder = Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(),
+				LOCAL_PATH_PANEL.getMaxLayerOfOperation());
+
 		// starting with layer i = 4 (application), ending with layer i = 1 (link)
 		for (int i = 4; i >= 1; i--) {
 			// visualisation if the packet was sent or received
@@ -698,16 +702,18 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		List<int[]> gridBagCoordsWithBorders;
 		if (!LOCAL_PATH_PANEL.isForwarded()) {
 			if (LOCAL_PATH_PANEL.isSent()) {
-				gridBagCoordsWithBorders = Collections.unmodifiableList(Arrays.asList(new int[] { 0, 5 },
-						new int[] { 0, 7 }, new int[] { 0, 9 }, new int[] { 0, 11 }, new int[] { 2, 11 }));
+				gridBagCoordsWithBorders = Collections.unmodifiableList(Arrays.asList(new int[] { X_OFFSET + 0, 5 },
+						new int[] { X_OFFSET + 0, 7 }, new int[] { X_OFFSET + 0, 9 }, new int[] { X_OFFSET + 0, 11 },
+						new int[] { X_OFFSET + 2, 11 }));
 			} else {
-				gridBagCoordsWithBorders = Collections.unmodifiableList(Arrays.asList(new int[] { 1, 11 },
-						new int[] { 3, 11 }, new int[] { 3, 9 }, new int[] { 3, 7 }, new int[] { 3, 5 }));
+				gridBagCoordsWithBorders = Collections.unmodifiableList(Arrays.asList(new int[] { X_OFFSET + 1, 11 },
+						new int[] { X_OFFSET + 3, 11 }, new int[] { X_OFFSET + 3, 9 }, new int[] { X_OFFSET + 3, 7 },
+						new int[] { X_OFFSET + 3, 5 }));
 			}
 		} else {
-			gridBagCoordsWithBorders = Collections
-					.unmodifiableList(Arrays.asList(new int[] { 1, 11 }, new int[] { 3, 11 }, new int[] { 3, 9 },
-							new int[] { 5, 9 }, new int[] { 5, 11 }, new int[] { 7, 11 }));
+			gridBagCoordsWithBorders = Collections.unmodifiableList(Arrays.asList(new int[] { X_OFFSET + 1, 11 },
+					new int[] { X_OFFSET + 3, 11 }, new int[] { X_OFFSET + 3, 9 }, new int[] { X_OFFSET + 5, 9 },
+					new int[] { X_OFFSET + 5, 11 }, new int[] { X_OFFSET + 7, 11 }));
 		}
 
 		// active border --> black, next active border --> red
@@ -759,7 +765,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			setBackground(Color.WHITE);
 
 			// create border only if layer message is actually painted
-			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame() && layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
+			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame()
+					&& layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
 				createBorder(activeBorder);
 			}
 		}
@@ -788,7 +795,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 			// Only draw nested messages if a message of the layer is in the frame.
 			// Otherwise the rectangle stays white (not visible).
-			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame() && layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
+			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame()
+					&& layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
 				setColorAccordingToLayer(layerNumber, rect);
 				rect.paintFilledRectangle(g, width, height);
 				if (layerNumber < LOCAL_PATH_PANEL.getMaxLayerInsideFrame()) {

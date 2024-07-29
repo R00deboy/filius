@@ -536,7 +536,7 @@ public class Lauscher implements I18n {
 						if (framesMitZeitstempel != null) {
 							int frameNumber;
 
-							for (frameNumber = 0; frameNumber < framesMitZeitstempel.size() - 1; frameNumber++) {
+							for (frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
 								// check payload if frame payload is an IP packet (instance variable {@code typ}
@@ -556,14 +556,15 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * This method checks if the node was the sender or receiver of the layer 2 (IP
-	 * or ICMP) packet of the frame. If this is not the case, we know that the
-	 * packet was forwarded by this node.
+	 * This method checks if the node was the original sender or receiver of the
+	 * layer 2 (IP or ICMP) packet inside the {@code frame}. If this is not the
+	 * case, we know that the packet was forwarded by this node.
 	 * 
 	 * @param frame The frame of which the layer 2 (IP or ICMP) packet should be
-	 *              checked.
-	 * @param node  The originally selected node.
+	 *              checked
+	 * @param node  The originally selected node
 	 * @return true oder false
+	 * @author Christoph Irniger
 	 */
 	private boolean packetOnlyReceivedOrOnlySent(EthernetFrame frame, InternetKnoten node) {
 		Object daten = frame.getDaten();
@@ -586,14 +587,15 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * This method returns the frame that belongs to the network interface indicated
-	 * in the first parameter and the frame number in the aggregated message table
-	 * (Datenaustausch) in the second parameter.
+	 * This helper method returns the frame that belongs to the network interface
+	 * indicated in the first parameter and the frame number in the aggregated
+	 * message table (Datenaustausch) in the second parameter.
 	 * 
 	 * @param interfaceId MAC address of the network interface
 	 * @param frameNumber number of the frame in the aggregated message table
 	 *                    (Datenaustausch)
 	 * @return frame which belongs to the parameters
+	 * @author Christoph Irniger
 	 */
 	public EthernetFrame getFrame(String interfaceId, int frameNumber) {
 		Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);

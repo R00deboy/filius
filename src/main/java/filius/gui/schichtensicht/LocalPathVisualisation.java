@@ -36,10 +36,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
 	private GridBagConstraints c;
 
-	// maximum layer inside the frame
-	// (1 = link, 2 = internet, 3 = transport, 4 = application)
-	private final int MAX_LAYER_INSIDE_FRAME;
-
 	private int pointInTime;
 	private int minPointInTime;
 	private int maxPointInTime;
@@ -53,7 +49,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// vertical gap between GridBag cells with content (must be divisible by 2)
 	private static final int VGAP_BETWEEN_CELLS = 12;
 
-	// width of rectangle including border (must be divisible by 2 * RECTANGLE_RATIO)
+	// width of rectangle including border (must be divisible by 2 *
+	// RECTANGLE_RATIO)
 	private static final int RECTANGLE_WIDTH = 180;
 	// ratio of width to height of a rectangle including border
 	private static final int RECTANGLE_RATIO = 3;
@@ -79,8 +76,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	public LocalPathVisualisation(LocalPathPanel localPathPanel) {
 		super();
 		LOCAL_PATH_PANEL = localPathPanel;
-		MAX_LAYER_INSIDE_FRAME = LOCAL_PATH_PANEL.getMaxLayer();
-
+		
 		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout(10, 10);
 		setLayout(borderLayout);
@@ -94,7 +90,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// create buttons
 		FORTH_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg1"));
 		BACK_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg2"));
-		BACK_IN_TIME.setEnabled(false);
+		// decativate "zurück" button if the frame was received
+		if (!LOCAL_PATH_PANEL.isSent()) {
+			BACK_IN_TIME.setEnabled(false);
+		}
 
 		// set initial value for senderSideIsActive
 		senderSideIsActive = LOCAL_PATH_PANEL.isSent();
@@ -106,14 +105,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// if the packet was not forwarded (i.e. sent or received)
 		if (!LOCAL_PATH_PANEL.isForwarded()) {
 			if (LOCAL_PATH_PANEL.isSent()) {
-				minPointInTime = 4 - MAX_LAYER_INSIDE_FRAME;
+				minPointInTime = 4 - LOCAL_PATH_PANEL.getMaxLayerInsideFrame();
 				maxPointInTime = 4;
 				pointInTimeForSenderSide = -1; // should never be reached, since only sent
 				pointInTime = minPointInTime;
 				visualisationSentOrReceived();
 			} else {
 				minPointInTime = 0;
-				maxPointInTime = MAX_LAYER_INSIDE_FRAME;
+				maxPointInTime = LOCAL_PATH_PANEL.getMaxLayerInsideFrame();
 				pointInTimeForSenderSide = 5; // should never be reached, since only received
 				pointInTime = minPointInTime;
 				visualisationSentOrReceived();
@@ -123,7 +122,12 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		else {
 			minPointInTime = 0;
 			maxPointInTime = 5;
-			pointInTime = LOCAL_PATH_PANEL.isSent() ? minPointInTime + 3 : minPointInTime;
+			if (LOCAL_PATH_PANEL.isSent()) {
+				pointInTime = minPointInTime + 3;
+				LOCAL_PATH_PANEL.hideNextHigherLayer();
+			} else {
+				pointInTime = minPointInTime;
+			}
 			pointInTimeForSenderSide = minPointInTime + 3;
 			visualisationForwarded();
 		}
@@ -348,6 +352,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		JLabel label;
 		boolean activeBorder;
 		boolean arrowPointsDown;
+		int layerOfActiveBorder = Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(), LOCAL_PATH_PANEL.getMaxLayerOfOperation());
+		
 		// starting with layer i = 4 (application), ending with layer i = 1 (link)
 		for (int i = 4; i >= 1; i--) {
 			// visualisation if the packet was sent or received
@@ -355,7 +361,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				if (LOCAL_PATH_PANEL.isSent()) {
 					// if the packet was sent, the first message (depending on which layers are
 					// involved) gets an active (red) border
-					activeBorder = (i == MAX_LAYER_INSIDE_FRAME) ? true : false;
+					activeBorder = (i == layerOfActiveBorder) ? true : false;
 					arrowPointsDown = true;
 				} else {
 					// active (red) border will not be here (but around the square message for the
@@ -370,7 +376,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				if (isSenderSideWhenForwarded) {
 					// if the packet was sent, create an active (red) border for the first message
 					// (depending on which layers are involved)
-					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((i == MAX_LAYER_INSIDE_FRAME) ? true : false) : false;
+					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((i == layerOfActiveBorder) ? true : false) : false;
 					arrowPointsDown = true;
 				}
 				// "receiver" side
@@ -383,7 +389,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			setFinishedLabel(CENTER_PANEL, label, xCoord, 5 + 2 * (4 - i), 1, 1);
 			// create vertical arrows below every nested messages rectangle
 			int maxLayerOfOperation = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
-			if (i <= Math.min(MAX_LAYER_INSIDE_FRAME, maxLayerOfOperation) && i >= 2) {
+			if (i <= Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(), maxLayerOfOperation) && i >= 2) {
 				label = new Arrow(arrowPointsDown, null, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 				setFinishedLabel(CENTER_PANEL, label, xCoord, 6 + 2 * (4 - i), 1, 1);
 			}
@@ -742,7 +748,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		private int heightWithBorder;
 		private int widthInsideBorder;
 		private int heightInsideBorder;
-		private final int MAX_LAYER_OF_OPERATION = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
 
 		private NestedMessagesVisualisation(int layerNumber, int widthWithBorder, int ratio, boolean activeBorder) {
 			this.layerNumber = layerNumber;
@@ -752,9 +757,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			this.widthInsideBorder = widthWithBorder - 2 * MAIN_BORDER_WIDTH;
 			this.heightInsideBorder = heightWithBorder - 2 * MAIN_BORDER_WIDTH;
 			setBackground(Color.WHITE);
-			
+
 			// create border only if layer message is actually painted
-			if (layerNumber <= MAX_LAYER_INSIDE_FRAME && layerNumber <= MAX_LAYER_OF_OPERATION) {
+			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame() && layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
 				createBorder(activeBorder);
 			}
 		}
@@ -783,12 +788,12 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 			// Only draw nested messages if a message of the layer is in the frame.
 			// Otherwise the rectangle stays white (not visible).
-			if (layerNumber <= MAX_LAYER_INSIDE_FRAME && layerNumber <= MAX_LAYER_OF_OPERATION) {
+			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame() && layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
 				setColorAccordingToLayer(layerNumber, rect);
 				rect.paintFilledRectangle(g, width, height);
-				if (layerNumber < MAX_LAYER_INSIDE_FRAME) {
+				if (layerNumber < LOCAL_PATH_PANEL.getMaxLayerInsideFrame()) {
 					// set other layer rectangles
-					for (int i = layerNumber + 1; i <= MAX_LAYER_INSIDE_FRAME; i++) {
+					for (int i = layerNumber + 1; i <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame(); i++) {
 						if (!isSquare) {
 							width = width - INDENT_NESTED_MSGS - BORDER_NESTED_MSGS;
 							height = height - 2 * BORDER_NESTED_MSGS;
@@ -821,7 +826,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				rect.setFillColor(AggregatedMessageTable.LayerColorVar.APPLICATION.backgroundColor);
 			}
 		}
-		
+
 		private void createBorder(boolean activeBorder) {
 			if (activeBorder) {
 				// draw the active (red) border around the message
@@ -831,10 +836,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				setBorder(getMatteBorder(Color.BLACK));
 			}
 		}
-		
+
 		private Border getMatteBorder(Color color) {
-			return BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
-					MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, color);
+			return BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
+					MAIN_BORDER_WIDTH, color);
 		}
 	}
 
@@ -902,7 +907,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			int arrowRectangleWidth = 4; // must be divisible by 2
 			int headHeight = 6;
 			int halfOfHeadWidth = headHeight;
-			
+
 			if (pointsDown != null && pointsDown) {
 				// rectangle
 				g.fillRect(xMiddle - arrowRectangleWidth / 2, 0, arrowRectangleWidth, overallLength - headHeight);
@@ -930,7 +935,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			} else if (pointsRight != null && pointsRight) {
 				// right arrow
 				g.fillRect(0, yMiddle - arrowRectangleWidth / 2, overallLength - headHeight, arrowRectangleWidth);
-				//  head
+				// head
 				int x1 = overallLength - headHeight;
 				int x2 = overallLength;
 				int x3 = overallLength - headHeight;

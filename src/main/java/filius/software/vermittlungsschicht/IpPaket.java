@@ -117,7 +117,7 @@ public class IpPaket implements Serializable, Cloneable {
 	 * 
 	 * @author Christoph Irniger
 	 */
-	public boolean[] checkContentAndTTL(IpPaket packet) {
+	public boolean[] checkPayloadAndTTL(IpPaket packet) {
 		boolean[] boolArray = new boolean[2];
 		
 		// --Payload checken--
@@ -163,7 +163,7 @@ public class IpPaket implements Serializable, Cloneable {
 		}
 		IpPaket packet = (IpPaket) o;
         
-		boolean[] boolArray = this.checkContentAndTTL(packet);
+		boolean[] boolArray = this.checkPayloadAndTTL(packet);
 		return boolArray[0] && boolArray[1];
     }
 }

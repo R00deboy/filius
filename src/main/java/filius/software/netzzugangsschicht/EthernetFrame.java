@@ -129,11 +129,11 @@ public class EthernetFrame implements Serializable {
 			if (!(daten instanceof IcmpPaket) && !(getDaten() instanceof IcmpPaket)) {
 				IpPaket ipPacket1 = (IpPaket) daten;
 				IpPaket ipPacket2 = (IpPaket) getDaten();
-				boolArray = ipPacket1.checkContentAndTTL(ipPacket2);
+				boolArray = ipPacket1.checkPayloadAndTTL(ipPacket2);
 			} else {
 				IcmpPaket icmpPacket1 = (IcmpPaket) daten;
 				IcmpPaket icmpPacket2 = (IcmpPaket) this.getDaten();
-				boolArray = icmpPacket1.checkContentAndTTL(icmpPacket2);
+				boolArray = icmpPacket1.checkPayloadAndTTL(icmpPacket2);
 			}
 		} else {
 			boolArray[0] = false;

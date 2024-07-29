@@ -111,7 +111,7 @@ public class IcmpPaket extends IpPaket {
 	 * 
 	 * @author Christoph Irniger
 	 */
-	public boolean[] checkContentAndTTL(IcmpPaket packet) {
+	public boolean[] checkPayloadAndTTL(IcmpPaket packet) {
 		boolean[] boolArray = new boolean[2];
 		
 		// Inhalt checken

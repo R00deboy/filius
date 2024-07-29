@@ -38,104 +38,105 @@ import filius.software.transportschicht.UdpSegment;
 @SuppressWarnings("serial")
 public class IpPaket implements Serializable, Cloneable {
 
-    public static final int UDP = 17, TCP = 6;
+	public static final int UDP = 17, TCP = 6;
 
-    /** IP-Adresse des sendenden Knotens */
-    private String sender;
-    private String empfaenger;
-    /** Time-to-Live */
-    private int ttl;
-    private final int protocol;
-    private Segment data;
+	/** IP-Adresse des sendenden Knotens */
+	private String sender;
+	private String empfaenger;
+	/** Time-to-Live */
+	private int ttl;
+	private final int protocol;
+	private Segment data;
 
-    public IpPaket(int protocol) {
-        this.protocol = protocol;
-    }
+	public IpPaket(int protocol) {
+		this.protocol = protocol;
+	}
 
-    @Override
-    public IpPaket clone() {
-        IpPaket clone = new IpPaket(protocol);
-        copyIpPacketAttributes(clone);
-        return clone;
-    }
+	@Override
+	public IpPaket clone() {
+		IpPaket clone = new IpPaket(protocol);
+		copyIpPacketAttributes(clone);
+		return clone;
+	}
 
-    void copyIpPacketAttributes(IpPaket clone) {
-        clone.ttl = ttl;
-        clone.empfaenger = empfaenger;
-        clone.sender = sender;
-        clone.data = data;
-    }
+	void copyIpPacketAttributes(IpPaket clone) {
+		clone.ttl = ttl;
+		clone.empfaenger = empfaenger;
+		clone.sender = sender;
+		clone.data = data;
+	}
 
-    public String getEmpfaenger() {
-        return empfaenger;
-    }
+	public String getEmpfaenger() {
+		return empfaenger;
+	}
 
-    public void setEmpfaenger(String empfaenger) {
-        this.empfaenger = empfaenger;
-    }
+	public void setEmpfaenger(String empfaenger) {
+		this.empfaenger = empfaenger;
+	}
 
-    public String getSender() {
-        return sender;
-    }
+	public String getSender() {
+		return sender;
+	}
 
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
+	public void setSender(String sender) {
+		this.sender = sender;
+	}
 
-    public int getProtocol() {
-        return protocol;
-    }
+	public int getProtocol() {
+		return protocol;
+	}
 
-    public int getTtl() {
-        return ttl;
-    }
+	public int getTtl() {
+		return ttl;
+	}
 
-    public void setTtl(int ttl) {
-        this.ttl = ttl;
-    }
+	public void setTtl(int ttl) {
+		this.ttl = ttl;
+	}
 
-    public Segment getSegment() {
-        return data;
-    }
+	public Segment getSegment() {
+		return data;
+	}
 
-    public void setSegment(Segment data) {
-        this.data = data;
-    }
+	public void setSegment(Segment data) {
+		this.data = data;
+	}
 
-    public String toString() {
-        return "[" + "ttl=" + ttl + ", " + "protocol=" + protocol + ", " + "empfaenger=" + empfaenger + ", " + "sender="
-                + sender + "]";
-    }
+	public String toString() {
+		return "[" + "ttl=" + ttl + ", " + "protocol=" + protocol + ", " + "empfaenger=" + empfaenger + ", " + "sender="
+				+ sender + "]";
+	}
 
-    public void decrementTtl() {
-        ttl--;
-    }
-    
+	public void decrementTtl() {
+		ttl--;
+	}
+
 	/**
-	 * Diese Methode prüft, ob ein IpPaket bis auf TTL dasselbe ist (erster
-	 * Eintrag) und ob TTL übereinstimmt (zweiter Eintrag).
+	 * Checks if this IP packet is equal to the packet in the argument except for
+	 * TTL (first entry) and if TTLs are equal (second entry).
 	 * 
+	 * @param packet
+	 * @return Array of boolean of length 2. First entry is true if this IP packet
+	 *         is equal to the packet in the argument except for TTL and the second
+	 *         entry is true if their TTLs are equal.
 	 * @author Christoph Irniger
 	 */
 	public boolean[] checkPayloadAndTTL(IpPaket packet) {
 		boolean[] boolArray = new boolean[2];
-		
+
 		// --Payload checken--
 		// Header checken
-        if (this.getSender().equals(packet.getSender()) &&
-        		this.getEmpfaenger().equals(packet.getEmpfaenger()) &&
-        		this.getProtocol() == packet.getProtocol()) {
-        	
+		if (this.getSender().equals(packet.getSender()) && this.getEmpfaenger().equals(packet.getEmpfaenger())
+				&& this.getProtocol() == packet.getProtocol()) {
+
 			// Daten checken
 			Segment segment1 = packet.getSegment();
 			Segment segment2 = this.getSegment();
 			if (segment1 instanceof TcpSegment && segment2 instanceof TcpSegment) {
-				boolArray[0] = ((TcpSegment) segment1).gleicherInhalt((TcpSegment) segment2);
-			}
-			else if (segment1 instanceof UdpSegment && segment2 instanceof UdpSegment) {
-				boolArray[0] = ((UdpSegment) segment1).gleicherInhalt((UdpSegment) segment2);
-			}
-			else {
+				boolArray[0] = ((TcpSegment) segment1).sameContent((TcpSegment) segment2);
+			} else if (segment1 instanceof UdpSegment && segment2 instanceof UdpSegment) {
+				boolArray[0] = ((UdpSegment) segment1).sameContent((UdpSegment) segment2);
+			} else {
 				boolArray[0] = false;
 			}
 		} else {
@@ -146,13 +147,13 @@ public class IpPaket implements Serializable, Cloneable {
 
 		return boolArray;
 	}
-	
+
 	/**
-	 * Gleich, wenn Sender, Empfänger, TTL, Protokoll und Daten gleich sind.
+	 * Equal if sender, receiver, TTL, protocol and data are equal.
 	 * 
 	 * @author Christoph Irniger
 	 */
-	public boolean gleicherInhalt(Object o) {
+	public boolean sameContent(Object o) {
 
 		if (o == this) {
 			return true;
@@ -162,8 +163,8 @@ public class IpPaket implements Serializable, Cloneable {
 			return false;
 		}
 		IpPaket packet = (IpPaket) o;
-        
+
 		boolean[] boolArray = this.checkPayloadAndTTL(packet);
 		return boolArray[0] && boolArray[1];
-    }
+	}
 }

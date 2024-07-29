@@ -125,11 +125,11 @@ public class TcpSegment extends Segment implements Serializable {
 	public boolean isUrg() {
 		return urg;
 	}
-	
+
 	public void setUrg(boolean urg) {
 		this.urg = urg;
 	}
-	
+
 	public boolean isPsh() {
 		return psh;
 	}
@@ -149,16 +149,16 @@ public class TcpSegment extends Segment implements Serializable {
 	public void setWindow(int window) {
 		this.window = window;
 	}
-	
+
 	/**
-	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn seqNummer,
-	 * ackNummer, dataOffset, reservedField, urg, ack, psh, rst, syn, fin, window
-	 * und urgentPointer gleich sind.
+	 * Equal if subjacent segments are equal and if seqNummer, ackNummer,
+	 * dataOffset, reservedField, urg, ack, psh, rst, syn, fin, window and
+	 * urgentPointer are equal.
 	 * 
 	 * @author Christoph Irniger
 	 */
 	@Override
-	public boolean gleicherInhalt(Object o) {
+	public boolean sameContent(Object o) {
 
 		if (o == this) {
 			return true;
@@ -168,38 +168,32 @@ public class TcpSegment extends Segment implements Serializable {
 			return false;
 		}
 
-		// Zuerst Oberklasse checken
+		// check super class first
 		if (o instanceof Segment) {
 			Segment segment = (Segment) o;
 
-			if (super.gleicherInhalt(segment)) {
+			if (super.sameContent(segment)) {
 
-				// Dann Rest
+				// then rest
 				if (o instanceof TcpSegment) {
 					TcpSegment tcpSegment = (TcpSegment) o;
-        			
-        			return this.getSeqNummer() == tcpSegment.getSeqNummer() &&
-					this.getAckNummer() == tcpSegment.getAckNummer() &&
-					this.getReservedField() == tcpSegment.getReservedField() &&
-					this.isUrg() == tcpSegment.isUrg() &&
-					this.isAck() == tcpSegment.isAck() &&
-					this.isPsh() == tcpSegment.isPsh() &&
-					this.isRst() == tcpSegment.isRst() &&
-					this.isSyn() == tcpSegment.isSyn() &&
-					this.isFin() == tcpSegment.isFin() &&
-					this.getWindow() == tcpSegment.getWindow() &&
-					this.getUrgentPointer() == tcpSegment.getUrgentPointer();
-                	}
-        		else {
-        			return false;
-        		}
-        	}
-        	else {
+
+					return this.getSeqNummer() == tcpSegment.getSeqNummer()
+							&& this.getAckNummer() == tcpSegment.getAckNummer()
+							&& this.getReservedField() == tcpSegment.getReservedField()
+							&& this.isUrg() == tcpSegment.isUrg() && this.isAck() == tcpSegment.isAck()
+							&& this.isPsh() == tcpSegment.isPsh() && this.isRst() == tcpSegment.isRst()
+							&& this.isSyn() == tcpSegment.isSyn() && this.isFin() == tcpSegment.isFin()
+							&& this.getWindow() == tcpSegment.getWindow()
+							&& this.getUrgentPointer() == tcpSegment.getUrgentPointer();
+				} else {
+					return false;
+				}
+			} else {
 				return false;
 			}
-        }
-        else {
-        	return false;
-        }
-    }
+		} else {
+			return false;
+		}
+	}
 }

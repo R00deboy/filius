@@ -29,111 +29,113 @@ package filius.software.vermittlungsschicht;
 @SuppressWarnings("serial")
 public class IcmpPaket extends IpPaket {
 
-    public static final int ICMP_PROTOCOL = 1;
-    /**
-     * sequence number of Echo Request packet: The sequence number can be used by the client to associate each echo
-     * request with its reply.
-     */
-    private int seqNr;
-    /**
-     * 0: ICMP Echo Reply (pong) <br />
-     * 3: see {@link #icmpType} <br />
-     * 8: ICMP Echo Request (ping)<br />
-     * 11: ICMP Time Exeeded (poof) <br />
-     * else: ICMP unknown
-     */
-    private int icmpType;
-    /**
-     * 0: "ICMP Network Unreachable <br />
-     * 1: ICMP Host Unreachable <br />
-     * other: ICMP Destination Unreachable
-     */
-    private int icmpCode;
-
-    public IcmpPaket() {
-        super(ICMP_PROTOCOL);
-    }
-
-    @Override
-    public IcmpPaket clone() {
-        IcmpPaket clone = new IcmpPaket();
-        copyIpPacketAttributes(clone);
-        copyIcmpAttributes(clone);
-        return clone;
-    }
-
-    private void copyIcmpAttributes(IcmpPaket clone) {
-        clone.seqNr = seqNr;
-        clone.icmpType = icmpType;
-        clone.icmpCode = icmpCode;
-    }
-
-    public void setIcmpType(int type) {
-        this.icmpType = type;
-    }
-
-    public void setIcmpCode(int code) {
-        this.icmpCode = code;
-    }
-
-    public int getIcmpType() {
-        return icmpType;
-    }
-
-    public int getIcmpCode() {
-        return icmpCode;
-    }
-
-    public boolean isEchoResponse() {
-        return icmpType == ICMP.TYPE_ECHO_REPLY && icmpCode == ICMP.CODE_ECHO;
-    }
-
-    public boolean isEchoRequest() {
-        return icmpType == ICMP.TYPE_ECHO_REQUEST && icmpCode == ICMP.CODE_ECHO;
-    }
-
-    public int getSeqNr() {
-        return this.seqNr;
-    }
-
-    public void setSeqNr(int seqNr) {
-        this.seqNr = seqNr;
-    }
-
-    public String toString() {
-        return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
-                + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + "]";
-    }
-    
+	public static final int ICMP_PROTOCOL = 1;
 	/**
-	 * Diese Methode prüft, ob ein IcmpPaket bis auf TTL dasselbe ist (erster
-	 * Eintrag) und ob TTL übereinstimmt (zweiter Eintrag).
+	 * sequence number of Echo Request packet: The sequence number can be used by
+	 * the client to associate each echo request with its reply.
+	 */
+	private int seqNr;
+	/**
+	 * 0: ICMP Echo Reply (pong) <br />
+	 * 3: see {@link #icmpType} <br />
+	 * 8: ICMP Echo Request (ping)<br />
+	 * 11: ICMP Time Exeeded (poof) <br />
+	 * else: ICMP unknown
+	 */
+	private int icmpType;
+	/**
+	 * 0: "ICMP Network Unreachable <br />
+	 * 1: ICMP Host Unreachable <br />
+	 * other: ICMP Destination Unreachable
+	 */
+	private int icmpCode;
+
+	public IcmpPaket() {
+		super(ICMP_PROTOCOL);
+	}
+
+	@Override
+	public IcmpPaket clone() {
+		IcmpPaket clone = new IcmpPaket();
+		copyIpPacketAttributes(clone);
+		copyIcmpAttributes(clone);
+		return clone;
+	}
+
+	private void copyIcmpAttributes(IcmpPaket clone) {
+		clone.seqNr = seqNr;
+		clone.icmpType = icmpType;
+		clone.icmpCode = icmpCode;
+	}
+
+	public void setIcmpType(int type) {
+		this.icmpType = type;
+	}
+
+	public void setIcmpCode(int code) {
+		this.icmpCode = code;
+	}
+
+	public int getIcmpType() {
+		return icmpType;
+	}
+
+	public int getIcmpCode() {
+		return icmpCode;
+	}
+
+	public boolean isEchoResponse() {
+		return icmpType == ICMP.TYPE_ECHO_REPLY && icmpCode == ICMP.CODE_ECHO;
+	}
+
+	public boolean isEchoRequest() {
+		return icmpType == ICMP.TYPE_ECHO_REQUEST && icmpCode == ICMP.CODE_ECHO;
+	}
+
+	public int getSeqNr() {
+		return this.seqNr;
+	}
+
+	public void setSeqNr(int seqNr) {
+		this.seqNr = seqNr;
+	}
+
+	public String toString() {
+		return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
+				+ "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + "]";
+	}
+
+	/**
+	 * Checks if this ICMP packet is equal to the packet in the argument except for
+	 * TTL (first entry) and if TTLs are equal (second entry).
 	 * 
+	 * @param packet
+	 * @return Array of boolean of length 2. First entry is true if this ICMP packet
+	 *         is equal to the packet in the argument except for TTL and the second
+	 *         entry is true if their TTLs are equal.
 	 * @author Christoph Irniger
 	 */
 	public boolean[] checkPayloadAndTTL(IcmpPaket packet) {
 		boolean[] boolArray = new boolean[2];
-		
-		// Inhalt checken
-        boolArray[0] = (this.getSender().equals(packet.getSender()) &&
-        		this.getEmpfaenger().equals(packet.getEmpfaenger()) &&
-        		this.getProtocol() == packet.getProtocol() &&
-				this.getSeqNr() == packet.getSeqNr() &&
-				this.getIcmpType() == packet.getIcmpType() &&
-				this.getIcmpCode() == packet.getIcmpCode());
-		// TTL checken
+
+		// check content
+		boolArray[0] = (this.getSender().equals(packet.getSender())
+				&& this.getEmpfaenger().equals(packet.getEmpfaenger()) && this.getProtocol() == packet.getProtocol()
+				&& this.getSeqNr() == packet.getSeqNr() && this.getIcmpType() == packet.getIcmpType()
+				&& this.getIcmpCode() == packet.getIcmpCode());
+		// check TTL
 		boolArray[1] = (this.getTtl() == packet.getTtl());
 		return boolArray;
 	}
-	
+
 	/**
-	 * Gleich, wenn darunterliegende IpPakete gleich sind und wenn seqNr, icmpType
-	 * und icmpCode gleich sind.
+	 * Equal if subjacent IP packets are equal and if seqNr, icmpType and icmpCode
+	 * are equal.
 	 * 
 	 * @author Christoph Irniger
 	 */
 	@Override
-	public boolean gleicherInhalt(Object o) {
+	public boolean sameContent(Object o) {
 
 		if (o == this) {
 			return true;
@@ -143,30 +145,26 @@ public class IcmpPaket extends IpPaket {
 			return false;
 		}
 
-		// Zuerst Oberklasse checken
+		// check super class first
 		if (o instanceof IpPaket) {
 			IpPaket ipPacket = (IpPaket) o;
 
-        	if (super.gleicherInhalt(ipPacket)) {
-        		
-        		// Dann Rest
-        		if (o instanceof IcmpPaket) {
-        			IcmpPaket icmpPacket = (IcmpPaket) o;
-        			
-        			return this.getSeqNr() == icmpPacket.getSeqNr() &&
-        					this.getIcmpType() == icmpPacket.getIcmpType() &&
-							this.getIcmpCode() == icmpPacket.getIcmpCode();
-                	}
-        		else {
-        			return false;
-        		}
-        	}
-        	else {
+			if (super.sameContent(ipPacket)) {
+
+				// then the rest
+				if (o instanceof IcmpPaket) {
+					IcmpPaket icmpPacket = (IcmpPaket) o;
+
+					return this.getSeqNr() == icmpPacket.getSeqNr() && this.getIcmpType() == icmpPacket.getIcmpType()
+							&& this.getIcmpCode() == icmpPacket.getIcmpCode();
+				} else {
+					return false;
+				}
+			} else {
 				return false;
 			}
-        }
-        else {
-        	return false;
-        }
-    }
+		} else {
+			return false;
+		}
+	}
 }

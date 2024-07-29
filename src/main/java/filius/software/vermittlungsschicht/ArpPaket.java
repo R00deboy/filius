@@ -30,106 +30,105 @@ import java.io.Serializable;
 /** Diese Klasse umfasst die Attribute eines ARP-Pakets */
 public class ArpPaket implements Serializable {
 
-    public static int REQUEST = 1, REPLY = 2;
+	public static int REQUEST = 1, REPLY = 2;
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /** Protokoll-Typ der Vermittlungsschicht */
-    private String protokollTyp;
+	/** Protokoll-Typ der Vermittlungsschicht */
+	private String protokollTyp;
 
-    /** Operation: 1 - request, 2 - reply */
-    private int operation = 1;
+	/** Operation: 1 - request, 2 - reply */
+	private int operation = 1;
 
-    /** MAC-Adresse des sendenden Knotens */
-    private String senderMAC;
+	/** MAC-Adresse des sendenden Knotens */
+	private String senderMAC;
 
-    /** IP-Adresse des sendenden Knotens */
-    private String senderIP;
+	/** IP-Adresse des sendenden Knotens */
+	private String senderIP;
 
-    /** MAC-Adresse des Zielknotens (i.d.R. Broadcast) */
-    private String targetMAC;
+	/** MAC-Adresse des Zielknotens (i.d.R. Broadcast) */
+	private String targetMAC;
 
-    /**
-     * Ziel-IP-Adresse bzw. die Adresse des Knotens, zu dem die MAC-Adresse gesucht wird
-     */
-    private String targetIP;
+	/**
+	 * Ziel-IP-Adresse bzw. die Adresse des Knotens, zu dem die MAC-Adresse gesucht
+	 * wird
+	 */
+	private String targetIP;
 
-    public String getProtokollTyp() {
-        return protokollTyp;
-    }
+	public String getProtokollTyp() {
+		return protokollTyp;
+	}
 
-    public void setProtokollTyp(String protokollTyp) {
-        this.protokollTyp = protokollTyp;
-    }
+	public void setProtokollTyp(String protokollTyp) {
+		this.protokollTyp = protokollTyp;
+	}
 
-    public String getSenderIP() {
-        return senderIP;
-    }
+	public String getSenderIP() {
+		return senderIP;
+	}
 
-    public void setSenderIP(String quellIp) {
-        this.senderIP = quellIp;
-    }
+	public void setSenderIP(String quellIp) {
+		this.senderIP = quellIp;
+	}
 
-    public String getSenderMAC() {
-        return senderMAC;
-    }
+	public String getSenderMAC() {
+		return senderMAC;
+	}
 
-    public void setSenderMAC(String quellMacAdresse) {
-        this.senderMAC = quellMacAdresse;
-    }
+	public void setSenderMAC(String quellMacAdresse) {
+		this.senderMAC = quellMacAdresse;
+	}
 
-    public String getTargetIP() {
-        return targetIP;
-    }
+	public String getTargetIP() {
+		return targetIP;
+	}
 
-    public void setTargetIP(String zielIp) {
-        this.targetIP = zielIp;
-    }
+	public void setTargetIP(String zielIp) {
+		this.targetIP = zielIp;
+	}
 
-    public String getTargetMAC() {
-        return targetMAC;
-    }
+	public String getTargetMAC() {
+		return targetMAC;
+	}
 
-    public void setTargetMAC(String zielMacAdresse) {
-        this.targetMAC = zielMacAdresse;
-    }
+	public void setTargetMAC(String zielMacAdresse) {
+		this.targetMAC = zielMacAdresse;
+	}
 
-    public String toString() {
-        return "[op=" + (operation == REQUEST ? "REQUEST" : "REPLY") + ", sender=" + senderMAC + "|" + senderIP
-                + ", target=" + targetMAC + "|" + targetIP + "]";
-    }
+	public String toString() {
+		return "[op=" + (operation == REQUEST ? "REQUEST" : "REPLY") + ", sender=" + senderMAC + "|" + senderIP
+				+ ", target=" + targetMAC + "|" + targetIP + "]";
+	}
 
-    public int getOperation() {
-        return operation;
-    }
+	public int getOperation() {
+		return operation;
+	}
 
-    public void setOperation(int operation) {
-        this.operation = operation;
-    }
-    
-    /**
-	 * Gleich, wenn protokollTyp, operation, senderMAC, senderIP, targetMAC und targetIP gleich sind.
+	public void setOperation(int operation) {
+		this.operation = operation;
+	}
+
+	/**
+	 * Equal if protokollTyp, operation, senderMAC, senderIP, targetMAC and targetIP
+	 * are equal.
 	 * 
 	 * @author Christoph Irniger
-	 */    
-    public boolean gleicherInhalt(Object o) {
- 
-        if (o == this) {
-            return true;
-        }
- 
-        if (!(o instanceof ArpPaket)) {
-            return false;
-        }
-        else {
+	 */
+	public boolean sameContent(Object o) {
+
+		if (o == this) {
+			return true;
+		}
+
+		if (!(o instanceof ArpPaket)) {
+			return false;
+		} else {
 			ArpPaket arpPaket = (ArpPaket) o;
-			
-			return this.getProtokollTyp() == arpPaket.getProtokollTyp() &&
-					this.getOperation() == arpPaket.getOperation() &&
-					this.getSenderMAC() == arpPaket.getSenderMAC() &&
-					this.getSenderIP() == arpPaket.getSenderIP() &&
-					this.getTargetMAC() == arpPaket.getTargetMAC() &&
-					this.getTargetIP() == arpPaket.getTargetIP();
-        }
-    }
+
+			return this.getProtokollTyp() == arpPaket.getProtokollTyp()
+					&& this.getOperation() == arpPaket.getOperation() && this.getSenderMAC() == arpPaket.getSenderMAC()
+					&& this.getSenderIP() == arpPaket.getSenderIP() && this.getTargetMAC() == arpPaket.getTargetMAC()
+					&& this.getTargetIP() == arpPaket.getTargetIP();
+		}
+	}
 }

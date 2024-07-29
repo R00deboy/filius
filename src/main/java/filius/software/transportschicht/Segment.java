@@ -70,12 +70,12 @@ public class Segment implements Serializable {
 	}
 
 	/**
-	 * Gleich, wenn protokollTyp, operation, senderMAC, senderIP, targetMAC und
-	 * targetIP gleich sind.
+	 * Equal if protokollTyp, operation, senderMAC, senderIP, targetMAC and targetIP
+	 * are equal.
 	 * 
 	 * @author Christoph Irniger
 	 */
-	public boolean gleicherInhalt(Object o) {
+	public boolean sameContent(Object o) {
 
 		if (o == this) {
 			return true;
@@ -86,18 +86,15 @@ public class Segment implements Serializable {
 		} else {
 			Segment segment = (Segment) o;
 
-			// Beide Daten null -> kein Anwendungsinhalt
+			// if both are null, there is no content on layer 4 (application)
 			if (this.getDaten() == null && segment.getDaten() == null) {
-				return this.getQuellPort() == segment.getQuellPort() &&
-						this.getZielPort() == segment.getZielPort() &&
-						this.getPruefSumme() == segment.getPruefSumme();
+				return this.getQuellPort() == segment.getQuellPort() && this.getZielPort() == segment.getZielPort()
+						&& this.getPruefSumme() == segment.getPruefSumme();
 			} else if (!(this.getDaten() == null || segment.getDaten() == null)) {
-				return this.getQuellPort() == segment.getQuellPort() &&
-						this.getZielPort() == segment.getZielPort() &&
-						this.getPruefSumme() == segment.getPruefSumme() &&
-						this.getDaten().equals(segment.getDaten());
-			}
-			else {
+				return this.getQuellPort() == segment.getQuellPort() && this.getZielPort() == segment.getZielPort()
+						&& this.getPruefSumme() == segment.getPruefSumme()
+						&& this.getDaten().equals(segment.getDaten());
+			} else {
 				return false;
 			}
 		}

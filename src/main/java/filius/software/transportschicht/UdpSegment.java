@@ -45,13 +45,12 @@ public class UdpSegment extends Segment implements Serializable {
 	}
 	
 	/**
-	 * Gleich, wenn darunterliegende Segmente gleich sind und wenn laenge gleich
-	 * ist.
+	 * Equal if subjacent segments are equal and if laenge is equal.
 	 * 
 	 * @author Christoph Irniger
 	 */
 	@Override
-	public boolean gleicherInhalt(Object o) {
+	public boolean sameContent(Object o) {
 
 		if (o == this) {
 			return true;
@@ -61,13 +60,13 @@ public class UdpSegment extends Segment implements Serializable {
 			return false;
 		}
 
-		// Zuerst Oberklasse checken
+		// check super class first
 		if (o instanceof Segment) {
 			Segment segment = (Segment) o;
 
-			if (super.gleicherInhalt(segment)) {
+			if (super.sameContent(segment)) {
 
-				// Dann Rest
+				// then rest
 				if (o instanceof UdpSegment) {
 					UdpSegment udpSegment = (UdpSegment) o;
 

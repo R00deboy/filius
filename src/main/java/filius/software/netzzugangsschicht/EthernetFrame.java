@@ -105,20 +105,32 @@ public class EthernetFrame implements Serializable {
 	}
 
 	/**
-	 * Diese Methode prüft, ob ein Frame vom Typ IP denselben Payload, aber eine
-	 * unterschiedliche TTL hat.
+	 * This method checks wheter both frames have the same payload and each a
+	 * different TTL. Only works if this frame and the frame in the first parameter
+	 * are IP packets (class {@code IpPaket}).
 	 * 
+	 * @param frame frame to be compared to this frame
+	 * @return true if this frame and the frame in the first parameter have the same
+	 *         payload and a different TTL, false otherwise
 	 * @author Christoph Irniger
 	 */
-	public boolean gleicherInhaltAndereTTL(EthernetFrame frame) {
+	public boolean samePayloadDifferentTTL(EthernetFrame frame) {
 		boolean[] boolArray = checkPayloadAndTTL(frame);
 		return boolArray[0] && !boolArray[1];
 	}
 
 	/**
-	 * Diese Methode prüft, ob ein Frame des Typs IP senselben Payload bis auf TTL
-	 * hat (erster Eintrag) und ob TTL übereinstimmt (zweiter Eintrag).
+	 * This method checks if a frame has the same payload except for TTL (first
+	 * entry) and if the TTL is the same (second entry). Returns false if this frame
+	 * or the frame in the first parameter is not an IP packet (class
+	 * {@code IpPaket}).
 	 * 
+	 * @param frame frame to be compared to this frame
+	 * @return Array of boolean of length 2. If this frame or the frame in the first
+	 *         parameter is not an IP packet (class {@code IpPaket}), both entries
+	 *         are false. Otherwise the first entry is true if both have the same
+	 *         payload except for TTL and the second entry is true if both frames
+	 *         have the same TTL.
 	 * @author Christoph Irniger
 	 */
 	private boolean[] checkPayloadAndTTL(EthernetFrame frame) {
@@ -130,10 +142,13 @@ public class EthernetFrame implements Serializable {
 				IpPaket ipPacket1 = (IpPaket) daten;
 				IpPaket ipPacket2 = (IpPaket) getDaten();
 				boolArray = ipPacket1.checkPayloadAndTTL(ipPacket2);
-			} else {
+			} else if (daten instanceof IcmpPaket && getDaten() instanceof IcmpPaket){
 				IcmpPaket icmpPacket1 = (IcmpPaket) daten;
 				IcmpPaket icmpPacket2 = (IcmpPaket) this.getDaten();
 				boolArray = icmpPacket1.checkPayloadAndTTL(icmpPacket2);
+			} else {
+				boolArray[0] = false;
+				boolArray[1] = false;
 			}
 		} else {
 			boolArray[0] = false;

@@ -541,7 +541,7 @@ public class Lauscher implements I18n {
 
 								// check payload if frame payload is an IP packet (instance variable {@code typ}
 								// is "0x800")
-								if (frame.getTyp().equals("0x800") && originalFrame.gleicherInhaltAndereTTL(frame)) {
+								if (frame.getTyp().equals("0x800") && originalFrame.samePayloadDifferentTTL(frame)) {
 									break;
 								}
 							}

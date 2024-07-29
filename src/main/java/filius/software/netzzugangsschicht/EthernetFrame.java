@@ -125,14 +125,19 @@ public class EthernetFrame implements Serializable {
 		Object daten = frame.getDaten();
 		boolean[] boolArray = new boolean[2];
 		
-		if (!(daten instanceof IcmpPaket)) {
-			IpPaket ipPacket1 = (IpPaket) daten;
-			IpPaket ipPacket2 = (IpPaket) this.getDaten();
-			boolArray = ipPacket1.checkContentAndTTL(ipPacket2);
+		if (daten instanceof IpPaket && getDaten() instanceof IpPaket) {
+			if (!(daten instanceof IcmpPaket) && !(getDaten() instanceof IcmpPaket)) {
+				IpPaket ipPacket1 = (IpPaket) daten;
+				IpPaket ipPacket2 = (IpPaket) getDaten();
+				boolArray = ipPacket1.checkContentAndTTL(ipPacket2);
+			} else {
+				IcmpPaket icmpPacket1 = (IcmpPaket) daten;
+				IcmpPaket icmpPacket2 = (IcmpPaket) this.getDaten();
+				boolArray = icmpPacket1.checkContentAndTTL(icmpPacket2);
+			}
 		} else {
-			IcmpPaket icmpPacket1 = (IcmpPaket) daten;
-			IcmpPaket icmpPacket2 = (IcmpPaket) this.getDaten();
-			boolArray = icmpPacket1.checkContentAndTTL(icmpPacket2);
+			boolArray[0] = false;
+			boolArray[1] = false;
 		}
 		return boolArray;
 	}

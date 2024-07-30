@@ -47,7 +47,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	private final boolean forwarded; // if the node forwarded an IP or ICMP packet
 
 	public JSplitPane splitPane;
-	private static final int DIVIDER_LOCATION = 350;
+	private static final int DIVIDER_LOCATION = 450;
 
 	private String[][] messageDetailsSent = new String[6][8]; // for the sent message
 	private String[][] messageDetailsReceived = new String[6][8]; // for the received message

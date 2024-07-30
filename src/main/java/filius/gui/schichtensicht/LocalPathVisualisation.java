@@ -34,7 +34,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 	private final JPanel CENTER_PANEL = new JPanel();
 	private final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
-	private GridBagConstraints c;
+	private GridBagConstraints c = new GridBagConstraints();
 	// x offset of center visualisation in GridBag layout
 	private final static int X_OFFSET = 4;
 
@@ -68,8 +68,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private static final int BORDER_NESTED_MSGS = 5;
 	// side length of squares needed for visualisation of a frame on cable (layer 1)
 	private static final int SQUARE_SIDE_LENGTH = RECTANGLE_HEIGHT;
-	// client info cell ratio of width to height
-	private static final double CLIENT_INFO_CELL_RATIO = (double) 60 / 31;
+	// node name cell height
+	private static final int NODE_NAME_CELL_HEIGHT = (int) (0.3 * RECTANGLE_HEIGHT);
+	// node info cell ratio of width to height
+	private static final int NODE_INFO_CELL_HEIGHT = (int) Math.round(RECTANGLE_WIDTH / 1.935);
 
 	// buttons "vorwärts" and "zurück"
 	private final JButton FORTH_IN_TIME;
@@ -87,11 +89,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// set GridBagLayout for CENTER_PANEL
 		CENTER_PANEL.setLayout(GB_LAYOUT_CENTER_PANEL);
 		CENTER_PANEL.setBackground(Color.WHITE);
-		c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.NORTH;
+		c.fill = GridBagConstraints.NONE;
 
 		// create buttons
 		FORTH_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg1"));
 		BACK_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg2"));
+		FORTH_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, RECTANGLE_HEIGHT / 2));
+		BACK_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, RECTANGLE_HEIGHT / 2));
 		// decativate "zurück" button if the frame was received
 		if (!LOCAL_PATH_PANEL.isSent()) {
 			BACK_IN_TIME.setEnabled(false);
@@ -100,9 +105,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// set initial value for senderSideIsActive
 		senderSideIsActive = LOCAL_PATH_PANEL.isSent();
 
-		// configure left and right side
-		sideConfiguration(BACK_IN_TIME, BorderLayout.WEST); // left side
-		sideConfiguration(FORTH_IN_TIME, BorderLayout.EAST); // right side
+		// configure left and right side (indication of layers and back and forth
+		// buttons)
+		addSidePanel(BACK_IN_TIME, BorderLayout.WEST); // left side
+		addSidePanel(FORTH_IN_TIME, BorderLayout.EAST); // right side
 
 		// if the packet was not forwarded (i.e. sent or received)
 		if (!LOCAL_PATH_PANEL.isForwarded()) {
@@ -186,20 +192,19 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			xCoord3 = X_OFFSET + 0;
 		}
 
-		// node name cell
+		// node name cell with empty cell above and below
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 0, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), xCoord0, 1, 1, 1,
-				true);
-		setSize(label, RECTANGLE_WIDTH, (int) (0.3 * RECTANGLE_HEIGHT));
+		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), xCoord0, 1, 1, 1, true);
+		setSize(label, RECTANGLE_WIDTH, NODE_NAME_CELL_HEIGHT);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 2, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
 		// node info cell with empty cell below
-		String clientInfo = createClientInfoByMac(LOCAL_PATH_PANEL.getInterfaceId());
-		editorPane = setEditorPane(CENTER_PANEL, clientInfo, xCoord0, 3, 1, 1, true);
-		setSize(editorPane, RECTANGLE_WIDTH, (int) (RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
+		String nodeInfo = createNodeInfoByMac(LOCAL_PATH_PANEL.getInterfaceId());
+		editorPane = setEditorPane(CENTER_PANEL, nodeInfo, xCoord0, 3, 1, 1, true);
+		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
@@ -260,27 +265,27 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 0, 3, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), X_OFFSET + 3, 1, 3, 1, true);
-		setSize(label, 2 * RECTANGLE_WIDTH + VGAP_BETWEEN_CELLS, (int) (0.3 * RECTANGLE_HEIGHT));
+		setSize(label, 2 * RECTANGLE_WIDTH + VGAP_BETWEEN_CELLS, NODE_NAME_CELL_HEIGHT);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 2, 3, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
 		// left and right node info cell with empty cell below
-		String clientInfoLeft;
-		String clientInfoRight;
+		String nodeInfoLeft;
+		String nodeInfoRight;
 		if (LOCAL_PATH_PANEL.isSent()) {
-			clientInfoLeft = createClientInfoByMac(LOCAL_PATH_PANEL.getCorrInterfaceId());
-			clientInfoRight = createClientInfoByMac(LOCAL_PATH_PANEL.getInterfaceId());
+			nodeInfoLeft = createNodeInfoByMac(LOCAL_PATH_PANEL.getCorrInterfaceId());
+			nodeInfoRight = createNodeInfoByMac(LOCAL_PATH_PANEL.getInterfaceId());
 		} else {
-			clientInfoLeft = createClientInfoByMac(LOCAL_PATH_PANEL.getInterfaceId());
-			clientInfoRight = createClientInfoByMac(LOCAL_PATH_PANEL.getCorrInterfaceId());
+			nodeInfoLeft = createNodeInfoByMac(LOCAL_PATH_PANEL.getInterfaceId());
+			nodeInfoRight = createNodeInfoByMac(LOCAL_PATH_PANEL.getCorrInterfaceId());
 		}
-		editorPane = setEditorPane(CENTER_PANEL, clientInfoLeft, X_OFFSET + 3, 3, 1, 1, true);
-		setSize(editorPane, RECTANGLE_WIDTH, (int) Math.round(RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
+		editorPane = setEditorPane(CENTER_PANEL, nodeInfoLeft, X_OFFSET + 3, 3, 1, 1, true);
+		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-		editorPane = setEditorPane(CENTER_PANEL, clientInfoRight, X_OFFSET + 5, 3, 1, 1, true);
-		setSize(editorPane, RECTANGLE_WIDTH, (int) Math.round(RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
+		editorPane = setEditorPane(CENTER_PANEL, nodeInfoRight, X_OFFSET + 5, 3, 1, 1, true);
+		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 5, 4, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
 
@@ -303,7 +308,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// Now the rest. For y Coordinates 0, 1, 2 no empty cells are required because
 		// they are already occupied by the labels with width 3 (see above).
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 4, 3, 1, 1);
-		setSize(label, VGAP_BETWEEN_CELLS, (int) Math.round(RECTANGLE_WIDTH / CLIENT_INFO_CELL_RATIO));
+		setSize(label, VGAP_BETWEEN_CELLS, NODE_INFO_CELL_HEIGHT);
 		label.setBackground(Color.BLUE);
 		// The right arrow is located at y coordinate 9 (see above). Thus skip i = 9.
 		for (int i = 5; i <= 11 && i != 9; i = i + 2) {
@@ -316,29 +321,28 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * This method creates a string with all the client info belonging to a MAC
+	 * This method creates a string with all the node info belonging to a MAC
 	 * address (i.e. interface ID). In the visualisation this string will be
 	 * displayed inside an EditorPane.
 	 * 
 	 * @param interfaceId MAC address of interface
-	 * @return String with the resulting client info
+	 * @return String with the resulting node info
 	 */
-	private String createClientInfoByMac(String interfaceId) {
+	private String createNodeInfoByMac(String interfaceId) {
 		InternetKnoten node = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten());
 		NetzwerkInterface ni = node.getNetzwerkInterfaceByMac(interfaceId);
-		String[] clientInfos = new String[5];
-		clientInfos[0] = "<b>" + messages.getString("schichten_lokaler_weg_msg6") + "</b> " + ni.getIp() + "<br />";
-		clientInfos[1] = "<b>" + messages.getString("schichten_lokaler_weg_msg7") + "</b> " + ni.getSubnetzMaske()
+		String[] nodeInfos = new String[5];
+		nodeInfos[0] = "<b>" + messages.getString("schichten_lokaler_weg_msg6") + "</b> " + ni.getIp() + "<br />";
+		nodeInfos[1] = "<b>" + messages.getString("schichten_lokaler_weg_msg7") + "</b> " + ni.getSubnetzMaske()
 				+ "<br />";
-		clientInfos[2] = "<b>" + messages.getString("schichten_lokaler_weg_msg8") + "</b> " + ni.getMac() + "<br />";
-		clientInfos[3] = "<b>" + messages.getString("schichten_lokaler_weg_msg9") + "</b> " + ni.getGateway()
-				+ "<br />";
-		clientInfos[4] = "<b>" + messages.getString("schichten_lokaler_weg_msg10") + "</b> " + ni.getDns();
-		String clientInfo = "";
-		for (int i = 0; i < clientInfos.length; i++) {
-			clientInfo = clientInfo + clientInfos[i];
+		nodeInfos[2] = "<b>" + messages.getString("schichten_lokaler_weg_msg8") + "</b> " + ni.getMac() + "<br />";
+		nodeInfos[3] = "<b>" + messages.getString("schichten_lokaler_weg_msg9") + "</b> " + ni.getGateway() + "<br />";
+		nodeInfos[4] = "<b>" + messages.getString("schichten_lokaler_weg_msg10") + "</b> " + ni.getDns();
+		String nodeInfo = "";
+		for (int i = 0; i < nodeInfos.length; i++) {
+			nodeInfo = nodeInfo + nodeInfos[i];
 		}
-		return clientInfo;
+		return nodeInfo;
 	}
 
 	/**
@@ -404,23 +408,28 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Right and left side of the visualisation, indicating the layers and showing
 	 * the buttons "vorwärts" and "zurück".
 	 * 
-	 * @param backOrForthButton "back" or "forth" button
-	 * @param position          position in the BorderLayout of the
+	 * @param backOrForthButton    "back" or "forth" button
+	 * @param borderLayoutPosition position in the BorderLayout of the
 	 */
-	private void sideConfiguration(JButton backOrForthButton, String borderLayoutPosition) {
+	private void addSidePanel(JButton backOrForthButton, String borderLayoutPosition) {
 		JPanel sidePanel = new JPanel(new GridBagLayout());
-		c = new GridBagConstraints();
-		setStandards(backOrForthButton, 0, 0, 1, 1);
+		JLabel label;
+
+		// set empty gap on top such that sidePanel is aligned with center visualisation
+		label = setEmptyCell(sidePanel, 0, 0, 1, 1);
+		setSize(label, RECTANGLE_WIDTH,
+				2 * VGAP_BETWEEN_CELLS + NODE_NAME_CELL_HEIGHT + NODE_INFO_CELL_HEIGHT - (int) backOrForthButton.getPreferredSize().getHeight());
+
+		setStandards(backOrForthButton, 0, 1, 1, 1);
 		sidePanel.add(backOrForthButton, c);
 		sidePanel.setBackground(Color.WHITE);
 
-		JLabel label;
 		String[] layers = { messages.getString("rp_lauscher_msg11"), messages.getString("rp_lauscher_msg10"),
 				messages.getString("rp_lauscher_msg9"), messages.getString("rp_lauscher_msg8") };
 		for (int i = 0; i < 4; i++) {
-			label = setEmptyCell(sidePanel, 0, 1 + i * 2, 1, 1);
+			label = setEmptyCell(sidePanel, 0, 2 + i * 2, 1, 1);
 			setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-			label = setLabel(sidePanel, layers[i], 0, 2 + i * 2, 1, 1, false);
+			label = setLabel(sidePanel, layers[i], 0, 3 + i * 2, 1, 1, false);
 			setSize(label, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
 			if (i == 0) {

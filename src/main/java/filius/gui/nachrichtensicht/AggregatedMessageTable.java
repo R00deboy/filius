@@ -462,21 +462,30 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
 	// color variants for the different layers
 	public enum LayerColorVar {
-		DEFAULT(Color.BLACK, Color.WHITE, Color.WHITE),
+		DEFAULT(Color.BLACK, Color.WHITE, Color.WHITE, Color.WHITE, Color.BLACK),
 		// old Fine colors: #EDEDED, #DAE3F3, #FBE5D6, #FFF2CC
-		LINK(Color.BLACK, Color.decode("#C9C9C9"), Color.decode("#DBDBDB")),
-		INTERNET(Color.BLACK, Color.decode("#8FAADC"), Color.decode("#B4C6E7")),
-		TRANSPORT(Color.BLACK, Color.decode("#F4B183"), Color.decode("#F7CAAC")),
-		APPLICATION(Color.BLACK, Color.decode("#FFD966"), Color.decode("#FFE599"));
+		LINK(Color.BLACK, Color.decode("#C9C9C9"), Color.decode("#DBDBDB"), Color.decode("#F2F2F2"),
+				Color.decode("#A6A6A6")),
+		INTERNET(Color.BLACK, Color.decode("#8FAADC"), Color.decode("#B4C6E7"), Color.decode("#D9E2F3"),
+				Color.decode("#2F5496")),
+		TRANSPORT(Color.BLACK, Color.decode("#F4B183"), Color.decode("#F7CAAC"), Color.decode("#FBE4D5"),
+				Color.decode("#C45911")),
+		APPLICATION(Color.BLACK, Color.decode("#FFD966"), Color.decode("#FFE599"), Color.decode("#FFF2CC"),
+				Color.decode("#BF8F00"));
 
 		public final Color foregroundColor;
 		public final Color backgroundColor;
 		public final Color backgroundColorFine;
+		public final Color backgroundColorUltraFine;
+		public final Color borderColor;
 
-		private LayerColorVar(Color foregroundColor, Color backgroundColor, Color backgroundColorFine) {
+		private LayerColorVar(Color foregroundColor, Color backgroundColor, Color backgroundColorFine,
+				Color backgroundColorUltraFine, Color borderColor) {
 			this.foregroundColor = foregroundColor;
 			this.backgroundColor = backgroundColor;
 			this.backgroundColorFine = backgroundColorFine;
+			this.backgroundColorUltraFine = backgroundColorUltraFine;
+			this.borderColor = borderColor;
 		}
 	}
 
@@ -516,8 +525,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LocalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
-				selectedFrameNumber);
+		new LocalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId, selectedFrameNumber);
 	}
 
 	/**

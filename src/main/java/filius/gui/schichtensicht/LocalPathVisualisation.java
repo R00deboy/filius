@@ -32,11 +32,13 @@ import filius.rahmenprogramm.I18n;
 public class LocalPathVisualisation extends JPanel implements I18n {
 	private final LocalPathPanel LOCAL_PATH_PANEL;
 
+	private static final Color BACKGROUND_COLOR = Color.WHITE;
+
 	private final JPanel CENTER_PANEL = new JPanel();
 	private final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
 	private GridBagConstraints c = new GridBagConstraints();
 	// x offset of center visualisation in GridBag layout
-	private final static int X_OFFSET = 4;
+	private final static int X_OFFSET = 2;
 
 	private int pointInTime;
 	private int minPointInTime;
@@ -48,8 +50,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// (for smaller on receiver side)
 	private int pointInTimeForSenderSide;
 
-	// vertical gap between GridBag cells with content (must be divisible by 2)
-	private static final int VGAP_BETWEEN_CELLS = 12;
+	// vertical and horizontal gap between GridBag cells with content
+	// (must be divisible by 2)
+	private static final int GAP_BETWEEN_CELLS = 12;
 
 	// width of rectangle including border (must be divisible by 2 *
 	// RECTANGLE_RATIO)
@@ -60,8 +63,10 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	private static final int RECTANGLE_HEIGHT = RECTANGLE_WIDTH / RECTANGLE_RATIO;
 
 	// instance variables for nested messages visualisation:
-	// border width around nested messages
+	// border width of standard border around nested messages
 	private static final int MAIN_BORDER_WIDTH = 2;
+	// border width of active border around nested messages
+	private static final int ACTIVE_BORDER_WIDTH = 2;
 	// left gap around a nested message
 	private static final int INDENT_NESTED_MSGS = 20;
 	// upper, lower and right gap around a nested message
@@ -82,21 +87,21 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		LOCAL_PATH_PANEL = localPathPanel;
 
 		// set BorderLayout
-		BorderLayout borderLayout = new BorderLayout(10, 10);
+		BorderLayout borderLayout = new BorderLayout();
 		setLayout(borderLayout);
-		setBackground(Color.WHITE);
+		setBackground(BACKGROUND_COLOR);
 
 		// set GridBagLayout for CENTER_PANEL
 		CENTER_PANEL.setLayout(GB_LAYOUT_CENTER_PANEL);
-		CENTER_PANEL.setBackground(Color.WHITE);
+		CENTER_PANEL.setBackground(BACKGROUND_COLOR);
 		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 
 		// create buttons
 		FORTH_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg1"));
 		BACK_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg2"));
-		FORTH_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, RECTANGLE_HEIGHT / 2));
-		BACK_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, RECTANGLE_HEIGHT / 2));
+		FORTH_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT));
+		BACK_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT));
 		// decativate "zurück" button if the frame was received
 		if (!LOCAL_PATH_PANEL.isSent()) {
 			BACK_IN_TIME.setEnabled(false);
@@ -105,29 +110,34 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// set initial value for senderSideIsActive
 		senderSideIsActive = LOCAL_PATH_PANEL.isSent();
 
-		// configure left and right side (indication of layers and back and forth
-		// buttons)
-		addSidePanel(BACK_IN_TIME, BorderLayout.WEST); // left side
-		addSidePanel(FORTH_IN_TIME, BorderLayout.EAST); // right side
-
 		// if the packet was not forwarded (i.e. sent or received)
 		if (!LOCAL_PATH_PANEL.isForwarded()) {
+			// configure left and right side (indication of layers and back and forth
+			// buttons)
+			addSidePanel(BACK_IN_TIME, 0); // left side
+			addSidePanel(FORTH_IN_TIME, 7); // right side
 			if (LOCAL_PATH_PANEL.isSent()) {
 				minPointInTime = 4 - LOCAL_PATH_PANEL.getMaxLayerInsideFrame();
 				maxPointInTime = 4;
 				pointInTimeForSenderSide = -1; // should never be reached, since only sent
-				pointInTime = minPointInTime;
-				visualisationSentOrReceived();
+				LOCAL_PATH_PANEL.hideNextHigherLayer();
+				LOCAL_PATH_PANEL.hideNextHigherLayer();
+				LOCAL_PATH_PANEL.hideNextHigherLayer();
 			} else {
 				minPointInTime = 0;
-				maxPointInTime = LOCAL_PATH_PANEL.getMaxLayerInsideFrame();
+				maxPointInTime = Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(),
+						LOCAL_PATH_PANEL.getMaxLayerOfOperation());
 				pointInTimeForSenderSide = 5; // should never be reached, since only received
-				pointInTime = minPointInTime;
-				visualisationSentOrReceived();
 			}
+			pointInTime = minPointInTime;
+			visualisationSentOrReceived();
 		}
 		// if the packet was forwarded (only for routers)
 		else {
+			// configure left and right side (indication of layers and back and forth
+			// buttons)
+			addSidePanel(BACK_IN_TIME, 0); // left side
+			addSidePanel(FORTH_IN_TIME, X_OFFSET + 10); // right side
 			minPointInTime = 0;
 			maxPointInTime = 5;
 			if (LOCAL_PATH_PANEL.isSent()) {
@@ -185,28 +195,40 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			xCoord1 = X_OFFSET + 1;
 			xCoord2 = X_OFFSET + 2;
 			xCoord3 = X_OFFSET + 3;
+			// colored layer indicators
+			coloredLayerIndicators(1, SQUARE_SIDE_LENGTH, true);
+			coloredLayerIndicators(3, SQUARE_SIDE_LENGTH, false);
+			coloredLayerIndicators(4, SQUARE_SIDE_LENGTH, false);
+			coloredLayerIndicators(5, SQUARE_SIDE_LENGTH, false);
+			coloredLayerIndicators(6, SQUARE_SIDE_LENGTH, true);
 		} else {
 			xCoord0 = X_OFFSET + 3;
 			xCoord1 = X_OFFSET + 2;
 			xCoord2 = X_OFFSET + 1;
 			xCoord3 = X_OFFSET + 0;
+			// colored layer indicators
+			coloredLayerIndicators(X_OFFSET - 1, SQUARE_SIDE_LENGTH, true);
+			coloredLayerIndicators(X_OFFSET, SQUARE_SIDE_LENGTH, false);
+			coloredLayerIndicators(X_OFFSET + 1, SQUARE_SIDE_LENGTH, false);
+			coloredLayerIndicators(X_OFFSET + 2, SQUARE_SIDE_LENGTH, false);
+			coloredLayerIndicators(X_OFFSET + 4, SQUARE_SIDE_LENGTH, true);
 		}
 
 		// node name cell with empty cell above and below
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 0, 1, 1);
-		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), xCoord0, 1, 1, 1, true);
 		setSize(label, RECTANGLE_WIDTH, NODE_NAME_CELL_HEIGHT);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 2, 1, 1);
-		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
 		// node info cell with empty cell below
 		String nodeInfo = createNodeInfoByMac(LOCAL_PATH_PANEL.getInterfaceId());
 		editorPane = setEditorPane(CENTER_PANEL, nodeInfo, xCoord0, 3, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
 		label = setEmptyCell(CENTER_PANEL, xCoord0, 4, 1, 1);
-		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
 		// create visualisations of rectangular nested messages including the arrows in
 		// between
@@ -239,6 +261,16 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		JLabel label;
 		JEditorPane editorPane;
 
+		// colored layer indicators
+		coloredLayerIndicators(X_OFFSET - 1, SQUARE_SIDE_LENGTH, true);
+		coloredLayerIndicators(X_OFFSET, SQUARE_SIDE_LENGTH, false);
+		coloredLayerIndicators(X_OFFSET + 1, SQUARE_SIDE_LENGTH, false);
+		coloredLayerIndicators(X_OFFSET + 2, SQUARE_SIDE_LENGTH, false);
+		coloredLayerIndicators(X_OFFSET + 6, SQUARE_SIDE_LENGTH, false);
+		coloredLayerIndicators(X_OFFSET + 7, SQUARE_SIDE_LENGTH, false);
+		coloredLayerIndicators(X_OFFSET + 8, SQUARE_SIDE_LENGTH, false);
+		coloredLayerIndicators(X_OFFSET + 9, SQUARE_SIDE_LENGTH, true);
+
 		// create first wire on the left
 		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
 		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 0, 11, 1, 1);
@@ -263,12 +295,12 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		// with GridBag width of 3: node name cell with empty cell above and below
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 0, 3, 1);
-		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 		label = setLabel(CENTER_PANEL, LOCAL_PATH_PANEL.getKnoten().holeAnzeigeName(), X_OFFSET + 3, 1, 3, 1, true);
-		setSize(label, 2 * RECTANGLE_WIDTH + VGAP_BETWEEN_CELLS, NODE_NAME_CELL_HEIGHT);
+		setSize(label, 2 * RECTANGLE_WIDTH + GAP_BETWEEN_CELLS, NODE_NAME_CELL_HEIGHT);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 2, 3, 1);
-		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
 		// left and right node info cell with empty cell below
 		String nodeInfoLeft;
@@ -283,41 +315,75 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		editorPane = setEditorPane(CENTER_PANEL, nodeInfoLeft, X_OFFSET + 3, 3, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 3, 4, 1, 1);
-		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 		editorPane = setEditorPane(CENTER_PANEL, nodeInfoRight, X_OFFSET + 5, 3, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
 		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 5, 4, 1, 1);
-		setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
 		// visualisations of rectangular nested messages including the arrows
 		// in between
 		createRectangularNestedMessages(X_OFFSET + 3, false);
 		createRectangularNestedMessages(X_OFFSET + 5, true);
 
-		// set right arrow
-		label = new Arrow(null, true, VGAP_BETWEEN_CELLS, VGAP_BETWEEN_CELLS);
+		// set right arrow in the middle (on layer 2)
+		label = new Arrow(null, true, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
 		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 4, 9, 1, 1);
 
-		// set empty cells in the exact middle (x coordinate 4)
-		// first the ones with even y coordinates
-		for (int i = 4; i <= 10; i = i + 2) {
-			label = setEmptyCell(CENTER_PANEL, X_OFFSET + 4, i, 1, 1);
-			setSize(label, VGAP_BETWEEN_CELLS, VGAP_BETWEEN_CELLS);
-			label.setBackground(Color.BLUE);
-		}
-		// Now the rest. For y Coordinates 0, 1, 2 no empty cells are required because
-		// they are already occupied by the labels with width 3 (see above).
-		label = setEmptyCell(CENTER_PANEL, X_OFFSET + 4, 3, 1, 1);
-		setSize(label, VGAP_BETWEEN_CELLS, NODE_INFO_CELL_HEIGHT);
-		label.setBackground(Color.BLUE);
 		// The right arrow is located at y coordinate 9 (see above). Thus skip i = 9.
-		for (int i = 5; i <= 11 && i != 9; i = i + 2) {
-			label = setEmptyCell(CENTER_PANEL, X_OFFSET + 4, i, 1, 1);
-			setSize(label, VGAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-			label.setBackground(Color.BLUE);
-		}
+		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 5, 1, 1, false);
+		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
+		label.setBackground(LayerColorVar.APPLICATION.backgroundColorUltraFine);
+		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 7, 1, 1, false);
+		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
+		label.setBackground(LayerColorVar.TRANSPORT.backgroundColorUltraFine);
+		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 11, 1, 1, false);
+		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
+		label.setBackground(LayerColorVar.LINK.backgroundColorUltraFine);
 
 		add(CENTER_PANEL, BorderLayout.CENTER);
+	}
+
+	/**
+	 * This method colors the empty space between the (nested) messages and the
+	 * layer indicators on the right and left in the corresponding backround color
+	 * (the ultra fine alternative).
+	 * 
+	 * @param xCoord x coordinate inside the GridBag layout
+	 * @param width  width of the labels
+	 */
+	/**
+	 * This method colors the empty space between the (nested) messages and the
+	 * layer indicators on the right and left in the corresponding backround color
+	 * (the ultra fine alternative).
+	 * 
+	 * @param xCoord          x coordinate inside the GridBag layout
+	 * @param width           width of the labels
+	 * @param includingLayer1 indicates if layer 1 should be drawn (true) or not
+	 *                        (false)
+	 */
+	private void coloredLayerIndicators(int xCoord, int width, boolean includingLayer1) {
+		c = new GridBagConstraints();
+		JLabel label;
+
+		// layers 2 to 4
+		for (int i = 4; i >= 2; i--) {
+			label = setLabel(CENTER_PANEL, "", xCoord + 0, 5 + 2 * (4 - i), 1, 1, false);
+			setSize(label, width, RECTANGLE_HEIGHT);
+			if (i == 4) {
+				label.setBackground(LayerColorVar.APPLICATION.backgroundColorUltraFine);
+			} else if (i == 3) {
+				label.setBackground(LayerColorVar.TRANSPORT.backgroundColorUltraFine);
+			} else if (i == 2) {
+				label.setBackground(LayerColorVar.INTERNET.backgroundColorUltraFine);
+			}
+		}
+		// layer 1
+		if (includingLayer1) {
+			label = setLabel(CENTER_PANEL, "", xCoord + 0, 11, 1, 1, false);
+			setSize(label, width, RECTANGLE_HEIGHT);
+			label.setBackground(LayerColorVar.LINK.backgroundColorUltraFine);
+		}
 	}
 
 	/**
@@ -398,7 +464,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// create vertical arrows below every nested messages rectangle
 			int maxLayerOfOperation = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
 			if (i <= Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(), maxLayerOfOperation) && i >= 2) {
-				label = new Arrow(arrowPointsDown, null, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
+				label = new Arrow(arrowPointsDown, null, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 				setFinishedLabel(CENTER_PANEL, label, xCoord, 6 + 2 * (4 - i), 1, 1);
 			}
 		}
@@ -408,41 +474,33 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 * Right and left side of the visualisation, indicating the layers and showing
 	 * the buttons "vorwärts" and "zurück".
 	 * 
-	 * @param backOrForthButton    "back" or "forth" button
-	 * @param borderLayoutPosition position in the BorderLayout of the
+	 * @param backOrForthButton "back" or "forth" button
+	 * @param xCoord            x coordinate inside the GridBag layout
 	 */
-	private void addSidePanel(JButton backOrForthButton, String borderLayoutPosition) {
-		JPanel sidePanel = new JPanel(new GridBagLayout());
+	private void addSidePanel(JButton backOrForthButton, int xCoord) {
 		JLabel label;
 
-		// set empty gap on top such that sidePanel is aligned with center visualisation
-		label = setEmptyCell(sidePanel, 0, 0, 1, 1);
-		setSize(label, RECTANGLE_WIDTH,
-				2 * VGAP_BETWEEN_CELLS + NODE_NAME_CELL_HEIGHT + NODE_INFO_CELL_HEIGHT - (int) backOrForthButton.getPreferredSize().getHeight());
-
-		setStandards(backOrForthButton, 0, 1, 1, 1);
-		sidePanel.add(backOrForthButton, c);
-		sidePanel.setBackground(Color.WHITE);
+		setStandards(backOrForthButton, xCoord + 0, 3, 1, 1);
+		CENTER_PANEL.add(backOrForthButton, c);
 
 		String[] layers = { messages.getString("rp_lauscher_msg11"), messages.getString("rp_lauscher_msg10"),
 				messages.getString("rp_lauscher_msg9"), messages.getString("rp_lauscher_msg8") };
-		for (int i = 0; i < 4; i++) {
-			label = setEmptyCell(sidePanel, 0, 2 + i * 2, 1, 1);
-			setSize(label, RECTANGLE_WIDTH, VGAP_BETWEEN_CELLS);
-			label = setLabel(sidePanel, layers[i], 0, 3 + i * 2, 1, 1, false);
+		for (int i = 4; i >= 1; i--) {
+			label = setEmptyCell(CENTER_PANEL, xCoord + 0, 4 + 2 * (4 - i), 1, 1);
+			setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
+			label = setLabel(CENTER_PANEL, layers[4 - i], xCoord + 0, 5 + 2 * (4 - i), 1, 1, false);
 			setSize(label, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			if (i == 0) {
+			if (i == 4) {
 				label.setBackground(LayerColorVar.APPLICATION.backgroundColorFine);
-			} else if (i == 1) {
+			} else if (i == 3) {
 				label.setBackground(LayerColorVar.TRANSPORT.backgroundColorFine);
 			} else if (i == 2) {
 				label.setBackground(LayerColorVar.INTERNET.backgroundColorFine);
-			} else if (i == 3) {
+			} else if (i == 1) {
 				label.setBackground(LayerColorVar.LINK.backgroundColorFine);
 			}
 		}
-		add(sidePanel, borderLayoutPosition);
 	}
 
 	/**
@@ -736,7 +794,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					&& gridy == gridBagCoordsWithBorders.get(pointInTime)[1]) {
 				// make current active border red
 				try {
-					((NestedMessagesVisualisation) component).createBorder(true);
+					((NestedMessagesVisualisation) component).createAndSetBorder(true);
 				} catch (Exception e) {
 					System.out.println("component is not an instance of NestedMessagesVisualisation");
 				}
@@ -744,7 +802,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					&& gridy == gridBagCoordsWithBorders.get(lastPointInTime)[1]) {
 				// make previous active border black
 				try {
-					((NestedMessagesVisualisation) component).createBorder(false);
+					((NestedMessagesVisualisation) component).createAndSetBorder(false);
 				} catch (Exception e) {
 					System.out.println("component is not an instance of NestedMessagesVisualisation");
 				}
@@ -771,12 +829,11 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			this.heightWithBorder = widthWithBorder / ratio;
 			this.widthInsideBorder = widthWithBorder - 2 * MAIN_BORDER_WIDTH;
 			this.heightInsideBorder = heightWithBorder - 2 * MAIN_BORDER_WIDTH;
-			setBackground(Color.WHITE);
 
 			// create border only if layer message is actually painted
 			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame()
 					&& layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
-				createBorder(activeBorder);
+				createAndSetBorder(activeBorder);
 			}
 		}
 
@@ -794,6 +851,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// origin with respect to border width
 			int xPos = MAIN_BORDER_WIDTH;
 			int yPos = MAIN_BORDER_WIDTH;
+			;
 			int width = this.widthInsideBorder;
 			int height = this.heightInsideBorder;
 
@@ -803,7 +861,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			rect.setY(yPos);
 
 			// Only draw nested messages if a message of the layer is in the frame.
-			// Otherwise the rectangle stays white (not visible).
+			// Otherwise the rectangle stays insivisble.
 			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame()
 					&& layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
 				setColorAccordingToLayer(layerNumber, rect);
@@ -829,7 +887,23 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 						rect.paintFilledRectangle(g, width, height);
 					}
 				}
+			} else {
+				setOpaque(true);
+				setBackgroundColorUltraFineAccordingToLayer(layerNumber);
 			}
+		}
+
+		private void createAndSetBorder(boolean activeBorder) {
+			// draw the (main or active) border around the message
+			Border matteBorder;
+			if (activeBorder) {
+				matteBorder = BorderFactory.createMatteBorder(ACTIVE_BORDER_WIDTH, ACTIVE_BORDER_WIDTH,
+						ACTIVE_BORDER_WIDTH, ACTIVE_BORDER_WIDTH, Color.RED);
+			} else {
+				matteBorder = BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
+						MAIN_BORDER_WIDTH, Color.BLACK);
+			}
+			setBorder(matteBorder);
 		}
 
 		private void setColorAccordingToLayer(int layerNumber, FilledRectangle rect) {
@@ -844,19 +918,30 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			}
 		}
 
-		private void createBorder(boolean activeBorder) {
-			if (activeBorder) {
-				// draw the active (red) border around the message
-				setBorder(getMatteBorder(Color.RED));
-			} else {
-				// draw the inactive (black) border around the message
-				setBorder(getMatteBorder(Color.BLACK));
+		private void setBackgroundColorUltraFineAccordingToLayer(int layerNumber) {
+			if (layerNumber == 1) {
+				setBackground(AggregatedMessageTable.LayerColorVar.LINK.backgroundColorUltraFine);
+			} else if (layerNumber == 2) {
+				setBackground(AggregatedMessageTable.LayerColorVar.INTERNET.backgroundColorUltraFine);
+			} else if (layerNumber == 3) {
+				setBackground(AggregatedMessageTable.LayerColorVar.TRANSPORT.backgroundColorUltraFine);
+			} else if (layerNumber == 4) {
+				setBackground(AggregatedMessageTable.LayerColorVar.APPLICATION.backgroundColorUltraFine);
 			}
 		}
 
-		private Border getMatteBorder(Color color) {
-			return BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
-					MAIN_BORDER_WIDTH, color);
+		private Color getBorderColorAccordingToLayer(int layerNumber) {
+			if (layerNumber == 1) {
+				return AggregatedMessageTable.LayerColorVar.LINK.borderColor;
+			} else if (layerNumber == 2) {
+				return AggregatedMessageTable.LayerColorVar.INTERNET.borderColor;
+			} else if (layerNumber == 3) {
+				return AggregatedMessageTable.LayerColorVar.TRANSPORT.borderColor;
+			} else if (layerNumber == 4) {
+				return AggregatedMessageTable.LayerColorVar.APPLICATION.borderColor;
+			} else {
+				return Color.BLACK;
+			}
 		}
 	}
 
@@ -903,7 +988,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			this.pointsRight = pointsRight;
 			this.rectangleWidth = rectangleWidth;
 			this.rectangleHeight = rectangleHeight;
-			setBackground(Color.WHITE);
 		}
 
 		@Override
@@ -950,6 +1034,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				int y3 = -1;
 				g.fillPolygon(new int[] { x1, x2, x3 }, new int[] { y1, y2, y3 }, 3);
 			} else if (pointsRight != null && pointsRight) {
+				// right arrows are needed on the internet layer
+				setOpaque(true);
+				setBackground(AggregatedMessageTable.LayerColorVar.INTERNET.backgroundColorUltraFine);
 				// right arrow
 				g.fillRect(0, yMiddle - arrowRectangleWidth / 2, overallLength - headHeight, arrowRectangleWidth);
 				// head
@@ -987,6 +1074,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		@Override
 		public void paintComponent(Graphics g) {
+			setOpaque(true);
+			setBackground(AggregatedMessageTable.LayerColorVar.LINK.backgroundColorUltraFine);
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);

@@ -520,7 +520,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/*
-	 * Local view of the path through the layers
+	 * Local view of the path through layers
 	 */
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
@@ -529,7 +529,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * Global view of the path through the layersF
+	 * Global view of the path through layers
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 

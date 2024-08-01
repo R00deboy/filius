@@ -483,9 +483,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 			Color foregroundColor = null;
 			Color backgroundColor = null;
 			Color backgroundColorFine = null;
-			foregroundColor = getCustomColor("foregroundColor", layerNumber);
-			backgroundColor = getCustomColor("backgroundColor", layerNumber);
-			backgroundColorFine = getCustomColor("backgroundColorFine", layerNumber);
+			foregroundColor = getLayerColorVar("foregroundColor", layerNumber);
+			backgroundColor = getLayerColorVar("backgroundColor", layerNumber);
+			backgroundColorFine = getLayerColorVar("backgroundColorFine", layerNumber);
 
 			// show columns
 			for (Component component : table.getComponents()) {
@@ -538,16 +538,28 @@ public class LocalPathPanel extends JPanel implements I18n {
 		}
 	}
 
+	/**
+	 * This method returns the color defined in the enum class LayerColorVar in
+	 * class AggregatedMessageTable corresponding to the type of color and the layer
+	 * which belongs to the column of the MessageDetailsTable.
+	 * 
+	 * @param typeOfColor All types of colors defined in the enum class in class
+	 *                    AggregatedMessageTable: "foregroundColor",
+	 *                    "backgroundColor", "backgroundColorFine",
+	 *                    "backgroundColorUltraFine", "borderColor"
+	 * @param column      column of the MessageDetailsTable
+	 * @return the desired color
+	 */
 	private Color getColorByColumn(String typeOfColor, int column) {
 		Color color = null;
 		if (column == 0 || column == 1) {
-			color = getCustomColor(typeOfColor, 1);
+			color = getLayerColorVar(typeOfColor, 1);
 		} else if (column == 2 || column == 3) {
-			color = getCustomColor(typeOfColor, 2);
+			color = getLayerColorVar(typeOfColor, 2);
 		} else if (column == 4 || column == 5) {
-			color = getCustomColor(typeOfColor, 3);
+			color = getLayerColorVar(typeOfColor, 3);
 		} else if (column == 6) {
-			color = getCustomColor(typeOfColor, 4);
+			color = getLayerColorVar(typeOfColor, 4);
 		}
 		return color;
 	}
@@ -565,7 +577,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 *                    TRANSPORT, 4 = APPLICATION)
 	 * @return the desired color
 	 */
-	public Color getCustomColor(String typeOfColor, int layerNumber) {
+	public Color getLayerColorVar(String typeOfColor, int layerNumber) {
 		return AggregatedMessageTable.LayerColorVar.getLayerColorVar(typeOfColor, layerNumber);
 	}
 
@@ -596,7 +608,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			}
 			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 2, 1, false);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(getCustomColor("backgroundColorFine", 4));
+			label.setBackground(getLayerColorVar("backgroundColorFine", 4));
 			setBoldAndItalic(label);
 			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 0.5, 1, false);
 			label.setHorizontalAlignment(JLabel.CENTER);
@@ -620,7 +632,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			}
 			label = setLabel(messageDetails[2][6], 6, 2, 1, 1, 2, 1, true);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(getCustomColor("backgroundColor", 4));
+			label.setBackground(getLayerColorVar("backgroundColor", 4));
 			label = setLabel(messageDetails[2][7], 7, 2, 1, 1, 0.5, 1, false);
 			label.setHorizontalAlignment(JLabel.CENTER);
 			label.setVerticalAlignment(JLabel.CENTER);

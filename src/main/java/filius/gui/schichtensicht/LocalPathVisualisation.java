@@ -330,13 +330,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// The right arrow is located at y coordinate 9 (see above). Thus skip i = 9.
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 5, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 4));
+		label.setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 4));
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 7, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 3));
+		label.setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 3));
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 11, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 1));
+		label.setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 1));
 
 		add(CENTER_PANEL, BorderLayout.CENTER);
 	}
@@ -359,13 +359,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		for (int layerNumber = 4; layerNumber >= 2; layerNumber--) {
 			label = setLabel(CENTER_PANEL, "", xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, width, RECTANGLE_HEIGHT);
-			label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", layerNumber));
+			label.setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", layerNumber));
 		}
 		// layer 1
 		if (includingLayer1) {
 			label = setLabel(CENTER_PANEL, "", xCoord + 0, 11, 1, 1, false);
 			setSize(label, width, RECTANGLE_HEIGHT);
-			label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 1));
+			label.setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 1));
 		}
 	}
 
@@ -473,7 +473,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			label = setLabel(CENTER_PANEL, layers[4 - layerNumber], xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColor", layerNumber));
+			label.setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColor", layerNumber));
 			label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		}
 	}
@@ -839,7 +839,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// Otherwise the rectangle stays insivisble.
 			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame()
 					&& layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
-				rect.setFillColor(LOCAL_PATH_PANEL.getCustomColor("backgroundColor", layerNumber));
+				rect.setFillColor(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColor", layerNumber));
 				rect.paintFilledRectangle(g, width, height);
 				if (layerNumber < LOCAL_PATH_PANEL.getMaxLayerInsideFrame()) {
 					// set other layer rectangles
@@ -857,14 +857,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 						}
 						rect.setX(xPos);
 						rect.setY(yPos);
-						rect.setFillColor(LOCAL_PATH_PANEL.getCustomColor("backgroundColor", i));
+						rect.setFillColor(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColor", i));
 
 						rect.paintFilledRectangle(g, width, height);
 					}
 				}
 			} else {
 				setOpaque(true);
-				setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", layerNumber));
+				setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", layerNumber));
 			}
 		}
 
@@ -976,7 +976,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			} else if (pointsRight != null && pointsRight) {
 				// right arrows are needed on the internet layer
 				setOpaque(true);
-				setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 2));
+				setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 2));
 				// right arrow
 				g.fillRect(0, yMiddle - arrowRectangleWidth / 2, overallLength - headHeight, arrowRectangleWidth);
 				// head
@@ -1015,14 +1015,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		@Override
 		public void paintComponent(Graphics g) {
 			setOpaque(true);
-			setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 1));
+			setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 1));
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
 			g.setColor(Color.BLACK);
 
 			// wire (ground)
-			g.setColor(LOCAL_PATH_PANEL.getCustomColor("backgroundColor", 1));
+			g.setColor(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColor", 1));
 			g.fillRect(0, this.rectangleHeight - 3 * MAIN_BORDER_WIDTH, this.rectangleWidth, 3 * MAIN_BORDER_WIDTH);
 		}
 	}

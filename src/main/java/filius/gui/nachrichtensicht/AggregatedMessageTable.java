@@ -445,7 +445,9 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		return lineData;
 	}
 
-	// original Filius colors for the different layers
+	/**
+	 * original Filius colors for the different layers
+	 */
 	public enum LayerColorOrig {
 		DEFAULT(Color.WHITE, Color.GRAY), LINK(Color.BLACK, new Color(0.9f, 0.9f, 0.9f)),
 		INTERNET(Color.BLACK, new Color(0.3f, 1f, 0.3f)), TRANSPORT(Color.BLACK, Color.CYAN),
@@ -460,7 +462,11 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		}
 	}
 
-	// color variants for the different layers
+	/**
+	 * color variants for the different layers
+	 * 
+	 * @author Christoph Irniger
+	 */
 	public enum LayerColorVar {
 		DEFAULT(Color.BLACK, Color.WHITE, Color.WHITE, Color.WHITE, Color.BLACK),
 		// old Fine colors: #EDEDED, #DAE3F3, #FBE5D6, #FFF2CC
@@ -486,6 +492,32 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 			this.backgroundColorFine = backgroundColorFine;
 			this.backgroundColorUltraFine = backgroundColorUltraFine;
 			this.borderColor = borderColor;
+		}
+
+		public static Color getLayerColorVar(String typeOfColor, int layerNumber) {
+			String layerName = null;
+			if (layerNumber == 1) {
+				layerName = "LINK";
+			} else if (layerNumber == 2) {
+				layerName = "INTERNET";
+			} else if (layerNumber == 3) {
+				layerName = "TRANSPORT";
+			} else if (layerNumber == 4) {
+				layerName = "APPLICATION";
+			}
+			Color color = null;
+			if (typeOfColor == "foregroundColor") {
+				color = valueOf(layerName).foregroundColor;
+			} else if (typeOfColor == "backgroundColor") {
+				color =  valueOf(layerName).backgroundColor;
+			} else if (typeOfColor == "backgroundColorFine") {
+				color =  valueOf(layerName).backgroundColorFine;
+			} else if (typeOfColor == "backgroundColorUltraFine") {
+				color =  valueOf(layerName).backgroundColorUltraFine;
+			} else if (typeOfColor == "borderColor") {
+				color =  valueOf(layerName).borderColor;
+			}
+			return color;
 		}
 	}
 
@@ -519,8 +551,10 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		return lines;
 	}
 
-	/*
+	/**
 	 * Local view of the path through layers
+	 * 
+	 * @author Christoph Irniger
 	 */
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
@@ -530,6 +564,8 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
 	/**
 	 * Global view of the path through layers
+	 * 
+	 * @author Christoph Irniger
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 
@@ -538,6 +574,8 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	/**
 	 * Verification that message has arrived at destination IP address (for global
 	 * view)
+	 * 
+	 * @author Christoph Irniger
 	 */
 	private Boolean hasMessageArrived(int messageNumber) {
 		return false;

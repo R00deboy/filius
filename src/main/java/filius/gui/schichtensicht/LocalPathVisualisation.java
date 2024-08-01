@@ -24,7 +24,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
 import filius.gui.nachrichtensicht.AggregatedMessageTable;
-import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
@@ -333,25 +332,17 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// The right arrow is located at y coordinate 9 (see above). Thus skip i = 9.
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 5, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LayerColorVar.APPLICATION.backgroundColorUltraFine);
+		label.setBackground(getCustomColor("backgroundColorUltraFine", 4));
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 7, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LayerColorVar.TRANSPORT.backgroundColorUltraFine);
+		label.setBackground(getCustomColor("backgroundColorUltraFine", 3));
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 11, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LayerColorVar.LINK.backgroundColorUltraFine);
+		label.setBackground(getCustomColor("backgroundColorUltraFine", 1));
 
 		add(CENTER_PANEL, BorderLayout.CENTER);
 	}
 
-	/**
-	 * This method colors the empty space between the (nested) messages and the
-	 * layer indicators on the right and left in the corresponding backround color
-	 * (the ultra fine alternative).
-	 * 
-	 * @param xCoord x coordinate inside the GridBag layout
-	 * @param width  width of the labels
-	 */
 	/**
 	 * This method colors the empty space between the (nested) messages and the
 	 * layer indicators on the right and left in the corresponding backround color
@@ -367,22 +358,16 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		JLabel label;
 
 		// layers 2 to 4
-		for (int i = 4; i >= 2; i--) {
-			label = setLabel(CENTER_PANEL, "", xCoord + 0, 5 + 2 * (4 - i), 1, 1, false);
+		for (int layerNumber = 4; layerNumber >= 2; layerNumber--) {
+			label = setLabel(CENTER_PANEL, "", xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, width, RECTANGLE_HEIGHT);
-			if (i == 4) {
-				label.setBackground(LayerColorVar.APPLICATION.backgroundColorUltraFine);
-			} else if (i == 3) {
-				label.setBackground(LayerColorVar.TRANSPORT.backgroundColorUltraFine);
-			} else if (i == 2) {
-				label.setBackground(LayerColorVar.INTERNET.backgroundColorUltraFine);
-			}
+			label.setBackground(getCustomColor("backgroundColorUltraFine", layerNumber));
 		}
 		// layer 1
 		if (includingLayer1) {
 			label = setLabel(CENTER_PANEL, "", xCoord + 0, 11, 1, 1, false);
 			setSize(label, width, RECTANGLE_HEIGHT);
-			label.setBackground(LayerColorVar.LINK.backgroundColorUltraFine);
+			label.setBackground(getCustomColor("backgroundColorUltraFine", 1));
 		}
 	}
 
@@ -428,14 +413,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		int layerOfActiveBorder = Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(),
 				LOCAL_PATH_PANEL.getMaxLayerOfOperation());
 
-		// starting with layer i = 4 (application), ending with layer i = 1 (link)
-		for (int i = 4; i >= 1; i--) {
+		for (int layerNumber = 4; layerNumber >= 1; layerNumber--) {
 			// visualisation if the packet was sent or received
 			if (!LOCAL_PATH_PANEL.isForwarded()) {
 				if (LOCAL_PATH_PANEL.isSent()) {
 					// if the packet was sent, the first message (depending on which layers are
 					// involved) gets an active (red) border
-					activeBorder = (i == layerOfActiveBorder) ? true : false;
+					activeBorder = (layerNumber == layerOfActiveBorder) ? true : false;
 					arrowPointsDown = true;
 				} else {
 					// active (red) border will not be here (but around the square message for the
@@ -450,7 +434,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				if (isSenderSideWhenForwarded) {
 					// if the packet was sent, create an active (red) border for the first message
 					// (depending on which layers are involved)
-					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((i == layerOfActiveBorder) ? true : false) : false;
+					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((layerNumber == layerOfActiveBorder) ? true : false) : false;
 					arrowPointsDown = true;
 				}
 				// "receiver" side
@@ -459,13 +443,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 					arrowPointsDown = false;
 				}
 			}
-			label = new NestedMessagesVisualisation(i, RECTANGLE_WIDTH, RECTANGLE_RATIO, activeBorder);
-			setFinishedLabel(CENTER_PANEL, label, xCoord, 5 + 2 * (4 - i), 1, 1);
+			label = new NestedMessagesVisualisation(layerNumber, RECTANGLE_WIDTH, RECTANGLE_RATIO, activeBorder);
+			setFinishedLabel(CENTER_PANEL, label, xCoord, 5 + 2 * (4 - layerNumber), 1, 1);
 			// create vertical arrows below every nested messages rectangle
 			int maxLayerOfOperation = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
-			if (i <= Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(), maxLayerOfOperation) && i >= 2) {
+			if (layerNumber <= Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(), maxLayerOfOperation) && layerNumber >= 2) {
 				label = new Arrow(arrowPointsDown, null, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
-				setFinishedLabel(CENTER_PANEL, label, xCoord, 6 + 2 * (4 - i), 1, 1);
+				setFinishedLabel(CENTER_PANEL, label, xCoord, 6 + 2 * (4 - layerNumber), 1, 1);
 			}
 		}
 	}
@@ -485,21 +469,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		String[] layers = { messages.getString("rp_lauscher_msg11"), messages.getString("rp_lauscher_msg10"),
 				messages.getString("rp_lauscher_msg9"), messages.getString("rp_lauscher_msg8") };
-		for (int i = 4; i >= 1; i--) {
-			label = setEmptyCell(CENTER_PANEL, xCoord + 0, 4 + 2 * (4 - i), 1, 1);
+		for (int layerNumber = 4; layerNumber >= 1; layerNumber--) {
+			label = setEmptyCell(CENTER_PANEL, xCoord + 0, 4 + 2 * (4 - layerNumber), 1, 1);
 			setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
-			label = setLabel(CENTER_PANEL, layers[4 - i], xCoord + 0, 5 + 2 * (4 - i), 1, 1, false);
+			label = setLabel(CENTER_PANEL, layers[4 - layerNumber], xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			if (i == 4) {
-				label.setBackground(LayerColorVar.APPLICATION.backgroundColorFine);
-			} else if (i == 3) {
-				label.setBackground(LayerColorVar.TRANSPORT.backgroundColorFine);
-			} else if (i == 2) {
-				label.setBackground(LayerColorVar.INTERNET.backgroundColorFine);
-			} else if (i == 1) {
-				label.setBackground(LayerColorVar.LINK.backgroundColorFine);
-			}
+			label.setBackground(getCustomColor("backgroundColor", layerNumber));
 		}
 	}
 
@@ -811,6 +787,23 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
+	 * This method returns the color defined in the enum class LayerColorVar in
+	 * class AggregatedMessageTable corresponding to the type of color and the layer
+	 * number.
+	 * 
+	 * @param typeOfColor All types of colors defined in the enum class in class
+	 *                    AggregatedMessageTable: "foregroundColor",
+	 *                    "backgroundColor", "backgroundColorFine",
+	 *                    "backgroundColorUltraFine", "borderColor"
+	 * @param layerNumber number of the layer (1 = LINK, 2 = INTERNET, 3 =
+	 *                    TRANSPORT, 4 = APPLICATION)
+	 * @return the desired color
+	 */
+	private Color getCustomColor(String typeOfColor, int layerNumber) {
+		return AggregatedMessageTable.LayerColorVar.getLayerColorVar(typeOfColor, layerNumber);
+	}
+
+	/**
 	 * Class for a rectangular visualisation of nested messages.
 	 */
 	private class NestedMessagesVisualisation extends JLabel {
@@ -864,7 +857,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// Otherwise the rectangle stays insivisble.
 			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame()
 					&& layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
-				setColorAccordingToLayer(layerNumber, rect);
+				rect.setFillColor(getCustomColor("backgroundColor", layerNumber));
 				rect.paintFilledRectangle(g, width, height);
 				if (layerNumber < LOCAL_PATH_PANEL.getMaxLayerInsideFrame()) {
 					// set other layer rectangles
@@ -882,14 +875,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 						}
 						rect.setX(xPos);
 						rect.setY(yPos);
-						setColorAccordingToLayer(i, rect);
+						rect.setFillColor(getCustomColor("backgroundColor", i));
 
 						rect.paintFilledRectangle(g, width, height);
 					}
 				}
 			} else {
 				setOpaque(true);
-				setBackgroundColorUltraFineAccordingToLayer(layerNumber);
+				setBackground(getCustomColor("backgroundColorUltraFine", layerNumber));
 			}
 		}
 
@@ -904,44 +897,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 						MAIN_BORDER_WIDTH, Color.BLACK);
 			}
 			setBorder(matteBorder);
-		}
-
-		private void setColorAccordingToLayer(int layerNumber, FilledRectangle rect) {
-			if (layerNumber == 1) {
-				rect.setFillColor(AggregatedMessageTable.LayerColorVar.LINK.backgroundColor);
-			} else if (layerNumber == 2) {
-				rect.setFillColor(AggregatedMessageTable.LayerColorVar.INTERNET.backgroundColor);
-			} else if (layerNumber == 3) {
-				rect.setFillColor(AggregatedMessageTable.LayerColorVar.TRANSPORT.backgroundColor);
-			} else if (layerNumber == 4) {
-				rect.setFillColor(AggregatedMessageTable.LayerColorVar.APPLICATION.backgroundColor);
-			}
-		}
-
-		private void setBackgroundColorUltraFineAccordingToLayer(int layerNumber) {
-			if (layerNumber == 1) {
-				setBackground(AggregatedMessageTable.LayerColorVar.LINK.backgroundColorUltraFine);
-			} else if (layerNumber == 2) {
-				setBackground(AggregatedMessageTable.LayerColorVar.INTERNET.backgroundColorUltraFine);
-			} else if (layerNumber == 3) {
-				setBackground(AggregatedMessageTable.LayerColorVar.TRANSPORT.backgroundColorUltraFine);
-			} else if (layerNumber == 4) {
-				setBackground(AggregatedMessageTable.LayerColorVar.APPLICATION.backgroundColorUltraFine);
-			}
-		}
-
-		private Color getBorderColorAccordingToLayer(int layerNumber) {
-			if (layerNumber == 1) {
-				return AggregatedMessageTable.LayerColorVar.LINK.borderColor;
-			} else if (layerNumber == 2) {
-				return AggregatedMessageTable.LayerColorVar.INTERNET.borderColor;
-			} else if (layerNumber == 3) {
-				return AggregatedMessageTable.LayerColorVar.TRANSPORT.borderColor;
-			} else if (layerNumber == 4) {
-				return AggregatedMessageTable.LayerColorVar.APPLICATION.borderColor;
-			} else {
-				return Color.BLACK;
-			}
 		}
 	}
 
@@ -1036,7 +991,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			} else if (pointsRight != null && pointsRight) {
 				// right arrows are needed on the internet layer
 				setOpaque(true);
-				setBackground(AggregatedMessageTable.LayerColorVar.INTERNET.backgroundColorUltraFine);
+				setBackground(getCustomColor("backgroundColorUltraFine", 2));
 				// right arrow
 				g.fillRect(0, yMiddle - arrowRectangleWidth / 2, overallLength - headHeight, arrowRectangleWidth);
 				// head
@@ -1075,14 +1030,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		@Override
 		public void paintComponent(Graphics g) {
 			setOpaque(true);
-			setBackground(AggregatedMessageTable.LayerColorVar.LINK.backgroundColorUltraFine);
+			setBackground(getCustomColor("backgroundColorUltraFine", 1));
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
 			g.setColor(Color.BLACK);
 
-			// wire
-			g.setColor(AggregatedMessageTable.LayerColorVar.LINK.backgroundColor);
+			// wire (ground)
+			g.setColor(getCustomColor("backgroundColor", 1));
 			g.fillRect(0, this.rectangleHeight - 3 * MAIN_BORDER_WIDTH, this.rectangleWidth, 3 * MAIN_BORDER_WIDTH);
 		}
 	}

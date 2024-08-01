@@ -22,6 +22,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import filius.gui.nachrichtensicht.AggregatedMessageTable;
 import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.InternetKnoten;
@@ -67,10 +68,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 	// maximum layer on which the node operates
 	// (1 = link, 2 = internet, 3 = transport, 4 = application)
 	private final int MAX_LAYER_OF_OPERATION;
-	
+
 	// current number of hidden layers
 	// 1 = Link, 2 = Link & Internet, 3 = Link & Internet & Transport
 	private int hiddenLayers;
+
+	private static final Color BACKGROUND_COLOR = Color.WHITE;
 
 	private static final int MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int MSG_DETAILS_CELL_HEIGHT = 30;
@@ -96,12 +99,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 		 * the visible element.
 		 */
 		MAX_LAYER_INSIDE_FRAME = fill();
-		
+
 		// determine if the packet (inside the frame) was forwarded
 		CORR_FRAME_DATA = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
 				(InternetKnoten) this.node);
 		CORR_INTERFACE_ID = (String) CORR_FRAME_DATA[0];
-		Integer corrFrameNumber   = (Integer) CORR_FRAME_DATA[1];
+		Integer corrFrameNumber = (Integer) CORR_FRAME_DATA[1];
 		forwarded = isFrameForwarded(CORR_INTERFACE_ID, corrFrameNumber);
 		fillOtherIfForwarded(CORR_INTERFACE_ID, corrFrameNumber);
 
@@ -137,7 +140,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		localPathDialog.setPreferredSize(dialogDimension);
 		localPathDialog.setMinimumSize(dialogDimension);
 	}
-	
+
 	public Knoten getKnoten() {
 		return node;
 	}
@@ -145,13 +148,21 @@ public class LocalPathPanel extends JPanel implements I18n {
 	public int getMaxLayerInsideFrame() {
 		return MAX_LAYER_INSIDE_FRAME;
 	}
-	
+
 	public int getMaxLayerOfOperation() {
 		return MAX_LAYER_OF_OPERATION;
 	}
-	
+
 	public String getCorrInterfaceId() {
 		return CORR_INTERFACE_ID;
+	}
+
+	public String getInterfaceId() {
+		return interfaceId;
+	}
+
+	public Color getBackgroundColor() {
+		return BACKGROUND_COLOR;
 	}
 
 	public boolean isSent() {
@@ -169,10 +180,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 */
 	private boolean isFrameSent() {
 		return interfaceId.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
-	}
-
-	public String getInterfaceId() {
-		return interfaceId;
 	}
 
 	/**
@@ -317,9 +324,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * @param corrFrameNumber corresponding frame number
 	 */
 	private boolean isFrameForwarded(String corrInterfaceId, Integer corrFrameNumber) {
-		return ((node instanceof Vermittlungsrechner
-				|| node instanceof Gateway) &&
-				(corrInterfaceId != null && corrFrameNumber != null));
+		return ((node instanceof Vermittlungsrechner || node instanceof Gateway)
+				&& (corrInterfaceId != null && corrFrameNumber != null));
 	}
 
 	/**
@@ -356,8 +362,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 					hideLayerData(i, tableSent);
 				}
 				hiddenLayers = MAX_LAYER_INSIDE_FRAME - 1;
-			} else if (node instanceof Vermittlungsrechner
-					|| node instanceof Gateway) {
+			} else if (node instanceof Vermittlungsrechner || node instanceof Gateway) {
 				hideLayerData(1, tableSent);
 				hiddenLayers = 1;
 			}
@@ -478,19 +483,9 @@ public class LocalPathPanel extends JPanel implements I18n {
 			Color foregroundColor = null;
 			Color backgroundColor = null;
 			Color backgroundColorFine = null;
-			if (layerNumber == 1) {
-				foregroundColor = LayerColorVar.LINK.foregroundColor;
-				backgroundColor = LayerColorVar.LINK.backgroundColor;
-				backgroundColorFine = LayerColorVar.LINK.backgroundColorFine;
-			} else if (layerNumber == 2) {
-				foregroundColor = LayerColorVar.INTERNET.foregroundColor;
-				backgroundColor = LayerColorVar.INTERNET.backgroundColor;
-				backgroundColorFine = LayerColorVar.INTERNET.backgroundColorFine;
-			} else if (layerNumber == 3) {
-				foregroundColor = LayerColorVar.TRANSPORT.foregroundColor;
-				backgroundColor = LayerColorVar.TRANSPORT.backgroundColor;
-				backgroundColorFine = LayerColorVar.TRANSPORT.backgroundColorFine;
-			}
+			foregroundColor = getCustomColor("foregroundColor", layerNumber);
+			backgroundColor = getCustomColor("backgroundColor", layerNumber);
+			backgroundColorFine = getCustomColor("backgroundColorFine", layerNumber);
 
 			// show columns
 			for (Component component : table.getComponents()) {
@@ -543,6 +538,37 @@ public class LocalPathPanel extends JPanel implements I18n {
 		}
 	}
 
+	private Color getColorByColumn(String typeOfColor, int column) {
+		Color color = null;
+		if (column == 0 || column == 1) {
+			color = getCustomColor(typeOfColor, 1);
+		} else if (column == 2 || column == 3) {
+			color = getCustomColor(typeOfColor, 2);
+		} else if (column == 4 || column == 5) {
+			color = getCustomColor(typeOfColor, 3);
+		} else if (column == 6) {
+			color = getCustomColor(typeOfColor, 4);
+		}
+		return color;
+	}
+
+	/**
+	 * This method returns the color defined in the enum class LayerColorVar in
+	 * class AggregatedMessageTable corresponding to the type of color and the layer
+	 * number.
+	 * 
+	 * @param typeOfColor All types of colors defined in the enum class in class
+	 *                    AggregatedMessageTable: "foregroundColor",
+	 *                    "backgroundColor", "backgroundColorFine",
+	 *                    "backgroundColorUltraFine", "borderColor"
+	 * @param layerNumber number of the layer (1 = LINK, 2 = INTERNET, 3 =
+	 *                    TRANSPORT, 4 = APPLICATION)
+	 * @return the desired color
+	 */
+	public Color getCustomColor(String typeOfColor, int layerNumber) {
+		return AggregatedMessageTable.LayerColorVar.getLayerColorVar(typeOfColor, layerNumber);
+	}
+
 	/*
 	 * Class for the table at the bottom of the SplitPane for the message details.
 	 */
@@ -561,97 +587,67 @@ public class LocalPathPanel extends JPanel implements I18n {
 			JLabel label;
 			JTextArea textArea;
 
-			// first line (from left to right)
-			for (int j = 0; j < 6; j = j + 2) {
-				label = setLabel(messageDetails[0][j], j, 0, 2, 1, 1, 1, false);
+			// first row (from left to right)
+			for (int column = 0; column < 6; column = column + 2) {
+				label = setLabel(messageDetails[0][column], column, 0, 2, 1, 1, 1, false);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
 				setBoldAndItalic(label);
-				if (j == 0 || j == 1) {
-					label.setBackground(LayerColorVar.LINK.backgroundColorFine);
-				} else if (j == 2 || j == 3) {
-					label.setBackground(LayerColorVar.INTERNET.backgroundColorFine);
-				} else if (j == 4 || j == 5) {
-					label.setBackground(LayerColorVar.TRANSPORT.backgroundColorFine);
-				}
+				label.setBackground((getColorByColumn("backgroundColorFine", column)));
 			}
 			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 2, 1, false);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(LayerColorVar.APPLICATION.backgroundColorFine);
+			label.setBackground(getCustomColor("backgroundColorFine", 4));
 			setBoldAndItalic(label);
 			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 0.5, 1, false);
 			label.setHorizontalAlignment(JLabel.CENTER);
 			label.setVerticalAlignment(JLabel.CENTER);
 			;
-			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
+			label.setBackground(BACKGROUND_COLOR);
 			setBoldAndItalic(label);
 
-			// second empty line, which is transparent (from left to right)
-			for (int j = 0; j < 6; j = j + 2) {
-				label = setEmptyCell(j, 1, 2, 1, 1, 0.8);
+			// second empty row, which is transparent (from left to right)
+			for (int column = 0; column < 6; column = column + 2) {
+				label = setEmptyCell(column, 1, 2, 1, 1, 0.8);
 			}
 			label = setEmptyCell(6, 1, 1, 1, 2, 0.8);
 			label = setEmptyCell(7, 1, 1, 1, 0.5, 0.8);
 
-			// third line (from left to right)
-			for (int j = 0; j < 6; j = j + 2) {
-				label = setLabel(messageDetails[2][j], j, 2, 2, 1, 1, 1, true);
+			// third row (from left to right)
+			for (int column = 0; column < 6; column = column + 2) {
+				label = setLabel(messageDetails[2][column], column, 2, 2, 1, 1, 1, true);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
-				if (j == 0 || j == 1) {
-					label.setBackground(LayerColorVar.LINK.backgroundColor);
-				} else if (j == 2 || j == 3) {
-					label.setBackground(LayerColorVar.INTERNET.backgroundColor);
-				} else if (j == 4 || j == 5) {
-					label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
-				}
+				label.setBackground((getColorByColumn("backgroundColor", column)));
 			}
 			label = setLabel(messageDetails[2][6], 6, 2, 1, 1, 2, 1, true);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(LayerColorVar.APPLICATION.backgroundColor);
+			label.setBackground(getCustomColor("backgroundColor", 4));
 			label = setLabel(messageDetails[2][7], 7, 2, 1, 1, 0.5, 1, false);
 			label.setHorizontalAlignment(JLabel.CENTER);
 			label.setVerticalAlignment(JLabel.CENTER);
-			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
+			label.setBackground(BACKGROUND_COLOR);
 			setBoldAndItalic(label);
 
-			// fourth and fifth line, first to sixth columns (from left to right)
-			for (int i = 3; i < 5; i++) {
-				for (int j = 0; j < 6; j++) {
-					label = setLabel(messageDetails[i][j], j, i, 1, 1, 1, 1, true);
-					if (j % 2 == 0) {
+			// fourth and fifth row, first to sixth columns (from left to right)
+			for (int row = 3; row < 5; row++) {
+				for (int column = 0; column < 6; column++) {
+					label = setLabel(messageDetails[row][column], column, row, 1, 1, 1, 1, true);
+					if (column % 2 == 0) {
 						label.setHorizontalAlignment(SwingConstants.RIGHT);
 					}
-					if (j == 0 || j == 1) {
-						label.setBackground(LayerColorVar.LINK.backgroundColor);
-					} else if (j == 2 || j == 3) {
-						label.setBackground(LayerColorVar.INTERNET.backgroundColor);
-					} else if (j == 4 || j == 5) {
-						label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
-					}
+					label.setBackground((getColorByColumn("backgroundColor", column)));
 				}
 			}
 
-			// sixth line, first to sixth columns (from left to right)
-			for (int j = 0; j < 6; j++) {
-				if (j % 2 == 0) {
-					label = setLabel(messageDetails[5][j], j, 5, 1, 1, 1, 3, true);
+			// sixth row, first to sixth columns (from left to right)
+			for (int column = 0; column < 6; column++) {
+				if (column % 2 == 0) {
+					label = setLabel(messageDetails[5][column], column, 5, 1, 1, 1, 3, true);
 					label.setHorizontalAlignment(SwingConstants.RIGHT);
 					label.setVerticalAlignment(SwingConstants.TOP);
-					if (j == 0) {
-						label.setBackground(LayerColorVar.LINK.backgroundColor);
-					} else if (j == 2) {
-						label.setBackground(LayerColorVar.INTERNET.backgroundColor);
-					} else if (j == 4) {
-						label.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
-					}
+					label.setBackground((getColorByColumn("backgroundColor", column)));
 				} else {
-					textArea = setTextArea(messageDetails[5][j], j, 5, 1, 1, 1, 3);
-					if (j == 1) {
-						textArea.setBackground(LayerColorVar.LINK.backgroundColor);
-					} else if (j == 3) {
-						textArea.setBackground(LayerColorVar.INTERNET.backgroundColor);
-					} else if (j == 5) {
-						textArea.setBackground(LayerColorVar.TRANSPORT.backgroundColor);
-					}
+					textArea = setTextArea(messageDetails[5][column], column, 5, 1, 1, 1, 3);
+					textArea.setBackground(getColorByColumn("backgroundColor", column));
 				}
 			}
 

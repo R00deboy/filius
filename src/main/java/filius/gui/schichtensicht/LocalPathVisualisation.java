@@ -22,16 +22,14 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 
-import filius.gui.nachrichtensicht.AggregatedMessageTable;
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
 
 public class LocalPathVisualisation extends JPanel implements I18n {
 	private final LocalPathPanel LOCAL_PATH_PANEL;
-
-	private static final Color BACKGROUND_COLOR = Color.WHITE;
 
 	private final JPanel CENTER_PANEL = new JPanel();
 	private final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
@@ -65,7 +63,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// border width of standard border around nested messages
 	private static final int MAIN_BORDER_WIDTH = 2;
 	// border width of active border around nested messages
-	private static final int ACTIVE_BORDER_WIDTH = 2;
+//	private static final int ACTIVE_BORDER_WIDTH = 2;
 	// left gap around a nested message
 	private static final int INDENT_NESTED_MSGS = 20;
 	// upper, lower and right gap around a nested message
@@ -88,11 +86,11 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout();
 		setLayout(borderLayout);
-		setBackground(BACKGROUND_COLOR);
+		setBackground(LOCAL_PATH_PANEL.getBackgroundColor());
 
 		// set GridBagLayout for CENTER_PANEL
 		CENTER_PANEL.setLayout(GB_LAYOUT_CENTER_PANEL);
-		CENTER_PANEL.setBackground(BACKGROUND_COLOR);
+		CENTER_PANEL.setBackground(LOCAL_PATH_PANEL.getBackgroundColor());
 		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 
@@ -332,13 +330,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		// The right arrow is located at y coordinate 9 (see above). Thus skip i = 9.
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 5, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(getCustomColor("backgroundColorUltraFine", 4));
+		label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 4));
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 7, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(getCustomColor("backgroundColorUltraFine", 3));
+		label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 3));
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 11, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(getCustomColor("backgroundColorUltraFine", 1));
+		label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 1));
 
 		add(CENTER_PANEL, BorderLayout.CENTER);
 	}
@@ -361,13 +359,13 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		for (int layerNumber = 4; layerNumber >= 2; layerNumber--) {
 			label = setLabel(CENTER_PANEL, "", xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, width, RECTANGLE_HEIGHT);
-			label.setBackground(getCustomColor("backgroundColorUltraFine", layerNumber));
+			label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", layerNumber));
 		}
 		// layer 1
 		if (includingLayer1) {
 			label = setLabel(CENTER_PANEL, "", xCoord + 0, 11, 1, 1, false);
 			setSize(label, width, RECTANGLE_HEIGHT);
-			label.setBackground(getCustomColor("backgroundColorUltraFine", 1));
+			label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 1));
 		}
 	}
 
@@ -475,7 +473,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			label = setLabel(CENTER_PANEL, layers[4 - layerNumber], xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(getCustomColor("backgroundColor", layerNumber));
+			label.setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColor", layerNumber));
+			label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		}
 	}
 
@@ -787,23 +786,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * This method returns the color defined in the enum class LayerColorVar in
-	 * class AggregatedMessageTable corresponding to the type of color and the layer
-	 * number.
-	 * 
-	 * @param typeOfColor All types of colors defined in the enum class in class
-	 *                    AggregatedMessageTable: "foregroundColor",
-	 *                    "backgroundColor", "backgroundColorFine",
-	 *                    "backgroundColorUltraFine", "borderColor"
-	 * @param layerNumber number of the layer (1 = LINK, 2 = INTERNET, 3 =
-	 *                    TRANSPORT, 4 = APPLICATION)
-	 * @return the desired color
-	 */
-	private Color getCustomColor(String typeOfColor, int layerNumber) {
-		return AggregatedMessageTable.LayerColorVar.getLayerColorVar(typeOfColor, layerNumber);
-	}
-
-	/**
 	 * Class for a rectangular visualisation of nested messages.
 	 */
 	private class NestedMessagesVisualisation extends JLabel {
@@ -857,7 +839,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// Otherwise the rectangle stays insivisble.
 			if (layerNumber <= LOCAL_PATH_PANEL.getMaxLayerInsideFrame()
 					&& layerNumber <= LOCAL_PATH_PANEL.getMaxLayerOfOperation()) {
-				rect.setFillColor(getCustomColor("backgroundColor", layerNumber));
+				rect.setFillColor(LOCAL_PATH_PANEL.getCustomColor("backgroundColor", layerNumber));
 				rect.paintFilledRectangle(g, width, height);
 				if (layerNumber < LOCAL_PATH_PANEL.getMaxLayerInsideFrame()) {
 					// set other layer rectangles
@@ -875,14 +857,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 						}
 						rect.setX(xPos);
 						rect.setY(yPos);
-						rect.setFillColor(getCustomColor("backgroundColor", i));
+						rect.setFillColor(LOCAL_PATH_PANEL.getCustomColor("backgroundColor", i));
 
 						rect.paintFilledRectangle(g, width, height);
 					}
 				}
 			} else {
 				setOpaque(true);
-				setBackground(getCustomColor("backgroundColorUltraFine", layerNumber));
+				setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", layerNumber));
 			}
 		}
 
@@ -890,11 +872,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// draw the (main or active) border around the message
 			Border matteBorder;
 			if (activeBorder) {
-				matteBorder = BorderFactory.createMatteBorder(ACTIVE_BORDER_WIDTH, ACTIVE_BORDER_WIDTH,
-						ACTIVE_BORDER_WIDTH, ACTIVE_BORDER_WIDTH, Color.RED);
+//				matteBorder = BorderFactory.createMatteBorder(ACTIVE_BORDER_WIDTH, ACTIVE_BORDER_WIDTH,
+//						ACTIVE_BORDER_WIDTH, ACTIVE_BORDER_WIDTH, Color.RED);
+				matteBorder = BorderFactory.createLoweredBevelBorder();
 			} else {
-				matteBorder = BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
-						MAIN_BORDER_WIDTH, Color.BLACK);
+//				matteBorder = BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
+//						MAIN_BORDER_WIDTH, Color.BLACK);
+				matteBorder = BorderFactory.createRaisedBevelBorder();
+				
 			}
 			setBorder(matteBorder);
 		}
@@ -991,7 +976,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			} else if (pointsRight != null && pointsRight) {
 				// right arrows are needed on the internet layer
 				setOpaque(true);
-				setBackground(getCustomColor("backgroundColorUltraFine", 2));
+				setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 2));
 				// right arrow
 				g.fillRect(0, yMiddle - arrowRectangleWidth / 2, overallLength - headHeight, arrowRectangleWidth);
 				// head
@@ -1030,14 +1015,14 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		@Override
 		public void paintComponent(Graphics g) {
 			setOpaque(true);
-			setBackground(getCustomColor("backgroundColorUltraFine", 1));
+			setBackground(LOCAL_PATH_PANEL.getCustomColor("backgroundColorUltraFine", 1));
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
 			g.setColor(Color.BLACK);
 
 			// wire (ground)
-			g.setColor(getCustomColor("backgroundColor", 1));
+			g.setColor(LOCAL_PATH_PANEL.getCustomColor("backgroundColor", 1));
 			g.fillRect(0, this.rectangleHeight - 3 * MAIN_BORDER_WIDTH, this.rectangleWidth, 3 * MAIN_BORDER_WIDTH);
 		}
 	}

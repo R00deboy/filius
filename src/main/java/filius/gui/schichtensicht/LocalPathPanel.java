@@ -21,9 +21,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 
 import filius.gui.nachrichtensicht.AggregatedMessageTable;
-import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.InternetKnoten;
 import filius.hardware.knoten.Knoten;
@@ -215,6 +215,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		for (int i = 0; i < daten.length; i++) {
 			if (daten[i][0].equals(selectedFrameNumberAsString)) {
+
 				// -----Netzzugangs-Daten-----
 				// Quelle
 				messageDetails[3][1] = daten[i][2].toString();
@@ -355,6 +356,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 */
 	private void setDefaultMessageDetails() {
 		if (sent && !forwarded) {
+
 			// for the sender of a message
 			updateMessageDetails(true);
 			if (node instanceof Vermittlungsrechner) {
@@ -367,6 +369,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 				hiddenLayers = 1;
 			}
 		} else {
+
 			// for the receiver of a message
 			// for a router, which has forwarded an IP or ICMP packet
 			updateMessageDetails(false);
@@ -403,6 +406,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * needed invisible according to {@code maxLayer}.
 	 */
 	private void setLayersInTablesInvisible() {
+
 		// determine columns to deactivate
 		Set<Integer> columns = new HashSet<>();
 		if (MAX_LAYER_INSIDE_FRAME == 4) {
@@ -414,6 +418,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			columns.add(5);
 			columns.add(6);
 		}
+
 		// deactivate columns
 		Set<MessageDetailsTable> tables = new HashSet<>();
 		tables.add(tableSent);
@@ -422,93 +427,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 			for (Component component : table.getComponents()) {
 				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
 					component.setVisible(false);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Hide data of a layer in the message details. 1 = link, 2 = internet, 3 =
-	 * transport.
-	 * 
-	 * @param layerNumber number for layer
-	 * @param table       table in which layer data should be hidden (either the
-	 *                    table for the sent or the received message)
-	 * @throws NoSuchElementException
-	 */
-	private void hideLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
-		if (layerNumber > 3 || layerNumber < 1) {
-			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
-		} else {
-			// determine columns to hide
-			Set<Integer> columns = new HashSet<>();
-			int firstColumn = (layerNumber - 1) * 2;
-			columns.add(firstColumn);
-			columns.add(firstColumn + 1);
-			// hide columns
-			for (Component component : table.getComponents()) {
-				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)
-						&& table.gridBagLayout.getConstraints(component).gridy > 1) {
-					component.setBackground(table.getBackground());
-					component.setForeground(table.getBackground());
-					if (component instanceof JTextArea) {
-						((JTextArea) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
-					} else if (component instanceof JLabel) {
-						((JLabel) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Show data of a layer in the message details. 1 = link, 2 = internet, 3 =
-	 * transport.
-	 * 
-	 * @param layerNumber number for layer
-	 * @param table       in which layer data should be shown
-	 * @throws NoSuchElementException
-	 */
-	private void showLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
-		if (layerNumber > 3 || layerNumber < 1) {
-			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
-		} else {
-			// determine columns to show
-			Set<Integer> columns = new HashSet<>();
-			int firstColumn = (layerNumber - 1) * 2;
-			columns.add(firstColumn);
-			columns.add(firstColumn + 1);
-
-			// determine colors
-			Color foregroundColor = null;
-			Color backgroundColor = null;
-			Color backgroundColorFine = null;
-			foregroundColor = getLayerColorVar("foregroundColor", layerNumber);
-			backgroundColor = getLayerColorVar("backgroundColor", layerNumber);
-			backgroundColorFine = getLayerColorVar("backgroundColorFine", layerNumber);
-
-			// show columns
-			for (Component component : table.getComponents()) {
-				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
-					int gridy = table.gridBagLayout.getConstraints(component).gridy;
-					if (gridy > 1) {
-						// set colors
-						component.setForeground(foregroundColor);
-						if (gridy == 0) {
-							component.setBackground(backgroundColorFine);
-						} else {
-							component.setBackground(backgroundColor);
-
-							// set border
-							Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
-							Border marginBorder = new EmptyBorder(5, 5, 5, 5);
-							if (component instanceof JTextArea) {
-								((JTextArea) component).setBorder(new CompoundBorder(lineBorder, marginBorder));
-							} else if (component instanceof JLabel) {
-								((JLabel) component).setBorder(new CompoundBorder(lineBorder, marginBorder));
-							}
-						}
-					}
 				}
 			}
 		}
@@ -535,6 +453,113 @@ public class LocalPathPanel extends JPanel implements I18n {
 			showLayerData(hiddenLayers, tableSent);
 			showLayerData(hiddenLayers, tableReceived);
 			hiddenLayers--;
+		}
+	}
+
+	/**
+	 * Hide data of a layer in the message details. 1 = link, 2 = internet, 3 =
+	 * transport.
+	 * 
+	 * @param layerNumber number for layer
+	 * @param table       table in which layer data should be hidden (either the
+	 *                    table for the sent or the received message)
+	 * @throws NoSuchElementException
+	 */
+	private void hideLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
+		if (layerNumber > 3 || layerNumber < 1) {
+			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
+		} else {
+
+			// determine columns to hide
+			Set<Integer> columns = new HashSet<>();
+			int firstColumn = (layerNumber - 1) * 2;
+			columns.add(firstColumn);
+			columns.add(firstColumn + 1);
+
+			// hide columns
+			for (Component component : table.getComponents()) {
+				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)
+						&& table.gridBagLayout.getConstraints(component).gridy > 1) {
+
+					// set foreground and background to main background (such that the component
+					// gets invisible)
+					component.setBackground(table.getBackground());
+					component.setForeground(table.getBackground());
+
+					// remove border
+					setBorderVisible(component, false);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Show data of a layer in the message details. 1 = link, 2 = internet, 3 =
+	 * transport.
+	 * 
+	 * @param layerNumber number for layer
+	 * @param table       in which layer data should be shown
+	 * @throws NoSuchElementException
+	 */
+	private void showLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {
+		if (layerNumber > 3 || layerNumber < 1) {
+			throw new NoSuchElementException("layerNumber has to be an integer from 1 to 3.");
+		} else {
+
+			// determine columns to show
+			Set<Integer> columns = new HashSet<>();
+			int firstColumn = (layerNumber - 1) * 2;
+			columns.add(firstColumn);
+			columns.add(firstColumn + 1);
+
+			// show columns
+			for (Component component : table.getComponents()) {
+				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
+					int gridy = table.gridBagLayout.getConstraints(component).gridy;
+					if (gridy > 1) {
+
+						// set colors
+						component.setForeground(getLayerColorVar("foregroundColor", layerNumber));
+						if (gridy == 0) {
+							component.setBackground(getLayerColorVar("backgroundColorFine", layerNumber));
+						} else {
+							component.setBackground(getLayerColorVar("backgroundColor", layerNumber));
+
+							// create border
+							setBorderVisible(component, true);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * If the boolean value is true, creates the border of the component. Otherwise
+	 * sets an empty border.
+	 * 
+	 * @param component the component whose border will be affected
+	 * @param isVisible the border is visible (true) or not (false)
+	 */
+	private void setBorderVisible(Component component, boolean isVisible) {
+		if (isVisible) {
+
+			// create border
+			Border loweredEtchedBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+			Border marginBorder = new EmptyBorder(5, 5, 5, 5);
+			if (component instanceof JTextArea) {
+				((JTextArea) component).setBorder(new CompoundBorder(loweredEtchedBorder, marginBorder));;
+			} else if (component instanceof JLabel) {
+				((JLabel) component).setBorder(new CompoundBorder(loweredEtchedBorder, marginBorder));
+			}
+		} else {
+
+			// remove border (set empty border)
+			if (component instanceof JTextArea) {
+				((JTextArea) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
+			} else if (component instanceof JLabel) {
+				((JLabel) component).setBorder(javax.swing.BorderFactory.createEmptyBorder());
+			}
 		}
 	}
 
@@ -603,18 +628,20 @@ public class LocalPathPanel extends JPanel implements I18n {
 			for (int column = 0; column < 6; column = column + 2) {
 				label = setLabel(messageDetails[0][column], column, 0, 2, 1, 1, 1, false);
 				label.setHorizontalAlignment(SwingConstants.CENTER);
-				setBoldAndItalic(label);
 				label.setBackground((getColorByColumn("backgroundColorFine", column)));
+				label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+				setBoldAndItalic(label);
 			}
 			label = setLabel(messageDetails[0][6], 6, 0, 1, 1, 2, 1, false);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
 			label.setBackground(getLayerColorVar("backgroundColorFine", 4));
+			label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			setBoldAndItalic(label);
 			label = setLabel(messageDetails[0][7], 7, 0, 1, 1, 0.5, 1, false);
 			label.setHorizontalAlignment(JLabel.CENTER);
 			label.setVerticalAlignment(JLabel.CENTER);
-			;
 			label.setBackground(BACKGROUND_COLOR);
+			label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			setBoldAndItalic(label);
 
 			// second empty row, which is transparent (from left to right)
@@ -637,6 +664,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			label.setHorizontalAlignment(JLabel.CENTER);
 			label.setVerticalAlignment(JLabel.CENTER);
 			label.setBackground(BACKGROUND_COLOR);
+			label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			setBoldAndItalic(label);
 
 			// fourth and fifth row, first to sixth columns (from left to right)
@@ -665,11 +693,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 			// last two cells on the bottom right with height 3
 			textArea = setTextArea(messageDetails[3][6], 6, 3, 1, 3, 2, 5 / 3.0);
-			textArea.setBackground(LayerColorVar.APPLICATION.backgroundColor);
+			textArea.setBackground(getLayerColorVar("backgroundColor", 4));
 			label = setLabel(messageDetails[3][7], 7, 3, 1, 3, 0.5, 5 / 3.0, false);
 			label.setHorizontalAlignment(JLabel.CENTER);
 			label.setVerticalAlignment(JLabel.CENTER);
-			label.setBackground(LayerColorVar.DEFAULT.backgroundColor);
+			label.setBackground(BACKGROUND_COLOR);
+			label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			setBoldAndItalic(label);
 		}
 
@@ -712,9 +741,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			setPlain(label);
 
 			if (needsBorder) {
-				Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
-				Border marginBorder = new EmptyBorder(5, 5, 5, 5);
-				label.setBorder(new CompoundBorder(lineBorder, marginBorder));
+				setBorderVisible(label, true);
 			}
 			add(label, c);
 
@@ -738,9 +765,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 			textArea.setEditable(false);
 			textArea.setFocusable(false);
 
-			Border lineBorder = BorderFactory.createLineBorder(Color.BLACK);
-			Border marginBorder = new EmptyBorder(5, 5, 5, 5);
-			textArea.setBorder(new CompoundBorder(lineBorder, marginBorder));
+			setBorderVisible(textArea, true);
 			add(textArea, c);
 
 			return textArea;

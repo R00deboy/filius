@@ -19,6 +19,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -432,7 +433,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 				if (isSenderSideWhenForwarded) {
 					// if the packet was sent, create an active (red) border for the first message
 					// (depending on which layers are involved)
-					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((layerNumber == layerOfActiveBorder) ? true : false) : false;
+					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((layerNumber == layerOfActiveBorder) ? true : false)
+							: false;
 					arrowPointsDown = true;
 				}
 				// "receiver" side
@@ -445,7 +447,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			setFinishedLabel(CENTER_PANEL, label, xCoord, 5 + 2 * (4 - layerNumber), 1, 1);
 			// create vertical arrows below every nested messages rectangle
 			int maxLayerOfOperation = ((InternetKnoten) LOCAL_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
-			if (layerNumber <= Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(), maxLayerOfOperation) && layerNumber >= 2) {
+			if (layerNumber <= Math.min(LOCAL_PATH_PANEL.getMaxLayerInsideFrame(), maxLayerOfOperation)
+					&& layerNumber >= 2) {
 				label = new Arrow(arrowPointsDown, null, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 				setFinishedLabel(CENTER_PANEL, label, xCoord, 6 + 2 * (4 - layerNumber), 1, 1);
 			}
@@ -473,7 +476,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			label = setLabel(CENTER_PANEL, layers[4 - layerNumber], xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColor", layerNumber));
+			label.setBackground(LOCAL_PATH_PANEL.getLayerColorVar("backgroundColorFine", layerNumber));
 			label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		}
 	}
@@ -870,18 +873,15 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 		private void createAndSetBorder(boolean activeBorder) {
 			// draw the (main or active) border around the message
-			Border matteBorder;
+			Border border;
 			if (activeBorder) {
-//				matteBorder = BorderFactory.createMatteBorder(ACTIVE_BORDER_WIDTH, ACTIVE_BORDER_WIDTH,
-//						ACTIVE_BORDER_WIDTH, ACTIVE_BORDER_WIDTH, Color.RED);
-				matteBorder = BorderFactory.createLoweredBevelBorder();
+				border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Color.decode("#FF0909"),
+						Color.decode("#E52323"), Color.decode("#E52323"), Color.decode("#FF0909"));
 			} else {
-//				matteBorder = BorderFactory.createMatteBorder(MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH, MAIN_BORDER_WIDTH,
-//						MAIN_BORDER_WIDTH, Color.BLACK);
-				matteBorder = BorderFactory.createRaisedBevelBorder();
-				
+				border = BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.decode("#514D4D"),
+						Color.decode("#252323"), Color.decode("#514D4D"), Color.decode("#252323"));
 			}
-			setBorder(matteBorder);
+			setBorder(border);
 		}
 	}
 

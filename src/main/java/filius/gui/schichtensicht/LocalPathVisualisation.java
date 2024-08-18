@@ -642,7 +642,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	 */
 	private void backAndForth() {
 		FORTH_IN_TIME.addActionListener(new ActionListener() {
-			// forth in time
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				forthButtonPressLogic();
@@ -650,7 +649,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		});
 
 		FORTH_IN_TIME.addKeyListener(new KeyListener() {
-
 			@Override
 			public void keyTyped(KeyEvent e) {
 			}
@@ -666,7 +664,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		});
 
 		BACK_IN_TIME.addActionListener(new ActionListener() {
-			// back in time
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				backButtonPressLogic();
@@ -674,7 +671,6 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		});
 
 		BACK_IN_TIME.addKeyListener(new KeyListener() {
-
 			@Override
 			public void keyTyped(KeyEvent e) {
 			}

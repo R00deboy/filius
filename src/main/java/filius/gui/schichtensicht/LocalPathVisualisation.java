@@ -8,22 +8,29 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.border.MatteBorder;
 
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
@@ -63,11 +70,9 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// instance variables for nested messages visualisation:
 	// border width of standard border around nested messages
 	private static final int MAIN_BORDER_WIDTH = 2;
-	// border width of active border around nested messages
-//	private static final int ACTIVE_BORDER_WIDTH = 2;
 	// left gap around a nested message
 	private static final int INDENT_NESTED_MSGS = 20;
-	// upper, lower and right gap around a nested message
+	// upper, lower and right gap between neighbouring nested messages
 	private static final int BORDER_NESTED_MSGS = 5;
 	// side length of squares needed for visualisation of a frame on cable (layer 1)
 	private static final int SQUARE_SIDE_LENGTH = RECTANGLE_HEIGHT;
@@ -76,7 +81,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	// node info cell ratio of width to height
 	private static final int NODE_INFO_CELL_HEIGHT = (int) Math.round(RECTANGLE_WIDTH / 1.935);
 
-	// buttons "vorwärts" and "zurück"
+	// buttons "forth" and "back"
 	private final JButton FORTH_IN_TIME;
 	private final JButton BACK_IN_TIME;
 
@@ -95,12 +100,22 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 
-		// create buttons
-		FORTH_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg1"));
-		BACK_IN_TIME = new JButton(messages.getString("schichten_allgemein_msg2"));
+		// create buttons (create BufferedImages first, then resize them to an Image)
+		BufferedImage arrowRightBI = null;
+		BufferedImage arrowLeftBI = null;
+		try {
+			arrowRightBI = ImageIO.read(new File("src/main/resources/gfx/allgemein/arrow_right.png"));
+			arrowLeftBI = ImageIO.read(new File("src/main/resources/gfx/allgemein/arrow_left.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Image arrowRight = arrowRightBI.getScaledInstance(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT, Image.SCALE_SMOOTH);
+		Image arrowLeft = arrowLeftBI.getScaledInstance(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT, Image.SCALE_SMOOTH);
+		FORTH_IN_TIME = new JButton(new ImageIcon(arrowRight));
+		BACK_IN_TIME = new JButton(new ImageIcon(arrowLeft));
 		FORTH_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT));
 		BACK_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT));
-		// decativate "zurück" button if the frame was received
+		// deactivate back button if the frame was received
 		if (!LOCAL_PATH_PANEL.isSent()) {
 			BACK_IN_TIME.setEnabled(false);
 		}
@@ -236,7 +251,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
 		setFinishedLabel(CENTER_PANEL, label, xCoord1, 11, 1, 1);
 
-		// create square nested messages and if packet was received, create active (red)
+		// create square nested messages and if packet was received, create active
 		// border
 		activeBorder = !LOCAL_PATH_PANEL.isSent();
 		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, activeBorder);
@@ -277,7 +292,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 8, 11, 1, 1);
 
 		// create left side square nested messages and if packet was received, create
-		// active (red) border
+		// active border
 		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, !LOCAL_PATH_PANEL.isSent());
 		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 1, 11, 1, 1);
 		// create right side square nested messages
@@ -417,11 +432,11 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			if (!LOCAL_PATH_PANEL.isForwarded()) {
 				if (LOCAL_PATH_PANEL.isSent()) {
 					// if the packet was sent, the first message (depending on which layers are
-					// involved) gets an active (red) border
+					// involved) gets an active border
 					activeBorder = (layerNumber == layerOfActiveBorder) ? true : false;
 					arrowPointsDown = true;
 				} else {
-					// active (red) border will not be here (but around the square message for the
+					// active border will not be here (but around the square message for the
 					// "received" visualisation)
 					activeBorder = false;
 					arrowPointsDown = false;
@@ -431,7 +446,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			else {
 				// "sender" side
 				if (isSenderSideWhenForwarded) {
-					// if the packet was sent, create an active (red) border for the first message
+					// if the packet was sent, create an active border for the first message
 					// (depending on which layers are involved)
 					activeBorder = LOCAL_PATH_PANEL.isSent() ? ((layerNumber == layerOfActiveBorder) ? true : false)
 							: false;
@@ -457,7 +472,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 	/**
 	 * Right and left side of the visualisation, indicating the layers and showing
-	 * the buttons "vorwärts" and "zurück".
+	 * the buttons "forth" and "back".
 	 * 
 	 * @param backOrForthButton "back" or "forth" button
 	 * @param xCoord            x coordinate inside the GridBag layout
@@ -619,8 +634,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Functionality of the two buttons to go back ("zurück") and forth (vorwärts")
-	 * in time.
+	 * Functionality of the "back" and "forth" buttons to go back and forth in time.
 	 */
 	private void backAndForth() {
 		FORTH_IN_TIME.addActionListener(new ActionListener() {
@@ -651,7 +665,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Updates Buttons "vorwärts" and "zurück" if button "vorwärts" was pressed
+	 * Updates "forth" and "back" buttons if button "forth" was pressed
 	 */
 	private void updateButtonsIfForth() {
 		BACK_IN_TIME.setEnabled(true);
@@ -663,7 +677,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Updates Buttons "vorwärts" and "zurück" if button "zurück" was pressed
+	 * Updates "forth" and "back" buttons if button "back" was pressed
 	 */
 	private void updateButtonsIfBack() {
 		FORTH_IN_TIME.setEnabled(true);
@@ -675,7 +689,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Hide or show layers in message details if button "vorwärts" was pressed
+	 * Hide or show layers in message details if button "forth" was pressed
 	 */
 	private void hideOrShowLayersIfForth() {
 		// if not forwarded (means hosts or routers which have sent or received the
@@ -700,7 +714,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Hide or show layers in message details if button "zurück" was pressed
+	 * Hide or show layers in message details if button "back" was pressed
 	 */
 	private void hideOrShowLayersIfBack() {
 		// if not forwarded (means hosts or routers which have sent or received the
@@ -734,7 +748,7 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Updates the active (red) border according to {@code pointInTime} and resets
+	 * Updates the active border according to {@code pointInTime} and resets
 	 * the old one to black.
 	 * 
 	 * @param isForth true if the "forth" button was pressed, false if the "back"
@@ -875,11 +889,11 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// draw the (main or active) border around the message
 			Border border;
 			if (activeBorder) {
-				border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Color.decode("#FF0909"),
-						Color.decode("#E52323"), Color.decode("#E52323"), Color.decode("#FF0909"));
+				MatteBorder outside = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#5AD86C"));
+				MatteBorder inside = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#75DF83"));
+				border = BorderFactory.createCompoundBorder(outside, inside);
 			} else {
-				border = BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.decode("#514D4D"),
-						Color.decode("#252323"), Color.decode("#514D4D"), Color.decode("#252323"));
+				border = BorderFactory.createMatteBorder(2, 2, 2, 2, Color.BLACK);
 			}
 			setBorder(border);
 		}

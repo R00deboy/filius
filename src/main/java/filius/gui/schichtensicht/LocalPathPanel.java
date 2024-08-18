@@ -377,8 +377,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Updates the message details (e.g. if one of the buttons "vorwärts" or
-	 * "zurück" is pressed).
+	 * Updates the message details (e.g. if one of the "forth" or "back" button was
+	 * pressed).
 	 * 
 	 * @param senderSideIsActive If true, the visualisation is on the sender side,
 	 *                           otherwise on the receiver side.
@@ -548,7 +548,8 @@ public class LocalPathPanel extends JPanel implements I18n {
 			Border loweredEtchedBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 			Border marginBorder = new EmptyBorder(5, 5, 5, 5);
 			if (component instanceof JTextArea) {
-				((JTextArea) component).setBorder(new CompoundBorder(loweredEtchedBorder, marginBorder));;
+				((JTextArea) component).setBorder(new CompoundBorder(loweredEtchedBorder, marginBorder));
+				;
 			} else if (component instanceof JLabel) {
 				((JLabel) component).setBorder(new CompoundBorder(loweredEtchedBorder, marginBorder));
 			}

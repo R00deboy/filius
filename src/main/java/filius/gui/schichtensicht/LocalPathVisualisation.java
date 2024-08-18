@@ -11,6 +11,8 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -635,18 +637,31 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 
 	/**
 	 * Functionality of the "back" and "forth" buttons to go back and forth in time.
+	 * The buttons can be triggered by clicking or by pressing the left or right
+	 * non-numpad arrow key.
 	 */
 	private void backAndForth() {
 		FORTH_IN_TIME.addActionListener(new ActionListener() {
 			// forth in time
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (pointInTime < maxPointInTime) {
-					pointInTime++;
-					updateButtonsIfForth();
-					hideOrShowLayersIfForth();
-					updateActiveBorder(true);
-				}
+				forthButtonPressLogic();
+			}
+		});
+
+		FORTH_IN_TIME.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				forthButtonPressLogic();
 			}
 		});
 
@@ -654,14 +669,49 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 			// back in time
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (pointInTime > minPointInTime) {
-					pointInTime--;
-					updateButtonsIfBack();
-					hideOrShowLayersIfBack();
-					updateActiveBorder(false);
-				}
+				backButtonPressLogic();
 			}
 		});
+
+		BACK_IN_TIME.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				backButtonPressLogic();
+			}
+		});
+	}
+
+	/**
+	 * What to do when the forth button is pressed.
+	 */
+	private void forthButtonPressLogic() {
+		if (pointInTime < maxPointInTime) {
+			pointInTime++;
+			updateButtonsIfForth();
+			hideOrShowLayersIfForth();
+			updateActiveBorder(true);
+		}
+	}
+
+	/**
+	 * What to do when the back button is pressed.
+	 */
+	private void backButtonPressLogic() {
+		if (pointInTime > minPointInTime) {
+			pointInTime--;
+			updateButtonsIfBack();
+			hideOrShowLayersIfBack();
+			updateActiveBorder(false);
+		}
 	}
 
 	/**
@@ -748,8 +798,8 @@ public class LocalPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Updates the active border according to {@code pointInTime} and resets
-	 * the old one to black.
+	 * Updates the active border according to {@code pointInTime} and resets the old
+	 * one to black.
 	 * 
 	 * @param isForth true if the "forth" button was pressed, false if the "back"
 	 *                button was pressed

@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
+import filius.gui.schichtensicht.GlobalPathDialog;
 import filius.gui.schichtensicht.LocalPathDialog;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
@@ -509,13 +510,13 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 			if (typeOfColor == "foregroundColor") {
 				color = valueOf(layerName).foregroundColor;
 			} else if (typeOfColor == "backgroundColor") {
-				color =  valueOf(layerName).backgroundColor;
+				color = valueOf(layerName).backgroundColor;
 			} else if (typeOfColor == "backgroundColorFine") {
-				color =  valueOf(layerName).backgroundColorFine;
+				color = valueOf(layerName).backgroundColorFine;
 			} else if (typeOfColor == "backgroundColorUltraFine") {
-				color =  valueOf(layerName).backgroundColorUltraFine;
+				color = valueOf(layerName).backgroundColorUltraFine;
 			} else if (typeOfColor == "borderColor") {
-				color =  valueOf(layerName).borderColor;
+				color = valueOf(layerName).borderColor;
 			}
 			return color;
 		}
@@ -568,16 +569,23 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 * @author Christoph Irniger
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
-
+		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
+				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
+		if (hasMessageArrived(selectedFrameNumber)) {
+			new GlobalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
+					selectedFrameNumber);
+		} else {
+			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("schichten_globaler_weg_msg1"));
+		}
 	}
 
 	/**
-	 * Verification that message has arrived at destination IP address (for global
-	 * view)
+	 * Verification that the IP packet inside the selected frame has arrived at
+	 * destination IP address (for global path)
 	 * 
 	 * @author Christoph Irniger
 	 */
-	private Boolean hasMessageArrived(int messageNumber) {
+	private Boolean hasMessageArrived(int selectedFrameNumber) {
 		return false;
 	}
 }

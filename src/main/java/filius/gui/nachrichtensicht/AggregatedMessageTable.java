@@ -61,8 +61,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
-import filius.gui.schichtensicht.GlobalPathDialog;
-import filius.gui.schichtensicht.LocalLayerPathDialog;
+import filius.gui.schichtensicht.DialogLayerPath;
+import filius.gui.schichtensicht.GlobalDialogLayerPath;
+import filius.gui.schichtensicht.LocalDialogLayerPath;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
@@ -560,7 +561,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LocalLayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId, selectedFrameNumber);
+		new LocalDialogLayerPath(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId, selectedFrameNumber);
 	}
 
 	/**
@@ -572,10 +573,10 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
 		if (hasMessageArrived(selectedFrameNumber)) {
-			new GlobalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
+			new GlobalDialogLayerPath(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
 					selectedFrameNumber);
 		} else {
-			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("schichten_globaler_weg_msg1"));
+			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("schichten_globaler_weg_msg2"));
 		}
 	}
 

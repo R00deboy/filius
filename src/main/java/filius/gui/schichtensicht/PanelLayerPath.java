@@ -25,6 +25,7 @@ import javax.swing.border.EtchedBorder;
 
 import filius.gui.nachrichtensicht.AggregatedMessageTable;
 import filius.hardware.knoten.Gateway;
+import filius.hardware.knoten.Host;
 import filius.hardware.knoten.InternetKnoten;
 import filius.hardware.knoten.Knoten;
 import filius.hardware.knoten.Vermittlungsrechner;
@@ -32,13 +33,13 @@ import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 
 /**
- * Panel which is embedded in a JDialog window. Consists of a splitPane
- * (visualisation in the upper part, message details table in the lower part).
+ * Super class for panels for local and global view of the path through the
+ * layers.
  * 
  * @author Christoph Irniger
  */
-public class LocalPathPanel extends JPanel implements I18n {
-	public final Knoten node;
+public class PanelLayerPath extends JPanel implements I18n {
+	private final Knoten node;
 
 	private final String interfaceId;
 
@@ -55,8 +56,6 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private MessageDetailsTable tableSent;
 	private MessageDetailsTable tableReceived;
-
-	private LocalPathVisualisation visualisation;
 
 	// info about the corresponding frame
 	private final Object[] CORR_FRAME_DATA;
@@ -80,13 +79,13 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // Access to Lauscher
 
-	public LocalPathPanel(LocalPathDialog localPathDialog) {
+	public PanelLayerPath(DialogLayerPath dialogLayerPath) {
 		super();
 
 		// inherit instance variables from super container (localPathDialog)
-		node = localPathDialog.getSystemSoftware().getKnoten();
-		interfaceId = localPathDialog.getInterfaceId();
-		selectedFrameNumber = localPathDialog.getSelectedFrameNumber();
+		node = dialogLayerPath.getSystemSoftware().getKnoten();
+		interfaceId = dialogLayerPath.getInterfaceId();
+		selectedFrameNumber = dialogLayerPath.getSelectedFrameNumber();
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
@@ -112,15 +111,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 		tableSent = new MessageDetailsTable(messageDetailsSent);
 		tableReceived = new MessageDetailsTable(messageDetailsReceived);
 		setLayersInTablesInvisible();
-		visualisation = new LocalPathVisualisation(this);
 
 		// SplitPane (for visualisation in upper and message details in lower part)
 		splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPane.setDividerLocation(DIVIDER_LOCATION);
-
-		// ScrollPane for top of SplitPane
-		splitPane.setTopComponent(new JScrollPane(visualisation));
 
 		// ScrollPane for bottom of SplitPane
 		setDefaultMessageDetails();
@@ -133,12 +128,12 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 		// set size and positioning properties of outer JDialog
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		localPathDialog.setLocation(screenSize.width / 6, screenSize.height / 6);
+		dialogLayerPath.setLocation(screenSize.width / 6, screenSize.height / 6);
 		int dialogWidth = MessageDetailsTable.getSizeOfMessageDetailsTable().width;
 		int dialogHeight = MessageDetailsTable.getSizeOfMessageDetailsTable().height + DIVIDER_LOCATION + 100;
 		Dimension dialogDimension = new Dimension(dialogWidth, dialogHeight);
-		localPathDialog.setPreferredSize(dialogDimension);
-		localPathDialog.setMinimumSize(dialogDimension);
+		dialogLayerPath.setPreferredSize(dialogDimension);
+		dialogLayerPath.setMinimumSize(dialogDimension);
 	}
 
 	public Knoten getKnoten() {
@@ -338,7 +333,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	 * @param corrFrameNumber
 	 */
 	private void fillOtherIfForwarded(String corrInterfaceId, Integer corrFrameNumber) {
-		if (forwarded == true) {
+		if (forwarded) {
 			if (sent) {
 				fillTitles(messageDetailsReceived);
 				fillMessageDetails(messageDetailsReceived, corrInterfaceId, corrFrameNumber);
@@ -350,7 +345,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Determines which message details ({@code messageDetailsSent} or
+	 * Determines and sets the message details ({@code messageDetailsSent} or
 	 * {@code messageDetailsReceived}) are visible when opening the whole window of
 	 * the local path for the first time.
 	 */
@@ -359,9 +354,10 @@ public class LocalPathPanel extends JPanel implements I18n {
 
 			// for the sender of a message
 			updateMessageDetails(true);
-			if (node instanceof Vermittlungsrechner) {
+			if (node instanceof Host) {
 				for (int i = 1; i < MAX_LAYER_INSIDE_FRAME; i++) {
 					hideLayerData(i, tableSent);
+					System.out.println("hide layer data " + i);
 				}
 				hiddenLayers = MAX_LAYER_INSIDE_FRAME - 1;
 			} else if (node instanceof Vermittlungsrechner || node instanceof Gateway) {
@@ -412,11 +408,11 @@ public class LocalPathPanel extends JPanel implements I18n {
 		if (MAX_LAYER_INSIDE_FRAME == 4) {
 			return;
 		} else if (MAX_LAYER_INSIDE_FRAME == 3) {
-			columns.add(6);
+			columns.add(6); // application data
 		} else if (MAX_LAYER_INSIDE_FRAME == 2) {
-			columns.add(4);
-			columns.add(5);
-			columns.add(6);
+			columns.add(4); // transport data left side
+			columns.add(5); // transport data right side
+			columns.add(6); // application data
 		}
 
 		// deactivate columns
@@ -724,7 +720,7 @@ public class LocalPathPanel extends JPanel implements I18n {
 		 * @return Dimension of the whole MessageDetailsTable
 		 */
 		private static Dimension getSizeOfMessageDetailsTable() {
-			return new Dimension(9 * LocalPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalPathPanel.MSG_DETAILS_CELL_HEIGHT);
+			return new Dimension(9 * PanelLayerPath.MSG_DETAILS_CELL_WIDTH, 8 * PanelLayerPath.MSG_DETAILS_CELL_HEIGHT);
 		}
 
 		/**

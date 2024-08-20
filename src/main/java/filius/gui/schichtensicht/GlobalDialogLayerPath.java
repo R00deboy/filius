@@ -1,9 +1,11 @@
 package filius.gui.schichtensicht;
 
-import javax.swing.JDialog;
+import java.awt.BorderLayout;
+
+import javax.swing.JFrame;
 
 import filius.rahmenprogramm.I18n;
-import filius.software.vermittlungsschicht.IpPaket;
+import filius.software.system.SystemSoftware;
 
 /**
  * This class is used to visualise the end-to-end path of a message through the TCP/IP layers
@@ -21,7 +23,20 @@ import filius.software.vermittlungsschicht.IpPaket;
  * @author Christoph Irniger
  */
 
-public class GlobalPathDialog extends JDialog implements I18n {
+public class GlobalDialogLayerPath extends DialogLayerPath implements I18n {
+	
+	public GlobalDialogLayerPath(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
+			int selectedFrameNumber) {
+		super(owner, systemSoftware, interfaceId, selectedFrameNumber);
+		
+		// title "Globaler Weg durch die Schichten"
+		setTitle(messages.getString("schichten_lokaler_weg_msg2"));
+
+		// Panel is in the center of the BorderLayout
+		localPanelLayerPath = new LocalPanelLayerPath(this);
+		add(localPanelLayerPath, BorderLayout.CENTER);
+		setVisible(true);
+	}
 	
 	/** 
 	 * Diese Ansicht muss auf der Position des Maus-Rechtsklicks in der Wireshark-Ansicht

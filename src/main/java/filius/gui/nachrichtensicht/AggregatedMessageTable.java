@@ -554,7 +554,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * Local view of the path through layers
+	 * Local view of the path through layers.
 	 * 
 	 * @author Christoph Irniger
 	 */
@@ -565,7 +565,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * Global view of the path through layers
+	 * Global view of the path through layers.
 	 * 
 	 * @author Christoph Irniger
 	 */
@@ -582,7 +582,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
 	/**
 	 * Verification that the IP packet inside the selected frame has arrived at
-	 * destination IP address (for global path)
+	 * destination IP address (for global path).
 	 * 
 	 * @author Christoph Irniger
 	 */

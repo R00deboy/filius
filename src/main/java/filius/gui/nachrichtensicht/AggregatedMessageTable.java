@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
 import filius.gui.schichtensicht.GlobalPathDialog;
-import filius.gui.schichtensicht.LocalPathDialog;
+import filius.gui.schichtensicht.LocalLayerPathDialog;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
@@ -560,7 +560,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LocalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId, selectedFrameNumber);
+		new LocalLayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId, selectedFrameNumber);
 	}
 
 	/**

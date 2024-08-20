@@ -540,7 +540,7 @@ public class Lauscher implements I18n {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
 								// check payload if frame payload is an IP packet (instance variable {@code typ}
-								// is "0x800")
+								// is "0x800") and if it has the same payload but different TTL
 								if (frame.getTyp().equals("0x800") && originalFrame.samePayloadDifferentTTL(frame)) {
 									break;
 								}

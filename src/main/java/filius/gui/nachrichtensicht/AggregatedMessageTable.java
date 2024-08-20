@@ -556,27 +556,35 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	/**
 	 * Local view of the path through layers.
 	 * 
+	 * @param systemSoftware      system software of the node
+	 * @param selectedFrameNumber number of the selected frame in the data exchange
+	 * 
 	 * @author Christoph Irniger
 	 */
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LocalDialogLayerPath(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId, selectedFrameNumber);
+		new LocalDialogLayerPath(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
+				selectedFrameNumber);
 	}
 
 	/**
 	 * Global view of the path through layers.
+	 * 
+	 * @param systemSoftware      system software of the node
+	 * @param selectedFrameNumber number of the selected frame in the data exchange
 	 * 
 	 * @author Christoph Irniger
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		if (hasMessageArrived(selectedFrameNumber)) {
+		if (hasMessageArrived(systemSoftware, selectedFrameNumber)) {
 			new GlobalDialogLayerPath(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
 					selectedFrameNumber);
 		} else {
-			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("schichten_globaler_weg_msg2"));
+			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(),
+					messages.getString("schichten_globaler_weg_msg2"));
 		}
 	}
 
@@ -584,9 +592,12 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 * Verification that the IP packet inside the selected frame has arrived at
 	 * destination IP address (for global path).
 	 * 
+	 * @param systemSoftware      system software of the node
+	 * @param selectedFrameNumber number of the selected frame in the data exchange
+	 * 
 	 * @author Christoph Irniger
 	 */
-	private Boolean hasMessageArrived(int selectedFrameNumber) {
+	private Boolean hasMessageArrived(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		return false;
 	}
 }

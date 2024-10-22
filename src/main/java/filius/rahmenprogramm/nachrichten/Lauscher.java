@@ -495,19 +495,19 @@ public class Lauscher implements I18n {
 	 * General: If a frame was forwarded by the node, given a (received / sent)
 	 * frame, the method finds the (sent / received) frame with the same content.
 	 * 
-	 * Specific: Given an interface ID and the frame number in the aggregated
-	 * message table (Datenaustausch), the Lauscher will be searched on other
-	 * network interfaces of the same node for a frame which has the same content
-	 * (except for TTL). <br \> The first entry of the returned array indicates the
-	 * network interface ID {@code interfaceId} and the second entry the number of
-	 * the frame {@code frameNumber} in the Aggregated Message Table
-	 * (Datenaustausch). If the two entries are the null pointer each, it means that
-	 * the layer 2 (IP or ICMP) packet was originally sent or received by this node,
-	 * i.e. that there is no corresponding frame.
+	 * Specific: Given an interface ID and the frame number in the data exchange
+	 * window (Datenaustausch), the Lauscher will be searched on other network
+	 * interfaces of the same node for a frame which has the same content (except
+	 * for TTL). <br \> The first entry of the returned array indicates the network
+	 * interface ID {@code interfaceId} and the second entry the number of the frame
+	 * {@code frameNumber} in the Aggregated Message Table (Datenaustausch). If the
+	 * two entries are the null pointer each, it means that the layer 2 (IP or ICMP)
+	 * packet was originally sent or received by this node, i.e. that there is no
+	 * corresponding frame.
 	 * 
 	 * @param originalInterfaceId MAC address of the network interface
-	 * @param originalFrameNumber number of the frame in the aggregated message
-	 *                            table (Datenaustausch)
+	 * @param originalFrameNumber number of the frame in the data exchange window
+	 *                            (Datenaustausch)
 	 * @param node                The node whose message details table
 	 *                            (Datenaustausch) we are on
 	 * @return Array with first entry {@code interfaceId} and second entry
@@ -547,6 +547,7 @@ public class Lauscher implements I18n {
 							}
 							interfaceIdAndFrameNumber[0] = (String) interfaceId;
 							interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
+							break;
 						}
 					}
 				}
@@ -587,12 +588,13 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * This helper method returns the frame that belongs to the network interface
-	 * indicated in the first parameter and the frame number in the aggregated
-	 * message table (Datenaustausch) in the second parameter.
+	 * This helper method returns the frame in the Lauscher data that belongs to the
+	 * network interface indicated in the first parameter and the frame number in
+	 * the aggregated message table (Datenaustausch) in the second parameter.
 	 * 
-	 * @param interfaceId MAC address of the network interface
-	 * @param frameNumber number of the frame in the aggregated message table
+	 * @param interfaceId MAC address of the network interface whose data exchange
+	 *                    should be searched for the frame
+	 * @param frameNumber number of the frame in the data exchange window
 	 *                    (Datenaustausch)
 	 * @return frame which belongs to the parameters
 	 * @author Christoph Irniger
@@ -600,5 +602,53 @@ public class Lauscher implements I18n {
 	public EthernetFrame getFrame(String interfaceId, int frameNumber) {
 		Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);
 		return (EthernetFrame) frameMitZeitstempel[1];
+	}
+
+	/**
+	 * If the frame has arrived at its destination, this method returns the
+	 * interface ID of the node with the destination IP of the IP or ICMP packet
+	 * inside the {@code frame}. If the return is null, the packet has not arrived
+	 * at its destination.
+	 * 
+	 * @param sourceId          MAC address of the source
+	 * @param sourceFrameNumber number of the frame in the data exchange window
+	 *                          (Datenaustausch) whose encapsuled IP or ICMP packet
+	 *                          should be checked
+	 * @return The interface ID of the destination. If this String is null, the
+	 *         packet has not arrived at its destination.
+	 * @author Christoph Irniger
+	 */
+	public String getInterfaceIdIfArrived(String sourceId, int sourceFrameNumber) {
+		EthernetFrame sourceFrame = getFrame(sourceId, sourceFrameNumber);
+
+		// all interface IDs except the source ID
+		Collection<String> allInterfaceIDsButOrigin = datenEinheiten.keySet();
+		allInterfaceIDsButOrigin.remove(sourceId);
+
+		String destinationId = null;
+
+		for (String id : allInterfaceIDsButOrigin) {
+			LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(sourceId);
+
+			if (framesMitZeitstempel != null) {
+				int frameNumber;
+
+				for (frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+					EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
+
+					if (sourceFrame.samePayloadDifferentTTL(frame)) {
+						// hier muss eine weitere Bedingung hinzugefügt werden, und zwar:
+						// "Gehört die id zur destination IP?"
+						// 1. Schritt: Über id die zugehörige IP-Adresse IPAddress des Interfaces finden
+						// 2. Schritt: IPAddress abgleichen mit destination IP von sourceFrame 
+						// 3. Schritt: Falls gleich: OK 
+						destinationId = id;
+						break;
+					}
+				}
+				break;
+			}
+		}
+		return destinationId;
 	}
 }

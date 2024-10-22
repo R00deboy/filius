@@ -68,6 +68,7 @@ import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.rahmenprogramm.nachrichten.LauscherBeobachter;
+import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.system.SystemSoftware;
 
 public class AggregatedMessageTable extends JTable implements LauscherBeobachter, I18n {
@@ -589,7 +590,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * Verification that the IP packet inside the selected frame has arrived at
+	 * Checks if the IP packet inside the selected frame has arrived at the
 	 * destination IP address (for global path).
 	 * 
 	 * @param systemSoftware      system software of the node
@@ -598,6 +599,6 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 * @author Christoph Irniger
 	 */
 	private Boolean hasMessageArrived(SystemSoftware systemSoftware, int selectedFrameNumber) {
-		return false;
+		return Lauscher.getLauscher().getInterfaceIdIfArrived(interfaceId, selectedFrameNumber) != null;
 	}
 }

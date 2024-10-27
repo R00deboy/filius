@@ -79,7 +79,7 @@ public class Lauscher implements I18n {
 	private HashMap<String, LinkedList<Object[]>> datenEinheiten = new HashMap<String, LinkedList<Object[]>>();
 	private List<Object[]> droppedDataUnits = new LinkedList<>();
 
-	private HashMap<String, InternetKnoten> nodeOfInterfaceID = new HashMap<String, InternetKnoten>();
+	private HashMap<String, String> IPOfInterfaceID = new HashMap<String, String>();
 
 	private Lauscher() {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", constr: Lauscher()");
@@ -144,8 +144,9 @@ public class Lauscher implements I18n {
 	 * @param interfaceId Uebergeben wird der String des NetzwerkInterface nach
 	 *                    Aufruf von toString()
 	 * @param frame
+	 * @param IPAddress
 	 */
-	public void addDatenEinheit(String interfaceId, EthernetFrame frame) {
+	public void addDatenEinheit(String interfaceId, EthernetFrame frame, String IPAddress) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", addDatenEinheit(" + interfaceId + "," + frame
 				+ ")");
 		if (!frame.isReadByLauscherForMac(interfaceId)) {
@@ -163,6 +164,8 @@ public class Lauscher implements I18n {
 			frame.setReadByLauscherForMac(interfaceId);
 			benachrichtigeBeobachter(interfaceId);
 		}
+
+		storeIPOfInterface(interfaceId, IPAddress);
 	}
 
 	public void addDroppedDataUnit(EthernetFrame frame) {
@@ -607,15 +610,15 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * Adds the pair interfaceId and node to the HashMap nodeOfInterfaceID.
+	 * Adds the pair interfaceId and IP address to the HashMap nodeOfInterfaceID.
 	 * 
 	 * @param interfaceId MAC address of the interface
-	 * @param node        the node which the interface belongs to
+	 * @param IPAddress   IP address of the interface
 	 * @author Christoph Irniger
 	 */
-	public void storeNodeOfInterface(String interfaceId, InternetKnoten node) {
-		if (!nodeOfInterfaceID.keySet().contains(interfaceId)) {
-			nodeOfInterfaceID.put(interfaceId, node);
+	public void storeIPOfInterface(String interfaceId, String IPAddress) {
+		if (!IPOfInterfaceID.keySet().contains(interfaceId)) {
+			IPOfInterfaceID.put(interfaceId, IPAddress);
 		}
 	}
 

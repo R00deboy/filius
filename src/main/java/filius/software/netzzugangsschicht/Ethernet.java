@@ -110,13 +110,15 @@ public class Ethernet extends Protokoll {
         }
 
         if (!gesendet) {
-            for (NetzwerkInterface nic : ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces()) {
+        	InternetKnoten node = (InternetKnoten) holeSystemSoftware().getKnoten();
+            for (NetzwerkInterface nic : node.getNetzwerkInterfaces()) {
                 if (nic.getMac().equalsIgnoreCase(startMAC)) {
                     synchronized (nic.getPort().holeAusgangsPuffer()) {
                         nic.getPort().holeAusgangsPuffer().add(ethernetFrame);
                         nic.getPort().holeAusgangsPuffer().notify();
                     }
                     Lauscher.getLauscher().addDatenEinheit(nic.getMac(), ethernetFrame);
+                    Lauscher.getLauscher().storeNodeOfInterface(nic.getMac(), node);
                 }
             }
         }

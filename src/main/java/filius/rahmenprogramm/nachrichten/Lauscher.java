@@ -78,6 +78,8 @@ public class Lauscher implements I18n {
 
 	private HashMap<String, LinkedList<Object[]>> datenEinheiten = new HashMap<String, LinkedList<Object[]>>();
 	private List<Object[]> droppedDataUnits = new LinkedList<>();
+	
+	private HashMap<String, InternetKnoten> nodeOfInterfaceID = new HashMap<String, InternetKnoten>();
 
 	private Lauscher() {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", constr: Lauscher()");
@@ -603,6 +605,10 @@ public class Lauscher implements I18n {
 		Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);
 		return (EthernetFrame) frameMitZeitstempel[1];
 	}
+	
+	public void storeNodeOfInterface(String interfaceId, InternetKnoten node) {
+		nodeOfInterfaceID.put(interfaceId, node);
+	}
 
 	/**
 	 * If the frame has arrived at its destination, this method returns the
@@ -622,12 +628,12 @@ public class Lauscher implements I18n {
 		EthernetFrame sourceFrame = getFrame(sourceId, sourceFrameNumber);
 
 		// all interface IDs except the source ID
-		Collection<String> allInterfaceIDsButOrigin = datenEinheiten.keySet();
-		allInterfaceIDsButOrigin.remove(sourceId);
+		Collection<String> allInterfaceIDsExceptOrigin = datenEinheiten.keySet();
+		allInterfaceIDsExceptOrigin.remove(sourceId);
 
 		String destinationId = null;
 
-		for (String id : allInterfaceIDsButOrigin) {
+		for (String id : allInterfaceIDsExceptOrigin) {
 			LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(sourceId);
 
 			if (framesMitZeitstempel != null) {
@@ -640,6 +646,7 @@ public class Lauscher implements I18n {
 						// hier muss eine weitere Bedingung hinzugefügt werden, und zwar:
 						// "Gehört die id zur destination IP?"
 						// 1. Schritt: Über id die zugehörige IP-Adresse IPAddress des Interfaces finden
+						// (bzw. Knoten finden...)
 						// 2. Schritt: IPAddress abgleichen mit destination IP von sourceFrame 
 						// 3. Schritt: Falls gleich: OK 
 						destinationId = id;

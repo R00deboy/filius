@@ -78,7 +78,7 @@ public class Lauscher implements I18n {
 
 	private HashMap<String, LinkedList<Object[]>> datenEinheiten = new HashMap<String, LinkedList<Object[]>>();
 	private List<Object[]> droppedDataUnits = new LinkedList<>();
-	
+
 	private HashMap<String, InternetKnoten> nodeOfInterfaceID = new HashMap<String, InternetKnoten>();
 
 	private Lauscher() {
@@ -605,9 +605,18 @@ public class Lauscher implements I18n {
 		Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);
 		return (EthernetFrame) frameMitZeitstempel[1];
 	}
-	
+
+	/**
+	 * Adds the pair interfaceId and node to the HashMap nodeOfInterfaceID.
+	 * 
+	 * @param interfaceId MAC address of the interface
+	 * @param node        the node which the interface belongs to
+	 * @author Christoph Irniger
+	 */
 	public void storeNodeOfInterface(String interfaceId, InternetKnoten node) {
-		nodeOfInterfaceID.put(interfaceId, node);
+		if (!nodeOfInterfaceID.keySet().contains(interfaceId)) {
+			nodeOfInterfaceID.put(interfaceId, node);
+		}
 	}
 
 	/**
@@ -647,8 +656,8 @@ public class Lauscher implements I18n {
 						// "Gehört die id zur destination IP?"
 						// 1. Schritt: Über id die zugehörige IP-Adresse IPAddress des Interfaces finden
 						// (bzw. Knoten finden...)
-						// 2. Schritt: IPAddress abgleichen mit destination IP von sourceFrame 
-						// 3. Schritt: Falls gleich: OK 
+						// 2. Schritt: IPAddress abgleichen mit destination IP von sourceFrame
+						// 3. Schritt: Falls gleich: OK
 						destinationId = id;
 						break;
 					}

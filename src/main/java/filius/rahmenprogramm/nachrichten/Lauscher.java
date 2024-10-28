@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
@@ -160,11 +161,9 @@ public class Lauscher implements I18n {
 			synchronized (liste) {
 				liste.addLast(frameMitZeitstempel);
 			}
-
 			frame.setReadByLauscherForMac(interfaceId);
 			benachrichtigeBeobachter(interfaceId);
 		}
-
 		storeIPOfInterface(interfaceId, IPAddress);
 	}
 
@@ -497,8 +496,9 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * General: If a frame was forwarded by the node, given a (received / sent)
-	 * frame, the method finds the (sent / received) frame with the same content.
+	 * General: If a frame was forwarded by the node (this usually means that it is
+	 * a router), given a (received / sent) frame, the method finds the (sent /
+	 * received) frame with the same content.
 	 * 
 	 * Specific: Given an interface ID and the frame number in the data exchange
 	 * window (Datenaustausch), the Lauscher will be searched on other network
@@ -524,8 +524,8 @@ public class Lauscher implements I18n {
 		Object[] interfaceIdAndFrameNumber = new Object[2];
 		EthernetFrame originalFrame = getFrame(originalInterfaceId, originalFrameNumber);
 
-		// ARP packets (instance variable {@code typ} is "0x806") cannot be forwarded
-		if (!originalFrame.getTyp().equals("0x806")) {
+		// ARP packets cannot be forwarded
+		if (!originalFrame.getTyp().equals(EthernetFrame.ARP)) {
 
 			// Only execute if the content of the frame (the IpPaket) was either originally
 			// sent or received by the node
@@ -544,9 +544,9 @@ public class Lauscher implements I18n {
 							for (frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
-								// check payload if frame payload is an IP packet (instance variable {@code typ}
-								// is "0x800") and if it has the same payload but different TTL
-								if (frame.getTyp().equals("0x800") && originalFrame.samePayloadDifferentTTL(frame)) {
+								// check if frame payload is an IP packet and if it has the same payload but
+								// different TTL
+								if (frame.getTyp().equals(EthernetFrame.IP) && originalFrame.samePayload(frame, true)) {
 									break;
 								}
 							}
@@ -639,32 +639,40 @@ public class Lauscher implements I18n {
 	public String getInterfaceIdIfArrived(String sourceId, int sourceFrameNumber) {
 		EthernetFrame sourceFrame = getFrame(sourceId, sourceFrameNumber);
 
-		// all interface IDs except the source ID
-		Collection<String> allInterfaceIDsExceptOrigin = datenEinheiten.keySet();
-		allInterfaceIDsExceptOrigin.remove(sourceId);
-
 		String destinationId = null;
 
-		for (String id : allInterfaceIDsExceptOrigin) {
-			LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(sourceId);
+		// run through all IDs...
+		System.out.println("source id: " + sourceId);
+		for (String id : datenEinheiten.keySet()) {
+			// ...except the source ID
+			if (!id.equals(sourceId)) {
+				System.out.println(id);
+				LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(id);
 
-			if (framesMitZeitstempel != null) {
-				int frameNumber;
+				if (framesMitZeitstempel != null) {
+					int frameNumber;
 
-				for (frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
-					EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
+					// run through (potentially, notice the break below) all frames saved for id
+					for (frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+						EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
-					if (sourceFrame.samePayloadDifferentTTL(frame)) {
-						// hier muss eine weitere Bedingung hinzugefügt werden, und zwar:
-						// "Gehört die id zur destination IP?"
-						// 1. Schritt: Über id die zugehörige IP-Adresse IPAddress des Interfaces finden
-						// (bzw. Knoten finden...)
-						// 2. Schritt: IPAddress abgleichen mit destination IP von sourceFrame
-						// 3. Schritt: Falls gleich: OK
-						destinationId = id;
-						break;
+						if (sourceFrame.samePayload(frame, false)) {
+							System.out.println("jup1");
+							System.out.println("jup2");
+							Object daten = frame.getDaten();
+							if (frame.getTyp().equals(EthernetFrame.IP)) {
+								if (((IpPaket) daten).getEmpfaenger().equals(IPOfInterfaceID.get(id))) {
+									System.out.println("jup2");
+									destinationId = id;
+									break;
+								}
+							} else if (frame.getTyp().equals(EthernetFrame.ARP)) {
+								// hier weitermachen
+							}
+						}
 					}
 				}
+			} else if (destinationId != null) {
 				break;
 			}
 		}

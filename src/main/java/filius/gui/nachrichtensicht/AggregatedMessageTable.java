@@ -579,7 +579,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
+				+ " (AggregatedMessageTable), showGlobalPathThroughLayers()");
 		if (hasMessageArrived(selectedFrameNumber)) {
 			new GlobalDialogLayerPath(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
 					selectedFrameNumber);

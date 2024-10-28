@@ -105,8 +105,9 @@ public class EthernetFrame implements Serializable {
 	}
 
 	/**
-	 * This method checks wheter both frames have the same payload and each a
-	 * different TTL. Only works if this frame and the frame in the argument are IP
+	 * This method checks wheter both frames have the same payload. If the second
+	 * argument {@code TTLsHaveToBeDifferent} is true, it also checks, if the TTLs
+	 * are different. Only works if this frame and the frame in the argument are IP
 	 * packets (class {@code IpPaket}).
 	 * 
 	 * @param frame frame to be compared to this frame
@@ -114,9 +115,13 @@ public class EthernetFrame implements Serializable {
 	 *         payload and a different TTL, false otherwise
 	 * @author Christoph Irniger
 	 */
-	public boolean samePayloadDifferentTTL(EthernetFrame frame) {
+	public boolean samePayload(EthernetFrame frame, boolean TTLsHaveToBeDifferent) {
 		boolean[] boolArray = checkPayloadAndTTL(frame);
-		return boolArray[0] && !boolArray[1];
+		if (TTLsHaveToBeDifferent) {
+			return boolArray[0] && !boolArray[1];
+		} else {
+			return boolArray[0];
+		}
 	}
 
 	/**

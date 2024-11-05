@@ -14,16 +14,18 @@ import javax.swing.SwingConstants;
 import filius.rahmenprogramm.I18n;
 
 public class LocalVisualisationLayerPath extends VisualisationLayerPath implements I18n {
-	
-	// visualisation is on the sender side (otherwise receiver side)
+
+	/** visualisation is on the sender side (otherwise receiver side) */
 	private boolean senderSideIsActive;
-	// for this and all greater points in time visualisation is on the sender side
-	// (for smaller on receiver side)
+	/**
+	 * for this and all greater points in time visualisation is on the sender side
+	 * (for smaller on receiver side)
+	 */
 	private int pointInTimeForSenderSide;
-	
+
 	public LocalVisualisationLayerPath(PanelLayerPath panelLayerPath) {
 		super(panelLayerPath);
-		
+
 		// deactivate back button if the frame was received
 		if (!LAYER_PATH_PANEL.isSent()) {
 			BACK_IN_TIME.setEnabled(false);

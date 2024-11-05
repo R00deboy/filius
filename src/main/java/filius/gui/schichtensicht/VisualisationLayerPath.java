@@ -40,41 +40,50 @@ public class VisualisationLayerPath extends JPanel implements I18n {
 	protected final JPanel CENTER_PANEL = new JPanel();
 	protected final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
 	protected GridBagConstraints c = new GridBagConstraints();
-	// x coordinate of the left most element in the GridBag layout after the layer
-	// descrtiption and the colored gap
+	/**
+	 * x coordinate of the left most element in the GridBag layout after the layer
+	 * descrtiption and the colored gap
+	 */
 	protected final static int X_OFFSET = 2;
 
 	protected int pointInTime;
 	protected int minPointInTime;
 	protected int maxPointInTime;
 
-	// vertical and horizontal gap between GridBag cells with content
-	// (must be divisible by 2)
+	/**
+	 * vertical and horizontal gap between GridBag cells with content (must be
+	 * divisible by 2)
+	 */
 	protected static final int GAP_BETWEEN_CELLS = 12;
 
-	// width of rectangle including border (must be divisible by 2 *
-	// RECTANGLE_RATIO)
+	/**
+	 * width of rectangle including border (must be divisible by 2 *
+	 * RECTANGLE_RATIO)
+	 */
 	protected static final int RECTANGLE_WIDTH = 180;
-	// ratio of width to height of a rectangle including border
+	/** ratio of width to height of a rectangle including border */
 	protected static final int RECTANGLE_RATIO = 3;
-	// resulting height of a rectangle including border (must be divisible by 2)
+	/** resulting height of a rectangle including border (must be divisible by 2) */
 	protected static final int RECTANGLE_HEIGHT = RECTANGLE_WIDTH / RECTANGLE_RATIO;
 
-	// instance variables for nested messages visualisation:
-	// border width of standard border around nested messages
+	/**
+	 * instance variables for nested messages visualisation: border width of
+	 * standard border around nested messages
+	 */
 	protected static final int MAIN_BORDER_WIDTH = 2;
-	// left gap around a nested message
+	/** left gap around a nested message */
 	protected static final int INDENT_NESTED_MSGS = 20;
-	// upper, lower and right gap between neighbouring nested messages
+	/** upper, lower and right gap between neighbouring nested messages */
 	protected static final int BORDER_NESTED_MSGS = 5;
-	// side length of squares needed for visualisation of a frame on cable (layer 1)
+	/**
+	 * side length of squares needed for visualisation of a frame on cable (layer 1)
+	 */
 	protected static final int SQUARE_SIDE_LENGTH = RECTANGLE_HEIGHT;
-	// node name cell height
+	/** node name cell height */
 	protected static final int NODE_NAME_CELL_HEIGHT = (int) (0.3 * RECTANGLE_HEIGHT);
-	// node info cell ratio of width to height
+	/** node info cell ratio of width to height */
 	protected static final int NODE_INFO_CELL_HEIGHT = (int) Math.round(RECTANGLE_WIDTH / 1.935);
 
-	// buttons "forth" and "back"
 	protected final JButton FORTH_IN_TIME;
 	protected final JButton BACK_IN_TIME;
 

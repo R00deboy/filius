@@ -33,6 +33,9 @@ public class ArpPaket implements Serializable {
 	public static int REQUEST = 1, REPLY = 2;
 
 	private static final long serialVersionUID = 1L;
+	
+	/** counter of the identification number of the IP packet*/
+	private static long identificationCounter;
 
 	/** Protokoll-Typ der Vermittlungsschicht */
 	private String protokollTyp;
@@ -54,6 +57,18 @@ public class ArpPaket implements Serializable {
 	 * wird
 	 */
 	private String targetIP;
+	
+	/** identification number of the IP packet*/
+	private final long identification;
+	
+	public ArpPaket() {
+		this.identification = setIdentCounter();
+	}
+	
+	private static synchronized long setIdentCounter() {
+		identificationCounter++;
+		return identificationCounter - 1;
+	}
 
 	public String getProtokollTyp() {
 		return protokollTyp;

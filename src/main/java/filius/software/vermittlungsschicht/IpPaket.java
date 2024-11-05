@@ -26,6 +26,7 @@
 package filius.software.vermittlungsschicht;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.transportschicht.Segment;
@@ -39,6 +40,9 @@ import filius.software.transportschicht.UdpSegment;
 public class IpPaket implements Serializable, Cloneable {
 
 	public static final int UDP = 17, TCP = 6;
+	
+	/** counter of the identification number of the IP packet*/
+	private static long identificationCounter;
 
 	/** IP-Adresse des sendenden Knotens */
 	private String sender;
@@ -47,9 +51,17 @@ public class IpPaket implements Serializable, Cloneable {
 	private int ttl;
 	private final int protocol;
 	private Segment data;
+	/** identification number of the IP packet*/
+	private final long identification;
 
 	public IpPaket(int protocol) {
 		this.protocol = protocol;
+		this.identification = setIdentCounter();
+	}
+	
+	private static synchronized long setIdentCounter() {
+		identificationCounter++;
+		return identificationCounter - 1;
 	}
 
 	@Override

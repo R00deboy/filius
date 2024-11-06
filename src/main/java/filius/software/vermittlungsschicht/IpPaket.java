@@ -56,10 +56,10 @@ public class IpPaket implements Serializable, Cloneable {
 
 	public IpPaket(int protocol) {
 		this.protocol = protocol;
-		this.identification = setIdentCounter();
+		this.identification = getIdentCounter();
 	}
 	
-	private static synchronized long setIdentCounter() {
+	private static synchronized long getIdentCounter() {
 		identificationCounter++;
 		return identificationCounter - 1;
 	}

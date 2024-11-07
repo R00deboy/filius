@@ -20,7 +20,7 @@ public class DialogLayerPath extends JDialog implements I18n {
 	/** frame number which was selected by mouse click, starts with 1 */
 	private final int selectedFrameNumber;
 
-	protected LocalPanelLayerPath localPanelLayerPath;
+	protected LocalLayerPathPanel localLayerPathPanel;
 
 	public DialogLayerPath(JFrame owner, SystemSoftware systemSoftware, String interfaceId, int selectedFrameNumber) {
 		super(owner, true);

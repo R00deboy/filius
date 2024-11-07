@@ -38,7 +38,7 @@ import filius.rahmenprogramm.nachrichten.Lauscher;
  * 
  * @author Christoph Irniger
  */
-public class PanelLayerPath extends JPanel implements I18n {
+public class LayerPathPanel extends JPanel implements I18n {
 	private final Knoten node;
 
 	private final String interfaceId;
@@ -79,7 +79,7 @@ public class PanelLayerPath extends JPanel implements I18n {
 
 	private static Lauscher lauscher = Lauscher.getLauscher(); // Access to Lauscher
 
-	public PanelLayerPath(DialogLayerPath dialogLayerPath) {
+	public LayerPathPanel(DialogLayerPath dialogLayerPath) {
 		super();
 
 		// inherit instance variables from super container (localPathDialog)
@@ -720,7 +720,7 @@ public class PanelLayerPath extends JPanel implements I18n {
 		 * @return Dimension of the whole MessageDetailsTable
 		 */
 		private static Dimension getSizeOfMessageDetailsTable() {
-			return new Dimension(9 * PanelLayerPath.MSG_DETAILS_CELL_WIDTH, 8 * PanelLayerPath.MSG_DETAILS_CELL_HEIGHT);
+			return new Dimension(9 * LayerPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LayerPathPanel.MSG_DETAILS_CELL_HEIGHT);
 		}
 
 		/**

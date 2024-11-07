@@ -2,10 +2,10 @@ package filius.gui.schichtensicht;
 
 import filius.rahmenprogramm.I18n;
 
-public class GlobalVisualisationLayerPath extends VisualisationLayerPath implements I18n {
+public class GlobalayerPathVisualisationL extends LayerPathVisualisation implements I18n {
 	
-	public GlobalVisualisationLayerPath(PanelLayerPath panelLayerPath) {
-		super(panelLayerPath);
+	public GlobalayerPathVisualisationL(LayerPathPanel layerPathPanel) {
+		super(layerPathPanel);
 		backAndForth();
 	}
 

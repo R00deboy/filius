@@ -23,9 +23,9 @@ import filius.software.system.SystemSoftware;
  * @author Christoph Irniger
  */
 
-public class GlobalDialogLayerPath extends DialogLayerPath implements I18n {
+public class GlobalLayerPathDialog extends DialogLayerPath implements I18n {
 	
-	public GlobalDialogLayerPath(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
+	public GlobalLayerPathDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
 			int selectedFrameNumber) {
 		super(owner, systemSoftware, interfaceId, selectedFrameNumber);
 		
@@ -33,8 +33,8 @@ public class GlobalDialogLayerPath extends DialogLayerPath implements I18n {
 		setTitle(messages.getString("schichten_lokaler_weg_msg2"));
 
 		// Panel is in the center of the BorderLayout
-		localPanelLayerPath = new LocalPanelLayerPath(this);
-		add(localPanelLayerPath, BorderLayout.CENTER);
+		localLayerPathPanel = new LocalLayerPathPanel(this);
+		add(localLayerPathPanel, BorderLayout.CENTER);
 		setVisible(true);
 	}
 	
@@ -57,6 +57,4 @@ public class GlobalDialogLayerPath extends DialogLayerPath implements I18n {
 	private int getNumberOfRouters() {
 		return 0;
 	}
-	
-	
 }

@@ -34,8 +34,8 @@ import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
 
-public class VisualisationLayerPath extends JPanel implements I18n {
-	protected final PanelLayerPath LAYER_PATH_PANEL;
+public class LayerPathVisualisation extends JPanel implements I18n {
+	protected final LayerPathPanel LAYER_PATH_PANEL;
 
 	protected final JPanel CENTER_PANEL = new JPanel();
 	protected final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
@@ -87,9 +87,9 @@ public class VisualisationLayerPath extends JPanel implements I18n {
 	protected final JButton FORTH_IN_TIME;
 	protected final JButton BACK_IN_TIME;
 
-	public VisualisationLayerPath(PanelLayerPath panelLayerPath) {
+	public LayerPathVisualisation(LayerPathPanel layerPathPanel) {
 		super();
-		LAYER_PATH_PANEL = panelLayerPath;
+		LAYER_PATH_PANEL = layerPathPanel;
 
 		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout();
@@ -734,7 +734,7 @@ public class VisualisationLayerPath extends JPanel implements I18n {
 	}
 
 	/**
-	 * Visualisation of a grey wire (link layer) and an arrow
+	 * class for the visualisation of a grey wire (link layer) and an arrow
 	 */
 	protected class WireWithArrow extends Arrow {
 

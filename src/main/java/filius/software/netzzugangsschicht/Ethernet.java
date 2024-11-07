@@ -116,7 +116,7 @@ public class Ethernet extends Protokoll {
                         nic.getPort().holeAusgangsPuffer().add(ethernetFrame);
                         nic.getPort().holeAusgangsPuffer().notify();
                     }
-                    Lauscher.getLauscher().addDatenEinheit(nic.getMac(), ethernetFrame, nic.getIp());
+                    Lauscher.getLauscher().addDatenEinheit(nic, ethernetFrame);
                 }
             }
         }

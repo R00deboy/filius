@@ -86,7 +86,7 @@ public class FirewallThread extends ProtokollThread<EthernetFrame> implements I1
     protected void verarbeiteDatenEinheit(EthernetFrame frame) {
         LOG.trace("INVOKED (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + " (FirewallThread), verarbeiteDatenEinheit(" + frame.toString() + ")");
-        Lauscher.getLauscher().addDatenEinheit(netzwerkInterface.getMac(), frame, netzwerkInterface.getIp());
+        Lauscher.getLauscher().addDatenEinheit(netzwerkInterface, frame);
         if (!checkDiscardByFirewall(frame)) {
             forwardFrame(frame);
         }

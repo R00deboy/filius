@@ -58,7 +58,7 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
         LOG.trace("INVOKED (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + " (EthernetThread), verarbeiteDateneinheit(" + etp.toString() + ")");
         // record receipt (independent of further processing)
-        Lauscher.getLauscher().addDatenEinheit(netzwerkInterface.getMac(), etp, netzwerkInterface.getIp());
+        Lauscher.getLauscher().addDatenEinheit(netzwerkInterface, etp);
 
         // only process in case of correct MAC address, i.e., this packet is
         // addressed for this NIC (or broadcast)

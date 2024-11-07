@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
@@ -80,7 +79,7 @@ public class Lauscher implements I18n {
 	private HashMap<String, LinkedList<Object[]>> datenEinheiten = new HashMap<String, LinkedList<Object[]>>();
 	private List<Object[]> droppedDataUnits = new LinkedList<>();
 
-	private HashMap<String, String> IPOfInterfaceID = new HashMap<String, String>();
+	private HashMap<String, NetzwerkInterface> InterfaceByID = new HashMap<String, NetzwerkInterface>();
 
 	private Lauscher() {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", constr: Lauscher()");
@@ -147,7 +146,8 @@ public class Lauscher implements I18n {
 	 * @param frame
 	 * @param IPAddress
 	 */
-	public void addDatenEinheit(String interfaceId, EthernetFrame frame, String IPAddress) {
+	public void addDatenEinheit(NetzwerkInterface networkInterface, EthernetFrame frame) {
+		String interfaceId = networkInterface.getMac();
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", addDatenEinheit(" + interfaceId + "," + frame
 				+ ")");
 		if (!frame.isReadByLauscherForMac(interfaceId)) {
@@ -164,7 +164,7 @@ public class Lauscher implements I18n {
 			frame.setReadByLauscherForMac(interfaceId);
 			benachrichtigeBeobachter(interfaceId);
 		}
-		storeIPOfInterface(interfaceId, IPAddress);
+		storeInterfaceByID(interfaceId, networkInterface);
 	}
 
 	public void addDroppedDataUnit(EthernetFrame frame) {
@@ -610,15 +610,16 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * Adds the pair interfaceId and IP address to the HashMap nodeOfInterfaceID.
+	 * Adds the pair {@code interfaceId} and {@code interface} of type
+	 * {@code NetzwerkInterface} to the HashMap InterfaceByID.
 	 * 
-	 * @param interfaceId MAC address of the interface
-	 * @param IPAddress   IP address of the interface
+	 * @param interfaceId      MAC address of the interface
+	 * @param networkInterface interface belonging to the interface ID
 	 * @author Christoph Irniger
 	 */
-	public void storeIPOfInterface(String interfaceId, String IPAddress) {
-		if (!IPOfInterfaceID.keySet().contains(interfaceId)) {
-			IPOfInterfaceID.put(interfaceId, IPAddress);
+	public void storeInterfaceByID(String interfaceId, NetzwerkInterface networkInterface) {
+		if (!InterfaceByID.keySet().contains(interfaceId)) {
+			InterfaceByID.put(interfaceId, networkInterface);
 		}
 	}
 
@@ -661,7 +662,7 @@ public class Lauscher implements I18n {
 							System.out.println("jup2");
 							Object daten = frame.getDaten();
 							if (frame.getTyp().equals(EthernetFrame.IP)) {
-								if (((IpPaket) daten).getEmpfaenger().equals(IPOfInterfaceID.get(id))) {
+								if (((IpPaket) daten).getEmpfaenger().equals(InterfaceByID.get(id).getIp())) {
 									System.out.println("jup2");
 									destinationId = id;
 									break;

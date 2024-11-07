@@ -163,7 +163,7 @@ public abstract class InternetKnoten extends Knoten {
     }
 
     public void hinzuAnschluss() {
-        netzwerkInterfaces.add(new NetzwerkInterface());
+        netzwerkInterfaces.add(new NetzwerkInterface(this));
     }
 
     public void setzeAnzahlAnschluesse(int anzahlAnschluesse) {
@@ -172,7 +172,7 @@ public abstract class InternetKnoten extends Knoten {
 
         netzwerkInterfaces = new LinkedList<NetzwerkInterface>();
         for (int i = 0; i < anzahlAnschluesse; i++) {
-            netzwerkInterfaces.add(new NetzwerkInterface());
+            netzwerkInterfaces.add(new NetzwerkInterface(this));
         }
     }
 }

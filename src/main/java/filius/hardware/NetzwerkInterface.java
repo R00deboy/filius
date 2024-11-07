@@ -30,6 +30,7 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.Information;
 import filius.software.vermittlungsschicht.IP;
 
@@ -37,6 +38,8 @@ public class NetzwerkInterface implements Serializable {
     private static Logger LOG = LoggerFactory.getLogger(NetzwerkInterface.class);
 
     private static final long serialVersionUID = 1L;
+    /** The node that the interface belongs to */
+    private InternetKnoten node;
     private String mac;
     private String ip;
     private String subnetzMaske;
@@ -60,6 +63,15 @@ public class NetzwerkInterface implements Serializable {
         anschluss = new Port(this);
 
         // this.initPersistenceAttributes();
+    }
+    
+    public NetzwerkInterface(InternetKnoten node) {
+    	this();
+    	this.node = node;
+    }
+    
+    private InternetKnoten getNode() {
+    	return this.node;
     }
 
     /**

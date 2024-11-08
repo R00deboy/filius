@@ -1,9 +1,12 @@
 package filius.gui.schichtensicht;
+
 import javax.swing.JScrollPane;
 
 /**
- * @author Christoph Irniger
+ * Panel which is embedded in a JDialog window. Consists of a splitPane
+ * (visualisation in the upper part, message details table in the lower part).
  * 
+ * @author Christoph Irniger
  */
 public class GlobalLayerPathPanel extends LayerPathPanel {
 

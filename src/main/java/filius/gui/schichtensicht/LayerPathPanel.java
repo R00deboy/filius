@@ -77,13 +77,13 @@ public class LayerPathPanel extends JPanel implements I18n {
 	private static final int MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int MSG_DETAILS_CELL_HEIGHT = 30;
 
-	public LayerPathPanel(DialogLayerPath dialogLayerPath) {
+	public LayerPathPanel(LayerPathDialog layerPathDialog) {
 		super();
 
 		// inherit instance variables from super container (localPathDialog)
-		node = dialogLayerPath.getSystemSoftware().getKnoten();
-		interfaceId = dialogLayerPath.getInterfaceId();
-		selectedFrameNumber = dialogLayerPath.getSelectedFrameNumber();
+		node = layerPathDialog.getSystemSoftware().getKnoten();
+		interfaceId = layerPathDialog.getInterfaceId();
+		selectedFrameNumber = layerPathDialog.getSelectedFrameNumber();
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
@@ -126,12 +126,12 @@ public class LayerPathPanel extends JPanel implements I18n {
 
 		// set size and positioning properties of outer JDialog
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		dialogLayerPath.setLocation(screenSize.width / 6, screenSize.height / 6);
+		layerPathDialog.setLocation(screenSize.width / 6, screenSize.height / 6);
 		int dialogWidth = MessageDetailsTable.getSizeOfMessageDetailsTable().width;
 		int dialogHeight = MessageDetailsTable.getSizeOfMessageDetailsTable().height + DIVIDER_LOCATION + 100;
 		Dimension dialogDimension = new Dimension(dialogWidth, dialogHeight);
-		dialogLayerPath.setPreferredSize(dialogDimension);
-		dialogLayerPath.setMinimumSize(dialogDimension);
+		layerPathDialog.setPreferredSize(dialogDimension);
+		layerPathDialog.setMinimumSize(dialogDimension);
 	}
 
 	public Knoten getKnoten() {

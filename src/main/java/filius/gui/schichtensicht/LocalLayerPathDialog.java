@@ -21,7 +21,7 @@ import filius.software.system.SystemSoftware;
  * 
  * @author Christoph Irniger
  */
-public class LocalLayerPathDialog extends DialogLayerPath implements I18n {
+public class LocalLayerPathDialog extends LayerPathDialog implements I18n {
 
 	public LocalLayerPathDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
 			int selectedFrameNumber) {

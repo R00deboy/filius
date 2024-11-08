@@ -13,8 +13,8 @@ import filius.rahmenprogramm.I18n;
 public class LocalLayerPathPanel extends LayerPathPanel implements I18n {
 	private LocalLayerPathVisualisation visualisation;
 
-	public LocalLayerPathPanel(DialogLayerPath dialogLayerPath) {
-		super(dialogLayerPath);
+	public LocalLayerPathPanel(LayerPathDialog layerPathDialog) {
+		super(layerPathDialog);
 
 		// set visualisation on top half of the SplitPane
 		visualisation = new LocalLayerPathVisualisation(this);

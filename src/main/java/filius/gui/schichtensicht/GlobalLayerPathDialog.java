@@ -23,7 +23,7 @@ import filius.software.system.SystemSoftware;
  * @author Christoph Irniger
  */
 
-public class GlobalLayerPathDialog extends DialogLayerPath implements I18n {
+public class GlobalLayerPathDialog extends LayerPathDialog implements I18n {
 	
 	public GlobalLayerPathDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
 			int selectedFrameNumber) {

@@ -12,7 +12,7 @@ import filius.software.system.SystemSoftware;
  * 
  * @author Christoph Irniger
  */
-public class DialogLayerPath extends JDialog implements I18n {
+public class LayerPathDialog extends JDialog implements I18n {
 	private final SystemSoftware systemSoftware;
 
 	private final String interfaceId;
@@ -22,7 +22,7 @@ public class DialogLayerPath extends JDialog implements I18n {
 
 	protected LocalLayerPathPanel localLayerPathPanel;
 
-	public DialogLayerPath(JFrame owner, SystemSoftware systemSoftware, String interfaceId, int selectedFrameNumber) {
+	public LayerPathDialog(JFrame owner, SystemSoftware systemSoftware, String interfaceId, int selectedFrameNumber) {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
 		this.interfaceId = interfaceId;

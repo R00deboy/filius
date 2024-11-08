@@ -31,8 +31,7 @@ public class LocalLayerPathDialog extends LayerPathDialog implements I18n {
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 
 		// Panel is in the center of the BorderLayout
-		localLayerPathPanel = new LocalLayerPathPanel(this);
-		add(localLayerPathPanel, BorderLayout.CENTER);
+		add(new LocalLayerPathPanel(this), BorderLayout.CENTER);
 		setVisible(true);
 	}
 }

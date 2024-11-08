@@ -6,13 +6,11 @@ import javax.swing.JScrollPane;
  * 
  */
 public class GlobalLayerPathPanel extends LayerPathPanel {
-	private GlobalayerPathVisualisationL l;
 
 	public GlobalLayerPathPanel(LayerPathDialog layerPathDialog) {
 		super(layerPathDialog);
 
-		// set l on top half of the SplitPane
-		l = new GlobalayerPathVisualisationL(this);
-		splitPane.setTopComponent(new JScrollPane(l));
+		// set visualisation on top half of the SplitPane
+		splitPane.setTopComponent(new JScrollPane(new GlobalLayerPathVisualisation(this)));
 	}
 }

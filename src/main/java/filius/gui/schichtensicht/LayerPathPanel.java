@@ -77,8 +77,6 @@ public class LayerPathPanel extends JPanel implements I18n {
 	private static final int MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int MSG_DETAILS_CELL_HEIGHT = 30;
 
-	private static Lauscher lauscher = Lauscher.getLauscher(); // Access to Lauscher
-
 	public LayerPathPanel(DialogLayerPath dialogLayerPath) {
 		super();
 
@@ -89,7 +87,7 @@ public class LayerPathPanel extends JPanel implements I18n {
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
-		sent = isFrameSent();
+		sent = isFrameSent(interfaceId, selectedFrameNumber);
 
 		/*
 		 * Fill matrices messageDetailsReceived and messageDetailsSent. Both have an
@@ -100,7 +98,7 @@ public class LayerPathPanel extends JPanel implements I18n {
 		MAX_LAYER_INSIDE_FRAME = fill();
 
 		// determine if the packet (inside the frame) was forwarded
-		CORR_FRAME_DATA = lauscher.getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
+		CORR_FRAME_DATA = Lauscher.getLauscher().getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
 				(InternetKnoten) this.node);
 		CORR_INTERFACE_ID = (String) CORR_FRAME_DATA[0];
 		Integer corrFrameNumber = (Integer) CORR_FRAME_DATA[1];
@@ -173,8 +171,9 @@ public class LayerPathPanel extends JPanel implements I18n {
 	 * 
 	 * @return true if sent, false if received
 	 */
-	private boolean isFrameSent() {
-		return interfaceId.equals(lauscher.getFrame(this.interfaceId, this.selectedFrameNumber).getQuellMacAdresse());
+	public static boolean isFrameSent(String interfaceId, int selectedFrameNumber) {
+		return interfaceId.equals(
+				Lauscher.getLauscher().getFrame(interfaceId, selectedFrameNumber).getQuellMacAdresse());
 	}
 
 	/**
@@ -204,7 +203,7 @@ public class LayerPathPanel extends JPanel implements I18n {
 	 * @return maximum layer that appears inside the frame
 	 */
 	private int fillMessageDetails(String[][] messageDetails, String interfaceId, int selectedFrameNumber) {
-		Object[][] daten = lauscher.getDaten(interfaceId, false, 0);
+		Object[][] daten = Lauscher.getLauscher().getDaten(interfaceId, false, 0);
 		String selectedFrameNumberAsString = Integer.toString(selectedFrameNumber);
 		int maxLayerInsideFrame = 1;
 

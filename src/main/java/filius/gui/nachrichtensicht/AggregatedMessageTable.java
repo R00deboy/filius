@@ -62,11 +62,13 @@ import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
 import filius.gui.schichtensicht.GlobalLayerPathDialog;
+import filius.gui.schichtensicht.LayerPathPanel;
 import filius.gui.schichtensicht.LocalLayerPathDialog;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.rahmenprogramm.nachrichten.LauscherBeobachter;
+import filius.software.netzzugangsschicht.Ethernet;
 import filius.software.system.SystemSoftware;
 
 public class AggregatedMessageTable extends JTable implements LauscherBeobachter, I18n {
@@ -578,25 +580,14 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showGlobalPathThroughLayers()");
-		if (hasMessageArrived(selectedFrameNumber)) {
+		// if the frame was sent and destination MAC of the frame is broadcast, global
+		// view is not possible
+		if (LayerPathPanel.isFrameSent(interfaceId, selectedFrameNumber) && Lauscher.getLauscher()
+				.getFrame(interfaceId, selectedFrameNumber).getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)) {
+			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("nachrichtentabelle_msg12"));
+		} else {
 			new GlobalLayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
 					selectedFrameNumber);
-		} else {
-			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(),
-					messages.getString("schichten_globaler_weg_msg2"));
 		}
-	}
-
-	/**
-	 * Checks if the IP packet inside the selected frame has arrived at the
-	 * destination IP address (for global path).
-	 * 
-	 * @param systemSoftware      system software of the node
-	 * @param selectedFrameNumber number of the selected frame in the data exchange
-	 * 
-	 * @author Christoph Irniger
-	 */
-	private Boolean hasMessageArrived(int selectedFrameNumber) {
-		return Lauscher.getLauscher().getInterfaceIdIfArrived(interfaceId, selectedFrameNumber) != null;
 	}
 }

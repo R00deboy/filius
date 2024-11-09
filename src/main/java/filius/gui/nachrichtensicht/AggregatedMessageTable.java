@@ -61,8 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
-import filius.gui.schichtensicht.GlobalLayerPathDialog;
-import filius.gui.schichtensicht.LayerPathPanel;
+import filius.gui.schichtensicht.GlobalLayerPath;
+import filius.gui.schichtensicht.LocalLayerPathPanel;
 import filius.gui.schichtensicht.LocalLayerPathDialog;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
@@ -582,11 +582,11 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 				+ " (AggregatedMessageTable), showGlobalPathThroughLayers()");
 		// if the frame was sent and destination MAC of the frame is broadcast, global
 		// view is not possible
-		if (LayerPathPanel.isFrameSent(interfaceId, selectedFrameNumber) && Lauscher.getLauscher()
+		if (LocalLayerPathPanel.isFrameSent(interfaceId, selectedFrameNumber) && Lauscher.getLauscher()
 				.getFrame(interfaceId, selectedFrameNumber).getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)) {
 			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("nachrichtentabelle_msg12"));
 		} else {
-			new GlobalLayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
+			new GlobalLayerPath(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
 					selectedFrameNumber);
 		}
 	}

@@ -40,16 +40,17 @@ public class LayerPathVisualisation extends JPanel implements I18n {
 	protected final JPanel CENTER_PANEL = new JPanel();
 	protected final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
 	protected GridBagConstraints c = new GridBagConstraints();
-	/**
-	 * x coordinate of the left most element in the GridBag layout after the layer
-	 * descrtiption and the colored gap
-	 */
-	protected final static int X_OFFSET = 2;
 
 	protected int pointInTime;
 	protected int minPointInTime;
 	protected int maxPointInTime;
 
+	/**
+	 * x coordinate of the left most element in the GridBag layout after the layer
+	 * descrtiption and the colored gap
+	 */
+	protected final static int X_OFFSET = 2;
+	
 	/**
 	 * vertical and horizontal gap between GridBag cells with content (must be
 	 * divisible by 2)

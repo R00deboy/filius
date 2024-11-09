@@ -4,6 +4,7 @@ import filius.rahmenprogramm.I18n;
 
 public class GlobalLayerPathVisualisation extends LocalLayerPathVisualisation implements I18n {
 	
+	
 	public GlobalLayerPathVisualisation(LayerPathPanel layerPathPanel) {
 		super(layerPathPanel);
 	}

@@ -23,23 +23,11 @@ public class GlobalLayerPathVisualisation extends LocalLayerPathVisualisation im
 //		return new Dimension(480, 300);
 //	}
 
-	@Override
-	protected void updateButtonsIfForth() {
+	private void updateBackButtonActivity() {
+		
 	}
-
-	@Override
-	protected void updateButtonsIfBack() {
-	}
-
-	@Override
-	protected void hideOrShowLayersIfForth() {
-	}
-
-	@Override
-	protected void hideOrShowLayersIfBack() {
-	}
-
-	@Override
-	protected void updateActiveBorder(boolean isForth) {
+	
+	private void updateForthButtonActivity() {
+		
 	}
 }

@@ -71,6 +71,8 @@ public class Information implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static final String FILENAME_EDITED_SZENARIO = "edited_scenario.fls";
+
     /** Zur Implementierung des Singleton */
     private static Information information = null;
 

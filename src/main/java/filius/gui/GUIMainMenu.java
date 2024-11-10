@@ -398,7 +398,9 @@ public class GUIMainMenu implements Serializable, I18n {
                 erfolg = SzenarioVerwaltung.getInstance().speichern(targetFilePath,
                         GUIContainer.getGUIContainer().getKnotenItems(), GUIContainer.getGUIContainer().getCableItems(),
                         GUIContainer.getGUIContainer().getDocuItems());
-                if (!erfolg) {
+                if (erfolg) {
+                    SzenarioVerwaltung.getInstance().setCurrentFile(targetFilePath, false);
+                } else {
                     JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("guimainmemu_msg11"));
                 }
             }

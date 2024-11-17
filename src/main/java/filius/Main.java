@@ -37,7 +37,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -51,6 +50,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import filius.gui.GUIContainer;
 import filius.gui.GUIMainMenu;
 import filius.gui.JMainFrame;
+import filius.gui.LanguageSelectionDialog;
 import filius.gui.SplashScreen;
 import filius.hardware.Verbindung;
 import filius.rahmenprogramm.FiliusArgs;
@@ -64,10 +64,6 @@ import filius.rahmenprogramm.SzenarioVerwaltung;
  */
 public class Main implements I18n {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-
-    private static final String FRANCAIS = "Français";
-    private static final String ENGLISH = "English";
-    private static final String DEUTSCH = "Deutsch";
 
     /**
      * Der Start laeuft folgendermassen ab:
@@ -97,18 +93,7 @@ public class Main implements I18n {
         String konfigPfad = Information.getInformation().getArbeitsbereichPfad() + "konfig.xml";
         String editedSzenarioDatei = null;
         if (!(new File(konfigPfad)).exists() && null == Information.getInformation().getLocale()) {
-            String[] possibleValues = { DEUTSCH, ENGLISH, FRANCAIS };
-            String selectedValue = (String) JOptionPane.showInputDialog(null, "", "Sprache/Language/Langue",
-                    JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
-            if (selectedValue == null) {
-                Information.getInformation().setLocale(Locale.GERMANY);
-            } else if (ENGLISH.equals(selectedValue)) {
-                Information.getInformation().setLocale(Locale.UK);
-            } else if (FRANCAIS.equals(selectedValue)) {
-                Information.getInformation().setLocale(Locale.FRANCE);
-            } else {
-                Information.getInformation().setLocale(Locale.GERMANY);
-            }
+            LanguageSelectionDialog.selectLanguage(false);
         } else {
             try {
                 xmldec = new XMLDecoder(new BufferedInputStream(Files.newInputStream(Paths.get(konfigPfad))));

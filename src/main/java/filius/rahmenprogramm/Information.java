@@ -262,9 +262,7 @@ public class Information implements Serializable {
      * @return
      */
     public ResourceBundle holeResourceBundle() {
-        ResourceBundle bundle;
-
-        bundle = ResourceBundle.getBundle("filius.messages.MessagesBundle", getLocaleOrDefault());
+        ResourceBundle bundle = ResourceBundle.getBundle("filius.messages.MessagesBundle", getLocaleOrDefault());
 
         return bundle;
     }

@@ -27,6 +27,7 @@ package filius.gui;
 
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,7 +59,7 @@ public class LanguageSelectionDialog extends JDialog {
     private Box buttonBox = Box.createHorizontalBox();
 
     private LanguageSelectionDialog(boolean restartMode) {
-        super();
+        super(restartMode ? JMainFrame.getJMainFrame() : null);
         this.setModal(true);
         Image image = Toolkit.getDefaultToolkit()
                 .getImage(LanguageSelectionDialog.class.getResource("/gfx/hardware/kabel.png"));
@@ -118,8 +119,15 @@ public class LanguageSelectionDialog extends JDialog {
         verticalBox.setPreferredSize(new Dimension(400, 240));
         getContentPane().add(verticalBox);
         pack();
-        setLocation((getToolkit().getScreenSize().width - getWidth()) / 2,
-                (getToolkit().getScreenSize().height - getHeight()) / 2);
+
+        if (restartMode) {
+            Rectangle mainFrameBounds = JMainFrame.getJMainFrame().getBounds();
+            setLocation(mainFrameBounds.x + mainFrameBounds.width / 2 - getWidth() / 2,
+                    mainFrameBounds.y + mainFrameBounds.height / 2 - getHeight() / 2);
+        } else {
+            setLocation((getToolkit().getScreenSize().width - getWidth()) / 2,
+                    (getToolkit().getScreenSize().height - getHeight()) / 2);
+        }
 
         verticalBox.add(Box.createVerticalStrut(10));
 

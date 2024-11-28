@@ -91,6 +91,7 @@ public class Main implements I18n {
         }
 
         String konfigPfad = Information.getInformation().getArbeitsbereichPfad() + "konfig.xml";
+        String lastSzenarioDatei = null;
         String editedSzenarioDatei = null;
         if (!(new File(konfigPfad)).exists() && null == Information.getInformation().getLocale()) {
             LanguageSelectionDialog.selectLanguage(false);
@@ -101,9 +102,7 @@ public class Main implements I18n {
                 if (programmKonfig != null) {
                     if (programmKonfig.length >= 4) {
                         JMainFrame.getJMainFrame().setBounds((Rectangle) programmKonfig[0]);
-                        if (szenarioDatei == null) {
-                            szenarioDatei = (String) programmKonfig[1];
-                        }
+                        lastSzenarioDatei = (String) programmKonfig[1];
                         if (programmKonfig[2] != null && programmKonfig[3] != null
                                 && null == Information.getInformation().getLocale()) {
                             Information.getInformation()
@@ -138,14 +137,18 @@ public class Main implements I18n {
         long splashTime = System.currentTimeMillis();
 
         try {
-            if (null != editedSzenarioDatei) {
+            if (null != szenarioDatei) {
+                SzenarioVerwaltung.getInstance().laden(szenarioDatei, GUIContainer.getGUIContainer().getKnotenItems(),
+                        GUIContainer.getGUIContainer().getCableItems(), GUIContainer.getGUIContainer().getDocuItems());
+            } else if (null != editedSzenarioDatei) {
                 SzenarioVerwaltung.getInstance().laden(editedSzenarioDatei,
                         GUIContainer.getGUIContainer().getKnotenItems(), GUIContainer.getGUIContainer().getCableItems(),
                         GUIContainer.getGUIContainer().getDocuItems());
-                SzenarioVerwaltung.getInstance().setCurrentFile(szenarioDatei, true);
-            } else if (null != szenarioDatei) {
-                SzenarioVerwaltung.getInstance().laden(szenarioDatei, GUIContainer.getGUIContainer().getKnotenItems(),
-                        GUIContainer.getGUIContainer().getCableItems(), GUIContainer.getGUIContainer().getDocuItems());
+                SzenarioVerwaltung.getInstance().setCurrentFile(lastSzenarioDatei, true);
+            } else if (null != lastSzenarioDatei) {
+                SzenarioVerwaltung.getInstance().laden(lastSzenarioDatei,
+                        GUIContainer.getGUIContainer().getKnotenItems(), GUIContainer.getGUIContainer().getCableItems(),
+                        GUIContainer.getGUIContainer().getDocuItems());
             }
         } catch (Exception e) {
             LOG.debug("", e);

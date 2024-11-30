@@ -1,5 +1,9 @@
 # Changelog Filius
 
+## [2.7.1] - 2024-11-30
+### Fixed
+ * Start-up with Filius scenario as program argument fixed
+ 
 ## [2.7.0] - 2024-11-23
 ### Added
  * New settings dialog to change the language

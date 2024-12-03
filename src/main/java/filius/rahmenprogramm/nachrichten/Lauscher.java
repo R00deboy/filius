@@ -141,8 +141,7 @@ public class Lauscher implements I18n {
 	/**
 	 * Hinzufuegen von einem EthernetFrame zu den Daten
 	 * 
-	 * @param interfaceId Uebergeben wird der String des NetzwerkInterface nach
-	 *                    Aufruf von toString()
+	 * @param networkInterface
 	 * @param frame
 	 * @param IPAddress
 	 */

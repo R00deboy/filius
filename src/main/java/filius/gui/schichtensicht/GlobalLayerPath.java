@@ -9,6 +9,8 @@ import filius.software.system.SystemSoftware;
 public class GlobalLayerPath extends JPanel implements I18n {
 
 	private LocalLayerPathDialog originalLocalDialog;
+	
+	// hier array mit allen Knoten
 
 	public GlobalLayerPath(JFrame owner, SystemSoftware systemSoftware, String interfaceId,
 			int selectedFrameNumber) {

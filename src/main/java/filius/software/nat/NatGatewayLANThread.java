@@ -30,6 +30,7 @@ import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.firewall.FirewallThread;
 import filius.software.netzzugangsschicht.EthernetFrame;
+import filius.software.system.SystemSoftware;
 import filius.software.transportschicht.TcpSegment;
 import filius.software.transportschicht.UdpSegment;
 import filius.software.vermittlungsschicht.IcmpPaket;
@@ -37,83 +38,84 @@ import filius.software.vermittlungsschicht.IpPaket;
 import filius.software.vermittlungsschicht.VermittlungsProtokoll;
 
 public class NatGatewayLANThread extends FirewallThread implements I18n {
-    private NatGateway natGateway;
+	private NatGateway natGateway;
 
-    private NetzwerkInterface lanNic;
-    private NetzwerkInterface wanNic;
+	private NetzwerkInterface lanNic;
+	private NetzwerkInterface wanNic;
 
-    /** Init thread for the LAN network interface */
-    public NatGatewayLANThread(NatGateway natGateway, NetzwerkInterface nic, NetzwerkInterface wanNic) {
-        super(natGateway, nic);
-        this.lanNic = nic;
-        this.wanNic = wanNic;
-        this.natGateway = natGateway;
-    }
+	/** Init thread for the LAN network interface */
+	public NatGatewayLANThread(NatGateway natGateway, NetzwerkInterface nic, NetzwerkInterface wanNic,
+			SystemSoftware systemSoftware) {
+		super(natGateway, nic, systemSoftware);
+		this.lanNic = nic;
+		this.wanNic = wanNic;
+		this.natGateway = natGateway;
+	}
 
-    @Override
-    protected void verarbeiteDatenEinheit(EthernetFrame frame) {
-        Lauscher.getLauscher().addDatenEinheit(lanNic, frame);
+	@Override
+	protected void verarbeiteDatenEinheit(EthernetFrame frame) {
+		Lauscher.getLauscher().addDatenEinheit(lanNic, this.systemSoftware, frame);
 
-        if (!checkDiscardByFirewall(frame) && !checkTTLExceeded(frame)) {
-            updateNatTable(frame);
-            modifyOutgoingFrame(frame);
-            forwardFrame(frame);
-        }
-    }
+		if (!checkDiscardByFirewall(frame) && !checkTTLExceeded(frame)) {
+			updateNatTable(frame);
+			modifyOutgoingFrame(frame);
+			forwardFrame(frame);
+		}
+	}
 
-    boolean checkTTLExceeded(EthernetFrame frame) {
-        boolean exceeded = false;
-        if (frame.getDaten() instanceof IpPaket) {
-            IpPaket packet = (IpPaket) frame.getDaten();
-            if (packet.getTtl() <= 1 && isOutgoingPacket(packet)) {
-                int seqNo = 0;
-                if (packet instanceof IcmpPaket) {
-                    seqNo = ((IcmpPaket) packet).getSeqNr();
-                }
-                natGateway.getSystemSoftware().holeICMP().sendeTimeExceededReply(packet.getSender(), seqNo);
-                exceeded = true;
-            }
-        }
-        return exceeded;
-    }
+	boolean checkTTLExceeded(EthernetFrame frame) {
+		boolean exceeded = false;
+		if (frame.getDaten() instanceof IpPaket) {
+			IpPaket packet = (IpPaket) frame.getDaten();
+			if (packet.getTtl() <= 1 && isOutgoingPacket(packet)) {
+				int seqNo = 0;
+				if (packet instanceof IcmpPaket) {
+					seqNo = ((IcmpPaket) packet).getSeqNr();
+				}
+				natGateway.getSystemSoftware().holeICMP().sendeTimeExceededReply(packet.getSender(), seqNo);
+				exceeded = true;
+			}
+		}
+		return exceeded;
+	}
 
-    protected void modifyOutgoingFrame(EthernetFrame frame) {
-        if (frame.getDaten() instanceof IpPaket
-                && !((IpPaket) frame.getDaten()).getEmpfaenger().equals(wanNic.getIp())) {
-            IpPaket packet = (IpPaket) frame.getDaten();
-            if (isOutgoingPacket(packet)) {
-                natGateway.replaceSource(packet);
-            }
-        }
-    }
+	protected void modifyOutgoingFrame(EthernetFrame frame) {
+		if (frame.getDaten() instanceof IpPaket
+				&& !((IpPaket) frame.getDaten()).getEmpfaenger().equals(wanNic.getIp())) {
+			IpPaket packet = (IpPaket) frame.getDaten();
+			if (isOutgoingPacket(packet)) {
+				natGateway.replaceSource(packet);
+			}
+		}
+	}
 
-    protected void updateNatTable(EthernetFrame frame) {
-        if (frame.getDaten() instanceof IpPaket) {
-            IpPaket packet = (IpPaket) frame.getDaten();
-            if (isOutgoingPacket(packet)) {
-                if (packet.getSegment() instanceof TcpSegment) {
-                    TcpSegment tcpSegment = (TcpSegment) packet.getSegment();
-                    if (tcpSegment.isSyn() && !tcpSegment.isAck()) {
-                        natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(),
-                                tcpSegment.getQuellPort(), packet.getEmpfaenger(), tcpSegment.getZielPort());
-                    }
-                } else if (packet.getSegment() instanceof UdpSegment) {
-                    UdpSegment udpSegment = (UdpSegment) packet.getSegment();
-                    natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(), udpSegment.getQuellPort(),
-                            packet.getEmpfaenger(), udpSegment.getZielPort());
-                } else if (packet.getProtocol() == IcmpPaket.ICMP_PROTOCOL) {
-                    natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(),
-                            NatGateway.PSEUDO_PORT_ICMP, packet.getEmpfaenger(), NatGateway.PSEUDO_PORT_ICMP);
-                }
-            }
-        }
-    }
+	protected void updateNatTable(EthernetFrame frame) {
+		if (frame.getDaten() instanceof IpPaket) {
+			IpPaket packet = (IpPaket) frame.getDaten();
+			if (isOutgoingPacket(packet)) {
+				if (packet.getSegment() instanceof TcpSegment) {
+					TcpSegment tcpSegment = (TcpSegment) packet.getSegment();
+					if (tcpSegment.isSyn() && !tcpSegment.isAck()) {
+						natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(),
+								tcpSegment.getQuellPort(), packet.getEmpfaenger(), tcpSegment.getZielPort());
+					}
+				} else if (packet.getSegment() instanceof UdpSegment) {
+					UdpSegment udpSegment = (UdpSegment) packet.getSegment();
+					natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(), udpSegment.getQuellPort(),
+							packet.getEmpfaenger(), udpSegment.getZielPort());
+				} else if (packet.getProtocol() == IcmpPaket.ICMP_PROTOCOL) {
+					natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(),
+							NatGateway.PSEUDO_PORT_ICMP, packet.getEmpfaenger(), NatGateway.PSEUDO_PORT_ICMP);
+				}
+			}
+		}
+	}
 
-    protected boolean isOutgoingPacket(IpPaket packet) {
-        return !VermittlungsProtokoll.gleichesRechnernetz(packet.getEmpfaenger(), lanNic.getIp(),
-                lanNic.getSubnetzMaske())
-                && !VermittlungsProtokoll.isBroadcast(packet.getEmpfaenger(), packet.getSender(),
-                        lanNic.getSubnetzMaske())
-                && !packet.getEmpfaenger().equals(wanNic.getIp());
-    }
+	protected boolean isOutgoingPacket(IpPaket packet) {
+		return !VermittlungsProtokoll.gleichesRechnernetz(packet.getEmpfaenger(), lanNic.getIp(),
+				lanNic.getSubnetzMaske())
+				&& !VermittlungsProtokoll.isBroadcast(packet.getEmpfaenger(), packet.getSender(),
+						lanNic.getSubnetzMaske())
+				&& !packet.getEmpfaenger().equals(wanNic.getIp());
+	}
 }

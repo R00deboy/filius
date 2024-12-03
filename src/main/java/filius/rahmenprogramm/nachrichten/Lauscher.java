@@ -45,6 +45,7 @@ import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.Information;
 import filius.software.netzzugangsschicht.EthernetFrame;
+import filius.software.system.SystemSoftware;
 import filius.software.transportschicht.TcpSegment;
 import filius.software.transportschicht.UdpSegment;
 import filius.software.vermittlungsschicht.ArpPaket;
@@ -80,6 +81,7 @@ public class Lauscher implements I18n {
 	private List<Object[]> droppedDataUnits = new LinkedList<>();
 
 	private HashMap<String, NetzwerkInterface> InterfaceByID = new HashMap<String, NetzwerkInterface>();
+	private HashMap<String, SystemSoftware> SystemSoftwareByID = new HashMap<String, SystemSoftware>();
 
 	private Lauscher() {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", constr: Lauscher()");
@@ -142,10 +144,11 @@ public class Lauscher implements I18n {
 	 * Hinzufuegen von einem EthernetFrame zu den Daten
 	 * 
 	 * @param networkInterface
+	 * @param systemSoftware
 	 * @param frame
-	 * @param IPAddress
 	 */
-	public void addDatenEinheit(NetzwerkInterface networkInterface, EthernetFrame frame) {
+	public void addDatenEinheit(NetzwerkInterface networkInterface, SystemSoftware systemSoftware,
+			EthernetFrame frame) {
 		String interfaceId = networkInterface.getMac();
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", addDatenEinheit(" + interfaceId + "," + frame
 				+ ")");
@@ -164,6 +167,7 @@ public class Lauscher implements I18n {
 			benachrichtigeBeobachter(interfaceId);
 		}
 		storeInterfaceByID(interfaceId, networkInterface);
+		storeSystemSoftwareByID(interfaceId, systemSoftware);
 	}
 
 	public void addDroppedDataUnit(EthernetFrame frame) {
@@ -619,6 +623,21 @@ public class Lauscher implements I18n {
 	public void storeInterfaceByID(String interfaceId, NetzwerkInterface networkInterface) {
 		if (!InterfaceByID.keySet().contains(interfaceId)) {
 			InterfaceByID.put(interfaceId, networkInterface);
+		}
+	}
+
+	/**
+	 * Adds the pair {@code interfaceId} and {@code systemSoftware} of type
+	 * {@code SystemSoftware} to the HashMap InterfaceByID.
+	 * 
+	 * @param interfaceId    MAC address of the interface
+	 * @param systemSoftware systemSoftware (operating system) belonging to the
+	 *                       interface ID
+	 * @author Christoph Irniger
+	 */
+	public void storeSystemSoftwareByID(String interfaceId, SystemSoftware systemSoftware) {
+		if (!SystemSoftwareByID.keySet().contains(interfaceId)) {
+			SystemSoftwareByID.put(interfaceId, systemSoftware);
 		}
 	}
 }

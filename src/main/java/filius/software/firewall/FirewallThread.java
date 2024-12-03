@@ -35,6 +35,7 @@ import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.ProtokollThread;
 import filius.software.netzzugangsschicht.EthernetFrame;
+import filius.software.system.SystemSoftware;
 import filius.software.vermittlungsschicht.IpPaket;
 
 /*
@@ -47,6 +48,7 @@ public class FirewallThread extends ProtokollThread<EthernetFrame> implements I1
     private static Logger LOG = LoggerFactory.getLogger(FirewallThread.class);
 
     private LinkedList<EthernetFrame> ausgangsPuffer;
+    protected SystemSoftware systemSoftware;
     private Firewall firewall;
     private NetzwerkInterface netzwerkInterface = null;
 
@@ -54,12 +56,13 @@ public class FirewallThread extends ProtokollThread<EthernetFrame> implements I1
         return netzwerkInterface;
     }
 
-    public FirewallThread(Firewall firewall, NetzwerkInterface nic) {
+    public FirewallThread(Firewall firewall, NetzwerkInterface nic, SystemSoftware systemSoftware) {
         super(new LinkedList<EthernetFrame>());
         LOG.trace("INVOKED-2 (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + " (FirewallThread), constr: FirewallThread(" + firewall + ")");
         this.firewall = firewall;
         this.netzwerkInterface = nic;
+        this.systemSoftware = systemSoftware;
     }
 
     /*
@@ -86,7 +89,7 @@ public class FirewallThread extends ProtokollThread<EthernetFrame> implements I1
     protected void verarbeiteDatenEinheit(EthernetFrame frame) {
         LOG.trace("INVOKED (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + " (FirewallThread), verarbeiteDatenEinheit(" + frame.toString() + ")");
-        Lauscher.getLauscher().addDatenEinheit(netzwerkInterface, frame);
+        Lauscher.getLauscher().addDatenEinheit(netzwerkInterface, systemSoftware, frame);
         if (!checkDiscardByFirewall(frame)) {
             forwardFrame(frame);
         }

@@ -33,9 +33,6 @@ import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 
 /**
- * Super class for panels for local and global view of the path through the
- * layers.
- * 
  * @author Christoph Irniger
  */
 public class LocalLayerPathPanel extends JPanel implements I18n {
@@ -722,7 +719,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		 * @return Dimension of the whole MessageDetailsTable
 		 */
 		private static Dimension getSizeOfMessageDetailsTable() {
-			return new Dimension(9 * LocalLayerPathPanel.MSG_DETAILS_CELL_WIDTH, 8 * LocalLayerPathPanel.MSG_DETAILS_CELL_HEIGHT);
+			return new Dimension(9 * LocalLayerPathPanel.MSG_DETAILS_CELL_WIDTH,
+					8 * LocalLayerPathPanel.MSG_DETAILS_CELL_HEIGHT);
 		}
 
 		/**

@@ -30,3 +30,9 @@ Nuvola_mimetypes_pdf.png / pdf_small.png
 Designer: David Vignoni / ICON KING
 License: GNU GPL 2.1 or later
 https://commons.wikimedia.org/wiki/File:Nuvola_mimetypes_pdf.png
+
+settings.png
+-----------------------
+Designer: Pau Giner
+License: Creative Commons CC0 1.0 Universal Public Domain Dedication
+https://commons.wikimedia.org/wiki/File:WMF-Agora-Settings_BCBCBC.svg

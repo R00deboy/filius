@@ -85,6 +85,7 @@ public class GUIMainMenu implements Serializable, I18n {
     private JButton btWizard;
     private JButton btHilfe;
     private JButton btInfo;
+    private JButton btSettings;
 
     public GUIMainMenu() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (GUIMainMenu), constr: GUIMainMenu()");
@@ -95,6 +96,12 @@ public class GUIMainMenu implements Serializable, I18n {
         menupanel.setBounds(0, 0, c.getWidth(), 65);
         menupanel.setEnabled(false);
         menupanel.setBackgroundImage("gfx/allgemein/menue_hg.png");
+
+        btNeu = new JButton();
+        btNeu.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/neu.png")));
+        btNeu.setBounds(10, 5, btNeu.getIcon().getIconWidth(), btNeu.getIcon().getIconHeight());
+        btNeu.setActionCommand("neu");
+        btNeu.setToolTipText(messages.getString("guimainmemu_msg5"));
 
         btOeffnen = new JButton();
         btOeffnen.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/oeffnen.png")));
@@ -107,6 +114,12 @@ public class GUIMainMenu implements Serializable, I18n {
         btSpeichern.setBounds(150, 5, btSpeichern.getIcon().getIconWidth(), btSpeichern.getIcon().getIconHeight());
         btSpeichern.setActionCommand("speichern");
         btSpeichern.setToolTipText(messages.getString("guimainmemu_msg2"));
+
+        btDokumodus = new JButton();
+        btDokumodus.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/dokumodus.png")));
+        btDokumodus.setBounds(250, 5, btDokumodus.getIcon().getIconWidth(), btDokumodus.getIcon().getIconHeight());
+        btDokumodus.setActionCommand("dokumodus");
+        btDokumodus.setToolTipText(messages.getString("guimainmemu_msg14"));
 
         btEntwurfsmodus = new JButton();
         btEntwurfsmodus.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/entwurfsmodus_aktiv.png")));
@@ -122,37 +135,31 @@ public class GUIMainMenu implements Serializable, I18n {
         btAktionsmodus.setActionCommand("aktionsmodus");
         btAktionsmodus.setToolTipText(messages.getString("guimainmemu_msg4"));
 
-        btNeu = new JButton();
-        btNeu.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/neu.png")));
-        btNeu.setBounds(10, 5, btNeu.getIcon().getIconWidth(), btNeu.getIcon().getIconHeight());
-        btNeu.setActionCommand("neu");
-        btNeu.setToolTipText(messages.getString("guimainmemu_msg5"));
-
-        btDokumodus = new JButton();
-        btDokumodus.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/dokumodus.png")));
-        btDokumodus.setBounds(250, 5, btDokumodus.getIcon().getIconWidth(), btDokumodus.getIcon().getIconHeight());
-        btDokumodus.setActionCommand("dokumodus");
-        btDokumodus.setToolTipText(messages.getString("guimainmemu_msg14"));
-
         if (isSoftwareWizardEnabled()) {
             btWizard = new JButton();
             btWizard.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/button_wizard.png")));
-            btWizard.setBounds(720, 5, btWizard.getIcon().getIconWidth(), btWizard.getIcon().getIconHeight());
+            btWizard.setBounds(700, 5, btWizard.getIcon().getIconWidth(), btWizard.getIcon().getIconHeight());
             btWizard.setActionCommand("wizard");
             btWizard.setToolTipText(messages.getString("guimainmemu_msg6"));
         }
 
         btHilfe = new JButton();
         btHilfe.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/hilfe.png")));
-        btHilfe.setBounds(840, 5, btHilfe.getIcon().getIconWidth(), btHilfe.getIcon().getIconHeight());
+        btHilfe.setBounds(800, 5, btHilfe.getIcon().getIconWidth(), btHilfe.getIcon().getIconHeight());
         btHilfe.setActionCommand("hilfe");
         btHilfe.setToolTipText(messages.getString("guimainmemu_msg7"));
 
         btInfo = new JButton();
         btInfo.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/info.png")));
-        btInfo.setBounds(910, 5, btInfo.getIcon().getIconWidth(), btInfo.getIcon().getIconHeight());
+        btInfo.setBounds(870, 5, btInfo.getIcon().getIconWidth(), btInfo.getIcon().getIconHeight());
         btInfo.setActionCommand("info");
         btInfo.setToolTipText(messages.getString("guimainmemu_msg8"));
+
+        btSettings = new JButton();
+        btSettings.setIcon(new ImageIcon(getClass().getResource("/gfx/allgemein/settings.png")));
+        btSettings.setBounds(940, 5, btInfo.getIcon().getIconWidth(), btInfo.getIcon().getIconHeight());
+        btSettings.setActionCommand("settings");
+        btSettings.setToolTipText(messages.getString("guimainmemu_msg18"));
 
         ActionListener al = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -187,6 +194,8 @@ public class GUIMainMenu implements Serializable, I18n {
                     selectMode(MODUS_DOKUMENTATION);
                 } else if (e.getActionCommand().equals(btInfo.getActionCommand())) {
                     (new InfoDialog(JMainFrame.getJMainFrame())).setVisible(true);
+                } else if (e.getActionCommand().equals(btSettings.getActionCommand())) {
+                    LanguageSelectionDialog.selectLanguage(true);
                 }
             }
         };
@@ -202,6 +211,7 @@ public class GUIMainMenu implements Serializable, I18n {
         }
         btInfo.addActionListener(al);
         btHilfe.addActionListener(al);
+        btSettings.addActionListener(al);
 
         geschwindigkeit = new JLabel();
         geschwindigkeit.setVisible(true);
@@ -238,6 +248,7 @@ public class GUIMainMenu implements Serializable, I18n {
         }
         menupanel.add(btHilfe);
         menupanel.add(btInfo);
+        menupanel.add(btSettings);
     }
 
     private void updateLatency() {
@@ -297,6 +308,8 @@ public class GUIMainMenu implements Serializable, I18n {
             btHilfe.doClick();
         else if (button.equals("btInfo"))
             btInfo.doClick();
+        else if (button.equals("btSettings"))
+            btSettings.doClick();
         else
             return false;
         return true;
@@ -398,7 +411,9 @@ public class GUIMainMenu implements Serializable, I18n {
                 erfolg = SzenarioVerwaltung.getInstance().speichern(targetFilePath,
                         GUIContainer.getGUIContainer().getKnotenItems(), GUIContainer.getGUIContainer().getCableItems(),
                         GUIContainer.getGUIContainer().getDocuItems());
-                if (!erfolg) {
+                if (erfolg) {
+                    SzenarioVerwaltung.getInstance().setCurrentFile(targetFilePath, false);
+                } else {
                     JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("guimainmemu_msg11"));
                 }
             }

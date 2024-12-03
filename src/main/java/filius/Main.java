@@ -37,7 +37,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -51,6 +50,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import filius.gui.GUIContainer;
 import filius.gui.GUIMainMenu;
 import filius.gui.JMainFrame;
+import filius.gui.LanguageSelectionDialog;
 import filius.gui.SplashScreen;
 import filius.hardware.Verbindung;
 import filius.rahmenprogramm.FiliusArgs;
@@ -64,10 +64,6 @@ import filius.rahmenprogramm.SzenarioVerwaltung;
  */
 public class Main implements I18n {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-
-    private static final String FRANCAIS = "Français";
-    private static final String ENGLISH = "English";
-    private static final String DEUTSCH = "Deutsch";
 
     /**
      * Der Start laeuft folgendermassen ab:
@@ -87,8 +83,6 @@ public class Main implements I18n {
         LOG.trace("INVOKED (static) filius.Main, starten(" + szenarioDatei + ")");
         SplashScreen splashScreen;
         XMLDecoder xmldec;
-        String konfigPfad;
-        Object[] programmKonfig;
 
         try {
             Information.getInformation().loadIni();
@@ -96,30 +90,19 @@ public class Main implements I18n {
             LOG.debug("ini could not be read: " + e1.getMessage());
         }
 
-        konfigPfad = Information.getInformation().getArbeitsbereichPfad() + "konfig.xml";
+        String konfigPfad = Information.getInformation().getArbeitsbereichPfad() + "konfig.xml";
+        String lastSzenarioDatei = null;
+        String editedSzenarioDatei = null;
         if (!(new File(konfigPfad)).exists() && null == Information.getInformation().getLocale()) {
-            String[] possibleValues = { DEUTSCH, ENGLISH, FRANCAIS };
-            String selectedValue = (String) JOptionPane.showInputDialog(null, "", "Sprache/Language/Langue",
-                    JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
-            if (selectedValue == null) {
-                Information.getInformation().setLocale(Locale.GERMANY);
-            } else if (ENGLISH.equals(selectedValue)) {
-                Information.getInformation().setLocale(Locale.UK);
-            } else if (FRANCAIS.equals(selectedValue)) {
-                Information.getInformation().setLocale(Locale.FRANCE);
-            } else {
-                Information.getInformation().setLocale(Locale.GERMANY);
-            }
+            LanguageSelectionDialog.selectLanguage(false);
         } else {
             try {
                 xmldec = new XMLDecoder(new BufferedInputStream(Files.newInputStream(Paths.get(konfigPfad))));
-                programmKonfig = (Object[]) xmldec.readObject();
+                Object[] programmKonfig = (Object[]) xmldec.readObject();
                 if (programmKonfig != null) {
                     if (programmKonfig.length >= 4) {
                         JMainFrame.getJMainFrame().setBounds((Rectangle) programmKonfig[0]);
-                        if (szenarioDatei == null) {
-                            szenarioDatei = (String) programmKonfig[1];
-                        }
+                        lastSzenarioDatei = (String) programmKonfig[1];
                         if (programmKonfig[2] != null && programmKonfig[3] != null
                                 && null == Information.getInformation().getLocale()) {
                             Information.getInformation()
@@ -128,6 +111,11 @@ public class Main implements I18n {
                     }
                     if (programmKonfig.length >= 5) {
                         Information.getInformation().setLastOpenedDirectory((String) programmKonfig[4]);
+                    }
+                    if (programmKonfig.length >= 6 && (Boolean) programmKonfig[5]) {
+                        editedSzenarioDatei = Information.getInformation().getArbeitsbereichPfad()
+                                + Information.FILENAME_EDITED_SZENARIO;
+                        ;
                     }
                 }
             } catch (Exception e) {
@@ -148,13 +136,22 @@ public class Main implements I18n {
 
         long splashTime = System.currentTimeMillis();
 
-        if (szenarioDatei != null) {
-            try {
+        try {
+            if (null != szenarioDatei) {
                 SzenarioVerwaltung.getInstance().laden(szenarioDatei, GUIContainer.getGUIContainer().getKnotenItems(),
                         GUIContainer.getGUIContainer().getCableItems(), GUIContainer.getGUIContainer().getDocuItems());
-            } catch (Exception e) {
-                LOG.debug("", e);
+            } else if (null != editedSzenarioDatei) {
+                SzenarioVerwaltung.getInstance().laden(editedSzenarioDatei,
+                        GUIContainer.getGUIContainer().getKnotenItems(), GUIContainer.getGUIContainer().getCableItems(),
+                        GUIContainer.getGUIContainer().getDocuItems());
+                SzenarioVerwaltung.getInstance().setCurrentFile(lastSzenarioDatei, true);
+            } else if (null != lastSzenarioDatei) {
+                SzenarioVerwaltung.getInstance().laden(lastSzenarioDatei,
+                        GUIContainer.getGUIContainer().getKnotenItems(), GUIContainer.getGUIContainer().getCableItems(),
+                        GUIContainer.getGUIContainer().getDocuItems());
             }
+        } catch (Exception e) {
+            LOG.debug("", e);
         }
         GUIContainer.getGUIContainer().setProperty(null);
         GUIContainer.getGUIContainer().updateViewport();
@@ -207,17 +204,22 @@ public class Main implements I18n {
         GUIContainer.getGUIContainer().getMenu().selectMode(GUIMainMenu.MODUS_ENTWURF);
 
         if (SzenarioVerwaltung.getInstance().istGeaendert()) {
-            entscheidung = JOptionPane.showConfirmDialog(JMainFrame.getJMainFrame(), messages.getString("main_msg1"),
-                    messages.getString("main_msg2"), JOptionPane.YES_NO_OPTION);
-            abbruch = entscheidung != JOptionPane.YES_OPTION;
+            // entscheidung = JOptionPane.showConfirmDialog(JMainFrame.getJMainFrame(), messages.getString("main_msg1"),
+            // messages.getString("main_msg2"), JOptionPane.YES_NO_OPTION);
+            // abbruch = entscheidung != JOptionPane.YES_OPTION;
+            SzenarioVerwaltung.getInstance().speichern(
+                    Information.getInformation().getArbeitsbereichPfad() + Information.FILENAME_EDITED_SZENARIO,
+                    GUIContainer.getGUIContainer().getKnotenItems(), GUIContainer.getGUIContainer().getCableItems(),
+                    GUIContainer.getGUIContainer().getDocuItems());
         }
         if (!abbruch) {
-            programmKonfig = new Object[5];
+            programmKonfig = new Object[6];
             programmKonfig[0] = JMainFrame.getJMainFrame().getBounds();
             programmKonfig[1] = SzenarioVerwaltung.getInstance().holePfad();
             programmKonfig[2] = Information.getInformation().getLocale().getLanguage();
             programmKonfig[3] = Information.getInformation().getLocale().getCountry();
             programmKonfig[4] = Information.getInformation().getLastOpenedDirectory();
+            programmKonfig[5] = SzenarioVerwaltung.getInstance().istGeaendert();
 
             String applicationConfigPath = Information.getInformation().getArbeitsbereichPfad() + "konfig.xml";
             try (FileOutputStream fos = new FileOutputStream(applicationConfigPath);

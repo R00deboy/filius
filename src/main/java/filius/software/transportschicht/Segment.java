@@ -70,13 +70,16 @@ public class Segment implements Serializable {
 	}
 
 	/**
-	 * Equal if protokollTyp, operation, senderMAC, senderIP, targetMAC and targetIP
-	 * are equal.
+	 * Checks if the whole content (which consists of quellPort, zielPort,
+	 * pruefSumme and daten) of <i>this</i> segment is equal to the segment in the
+	 * argument (generally given as an Object).
 	 * 
+	 * @param o segment to be compared to <it>this</i> segment
+	 * @return true if quellPort, zielPort, pruefSumme and daten in the segment in
+	 *         the argument are the same as in <it>this</i> IP packet
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContent(Object o) {
-
 		if (o == this) {
 			return true;
 		}

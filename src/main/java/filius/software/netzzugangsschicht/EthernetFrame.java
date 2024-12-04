@@ -105,72 +105,15 @@ public class EthernetFrame implements Serializable {
 	}
 
 	/**
-	 * This method checks wheter both frames have the same payload. If the second
-	 * argument {@code TTLsHaveToBeDifferent} is true, it also checks, if the TTLs
-	 * are different. Only works if this frame and the frame in the argument are of
-	 * type IP ({@code typ} {@code IP}).
+	 * Checks if the whole content (which consists of zielMacAdresse,
+	 * quellMacAdresse and daten) of <i>this</i> frame is equal to the frame in the
+	 * argument (generally given as an Object).
 	 * 
-	 * @param frame frame to be compared to this frame
-	 * @return true if this frame and the frame in the argument have the same
-	 *         payload and a different TTL, false otherwise
-	 * @author Christoph Irniger
-	 */
-	public boolean samePayload(EthernetFrame frame, boolean TTLsHaveToBeDifferent) {
-		boolean[] boolArray = checkPayloadAndTTL(frame);
-		if (TTLsHaveToBeDifferent) {
-			return boolArray[0] && !boolArray[1];
-		} else {
-			return boolArray[0];
-		}
-	}
-
-	/**
-	 * This method checks if a frame has the same payload except for TTL (first
-	 * entry) and if the TTL is the same (second entry). Returns false if this frame
-	 * or the frame in the argument is not of type IP ({@code typ} {@code IP}).
-	 * 
-	 * @param frame frame to be compared to this frame
-	 * @return Array of boolean of length 2. If this frame or the frame in the
-	 *         argument is not of type IP ({@code typ} {@code IP}), both entries are
-	 *         false. Otherwise the first entry is true if both have the same
-	 *         payload except for TTL and the second entry is true if both frames
-	 *         have the same TTL.
-	 * @author Christoph Irniger
-	 */
-	private boolean[] checkPayloadAndTTL(EthernetFrame frame) {
-		Object daten = frame.getDaten();
-		boolean[] boolArray = new boolean[2];
-
-		if (daten instanceof IpPaket && getDaten() instanceof IpPaket) {
-			if (!(daten instanceof IcmpPaket) && !(getDaten() instanceof IcmpPaket)) {
-				IpPaket ipPacket1 = (IpPaket) daten;
-				IpPaket ipPacket2 = (IpPaket) getDaten();
-				boolArray = ipPacket1.checkPayloadAndTTL(ipPacket2);
-			} else if (daten instanceof IcmpPaket && getDaten() instanceof IcmpPaket) {
-				IcmpPaket icmpPacket1 = (IcmpPaket) daten;
-				IcmpPaket icmpPacket2 = (IcmpPaket) this.getDaten();
-				boolArray = icmpPacket1.checkPayloadAndTTL(icmpPacket2);
-			} else {
-				boolArray[0] = false;
-				boolArray[1] = false;
-			}
-		} else {
-			boolArray[0] = false;
-			boolArray[1] = false;
-		}
-		return boolArray;
-	}
-
-	/**
-	 * Checks if this frame is equal to the frame in the argument (generally given
-	 * as an Object) regarding sender, receiver and data.
-	 * 
-	 * @param o frame that needs to be compared to this frame
-	 * @return true if sender, receiver and data are equal
+	 * @param o frame to be compared to <i>this</i> frame
+	 * @return true if zielMacAdresse, quellMacAdresse and daten are equal
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContent(Object o) {
-
 		if (o == this) {
 			return true;
 		}
@@ -187,11 +130,9 @@ public class EthernetFrame implements Serializable {
 					&& this.getQuellMacAdresse().equals(frame.getQuellMacAdresse())
 					&& this.getTyp().equals(frame.getTyp())) {
 
-				// check data
+				// check payload
 				if (frame.getTyp().equals("0x800")) {
-					boolean[] boolArray = checkPayloadAndTTL(frame);
-					// payload and TTL have to be the same
-					return boolArray[0] && boolArray[1];
+					return samePayload(frame, true, false, 0);
 				} else if (frame.getTyp().equals("0x806")) {
 					ArpPaket arpPaket1 = (ArpPaket) frame.getDaten();
 					ArpPaket arpPaket2 = (ArpPaket) this.getDaten();
@@ -201,6 +142,54 @@ public class EthernetFrame implements Serializable {
 				}
 			} else {
 				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * This method checks wheter the frame in the first argument has the same
+	 * payload as <i>this</i> frame and if desired, checks if it has the specified
+	 * TTL. Only works for frames of type IP.
+	 * 
+	 * @param frame              frame to be compared to <i>this</i> frame
+	 * @param requireSameTTL     wheter the TTL of <i>this</i> frame in the first
+	 *                           argument should be equal to {@code ttl} in the
+	 *                           third argument (if true, the next two arguments do
+	 *                           not have any effect)
+	 * @param requireSpecificTTL wheter the TTL of the frame in the first argument
+	 *                           should be equal to {@code ttl} in the third
+	 *                           argument (if false, the next argument does not have
+	 *                           any effect)
+	 * @param ttl                desired TTL of frame in the first argument
+	 * @return true if the frame in the argument has the same payload as <i>this</i>
+	 *         frame considerung the specified conditions
+	 * @author Christoph Irniger
+	 */
+	public boolean samePayload(EthernetFrame frame, boolean requireSameTTL, boolean requireSpecificTTL, int ttl) {
+		Object packet1 = this.getDaten();
+		Object packet2 = frame.getDaten();
+
+		if (packet1 instanceof IpPaket && packet2 instanceof IpPaket) {
+			IpPaket ipPacket1 = (IpPaket) packet1;
+			IpPaket ipPacket2 = (IpPaket) packet2;
+			boolean sameContentApartFromTTL;
+			if (!(packet1 instanceof IcmpPaket) && !(packet2 instanceof IcmpPaket)) {
+				sameContentApartFromTTL = ipPacket1.sameContentApartFromTTL(ipPacket2);
+			} else if (packet1 instanceof IcmpPaket && packet2 instanceof IcmpPaket) {
+				IcmpPaket icmpPacket1 = (IcmpPaket) packet1;
+				IcmpPaket icmpPacket2 = (IcmpPaket) packet2;
+				sameContentApartFromTTL = icmpPacket1.sameContentApartFromTTL(icmpPacket2);
+			} else {
+				return false;
+			}
+			if (requireSameTTL) {
+				return sameContentApartFromTTL && ipPacket1.getTtl() == ipPacket2.getTtl();
+			} else if (requireSpecificTTL) {
+				return sameContentApartFromTTL && ipPacket2.getTtl() == ttl;
+			} else {
+				return sameContentApartFromTTL;
 			}
 		} else {
 			return false;

@@ -25,6 +25,10 @@
  */
 package filius.software.vermittlungsschicht;
 
+import filius.software.transportschicht.Segment;
+import filius.software.transportschicht.TcpSegment;
+import filius.software.transportschicht.UdpSegment;
+
 /** Diese Klasse umfasst die Attribute eines ICMP-Pakets */
 @SuppressWarnings("serial")
 public class IcmpPaket extends IpPaket {
@@ -106,37 +110,17 @@ public class IcmpPaket extends IpPaket {
 	}
 
 	/**
-	 * Checks if this ICMP packet is equal to the packet in the argument except for
-	 * TTL (first entry) and if TTLs are equal (second entry).
+	 * Checks if the ICMP packet in the argument has the same content (which
+	 * consists of the content of the subjacent IP packet and seqNr, icmpType and
+	 * icmpCode).
 	 * 
-	 * @param packet
-	 * @return Array of boolean of length 2. First entry is true if this ICMP packet
-	 *         is equal to the packet in the argument except for TTL and the second
-	 *         entry is true if their TTLs are equal.
-	 * @author Christoph Irniger
-	 */
-	public boolean[] checkPayloadAndTTL(IcmpPaket packet) {
-		boolean[] boolArray = new boolean[2];
-
-		// check content
-		boolArray[0] = (this.getSender().equals(packet.getSender())
-				&& this.getEmpfaenger().equals(packet.getEmpfaenger()) && this.getProtocol() == packet.getProtocol()
-				&& this.getSeqNr() == packet.getSeqNr() && this.getIcmpType() == packet.getIcmpType()
-				&& this.getIcmpCode() == packet.getIcmpCode());
-		// check TTL
-		boolArray[1] = (this.getTtl() == packet.getTtl());
-		return boolArray;
-	}
-
-	/**
-	 * Equal if subjacent IP packets are equal and if seqNr, icmpType and icmpCode
-	 * are equal.
-	 * 
+	 * @param o ICMP packet to be compared to <it>this</i> ICMP packet
+	 * @return true if the content of the subjacent IP packet and seqNr, icmpType
+	 *         and icmpCode are the same as in <it>this</i> ICMP packet
 	 * @author Christoph Irniger
 	 */
 	@Override
 	public boolean sameContent(Object o) {
-
 		if (o == this) {
 			return true;
 		}
@@ -145,24 +129,28 @@ public class IcmpPaket extends IpPaket {
 			return false;
 		}
 
+		IcmpPaket packet = (IcmpPaket) o;
+
+		boolean sameContent = sameContentApartFromTTL(packet);
+
+		return sameContent && (this.getTtl() == packet.getTtl());
+	}
+
+	/**
+	 * Checks if this ICMP packet is equal to the packet in the argument apart from
+	 * the TTL field.
+	 * 
+	 * @param packet packet to be compared to <i>this</i> packet
+	 * @return true if this ICMP packet is equal to the ICMP packet in the argument
+	 *         apart from the TTL field
+	 * @author Christoph Irniger
+	 */
+	public boolean sameContentApartFromTTL(IcmpPaket packet) {
 		// check super class first
-		if (o instanceof IpPaket) {
-			IpPaket ipPacket = (IpPaket) o;
-
-			if (super.sameContent(ipPacket)) {
-
-				// then the rest
-				if (o instanceof IcmpPaket) {
-					IcmpPaket icmpPacket = (IcmpPaket) o;
-
-					return this.getSeqNr() == icmpPacket.getSeqNr() && this.getIcmpType() == icmpPacket.getIcmpType()
-							&& this.getIcmpCode() == icmpPacket.getIcmpCode();
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
+		if (super.sameContent(packet)) {
+			// then the rest
+			return this.getSeqNr() == packet.getSeqNr() && this.getIcmpType() == packet.getIcmpType()
+					&& this.getIcmpCode() == packet.getIcmpCode();
 		} else {
 			return false;
 		}

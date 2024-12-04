@@ -40,8 +40,8 @@ import filius.software.transportschicht.UdpSegment;
 public class IpPaket implements Serializable, Cloneable {
 
 	public static final int UDP = 17, TCP = 6;
-	
-	/** counter of the identification number of the IP packet*/
+
+	/** counter of the identification number of the IP packet */
 	private static long identificationCounter;
 
 	/** IP-Adresse des sendenden Knotens */
@@ -51,14 +51,14 @@ public class IpPaket implements Serializable, Cloneable {
 	private int ttl;
 	private final int protocol;
 	private Segment data;
-	/** identification number of the IP packet*/
+	/** identification number of the IP packet */
 	private final long identification;
 
 	public IpPaket(int protocol) {
 		this.protocol = protocol;
 		this.identification = getIdentCounter();
 	}
-	
+
 	private static synchronized long getIdentCounter() {
 		identificationCounter++;
 		return identificationCounter - 1;
@@ -124,45 +124,12 @@ public class IpPaket implements Serializable, Cloneable {
 	}
 
 	/**
-	 * Checks if this IP packet is equal to the packet in the argument except for
-	 * TTL (first entry) and if TTLs are equal (second entry).
+	 * Checks if the IP packet in the argument has the same content regarding
+	 * sender, receiver, TTL, protocol and data.
 	 * 
-	 * @param packet
-	 * @return Array of boolean of length 2. First entry is true if this IP packet
-	 *         is equal to the packet in the argument except for TTL and the second
-	 *         entry is true if their TTLs are equal.
-	 * @author Christoph Irniger
-	 */
-	public boolean[] checkPayloadAndTTL(IpPaket packet) {
-		boolean[] boolArray = new boolean[2];
-
-		// --Payload checken--
-		// Header checken
-		if (this.getSender().equals(packet.getSender()) && this.getEmpfaenger().equals(packet.getEmpfaenger())
-				&& this.getProtocol() == packet.getProtocol()) {
-
-			// Daten checken
-			Segment segment1 = packet.getSegment();
-			Segment segment2 = this.getSegment();
-			if (segment1 instanceof TcpSegment && segment2 instanceof TcpSegment) {
-				boolArray[0] = ((TcpSegment) segment1).sameContent((TcpSegment) segment2);
-			} else if (segment1 instanceof UdpSegment && segment2 instanceof UdpSegment) {
-				boolArray[0] = ((UdpSegment) segment1).sameContent((UdpSegment) segment2);
-			} else {
-				boolArray[0] = false;
-			}
-		} else {
-			boolArray[0] = false;
-		}
-		// --TTL checken--
-		boolArray[1] = (this.getTtl() == packet.getTtl());
-
-		return boolArray;
-	}
-
-	/**
-	 * Equal if sender, receiver, TTL, protocol and data are equal.
-	 * 
+	 * @param o IP packet to be compared to <it>this</i> IP packet
+	 * @return true, if sender, receiver, TTL, protocol and data in the IP packet in
+	 *         the argument are the same as in <it>this</i> IP packet
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContent(Object o) {
@@ -174,9 +141,66 @@ public class IpPaket implements Serializable, Cloneable {
 		if (!(o instanceof IpPaket)) {
 			return false;
 		}
+
 		IpPaket packet = (IpPaket) o;
 
-		boolean[] boolArray = this.checkPayloadAndTTL(packet);
-		return boolArray[0] && boolArray[1];
+		Object[] returnArray = this.checkPayloadAndComputeTtlDiff(packet);
+
+		boolean sameTtl;
+		if (returnArray[1] instanceof Integer) {
+			sameTtl = ((Integer) (returnArray[1])).intValue() == 0;
+		} else {
+			sameTtl = false;
+		}
+
+		boolean samePayload;
+		if (returnArray[0] instanceof Boolean) {
+			samePayload = (boolean) returnArray[0];
+		} else {
+			samePayload = false;
+		}
+
+		return samePayload && sameTtl;
+	}
+
+	/**
+	 * Checks if this IP packet is equal to the packet in the argument except for
+	 * the TTL field (first entry). Computes the difference of the TTL of
+	 * <i>this</i> packet and the packet in the argument (<i>this</i> TTL minus TTL
+	 * of argument) (second entry).
+	 * 
+	 * @param packet
+	 * @return Array of Object of length 2. First entry is a Boolean, second an
+	 *         Integer. First entry is true if this IP packet is equal to the packet
+	 *         in the argument. Second entry is the difference of the TTL of
+	 *         <i>this</i> packet and the packet in the argument (<i>this</i> TTL
+	 *         minus TTl of argument).
+	 * @author Christoph Irniger
+	 */
+	public Object[] checkPayloadAndComputeTtlDiff(IpPaket packet) {
+		Object[] returnArray = new Object[2];
+
+		// --Check Payload--
+		// Check header
+		if (this.getSender().equals(packet.getSender()) && this.getEmpfaenger().equals(packet.getEmpfaenger())
+				&& this.getProtocol() == packet.getProtocol()) {
+
+			// Check data
+			Segment segment1 = packet.getSegment();
+			Segment segment2 = this.getSegment();
+			if (segment1 instanceof TcpSegment && segment2 instanceof TcpSegment) {
+				returnArray[0] = ((TcpSegment) segment1).sameContent((TcpSegment) segment2);
+			} else if (segment1 instanceof UdpSegment && segment2 instanceof UdpSegment) {
+				returnArray[0] = ((UdpSegment) segment1).sameContent((UdpSegment) segment2);
+			} else {
+				returnArray[0] = false;
+			}
+		} else {
+			returnArray[0] = false;
+		}
+		// --Compute TTL difference--
+		returnArray[1] = this.getTtl() - packet.getTtl();
+
+		return returnArray;
 	}
 }

@@ -25,6 +25,7 @@
  */
 package filius.rahmenprogramm.nachrichten;
 
+import java.net.NetworkInterface;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -104,6 +105,14 @@ public class Lauscher implements I18n {
 			lauscher = new Lauscher();
 		}
 		return lauscher;
+	}
+	
+	public NetzwerkInterface getInterfaceByID(String interfaceId) {
+		return InterfaceByID.get(interfaceId);
+	}
+	
+	public SystemSoftware getSystemSoftwareByID(String interfaceId) {
+		return SystemSoftwareByID.get(interfaceId);
 	}
 
 	public void removeIdentifier(String identifier) {
@@ -530,8 +539,8 @@ public class Lauscher implements I18n {
 		// ARP packets cannot be forwarded
 		if (!originalFrame.getTyp().equals(EthernetFrame.ARP)) {
 
-			// Only execute if the content of the frame (the IpPaket) was either originally
-			// sent or received by the node
+			// Only execute if the content of the frame (the IpPaket) was neither originally
+			// sent nor received by the node
 			if (!packetOnlyReceivedOrOnlySent(originalFrame, node)) {
 				List<NetzwerkInterface> netzwerkInterfaces = node.getNetzwerkInterfaces();
 

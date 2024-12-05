@@ -150,27 +150,31 @@ public class EthernetFrame implements Serializable {
 
 	/**
 	 * This method checks wheter the frame in the first argument has the same
-	 * payload as <i>this</i> frame and if desired, checks if it has the specified
-	 * TTL. Only works for frames of type IP.
+	 * payload as <i>this</i> frame and if desired, checks if the encapsuled IP
+	 * packet has the specified TTL difference. If at least one of the frames is not
+	 * of type IP, returns false.
 	 * 
-	 * @param frame              frame to be compared to <i>this</i> frame
-	 * @param requireSameTTL     wheter the TTL of <i>this</i> frame in the first
-	 *                           argument should be equal to {@code ttl} in the
-	 *                           third argument (if true, the next two arguments do
-	 *                           not have any effect)
-	 * @param requireSpecificTTL wheter the TTL of the frame in the first argument
-	 *                           should be equal to {@code ttl} in the third
-	 *                           argument (if false, the next argument does not have
-	 *                           any effect)
-	 * @param ttl                desired TTL of frame in the first argument
-	 * @return true if the frame in the argument has the same payload as <i>this</i>
-	 *         frame considerung the specified conditions
+	 * @param frame                frame to be compared to <i>this</i> frame
+	 * @param requireSameTTL       wheter the TTL of <i>this</i> frame in the first
+	 *                             argument should be equal to {@code ttl} in the
+	 *                             third argument (if true, the next two arguments
+	 *                             do not have any effect)
+	 * @param requireTTLDifference wheter the TTL of the frame in the first argument
+	 *                             should be equal to the TTL of <i>this</i> frame
+	 *                             minus {@code ttlDiff} (third argument) (if false,
+	 *                             the next argument does not have any effect)
+	 * @param ttlDiff              desired TTL difference (<i>this</i> frame minus
+	 *                             frame in the first argument)
+	 * @return true if <i>this</i> frame and the frame in the first argument are
+	 *         both of type IP and have the same payload under the specified
+	 *         conditions
 	 * @author Christoph Irniger
 	 */
-	public boolean samePayload(EthernetFrame frame, boolean requireSameTTL, boolean requireSpecificTTL, int ttl) {
+	public boolean samePayload(EthernetFrame frame, boolean requireSameTTL, boolean requireTTLDifference, int ttlDiff) {
 		Object packet1 = this.getDaten();
 		Object packet2 = frame.getDaten();
 
+		// if both frames are of type IP
 		if (packet1 instanceof IpPaket && packet2 instanceof IpPaket) {
 			IpPaket ipPacket1 = (IpPaket) packet1;
 			IpPaket ipPacket2 = (IpPaket) packet2;
@@ -186,8 +190,8 @@ public class EthernetFrame implements Serializable {
 			}
 			if (requireSameTTL) {
 				return sameContentApartFromTTL && ipPacket1.getTtl() == ipPacket2.getTtl();
-			} else if (requireSpecificTTL) {
-				return sameContentApartFromTTL && ipPacket2.getTtl() == ttl;
+			} else if (requireTTLDifference) {
+				return sameContentApartFromTTL && ipPacket1.getTtl() - ttlDiff == ipPacket2.getTtl();
 			} else {
 				return sameContentApartFromTTL;
 			}

@@ -106,11 +106,11 @@ public class Lauscher implements I18n {
 		}
 		return lauscher;
 	}
-	
+
 	public NetzwerkInterface getInterfaceByID(String interfaceId) {
 		return InterfaceByID.get(interfaceId);
 	}
-	
+
 	public SystemSoftware getSystemSoftwareByID(String interfaceId) {
 		return SystemSoftwareByID.get(interfaceId);
 	}
@@ -539,8 +539,8 @@ public class Lauscher implements I18n {
 		// ARP packets cannot be forwarded
 		if (!originalFrame.getTyp().equals(EthernetFrame.ARP)) {
 
-			// Only execute if the content of the frame (the IpPaket) was neither originally
-			// sent nor received by the node
+			// Only execute if the node was not the original sender or receiver of the
+			// encapsuled IP packet (e.g. has forwarded the packet)
 			if (!packetOnlyReceivedOrOnlySent(originalFrame, node)) {
 				List<NetzwerkInterface> netzwerkInterfaces = node.getNetzwerkInterfaces();
 
@@ -553,12 +553,16 @@ public class Lauscher implements I18n {
 						if (framesMitZeitstempel != null) {
 							int frameNumber;
 
+							boolean sent = originalFrame.getQuellMacAdresse().equals(originalInterfaceId);
+							boolean received = originalFrame.getZielMacAdresse().equals(originalInterfaceId);
+
 							for (frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
-								// check if frame payload is an IP packet and if it has the same payload but
-								// different TTL
-								if (frame.getTyp().equals(EthernetFrame.IP) && originalFrame.samePayload(frame, true)) {
+								// if the original frame was sent, the TTL difference (original frame minus
+								// frame) has to be -1, if received +1
+								if (originalFrame.samePayload(frame, false, true, -1) && sent
+										|| originalFrame.samePayload(frame, false, true, 1) && received) {
 									break;
 								}
 							}

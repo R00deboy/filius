@@ -170,6 +170,8 @@ public class IpPaket implements Serializable, Cloneable {
 				return ((TcpSegment) segment1).sameContent((TcpSegment) segment2);
 			} else if (segment1 instanceof UdpSegment && segment2 instanceof UdpSegment) {
 				return ((UdpSegment) segment1).sameContent((UdpSegment) segment2);
+			} else if (segment1 == null && segment2 == null){
+				return true;
 			} else {
 				return false;
 			}

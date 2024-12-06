@@ -160,11 +160,12 @@ public class EthernetFrame implements Serializable {
 	 *                             third argument (if true, the next two arguments
 	 *                             do not have any effect)
 	 * @param requireTTLDifference wheter the TTL of the frame in the first argument
-	 *                             should be equal to the TTL of <i>this</i> frame
-	 *                             minus {@code ttlDiff} (third argument) (if false,
-	 *                             the next argument does not have any effect)
-	 * @param ttlDiff              desired TTL difference (<i>this</i> frame minus
-	 *                             frame in the first argument)
+	 *                             should be equal to the TTL of {@code ttlDiff}
+	 *                             (third argument) minus <i>this</i> frame (if
+	 *                             false, the next argument does not have any
+	 *                             effect)
+	 * @param ttlDiff              desired TTL difference (frame in the first
+	 *                             argument minus <i>this</i> frame)
 	 * @return true if <i>this</i> frame and the frame in the first argument are
 	 *         both of type IP and have the same payload under the specified
 	 *         conditions
@@ -191,7 +192,7 @@ public class EthernetFrame implements Serializable {
 			if (requireSameTTL) {
 				return sameContentApartFromTTL && ipPacket1.getTtl() == ipPacket2.getTtl();
 			} else if (requireTTLDifference) {
-				return sameContentApartFromTTL && ipPacket1.getTtl() - ttlDiff == ipPacket2.getTtl();
+				return sameContentApartFromTTL && ipPacket1.getTtl() + ttlDiff == ipPacket2.getTtl();
 			} else {
 				return sameContentApartFromTTL;
 			}

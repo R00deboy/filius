@@ -25,7 +25,6 @@
  */
 package filius.rahmenprogramm.nachrichten;
 
-import java.net.NetworkInterface;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -527,9 +526,9 @@ public class Lauscher implements I18n {
 	 *                            (Datenaustausch)
 	 * @param node                The node whose message details table
 	 *                            (Datenaustausch) we are on
-	 * @return Array with first entry {@code interfaceId} and second entry
-	 *         {@code frameNumber}. If no corresponding frame exists, the two
-	 *         entries are the null pointer each.
+	 * @return Array of length two. First entry is the interface ID, second entry
+	 *         the frame number in the data exchange window (starts with 1). If no
+	 *         corresponding frame exists, the two entries are null.
 	 * @author Christoph Irniger
 	 */
 	public Object[] getCorrespondingFrame(String originalInterfaceId, int originalFrameNumber, InternetKnoten node) {
@@ -544,6 +543,7 @@ public class Lauscher implements I18n {
 			if (!packetOnlyReceivedOrOnlySent(originalFrame, node)) {
 				List<NetzwerkInterface> netzwerkInterfaces = node.getNetzwerkInterfaces();
 
+				boolean found = false;
 				for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
 					String interfaceId = netzwerkInterface.getMac();
 
@@ -551,26 +551,69 @@ public class Lauscher implements I18n {
 						LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
 
 						if (framesMitZeitstempel != null) {
-							int frameNumber;
-
 							boolean sent = originalFrame.getQuellMacAdresse().equals(originalInterfaceId);
 							boolean received = originalFrame.getZielMacAdresse().equals(originalInterfaceId);
 
-							for (frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+							for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
 								// if the original frame was sent, the TTL difference (original frame minus
 								// frame) has to be -1, if received +1
-								if (originalFrame.samePayload(frame, false, true, -1) && sent
-										|| originalFrame.samePayload(frame, false, true, 1) && received) {
+								if (originalFrame.samePayload(frame, false, true, 1) && sent
+										|| originalFrame.samePayload(frame, false, true, -1) && received) {
+									found = true;
+									interfaceIdAndFrameNumber[0] = (String) interfaceId;
+									interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
 									break;
 								}
 							}
-							interfaceIdAndFrameNumber[0] = (String) interfaceId;
-							interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
-							break;
+							if (found) {
+								break;
+							}
 						}
 					}
+				}
+			}
+		}
+		return interfaceIdAndFrameNumber;
+	}
+
+	/**
+	 * Finds the next or previous frame in the global path of an IP packet through
+	 * the nodes. (The "TTL of a frame" in the parameter and return descriptions is
+	 * actually the TTL of the encapsuled IP packet.)
+	 * 
+	 * @param sameTTL       true if the next or previous frame should have the same
+	 *                      TTL (if true, the next two arguments do not have any
+	 *                      effect)
+	 * @param getNext       true if the next frame with TTL-1 is desired, false if
+	 *                      the previous frame with TTL+1 is desired (if false, the
+	 *                      next argument does not have any effect)
+	 * @param originalFrame original frame whose next or previous frame is wanted
+	 * @return Array of length two. First entry is the interface ID, second entry
+	 *         the frame number in the data exchange window (starts with 1). If no
+	 *         corresponding frame exists, the two entries are null.
+	 * @author Christoph Irniger
+	 */
+	public Object[] getNextOrPreviousFrame(boolean sameTTL, boolean getNext, EthernetFrame originalFrame) {
+		Object[] interfaceIdAndFrameNumber = new Object[2];
+		int ttlDiff = getNext ? -1 : 1;
+		EthernetFrame resultingFrame = null;
+		boolean found = false;
+		for (String interfaceId : getInterfaceIDs()) {
+			LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
+			if (framesMitZeitstempel != null) {
+				for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+					resultingFrame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
+					if (originalFrame.samePayload(resultingFrame, sameTTL, true, ttlDiff)) {
+						found = true;
+						interfaceIdAndFrameNumber[0] = interfaceId;
+						interfaceIdAndFrameNumber[1] = frameNumber + 1;
+						break;
+					}
+				}
+				if (found) {
+					break;
 				}
 			}
 		}
@@ -623,6 +666,24 @@ public class Lauscher implements I18n {
 	public EthernetFrame getFrame(String interfaceId, int frameNumber) {
 		Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);
 		return (EthernetFrame) frameMitZeitstempel[1];
+	}
+
+	/**
+	 * Returns the frame number (number of a frame in the data exchange window of an
+	 * interface) to a given interface ID and ethernet frame.
+	 * 
+	 * @param interfaceId ID of the interface
+	 * @param frame       frame which the number should be computed for
+	 * @return the frame number in the data exchange window (starts with 1)
+	 */
+	public int getFrameNumber(String interfaceId, EthernetFrame frame) {
+		LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
+		for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+			if (((EthernetFrame) framesMitZeitstempel.get(frameNumber)[1]).sameContent(frame)) {
+				return frameNumber + 1;
+			}
+		}
+		return 0;
 	}
 
 	/**

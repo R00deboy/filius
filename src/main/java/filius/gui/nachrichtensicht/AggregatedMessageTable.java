@@ -565,7 +565,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LocalLayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
+		new LocalLayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware,
 				selectedFrameNumber);
 	}
 
@@ -586,7 +586,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 				.getFrame(interfaceId, selectedFrameNumber).getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)) {
 			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("nachrichtentabelle_msg12"));
 		} else {
-			new GlobalLayerPath(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId,
+			new GlobalLayerPath(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware,
 					selectedFrameNumber);
 		}
 	}

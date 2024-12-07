@@ -151,7 +151,9 @@ public class EthernetFrame implements Serializable {
 
 	/**
 	 * This method checks wheter the frame in the first argument has the same the
-	 * same payload data (e.g. IP packet) as <i>this</i> frame and a specific TTL.
+	 * same payload as <i>this</i> frame and a specific TTL. Returns false if the
+	 * frame in the first argument or <i>this</i> frame is not an IP packet (e.g. an
+	 * ARP packet).
 	 * 
 	 * @param originalFrame the frame whose payload should be compared to
 	 *                      <i>this</i> payload

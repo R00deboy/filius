@@ -1,18 +1,13 @@
 package filius.gui.schichtensicht;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import filius.hardware.knoten.InternetKnoten;
-import filius.hardware.knoten.Knoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.system.SystemSoftware;
-import filius.software.vermittlungsschicht.ArpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 
 /**
@@ -38,7 +33,6 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	private static final int MAX_TTL = 64;
 
 	private final JFrame owner;
-	private final SystemSoftware mainSystemSoftware;
 	private final String mainInterfaceId;
 	private final int mainFrameNumber;
 	private final EthernetFrame mainFrame;
@@ -62,7 +56,6 @@ public class GlobalLayerPath extends JPanel implements I18n {
 
 	public GlobalLayerPath(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int frameNumber) {
 		this.owner = owner;
-		mainSystemSoftware = systemSoftware;
 		mainInterfaceId = interfaceId;
 		mainFrameNumber = frameNumber;
 		mainFrame = LAUSCHER.getFrame(mainInterfaceId, mainFrameNumber);
@@ -80,30 +73,52 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	 * Fills the list with all the frames involved in delivering the IP packet
 	 */
 	private void fillFramePath() {
-		EthernetFrame originalframe = LAUSCHER.getFrame(mainInterfaceId, mainFrameNumber);
-		for (int ttl = MAX_TTL; ttl > 0; ttl--) {
-			EthernetFrame frame = LAUSCHER.getFrameWithSameContentAndSpecificTTL(originalframe, ttl);
-			if (frame != null) {
-				addToFramePath(frame);
+		// frame was received via ethernet broadcast (e.g. ARP, DHCP)
+		if (mainFrame.getZielMacAdresse().equals(ETHERNET_BROADCAST)
+				&& !mainFrame.getQuellMacAdresse().equals(mainInterfaceId)) {
+			addToFramePath(mainFrame);
+		} else if (mainFrame.getDaten() instanceof IpPaket) {
+			EthernetFrame originalframe = LAUSCHER.getFrame(mainInterfaceId, mainFrameNumber);
+			for (int ttl = MAX_TTL; ttl > 0; ttl--) {
+				EthernetFrame frame = LAUSCHER.getFrameWithSameContentAndSpecificTTL(originalframe, ttl);
+				if (frame != null) {
+					addToFramePath(frame);
+				}
 			}
 		}
 	}
 
 	private void fillLocalPanelsPath() {
-		EthernetFrame firstFrame = framePath.getFirst();
-
-		// add sender
-		String interfaceId = firstFrame.getQuellMacAdresse();
-		SystemSoftware systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
-		int frameNumber = LAUSCHER.getFrameNumber(interfaceId, firstFrame);
-		addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
-
-		// add routers and receiver
-		for (EthernetFrame frame : framePath) {
-			interfaceId = frame.getZielMacAdresse();
-			systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
-			frameNumber = LAUSCHER.getFrameNumber(interfaceId, frame);
+		// frame was received via ethernet broadcast
+		if (mainFrame.getZielMacAdresse().equals(ETHERNET_BROADCAST)
+				&& !mainFrame.getQuellMacAdresse().equals(mainInterfaceId)) {
+			// add sender
+			String interfaceId = mainFrame.getQuellMacAdresse();
+			SystemSoftware systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
+			int frameNumber = LAUSCHER.getFrameNumber(interfaceId, mainFrame);
 			addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
+
+			// add receiver
+			interfaceId = mainFrame.getZielMacAdresse();
+			systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
+			frameNumber = LAUSCHER.getFrameNumber(interfaceId, mainFrame);
+			addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
+		} else {
+			EthernetFrame firstFrame = framePath.getFirst();
+
+			// add sender
+			String interfaceId = firstFrame.getQuellMacAdresse();
+			SystemSoftware systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
+			int frameNumber = LAUSCHER.getFrameNumber(interfaceId, firstFrame);
+			addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
+
+			// add routers and receiver
+			for (EthernetFrame frame : framePath) {
+				interfaceId = frame.getZielMacAdresse();
+				systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
+				frameNumber = LAUSCHER.getFrameNumber(interfaceId, frame);
+				addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
+			}
 		}
 	}
 

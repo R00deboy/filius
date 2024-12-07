@@ -507,19 +507,19 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * General: If a frame was forwarded by the node (this usually means that it is
-	 * a router), given a (received / sent) frame, the method finds the (sent /
-	 * received) frame with the same content.
+	 * General: If a frame was forwarded by the node (this means that it is a
+	 * router), given a (received / sent) frame, the method finds the (sent /
+	 * received) frame with the same encapsuled IP packet on another interface of
+	 * the node.
 	 * 
 	 * Specific: Given an interface ID and the frame number in the data exchange
-	 * window (Datenaustausch), the Lauscher will be searched on other network
-	 * interfaces of the same node for a frame which has the same content (except
-	 * for TTL). <br \> The first entry of the returned array indicates the network
-	 * interface ID {@code interfaceId} and the second entry the number of the frame
-	 * {@code frameNumber} in the Aggregated Message Table (Datenaustausch). If the
-	 * two entries are the null pointer each, it means that the layer 2 (IP or ICMP)
-	 * packet was originally sent or received by this node, i.e. that there is no
-	 * corresponding frame.
+	 * window (Datenaustausch), other interfaces of the node will be searched for a
+	 * frame which has the same content apart from TTL). <br \> The first entry of
+	 * the returned array contains the network interface ID {@code interfaceId} and
+	 * the second entry the number of the frame {@code frameNumber} in the data
+	 * exchange window. If the two entries are the null pointer each, it means that
+	 * the layer 2 (IP or ICMP) packet was originally sent or received by this node,
+	 * i.e. that there is no corresponding frame.
 	 * 
 	 * @param originalInterfaceId MAC address of the network interface
 	 * @param originalFrameNumber number of the frame in the data exchange window
@@ -535,8 +535,9 @@ public class Lauscher implements I18n {
 		Object[] interfaceIdAndFrameNumber = new Object[2];
 		EthernetFrame originalFrame = getFrame(originalInterfaceId, originalFrameNumber);
 
-		// ARP packets cannot be forwarded
-		if (!originalFrame.getTyp().equals(EthernetFrame.ARP)) {
+		Object data = originalFrame.getDaten();
+		// Only IP packets can be forwarded
+		if ((data instanceof IpPaket)) {
 
 			// Only execute if the node was not the original sender or receiver of the
 			// encapsuled IP packet (e.g. has forwarded the packet)
@@ -557,10 +558,12 @@ public class Lauscher implements I18n {
 							for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
-								// if the original frame was sent, the TTL difference (original frame minus
-								// frame) has to be -1, if received +1
-								if (originalFrame.samePayload(frame, false, true, 1) && sent
-										|| originalFrame.samePayload(frame, false, true, -1) && received) {
+								// if the original frame was sent, the TTL of the desired frame (the received
+								// one) has to be one more than the one of the original frame, if received (the
+								// sent one) one less
+								int originalTTL = ((IpPaket) data).getTtl();
+								if (originalFrame.samePayload(frame, originalTTL + 1) && sent
+										|| originalFrame.samePayload(frame, originalTTL - 1) && received) {
 									found = true;
 									interfaceIdAndFrameNumber[0] = (String) interfaceId;
 									interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
@@ -579,36 +582,25 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * Finds the next or previous frame in the global path of an IP packet through
-	 * the nodes. (The "TTL of a frame" in the parameter and return descriptions is
-	 * actually the TTL of the encapsuled IP packet.)
+	 * Returns the ethernet frame with the same payload (e.g. IP packet) as the
+	 * frame in the first argument but with a specific TTL. If no such frame exists,
+	 * returns null.
 	 * 
-	 * @param sameTTL       true if the next or previous frame should have the same
-	 *                      TTL (if true, the next two arguments do not have any
-	 *                      effect)
-	 * @param getNext       true if the next frame with TTL-1 is desired, false if
-	 *                      the previous frame with TTL+1 is desired (if false, the
-	 *                      next argument does not have any effect)
-	 * @param originalFrame original frame whose next or previous frame is wanted
-	 * @return Array of length two. First entry is the interface ID, second entry
-	 *         the frame number in the data exchange window (starts with 1). If no
-	 *         corresponding frame exists, the two entries are null.
-	 * @author Christoph Irniger
+	 * @param originalFrame the frame whose data should be equal to the returned one
+	 * @param ttl           the desired TTL
+	 * @return frame with same data and specified TTL (null if it does not exist)
 	 */
-	public Object[] getNextOrPreviousFrame(boolean sameTTL, boolean getNext, EthernetFrame originalFrame) {
-		Object[] interfaceIdAndFrameNumber = new Object[2];
-		int ttlDiff = getNext ? -1 : 1;
-		EthernetFrame resultingFrame = null;
+	public EthernetFrame getFrameWithSameContentAndSpecificTTL(EthernetFrame originalFrame, int ttl) {
+		EthernetFrame frame = null;
 		boolean found = false;
+
 		for (String interfaceId : getInterfaceIDs()) {
 			LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
 			if (framesMitZeitstempel != null) {
-				for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
-					resultingFrame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
-					if (originalFrame.samePayload(resultingFrame, sameTTL, true, ttlDiff)) {
+				for (Object[] frameMitZeitstempel : framesMitZeitstempel) {
+					frame = (EthernetFrame) frameMitZeitstempel[1];
+					if (frame.samePayload(originalFrame, ttl)) {
 						found = true;
-						interfaceIdAndFrameNumber[0] = interfaceId;
-						interfaceIdAndFrameNumber[1] = frameNumber + 1;
 						break;
 					}
 				}
@@ -617,7 +609,7 @@ public class Lauscher implements I18n {
 				}
 			}
 		}
-		return interfaceIdAndFrameNumber;
+		return frame;
 	}
 
 	/**

@@ -37,9 +37,11 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	private final int mainFrameNumber;
 	private final EthernetFrame mainFrame;
 
-	/** local view of the selected node */
+	/** local path view of the selected node */
 	private final LocalLayerPathDialog mainLocalDialog;
 	private final LocalLayerPathPanel mainLocalPanel;
+
+	private int currentLocalPanelPathIndex = 0;
 
 	/**
 	 * Path of a packet represented as list of ethernet frames encapsulationg this
@@ -50,7 +52,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	/**
 	 * list of LocalLayerPathPanels corresponding to the nodes involved in the path
 	 * of a packet in chronological order (i.e. sender node comes first, then all
-	 * the routers and at last the receiver node
+	 * the routers and at last the receiver node).
 	 */
 	ArrayList<LocalLayerPathPanel> localPanelPath = new ArrayList<LocalLayerPathPanel>();
 
@@ -67,10 +69,13 @@ public class GlobalLayerPath extends JPanel implements I18n {
 
 		fillFramePath();
 		fillLocalPanelsPath();
+
+		currentLocalPanelPathIndex = localPanelPath.indexOf(mainLocalPanel);
 	}
 
 	/**
-	 * Fills the list with all the frames involved in delivering the IP packet
+	 * Fills the frame path list with all the frames involved in delivering the IP
+	 * packet.
 	 */
 	private void fillFramePath() {
 		// frame was received via ethernet broadcast (e.g. ARP, DHCP)
@@ -83,11 +88,17 @@ public class GlobalLayerPath extends JPanel implements I18n {
 				EthernetFrame frame = LAUSCHER.getFrameWithSameContentAndSpecificTTL(originalframe, ttl);
 				if (frame != null) {
 					addToFramePath(frame);
+				} else {
+					break;
 				}
 			}
 		}
 	}
 
+	/**
+	 * Fills the LocalPanels path list with all the LocalPanels involved in
+	 * delivering the IP packet.
+	 */
 	private void fillLocalPanelsPath() {
 		// frame was received via ethernet broadcast
 		if (mainFrame.getZielMacAdresse().equals(ETHERNET_BROADCAST)
@@ -153,6 +164,11 @@ public class GlobalLayerPath extends JPanel implements I18n {
 			localPanelPath.add(
 					new LocalLayerPathPanel(new LocalLayerPathDialog(owner, interfaceId, systemSoftware, frameNumber)));
 		}
+	}
+
+	public void switchPanel(Boolean switchForward) {
+		currentLocalPanelPathIndex = switchForward ? currentLocalPanelPathIndex + 1 : currentLocalPanelPathIndex - 1;
+		// TO DO
 	}
 
 //	@Override

@@ -161,8 +161,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		if (interfaceId.equals(mainInterfaceId) && frameNumber == mainFrameNumber) {
 			localPanelPath.add(mainLocalPanel);
 		} else {
-			localPanelPath.add(new LocalLayerPathPanel(
-					new LocalLayerPathDialog(owner, interfaceId, systemSoftware, frameNumber, this)));
+			localPanelPath.add(new LocalLayerPathPanel(owner, interfaceId, systemSoftware, frameNumber, this));
 		}
 	}
 

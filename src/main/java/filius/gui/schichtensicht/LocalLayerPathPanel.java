@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.awt.Font;
 import javax.swing.BorderFactory;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,6 +31,7 @@ import filius.hardware.knoten.Knoten;
 import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
+import filius.software.system.SystemSoftware;
 
 /**
  * @author Christoph Irniger
@@ -39,10 +41,9 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 	private final String interfaceId;
 
-	private final int selectedFrameNumber; // starts with 1
+	/** frame number which was selected by mouse click, starts with 1 */
+	private final int selectedFrameNumber;
 	
-	private final GlobalLayerPath globalLayerPath;
-
 	private final boolean sent; // if the node sent the frame, otherwise the node received the frame
 	private final boolean forwarded; // if the node forwarded an IP or ICMP packet
 
@@ -75,14 +76,14 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	private static final int MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int MSG_DETAILS_CELL_HEIGHT = 30;
 
-	public LocalLayerPathPanel(LocalLayerPathDialog localLayerPathDialog) {
+	public LocalLayerPathPanel(JFrame owner, String interfaceId, SystemSoftware systemSoftware,
+			int selectedFrameNumber, GlobalLayerPath globalLayerPath) {
 		super();
 
 		// inherit instance variables from super container (localPathDialog)
-		node = localLayerPathDialog.getSystemSoftware().getKnoten();
-		interfaceId = localLayerPathDialog.getInterfaceId();
-		selectedFrameNumber = localLayerPathDialog.getSelectedFrameNumber();
-		this.globalLayerPath = localLayerPathDialog.getGlobalLayerPath();
+		node = systemSoftware.getKnoten();
+		this.interfaceId = interfaceId;
+		this.selectedFrameNumber = selectedFrameNumber;
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
@@ -124,7 +125,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		add(splitPane, BorderLayout.CENTER);
 
 		// set visualisation on top half of the SplitPane
-		splitPane.setTopComponent(new JScrollPane(new LocalLayerPathVisualisation(this)));
+		splitPane.setTopComponent(new JScrollPane(new LocalLayerPathVisualisation(this, globalLayerPath)));
 	}
 	
 	public Knoten getKnoten() {
@@ -133,10 +134,6 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	
 	public String getInterfaceId() {
 		return interfaceId;
-	}
-	
-	public GlobalLayerPath getGlobalLayerPath() {
-		return globalLayerPath;
 	}
 
 	public int getMaxLayerInsideFrame() {

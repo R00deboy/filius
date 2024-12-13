@@ -28,22 +28,9 @@ public class LocalLayerPathDialog extends JDialog implements I18n {
 	/** the corresponding JPanel which is contained in this JDialog */
 	private final LocalLayerPathPanel localLayerPathPanel;
 
-	private final SystemSoftware systemSoftware;
-
-	private final String interfaceId;
-
-	/** frame number which was selected by mouse click, starts with 1 */
-	private final int selectedFrameNumber;
-
-	private final GlobalLayerPath globalLayerPath;
-
 	public LocalLayerPathDialog(JFrame owner, String interfaceId, SystemSoftware systemSoftware,
 			int selectedFrameNumber, GlobalLayerPath globalLayerPath) {
 		super(owner, true);
-		this.systemSoftware = systemSoftware;
-		this.interfaceId = interfaceId;
-		this.selectedFrameNumber = selectedFrameNumber;
-		this.globalLayerPath = globalLayerPath;
 
 		// user can resize the JDialog
 		setResizable(true);
@@ -55,7 +42,8 @@ public class LocalLayerPathDialog extends JDialog implements I18n {
 		// title "Lokaler Weg durch die Schichten"
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 
-		localLayerPathPanel = new LocalLayerPathPanel(this);
+		localLayerPathPanel = new LocalLayerPathPanel(owner, interfaceId, systemSoftware, selectedFrameNumber,
+				globalLayerPath);
 
 		// set size and positioning properties of outer JDialog
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -73,21 +61,5 @@ public class LocalLayerPathDialog extends JDialog implements I18n {
 
 	protected LocalLayerPathPanel getLocalLayerPathPanel() {
 		return this.localLayerPathPanel;
-	}
-
-	public SystemSoftware getSystemSoftware() {
-		return this.systemSoftware;
-	}
-
-	public String getInterfaceId() {
-		return this.interfaceId;
-	}
-
-	public int getSelectedFrameNumber() {
-		return this.selectedFrameNumber;
-	}
-
-	public GlobalLayerPath getGlobalLayerPath() {
-		return this.globalLayerPath;
 	}
 }

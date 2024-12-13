@@ -41,6 +41,7 @@ import filius.rahmenprogramm.I18n;
 public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private final LocalLayerPathPanel LAYER_PATH_PANEL;
 
+	/** if null, we are in the local layer path view */
 	private final GlobalLayerPath globalLayerPath;
 
 	private final JPanel CENTER_PANEL = new JPanel();
@@ -102,10 +103,10 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private final JButton FORTH_IN_TIME;
 	private final JButton BACK_IN_TIME;
 
-	public LocalLayerPathVisualisation(LocalLayerPathPanel layerPathPanel) {
+	public LocalLayerPathVisualisation(LocalLayerPathPanel layerPathPanel, GlobalLayerPath globalLayerPath) {
 		super();
 		LAYER_PATH_PANEL = layerPathPanel;
-		this.globalLayerPath = layerPathPanel.getGlobalLayerPath();
+		this.globalLayerPath = globalLayerPath;
 
 		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout();

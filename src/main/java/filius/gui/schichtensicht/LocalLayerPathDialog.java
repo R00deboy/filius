@@ -26,7 +26,7 @@ import filius.software.system.SystemSoftware;
  */
 public class LocalLayerPathDialog extends JDialog implements I18n {
 	/** the corresponding JPanel which is contained in this JDialog */
-	private final LocalLayerPathPanel localLayerPathPanel;
+	private final LocalLayerPathPanel LOCAL_LAYER_PATH_PANEL;
 
 	public LocalLayerPathDialog(JFrame owner, String interfaceId, SystemSoftware systemSoftware,
 			int selectedFrameNumber, GlobalLayerPath globalLayerPath) {
@@ -42,24 +42,24 @@ public class LocalLayerPathDialog extends JDialog implements I18n {
 		// title "Lokaler Weg durch die Schichten"
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 
-		localLayerPathPanel = new LocalLayerPathPanel(owner, interfaceId, systemSoftware, selectedFrameNumber,
+		LOCAL_LAYER_PATH_PANEL = new LocalLayerPathPanel(owner, interfaceId, systemSoftware, selectedFrameNumber,
 				globalLayerPath);
 
 		// set size and positioning properties of outer JDialog
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation(screenSize.width / 6, screenSize.height / 6);
-		int dialogWidth = localLayerPathPanel.getSizeOfMessageDetailsTable().width;
-		int dialogHeight = localLayerPathPanel.getSizeOfMessageDetailsTable().height
-				+ LocalLayerPathPanel.DIVIDER_LOCATION + 100;
+		int dialogWidth = LOCAL_LAYER_PATH_PANEL.getSizeOfMessageDetailsTable().width;
+		int dialogHeight = LOCAL_LAYER_PATH_PANEL.getSizeOfMessageDetailsTable().height
+				+ LOCAL_LAYER_PATH_PANEL.getDividerLocation() + 100;
 		setPreferredSize(new Dimension(dialogWidth, dialogHeight));
 		setMinimumSize(new Dimension(dialogWidth, dialogHeight));
 
 		// Panel is in the center of the BorderLayout
-		add(localLayerPathPanel, BorderLayout.CENTER);
+		add(LOCAL_LAYER_PATH_PANEL, BorderLayout.CENTER);
 		setVisible(true);
 	}
 
 	protected LocalLayerPathPanel getLocalLayerPathPanel() {
-		return this.localLayerPathPanel;
+		return this.LOCAL_LAYER_PATH_PANEL;
 	}
 }

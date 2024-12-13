@@ -37,21 +37,25 @@ import filius.software.system.SystemSoftware;
  * @author Christoph Irniger
  */
 public class LocalLayerPathPanel extends JPanel implements I18n {
-	private final Knoten node;
+	private final Knoten NODE;
 
-	private final String interfaceId;
+	private final String INTERFACE_ID;
 
 	/** frame number which was selected by mouse click, starts with 1 */
-	private final int selectedFrameNumber;
-	
-	private final boolean sent; // if the node sent the frame, otherwise the node received the frame
-	private final boolean forwarded; // if the node forwarded an IP or ICMP packet
+	private final int SELECTED_FRAME_NUMBER;
 
-	public JSplitPane splitPane;
-	public static final int DIVIDER_LOCATION = 450;
+	/** if the node sent the frame, otherwise the node received the frame */
+	private final boolean SENT;
+	/** if the node forwarded an IP or ICMP packet */
+	private final boolean FORWARDED;
 
-	private String[][] messageDetailsSent = new String[6][8]; // for the sent message
-	private String[][] messageDetailsReceived = new String[6][8]; // for the received message
+	private final JSplitPane SPLIT_PANE;
+	private static final int DIVIDER_LOCATION = 450;
+
+	/** details of the sent message */
+	private String[][] messageDetailsSent = new String[6][8];
+	/** details of the received message */
+	private String[][] messageDetailsReceived = new String[6][8];
 
 	private MessageDetailsTable tableSent;
 	private MessageDetailsTable tableReceived;
@@ -60,15 +64,21 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	private final Object[] CORR_FRAME_DATA;
 	private final String CORR_INTERFACE_ID;
 
-	// maximum layer inside the frame
-	// (1 = link, 2 = internet, 3 = transport, 4 = application)
+	/**
+	 * maximum layer inside the frame (1 = link, 2 = internet, 3 = transport, 4 =
+	 * application)
+	 */
 	private final int MAX_LAYER_INSIDE_FRAME;
-	// maximum layer on which the node operates
-	// (1 = link, 2 = internet, 3 = transport, 4 = application)
+	/**
+	 * maximum layer on which the node operates (1 = link, 2 = internet, 3 =
+	 * transport, 4 = application)
+	 */
 	private final int MAX_LAYER_OF_OPERATION;
 
-	// current number of hidden layers
-	// 1 = Link, 2 = Link & Internet, 3 = Link & Internet & Transport
+	/**
+	 * current number of hidden layers 1 = Link, 2 = Link & Internet, 3 = Link &
+	 * Internet & Transport
+	 */
 	private int hiddenLayers;
 
 	private static final Color BACKGROUND_COLOR = Color.WHITE;
@@ -76,18 +86,18 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	private static final int MSG_DETAILS_CELL_WIDTH = 150;
 	private static final int MSG_DETAILS_CELL_HEIGHT = 30;
 
-	public LocalLayerPathPanel(JFrame owner, String interfaceId, SystemSoftware systemSoftware,
-			int selectedFrameNumber, GlobalLayerPath globalLayerPath) {
+	public LocalLayerPathPanel(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int selectedFrameNumber,
+			GlobalLayerPath globalLayerPath) {
 		super();
 
 		// inherit instance variables from super container (localPathDialog)
-		node = systemSoftware.getKnoten();
-		this.interfaceId = interfaceId;
-		this.selectedFrameNumber = selectedFrameNumber;
+		NODE = systemSoftware.getKnoten();
+		this.INTERFACE_ID = interfaceId;
+		this.SELECTED_FRAME_NUMBER = selectedFrameNumber;
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
-		sent = isFrameSent(interfaceId, selectedFrameNumber);
+		SENT = isFrameSent(interfaceId, selectedFrameNumber);
 
 		/*
 		 * Fill matrices messageDetailsReceived and messageDetailsSent. Both have an
@@ -98,11 +108,11 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		MAX_LAYER_INSIDE_FRAME = fill();
 
 		// determine if the packet (inside the frame) was forwarded
-		CORR_FRAME_DATA = Lauscher.getLauscher().getCorrespondingFrame(this.interfaceId, this.selectedFrameNumber,
-				(InternetKnoten) this.node);
+		CORR_FRAME_DATA = Lauscher.getLauscher().getCorrespondingFrame(this.INTERFACE_ID, this.SELECTED_FRAME_NUMBER,
+				(InternetKnoten) this.NODE);
 		CORR_INTERFACE_ID = (String) CORR_FRAME_DATA[0];
 		Integer corrFrameNumber = (Integer) CORR_FRAME_DATA[1];
-		forwarded = isFrameForwarded(CORR_INTERFACE_ID, corrFrameNumber);
+		FORWARDED = isFrameForwarded(CORR_INTERFACE_ID, corrFrameNumber);
 		fillOtherIfForwarded(CORR_INTERFACE_ID, corrFrameNumber);
 
 		// initialise visualisation and tables for message details
@@ -111,9 +121,9 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		setLayersInTablesInvisible();
 
 		// SplitPane (for visualisation in upper and message details in lower part)
-		splitPane = new JSplitPane();
-		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		splitPane.setDividerLocation(DIVIDER_LOCATION);
+		SPLIT_PANE = new JSplitPane();
+		SPLIT_PANE.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		SPLIT_PANE.setDividerLocation(DIVIDER_LOCATION);
 
 		// ScrollPane for bottom of SplitPane
 		setDefaultMessageDetails();
@@ -122,18 +132,18 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		setLayout(new BorderLayout(10, 10));
 
 		// add splitPane to the current JPanel
-		add(splitPane, BorderLayout.CENTER);
+		add(SPLIT_PANE, BorderLayout.CENTER);
 
 		// set visualisation on top half of the SplitPane
-		splitPane.setTopComponent(new JScrollPane(new LocalLayerPathVisualisation(this, globalLayerPath)));
+		SPLIT_PANE.setTopComponent(new JScrollPane(new LocalLayerPathVisualisation(this, globalLayerPath)));
 	}
-	
+
 	public Knoten getKnoten() {
-		return node;
+		return NODE;
 	}
-	
+
 	public String getInterfaceId() {
-		return interfaceId;
+		return INTERFACE_ID;
 	}
 
 	public int getMaxLayerInsideFrame() {
@@ -153,13 +163,17 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	}
 
 	public boolean isSent() {
-		return sent;
+		return SENT;
 	}
 
 	public boolean isForwarded() {
-		return forwarded;
+		return FORWARDED;
 	}
 	
+	public int getDividerLocation() {
+		return DIVIDER_LOCATION;
+	}
+
 	public Dimension getSizeOfMessageDetailsTable() {
 		return MessageDetailsTable.getSizeOfMessageDetailsTable();
 	}
@@ -181,12 +195,12 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 * @return maximum layer that appears inside the frame
 	 */
 	private int fill() {
-		if (sent) {
+		if (SENT) {
 			fillTitles(messageDetailsSent);
-			return fillMessageDetails(messageDetailsSent, this.interfaceId, this.selectedFrameNumber);
+			return fillMessageDetails(messageDetailsSent, this.INTERFACE_ID, this.SELECTED_FRAME_NUMBER);
 		} else {
 			fillTitles(messageDetailsReceived);
-			return fillMessageDetails(messageDetailsReceived, this.interfaceId, this.selectedFrameNumber);
+			return fillMessageDetails(messageDetailsReceived, this.INTERFACE_ID, this.SELECTED_FRAME_NUMBER);
 		}
 	}
 
@@ -317,7 +331,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 * @param corrFrameNumber corresponding frame number
 	 */
 	private boolean isFrameForwarded(String corrInterfaceId, Integer corrFrameNumber) {
-		return ((node instanceof Vermittlungsrechner || node instanceof Gateway)
+		return ((NODE instanceof Vermittlungsrechner || NODE instanceof Gateway)
 				&& (corrInterfaceId != null && corrFrameNumber != null));
 	}
 
@@ -330,8 +344,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 * @param corrFrameNumber
 	 */
 	private void fillOtherIfForwarded(String corrInterfaceId, Integer corrFrameNumber) {
-		if (forwarded) {
-			if (sent) {
+		if (FORWARDED) {
+			if (SENT) {
 				fillTitles(messageDetailsReceived);
 				fillMessageDetails(messageDetailsReceived, corrInterfaceId, corrFrameNumber);
 			} else {
@@ -347,17 +361,17 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 * the local path for the first time.
 	 */
 	private void setDefaultMessageDetails() {
-		if (sent && !forwarded) {
+		if (SENT && !FORWARDED) {
 
 			// for the sender of a message
 			updateMessageDetails(true);
-			if (node instanceof Host) {
+			if (NODE instanceof Host) {
 				for (int i = 1; i < MAX_LAYER_INSIDE_FRAME; i++) {
 					hideLayerData(i, tableSent);
 					System.out.println("hide layer data " + i);
 				}
 				hiddenLayers = MAX_LAYER_INSIDE_FRAME - 1;
-			} else if (node instanceof Vermittlungsrechner || node instanceof Gateway) {
+			} else if (NODE instanceof Vermittlungsrechner || NODE instanceof Gateway) {
 				hideLayerData(1, tableSent);
 				hiddenLayers = 1;
 			}
@@ -379,18 +393,18 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	public void updateMessageDetails(boolean senderSideIsActive) {
 		if (senderSideIsActive) {
 			// save old divider location
-			int currentDividerLocation = splitPane.getDividerLocation();
+			int currentDividerLocation = SPLIT_PANE.getDividerLocation();
 			// set new table
-			splitPane.setBottomComponent(new JScrollPane(tableSent));
+			SPLIT_PANE.setBottomComponent(new JScrollPane(tableSent));
 			// set old divider location
-			splitPane.setDividerLocation(currentDividerLocation);
+			SPLIT_PANE.setDividerLocation(currentDividerLocation);
 		} else {
 			// save old divider location
-			int currentDividerLocation = splitPane.getDividerLocation();
+			int currentDividerLocation = SPLIT_PANE.getDividerLocation();
 			// set new table
-			splitPane.setBottomComponent(new JScrollPane(tableReceived));
+			SPLIT_PANE.setBottomComponent(new JScrollPane(tableReceived));
 			// set old divider location
-			splitPane.setDividerLocation(currentDividerLocation);
+			SPLIT_PANE.setDividerLocation(currentDividerLocation);
 		}
 	}
 

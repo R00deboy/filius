@@ -61,7 +61,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		mainInterfaceId = interfaceId;
 		mainFrameNumber = frameNumber;
 		mainFrame = LAUSCHER.getFrame(mainInterfaceId, mainFrameNumber);
-		mainLocalDialog = new LocalLayerPathDialog(owner, interfaceId, systemSoftware, frameNumber);
+		mainLocalDialog = new LocalLayerPathDialog(owner, interfaceId, systemSoftware, frameNumber, this);
 		mainLocalPanel = mainLocalDialog.getLocalLayerPathPanel();
 
 		// overwrite title to "Globaler Weg durch die Schichten"
@@ -161,14 +161,21 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		if (interfaceId.equals(mainInterfaceId) && frameNumber == mainFrameNumber) {
 			localPanelPath.add(mainLocalPanel);
 		} else {
-			localPanelPath.add(
-					new LocalLayerPathPanel(new LocalLayerPathDialog(owner, interfaceId, systemSoftware, frameNumber)));
+			localPanelPath.add(new LocalLayerPathPanel(
+					new LocalLayerPathDialog(owner, interfaceId, systemSoftware, frameNumber, this)));
 		}
 	}
 
+	/**
+	 * Switches to the view in the main JDialog window to the next or previous
+	 * LocalLayerPathPanel of the LocalPanels path list.
+	 * 
+	 * @param switchForward true, if one wants to switch forward, false if backward
+	 */
 	public void switchPanel(Boolean switchForward) {
+		mainLocalDialog.remove(localPanelPath.get(currentLocalPanelPathIndex));
 		currentLocalPanelPathIndex = switchForward ? currentLocalPanelPathIndex + 1 : currentLocalPanelPathIndex - 1;
-		// TO DO
+		mainLocalDialog.add(localPanelPath.get(currentLocalPanelPathIndex));
 	}
 
 //	@Override

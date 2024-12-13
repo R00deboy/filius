@@ -1,6 +1,9 @@
 package filius.gui.schichtensicht;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
@@ -22,6 +25,7 @@ import filius.software.system.SystemSoftware;
  * @author Christoph Irniger
  */
 public class LocalLayerPathDialog extends JDialog implements I18n {
+	/** the corresponding JPanel which is contained in this JDialog */
 	private final LocalLayerPathPanel localLayerPathPanel;
 
 	private final SystemSoftware systemSoftware;
@@ -31,12 +35,15 @@ public class LocalLayerPathDialog extends JDialog implements I18n {
 	/** frame number which was selected by mouse click, starts with 1 */
 	private final int selectedFrameNumber;
 
+	private final GlobalLayerPath globalLayerPath;
+
 	public LocalLayerPathDialog(JFrame owner, String interfaceId, SystemSoftware systemSoftware,
-			int selectedFrameNumber) {
+			int selectedFrameNumber, GlobalLayerPath globalLayerPath) {
 		super(owner, true);
 		this.systemSoftware = systemSoftware;
 		this.interfaceId = interfaceId;
 		this.selectedFrameNumber = selectedFrameNumber;
+		this.globalLayerPath = globalLayerPath;
 
 		// user can resize the JDialog
 		setResizable(true);
@@ -49,6 +56,15 @@ public class LocalLayerPathDialog extends JDialog implements I18n {
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 
 		localLayerPathPanel = new LocalLayerPathPanel(this);
+
+		// set size and positioning properties of outer JDialog
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation(screenSize.width / 6, screenSize.height / 6);
+		int dialogWidth = localLayerPathPanel.getSizeOfMessageDetailsTable().width;
+		int dialogHeight = localLayerPathPanel.getSizeOfMessageDetailsTable().height
+				+ LocalLayerPathPanel.DIVIDER_LOCATION + 100;
+		setPreferredSize(new Dimension(dialogWidth, dialogHeight));
+		setMinimumSize(new Dimension(dialogWidth, dialogHeight));
 
 		// Panel is in the center of the BorderLayout
 		add(localLayerPathPanel, BorderLayout.CENTER);
@@ -69,5 +85,9 @@ public class LocalLayerPathDialog extends JDialog implements I18n {
 
 	public int getSelectedFrameNumber() {
 		return this.selectedFrameNumber;
+	}
+
+	public GlobalLayerPath getGlobalLayerPath() {
+		return this.globalLayerPath;
 	}
 }

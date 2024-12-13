@@ -41,6 +41,8 @@ import filius.rahmenprogramm.I18n;
 public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private final LocalLayerPathPanel LAYER_PATH_PANEL;
 
+	private final GlobalLayerPath globalLayerPath;
+
 	private final JPanel CENTER_PANEL = new JPanel();
 	private final GridBagLayout GB_LAYOUT_CENTER_PANEL = new GridBagLayout();
 	private GridBagConstraints c = new GridBagConstraints();
@@ -103,6 +105,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	public LocalLayerPathVisualisation(LocalLayerPathPanel layerPathPanel) {
 		super();
 		LAYER_PATH_PANEL = layerPathPanel;
+		this.globalLayerPath = layerPathPanel.getGlobalLayerPath();
 
 		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout();
@@ -697,6 +700,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			updateButtonsIfForth();
 			hideOrShowLayersIfForth();
 			updateActiveBorder(true);
+		} else {
+			globalLayerPath.switchPanel(true);
 		}
 	}
 
@@ -709,6 +714,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			updateButtonsIfBack();
 			hideOrShowLayersIfBack();
 			updateActiveBorder(false);
+		} else {
+			globalLayerPath.switchPanel(false);
 		}
 	}
 
@@ -718,7 +725,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private void updateButtonsIfForth() {
 		BACK_IN_TIME.setEnabled(true);
 		if (pointInTime == maxPointInTime) {
-			FORTH_IN_TIME.setEnabled(false);
+			if (globalLayerPath == null) {
+				FORTH_IN_TIME.setEnabled(false);
+			}
 		}
 		updateSenderSide();
 		LAYER_PATH_PANEL.updateMessageDetails(senderSideIsActive);
@@ -730,7 +739,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private void updateButtonsIfBack() {
 		FORTH_IN_TIME.setEnabled(true);
 		if (pointInTime == minPointInTime) {
-			BACK_IN_TIME.setEnabled(false);
+			if (globalLayerPath == null) {
+				BACK_IN_TIME.setEnabled(false);
+			}
 		}
 		updateSenderSide();
 		LAYER_PATH_PANEL.updateMessageDetails(senderSideIsActive);

@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -41,12 +40,14 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	private final String interfaceId;
 
 	private final int selectedFrameNumber; // starts with 1
+	
+	private final GlobalLayerPath globalLayerPath;
 
 	private final boolean sent; // if the node sent the frame, otherwise the node received the frame
 	private final boolean forwarded; // if the node forwarded an IP or ICMP packet
 
 	public JSplitPane splitPane;
-	private static final int DIVIDER_LOCATION = 450;
+	public static final int DIVIDER_LOCATION = 450;
 
 	private String[][] messageDetailsSent = new String[6][8]; // for the sent message
 	private String[][] messageDetailsReceived = new String[6][8]; // for the received message
@@ -81,6 +82,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		node = localLayerPathDialog.getSystemSoftware().getKnoten();
 		interfaceId = localLayerPathDialog.getInterfaceId();
 		selectedFrameNumber = localLayerPathDialog.getSelectedFrameNumber();
+		this.globalLayerPath = localLayerPathDialog.getGlobalLayerPath();
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
@@ -121,21 +123,20 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		// add splitPane to the current JPanel
 		add(splitPane, BorderLayout.CENTER);
 
-		// set size and positioning properties of outer JDialog
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		localLayerPathDialog.setLocation(screenSize.width / 6, screenSize.height / 6);
-		int dialogWidth = MessageDetailsTable.getSizeOfMessageDetailsTable().width;
-		int dialogHeight = MessageDetailsTable.getSizeOfMessageDetailsTable().height + DIVIDER_LOCATION + 100;
-		Dimension dialogDimension = new Dimension(dialogWidth, dialogHeight);
-		localLayerPathDialog.setPreferredSize(dialogDimension);
-		localLayerPathDialog.setMinimumSize(dialogDimension);
-
 		// set visualisation on top half of the SplitPane
 		splitPane.setTopComponent(new JScrollPane(new LocalLayerPathVisualisation(this)));
 	}
-
+	
 	public Knoten getKnoten() {
 		return node;
+	}
+	
+	public String getInterfaceId() {
+		return interfaceId;
+	}
+	
+	public GlobalLayerPath getGlobalLayerPath() {
+		return globalLayerPath;
 	}
 
 	public int getMaxLayerInsideFrame() {
@@ -150,10 +151,6 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		return CORR_INTERFACE_ID;
 	}
 
-	public String getInterfaceId() {
-		return interfaceId;
-	}
-
 	public Color getBackgroundColor() {
 		return BACKGROUND_COLOR;
 	}
@@ -164,6 +161,10 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 	public boolean isForwarded() {
 		return forwarded;
+	}
+	
+	public Dimension getSizeOfMessageDetailsTable() {
+		return MessageDetailsTable.getSizeOfMessageDetailsTable();
 	}
 
 	/**

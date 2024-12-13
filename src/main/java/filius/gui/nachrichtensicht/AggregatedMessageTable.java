@@ -566,7 +566,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
 		new LocalLayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware,
-				selectedFrameNumber);
+				selectedFrameNumber, null);
 	}
 
 	/**

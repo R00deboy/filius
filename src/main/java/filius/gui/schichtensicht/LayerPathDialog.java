@@ -48,6 +48,8 @@ public class LayerPathDialog extends JDialog implements I18n {
 
 		// Panel is in the center of the BorderLayout
 		add(LOCAL_LAYER_PATH_PANEL, BorderLayout.CENTER);
+
+		// When in global view Dialog will be set visible inside the global view class
 		if (globalLayerPath == null) {
 			setVisible(true);
 		}

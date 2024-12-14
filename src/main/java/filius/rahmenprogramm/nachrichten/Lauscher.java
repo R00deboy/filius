@@ -585,33 +585,27 @@ public class Lauscher implements I18n {
 	 * Returns the ethernet frame with the same payload as the frame in the first
 	 * argument but with a desired TTL. If the frame in the first argument does not
 	 * encapsule an IP packet (e.g. an ARP packet) the method returns null. If no
-	 * such frame exists, returns null.
+	 * such frame exists it returns null as well.
 	 * 
 	 * @param originalFrame the frame whose data should be equal to the returned one
 	 * @param ttl           the desired TTL
 	 * @return frame with same data and specified TTL (null if it does not exist)
 	 */
 	public EthernetFrame getFrameWithSameContentAndSpecificTTL(EthernetFrame originalFrame, int ttl) {
-		EthernetFrame frame = null;
 		if (originalFrame.getDaten() instanceof IpPaket) {
-			boolean found = false;
 			for (String interfaceId : getInterfaceIDs()) {
 				LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
 				if (framesMitZeitstempel != null) {
 					for (Object[] frameMitZeitstempel : framesMitZeitstempel) {
-						frame = (EthernetFrame) frameMitZeitstempel[1];
+						EthernetFrame frame = (EthernetFrame) frameMitZeitstempel[1];
 						if (frame.samePayload(originalFrame, ttl)) {
-							found = true;
-							break;
+							return frame;
 						}
-					}
-					if (found) {
-						break;
 					}
 				}
 			}
 		}
-		return frame;
+		return null;
 	}
 
 	/**

@@ -34,6 +34,17 @@ import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.system.SystemSoftware;
 
 /**
+ * This class is used to visualise the path of a layer 2 packet (in Filius: IP
+ * or ARP packet) through the TCP/IP layers on the selected node (host or
+ * router). The idea was taken from the following website and with permission of
+ * the creator: https://oinf.ch/interactive/tcp-ip-visualisierung/
+ * 
+ * This view corresponds to reality. In packet-switching networks like the
+ * internet a single node in general cannot track the end-to-end path of a
+ * packet. This follows immediately from the properties of the packet-switching
+ * network model. The node can only reproduce the receiving, processing and
+ * forwarding of a packet.
+ * 
  * @author Christoph Irniger
  */
 public class LocalLayerPathPanel extends JPanel implements I18n {
@@ -136,6 +147,11 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 		// set visualisation on top half of the SplitPane
 		SPLIT_PANE.setTopComponent(new JScrollPane(new LocalLayerPathVisualisation(this, globalLayerPath)));
+	}
+	
+	@Override
+	public String toString() {
+		return INTERFACE_ID + " " + NODE.toString() + " " + SELECTED_FRAME_NUMBER; 
 	}
 
 	public Knoten getKnoten() {
@@ -368,7 +384,6 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 			if (NODE instanceof Host) {
 				for (int i = 1; i < MAX_LAYER_INSIDE_FRAME; i++) {
 					hideLayerData(i, tableSent);
-					System.out.println("hide layer data " + i);
 				}
 				hiddenLayers = MAX_LAYER_INSIDE_FRAME - 1;
 			} else if (NODE instanceof Vermittlungsrechner || NODE instanceof Gateway) {

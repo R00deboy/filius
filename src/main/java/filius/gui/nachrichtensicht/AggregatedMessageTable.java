@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 import filius.gui.JMainFrame;
 import filius.gui.schichtensicht.GlobalLayerPath;
 import filius.gui.schichtensicht.LocalLayerPathPanel;
-import filius.gui.schichtensicht.LocalLayerPathDialog;
+import filius.gui.schichtensicht.LayerPathDialog;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
@@ -559,14 +559,15 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 * 
 	 * @param systemSoftware      system software of the node
 	 * @param selectedFrameNumber number of the selected frame in the data exchange
+	 *                            (starts with 1)
 	 * 
 	 * @author Christoph Irniger
 	 */
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LocalLayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware,
-				selectedFrameNumber, null);
+		new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, selectedFrameNumber,
+				null);
 	}
 
 	/**
@@ -574,6 +575,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 * 
 	 * @param systemSoftware      system software of the node
 	 * @param selectedFrameNumber number of the selected frame in the data exchange
+	 *                            (starts with 1)
 	 * 
 	 * @author Christoph Irniger
 	 */

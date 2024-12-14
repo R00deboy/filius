@@ -38,7 +38,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	private final EthernetFrame MAIN_FRAME;
 
 	/** local path view of the selected node */
-	private final LocalLayerPathDialog MAIN_LOCAL_DIALOG;
+	private final LayerPathDialog MAIN_DIALOG;
 	private final LocalLayerPathPanel MAIN_LOCAL_PANEL;
 
 	private int currentLocalPanelPathIndex = 0;
@@ -61,16 +61,18 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		MAIN_INTERFACE_ID = interfaceId;
 		MAIN_FRAME_NUMBER = frameNumber;
 		MAIN_FRAME = LAUSCHER.getFrame(MAIN_INTERFACE_ID, MAIN_FRAME_NUMBER);
-		MAIN_LOCAL_DIALOG = new LocalLayerPathDialog(owner, interfaceId, systemSoftware, frameNumber, this);
-		MAIN_LOCAL_PANEL = MAIN_LOCAL_DIALOG.getLocalLayerPathPanel();
+		
+		MAIN_DIALOG = new LayerPathDialog(owner, interfaceId, systemSoftware, frameNumber, this);
+		MAIN_LOCAL_PANEL = MAIN_DIALOG.getLocalLayerPathPanel();
 
 		// overwrite title to "Globaler Weg durch die Schichten"
-		MAIN_LOCAL_DIALOG.setTitle(messages.getString("schichten_globaler_weg_msg2"));
+		MAIN_DIALOG.setTitle(messages.getString("schichten_globaler_weg_msg2"));
 
 		fillFramePath();
 		fillLocalPanelsPath();
-
+		
 		currentLocalPanelPathIndex = localPanelPath.indexOf(MAIN_LOCAL_PANEL);
+		MAIN_DIALOG.setVisible(true);
 	}
 
 	/**
@@ -172,9 +174,13 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	 * @param switchForward true, if one wants to switch forward, false if backward
 	 */
 	public void switchPanel(Boolean switchForward) {
-		MAIN_LOCAL_DIALOG.remove(localPanelPath.get(currentLocalPanelPathIndex));
+		LocalLayerPathPanel oldPanel = localPanelPath.get(currentLocalPanelPathIndex);
+		oldPanel.setVisible(false);
+		MAIN_DIALOG.remove(oldPanel);
 		currentLocalPanelPathIndex = switchForward ? currentLocalPanelPathIndex + 1 : currentLocalPanelPathIndex - 1;
-		MAIN_LOCAL_DIALOG.add(localPanelPath.get(currentLocalPanelPathIndex));
+		LocalLayerPathPanel newPanel = localPanelPath.get(currentLocalPanelPathIndex);
+		MAIN_DIALOG.add(newPanel);
+		newPanel.setVisible(true);
 	}
 
 //	@Override

@@ -11,25 +11,17 @@ import filius.rahmenprogramm.I18n;
 import filius.software.system.SystemSoftware;
 
 /**
- * This class is used to visualise the path of a layer 2 packet (in Filius: IP
- * or ARP packet) through the TCP/IP layers on the selected node (host or
- * router). The idea was taken from the following website and with permission of
- * the creator: https://oinf.ch/interactive/tcp-ip-visualisierung/
- * 
- * This view corresponds to reality. In packet-switching networks like the
- * internet a single node in general cannot track the end-to-end path of a
- * packet. This follows immediately from the properties of the packet-switching
- * network model. The node can only reproduce the receiving, processing and
- * forwarding of a packet.
+ * This class is used as a top container for the local or global layer path
+ * view.
  * 
  * @author Christoph Irniger
  */
-public class LocalLayerPathDialog extends JDialog implements I18n {
+public class LayerPathDialog extends JDialog implements I18n {
 	/** the corresponding JPanel which is contained in this JDialog */
 	private final LocalLayerPathPanel LOCAL_LAYER_PATH_PANEL;
 
-	public LocalLayerPathDialog(JFrame owner, String interfaceId, SystemSoftware systemSoftware,
-			int selectedFrameNumber, GlobalLayerPath globalLayerPath) {
+	public LayerPathDialog(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int selectedFrameNumber,
+			GlobalLayerPath globalLayerPath) {
 		super(owner, true);
 
 		// user can resize the JDialog
@@ -56,7 +48,9 @@ public class LocalLayerPathDialog extends JDialog implements I18n {
 
 		// Panel is in the center of the BorderLayout
 		add(LOCAL_LAYER_PATH_PANEL, BorderLayout.CENTER);
-		setVisible(true);
+		if (globalLayerPath == null) {
+			setVisible(true);
+		}
 	}
 
 	protected LocalLayerPathPanel getLocalLayerPathPanel() {

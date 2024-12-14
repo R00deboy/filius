@@ -150,32 +150,32 @@ public class EthernetFrame implements Serializable {
 	}
 
 	/**
-	 * This method checks wheter the frame in the first argument has the same the
-	 * same payload as <i>this</i> frame and a specific TTL. Returns false if the
-	 * frame in the first argument or <i>this</i> frame is not an IP packet (e.g. an
-	 * ARP packet).
+	 * This method checks wheter the frame in the first argument has the same
+	 * payload as <i>this</i> frame and a specific TTL. Returns false if the frame
+	 * in the first argument or <i>this</i> frame is not an IP packet (e.g. an ARP
+	 * packet).
 	 * 
-	 * @param originalFrame the frame whose payload should be compared to
-	 *                      <i>this</i> payload
-	 * @param ttl           the desired TTL of the frame in the first argument
+	 * @param frame the frame whose payload should be compared to <i>this</i>
+	 *              payload
+	 * @param ttl   the desired TTL of the frame in the first argument
 	 * @return true if the frame in the first argument has the same payload and the
 	 *         specified TTL
 	 * @author Christoph Irniger
 	 */
 	public boolean samePayload(EthernetFrame frame, int ttl) {
-		Object packet1 = this.getDaten();
-		Object packet2 = frame.getDaten();
+		Object thisPacket = this.getDaten();
+		Object argumentPacket = frame.getDaten();
 
 		// if both frames are of type IP
-		if (packet1 instanceof IpPaket && packet2 instanceof IpPaket) {
-			IpPaket ipPacket1 = (IpPaket) packet1;
-			IpPaket ipPacket2 = (IpPaket) packet2;
-			if (!(packet1 instanceof IcmpPaket) && !(packet2 instanceof IcmpPaket)) {
-				return ipPacket1.sameContentApartFromTTL(ipPacket2) && ipPacket2.getTtl() == ttl;
-			} else if (packet1 instanceof IcmpPaket && packet2 instanceof IcmpPaket) {
-				IcmpPaket icmpPacket1 = (IcmpPaket) packet1;
-				IcmpPaket icmpPacket2 = (IcmpPaket) packet2;
-				return icmpPacket1.sameContentApartFromTTL(icmpPacket2) && icmpPacket2.getTtl() == ttl;
+		if (thisPacket instanceof IpPaket && argumentPacket instanceof IpPaket) {
+			IpPaket thisIpPacket = (IpPaket) thisPacket;
+			IpPaket argumentIpPacket = (IpPaket) argumentPacket;
+			if (!(thisPacket instanceof IcmpPaket) && !(argumentPacket instanceof IcmpPaket)) {
+				return thisIpPacket.sameContentApartFromTTL(argumentIpPacket) && thisIpPacket.getTtl() == ttl;
+			} else if (thisPacket instanceof IcmpPaket && argumentPacket instanceof IcmpPaket) {
+				IcmpPaket thisIcmpPacket = (IcmpPaket) thisPacket;
+				IcmpPaket argumentIcmpPacket = (IcmpPaket) argumentPacket;
+				return thisIcmpPacket.sameContentApartFromTTL(argumentIcmpPacket) && thisIcmpPacket.getTtl() == ttl;
 			} else {
 				return false;
 			}

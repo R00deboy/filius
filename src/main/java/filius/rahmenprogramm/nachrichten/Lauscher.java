@@ -664,17 +664,21 @@ public class Lauscher implements I18n {
 
 	/**
 	 * Returns the frame number (number of a frame in the data exchange window of an
-	 * interface) to a given interface ID and ethernet frame.
+	 * interface) to a given interface ID and ethernet frame. Returns 0 if the frame
+	 * was not found.
 	 * 
 	 * @param interfaceId ID of the interface
 	 * @param frame       frame which the number should be computed for
-	 * @return the frame number in the data exchange window (starts with 1)
+	 * @return the frame number in the data exchange window (starts with 1) or 0 if
+	 *         the frame was not found
 	 */
 	public int getFrameNumber(String interfaceId, EthernetFrame frame) {
 		LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
-		for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
-			if (((EthernetFrame) framesMitZeitstempel.get(frameNumber)[1]).sameContent(frame)) {
-				return frameNumber + 1;
+		if (framesMitZeitstempel != null) {
+			for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+				if (((EthernetFrame) framesMitZeitstempel.get(frameNumber)[1]).sameContent(frame)) {
+					return frameNumber + 1;
+				}
 			}
 		}
 		return 0;

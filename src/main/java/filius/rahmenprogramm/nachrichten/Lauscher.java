@@ -562,8 +562,8 @@ public class Lauscher implements I18n {
 								// one) has to be one more than the one of the original frame, if received (the
 								// sent one) one less
 								int originalTTL = ((IpPaket) data).getTtl();
-								if (originalFrame.samePayload(frame, originalTTL + 1) && sent
-										|| originalFrame.samePayload(frame, originalTTL - 1) && received) {
+								if (frame.samePayload(originalFrame, originalTTL + 1) && sent
+										|| frame.samePayload(originalFrame, originalTTL - 1) && received) {
 									found = true;
 									interfaceIdAndFrameNumber[0] = (String) interfaceId;
 									interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;

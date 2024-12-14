@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import filius.hardware.knoten.InternetKnoten;
+import filius.hardware.knoten.Knoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.netzzugangsschicht.EthernetFrame;
@@ -34,6 +36,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 
 	private final JFrame OWNER;
 	private final String MAIN_INTERFACE_ID;
+	private final Knoten MAIN_NODE;
 	private final int MAIN_FRAME_NUMBER;
 	private final EthernetFrame MAIN_FRAME;
 
@@ -58,10 +61,11 @@ public class GlobalLayerPath extends JPanel implements I18n {
 
 	public GlobalLayerPath(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int frameNumber) {
 		this.OWNER = owner;
+		MAIN_NODE = (InternetKnoten) systemSoftware.getKnoten();
 		MAIN_INTERFACE_ID = interfaceId;
 		MAIN_FRAME_NUMBER = frameNumber;
 		MAIN_FRAME = LAUSCHER.getFrame(MAIN_INTERFACE_ID, MAIN_FRAME_NUMBER);
-		
+
 		MAIN_DIALOG = new LayerPathDialog(owner, interfaceId, systemSoftware, frameNumber, this);
 		MAIN_LOCAL_PANEL = MAIN_DIALOG.getLocalLayerPathPanel();
 
@@ -69,9 +73,16 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		MAIN_DIALOG.setTitle(messages.getString("schichten_globaler_weg_msg2"));
 
 		fillFramePath();
+		for (EthernetFrame frame : framePath) {
+			System.out.println(frame.toString());
+		}
 		fillLocalPanelsPath();
-		
+		for (LocalLayerPathPanel localLayerPathPanel : localPanelPath) {
+			System.out.println(localLayerPathPanel.toString());
+		}
+
 		currentLocalPanelPathIndex = localPanelPath.indexOf(MAIN_LOCAL_PANEL);
+		System.out.println(currentLocalPanelPathIndex);
 		MAIN_DIALOG.setVisible(true);
 	}
 
@@ -159,8 +170,8 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	 *                       with 1)
 	 */
 	private void addToLocalPanelPath(String interfaceId, SystemSoftware systemSoftware, int frameNumber) {
-		// if frame is exactly the same (incl. TTL) as the main frame
-		if (interfaceId.equals(MAIN_INTERFACE_ID) && frameNumber == MAIN_FRAME_NUMBER) {
+		// if the interface is on the main node, add the main panel
+		if ((systemSoftware.getKnoten()).equals(MAIN_NODE)) {
 			localPanelPath.add(MAIN_LOCAL_PANEL);
 		} else {
 			localPanelPath.add(new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this));

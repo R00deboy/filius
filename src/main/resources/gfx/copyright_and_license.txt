@@ -31,6 +31,12 @@ Designer: David Vignoni / ICON KING
 License: GNU GPL 2.1 or later
 https://commons.wikimedia.org/wiki/File:Nuvola_mimetypes_pdf.png
 
+settings.png
+-----------------------
+Designer: Pau Giner
+License: Creative Commons CC0 1.0 Universal Public Domain Dedication
+https://commons.wikimedia.org/wiki/File:WMF-Agora-Settings_BCBCBC.svg
+
 Files:
  gatewayS.svg gatewayS.png
  laptopS.svg laptopS.png
@@ -62,3 +68,4 @@ Copyright:
 License: GPL-3
 Comment: Based on GNOME artwork (http://www.gnome.org), slightly adapted
  https://commons.wikimedia.org/wiki/File:Gnome-network-server.svg
+

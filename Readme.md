@@ -35,7 +35,7 @@ This program uses free code signing provided by [SignPath.io](https://signpath.i
 
 ## Development Environment
 
-Filius is developed with Eclipse using Maven as build tool.
+Filius is developed with Eclipse using Maven as a build tool.
 
 Currently, the build works with Java up to version 13 since some unit tests cannot be executed with the newest Java versions. In other words: It is possible to develop with a newer version but there will be some tests that fail.
 

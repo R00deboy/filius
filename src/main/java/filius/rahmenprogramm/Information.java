@@ -71,6 +71,8 @@ public class Information implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static final String FILENAME_EDITED_SZENARIO = "edited_scenario.fls";
+
     /** Zur Implementierung des Singleton */
     private static Information information = null;
 
@@ -260,9 +262,7 @@ public class Information implements Serializable {
      * @return
      */
     public ResourceBundle holeResourceBundle() {
-        ResourceBundle bundle;
-
-        bundle = ResourceBundle.getBundle("filius.messages.MessagesBundle", getLocaleOrDefault());
+        ResourceBundle bundle = ResourceBundle.getBundle("filius.messages.MessagesBundle", getLocaleOrDefault());
 
         return bundle;
     }

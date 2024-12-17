@@ -106,7 +106,7 @@ public class GUIMainMenu implements Serializable, I18n {
         iconSelect.setVisible(true);
         iconSelect.setBounds(520, 8, 90, 20);
         iconSelect.setActionCommand("iconselect");
-        iconSelect.setToolTipText(messages.getString("guimainmemu_msg18"));
+        iconSelect.setToolTipText(messages.getString("guimainmemu_msg19"));
         iconSelect.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
                 iconTheme = iconSelect.getSelectedIndex();

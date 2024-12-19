@@ -73,16 +73,9 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		MAIN_DIALOG.setTitle(messages.getString("schichten_globaler_weg_msg2"));
 
 		fillFramePath();
-		for (EthernetFrame frame : framePath) {
-			System.out.println(frame.toString());
-		}
 		fillLocalPanelsPath();
-		for (LocalLayerPathPanel localLayerPathPanel : localPanelPath) {
-			System.out.println(localLayerPathPanel.toString());
-		}
-
+		
 		currentLocalPanelPathIndex = localPanelPath.indexOf(MAIN_LOCAL_PANEL);
-		System.out.println(currentLocalPanelPathIndex);
 		MAIN_DIALOG.setVisible(true);
 	}
 

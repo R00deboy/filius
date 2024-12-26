@@ -116,7 +116,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 			addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
 
 			// add receiver
-			interfaceId = MAIN_FRAME.getZielMacAdresse();
+			interfaceId = MAIN_INTERFACE_ID;
 			systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
 			frameNumber = LAUSCHER.getFrameNumber(interfaceId, MAIN_FRAME);
 			addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);

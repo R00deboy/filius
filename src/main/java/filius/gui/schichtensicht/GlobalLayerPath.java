@@ -46,6 +46,9 @@ public class GlobalLayerPath extends JPanel implements I18n {
 
 	private int currentLocalPanelPathIndex = 0;
 
+	/** if the active border of the next local panel should be at the end */
+	private boolean activeBorderOfNextPanelAtEnd;
+
 	/**
 	 * Path of a packet represented as list of ethernet frames encapsulationg this
 	 * packet in chronological order of creation.
@@ -74,9 +77,13 @@ public class GlobalLayerPath extends JPanel implements I18n {
 
 		fillFramePath();
 		fillLocalPanelsPath();
-		
+
 		currentLocalPanelPathIndex = localPanelPath.indexOf(MAIN_LOCAL_PANEL);
 		MAIN_DIALOG.setVisible(true);
+	}
+	
+	public boolean isActiveBorderOfNextPanelAtEnd() {
+		return activeBorderOfNextPanelAtEnd;
 	}
 
 	/**
@@ -167,6 +174,9 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		if ((systemSoftware.getKnoten()).equals(MAIN_NODE)) {
 			localPanelPath.add(MAIN_LOCAL_PANEL);
 		} else {
+			if (!localPanelPath.contains(MAIN_LOCAL_PANEL)) {
+				activeBorderOfNextPanelAtEnd = true;
+			}
 			localPanelPath.add(new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this));
 		}
 	}

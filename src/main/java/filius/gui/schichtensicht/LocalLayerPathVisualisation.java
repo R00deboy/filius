@@ -138,14 +138,19 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		// start back and forth logic of buttons
 		backAndForth();
 
-		// deactivate back button if the frame was received
-		if (!LAYER_PATH_PANEL.isSent()) {
+		// deactivate back button in local view if the frame was received
+		if (globalLayerPath == null && !LAYER_PATH_PANEL.isSent()) {
+			BACK_IN_TIME.setEnabled(false);
+		}
+		// deactivate back button in global view if the frame was sent
+		else if (globalLayerPath != null && LAYER_PATH_PANEL.isSent()) {
 			BACK_IN_TIME.setEnabled(false);
 		}
 
 		// set initial value for senderSideIsActive
 		senderSideIsActive = LAYER_PATH_PANEL.isSent();
 
+		// ---------- configuration of points in time and layout ----------
 		// if the packet was not forwarded (i.e. sent or received)
 		if (!LAYER_PATH_PANEL.isForwarded()) {
 			// configure left and right side (indication of layers and back and forth
@@ -162,7 +167,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 						LAYER_PATH_PANEL.getMaxLayerOfOperation());
 				pointInTimeForSenderSide = 5; // should never be reached, since only received
 			}
-			pointInTime = minPointInTime;
+			pointInTime = globalLayerPath.isActiveBorderOfNextPanelAtEnd() ? maxPointInTime : minPointInTime;
 			visualisationSentOrReceived();
 		}
 		// if the packet was forwarded (only for routers)
@@ -173,11 +178,15 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			addSidePanel(FORTH_IN_TIME, X_OFFSET + 10); // right side
 			minPointInTime = 0;
 			maxPointInTime = 5;
-			if (LAYER_PATH_PANEL.isSent()) {
-				pointInTime = minPointInTime + 3;
-				LAYER_PATH_PANEL.hideNextHigherLayer();
+			if (!globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
+				if (LAYER_PATH_PANEL.isSent()) {
+					pointInTime = minPointInTime + 3;
+					LAYER_PATH_PANEL.hideNextHigherLayer();
+				} else {
+					pointInTime = minPointInTime;
+				}
 			} else {
-				pointInTime = minPointInTime;
+				pointInTime = maxPointInTime;
 			}
 			pointInTimeForSenderSide = minPointInTime + 3;
 			visualisationForwarded();
@@ -259,9 +268,10 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
 		setFinishedLabel(CENTER_PANEL, label, xCoord1, 11, 1, 1);
 
-		// create square nested messages and if packet was received, create active
-		// border
-		activeBorder = !LAYER_PATH_PANEL.isSent();
+		// create square nested messages and if packet was received or this
+		// visualisation is part of the global view before the main panel, create active
+		// border here
+		activeBorder = !LAYER_PATH_PANEL.isSent() || globalLayerPath.isActiveBorderOfNextPanelAtEnd();
 		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, activeBorder);
 		setFinishedLabel(CENTER_PANEL, label, xCoord2, 11, 1, 1);
 
@@ -299,12 +309,15 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
 		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 8, 11, 1, 1);
 
-		// create left side square nested messages and if packet was received, create
-		// active border
-		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, !LAYER_PATH_PANEL.isSent());
+		// create left side square nested messages and if packet was received and not
+		// part of the global view, create active border here
+		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1,
+				!LAYER_PATH_PANEL.isSent() && !globalLayerPath.isActiveBorderOfNextPanelAtEnd());
 		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 1, 11, 1, 1);
-		// create right side square nested messages
-		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, false);
+		// create right side square nested messages and if this visualisation is part of
+		// the global view before the main panel, create active border here
+		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1,
+				globalLayerPath.isActiveBorderOfNextPanelAtEnd());
 		setFinishedLabel(CENTER_PANEL, label, X_OFFSET + 7, 11, 1, 1);
 
 		// create second wire on the left
@@ -438,7 +451,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		for (int layerNumber = 4; layerNumber >= 1; layerNumber--) {
 			// visualisation if the packet was sent or received
 			if (!LAYER_PATH_PANEL.isForwarded()) {
-				if (LAYER_PATH_PANEL.isSent()) {
+				if (LAYER_PATH_PANEL.isSent() && !globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
 					// if the packet was sent, the first message (depending on which layers are
 					// involved) gets an active border
 					activeBorder = (layerNumber == layerOfActiveBorder) ? true : false;

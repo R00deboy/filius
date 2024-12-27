@@ -182,14 +182,14 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			minPointInTime = 0;
 			maxPointInTime = 5;
 			// set point in time
-			if (globalLayerPath == null) {
+			if (globalLayerPath == null || !globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
 				if (LAYER_PATH_PANEL.isSent()) {
 					pointInTime = minPointInTime + 3;
 					LAYER_PATH_PANEL.hideNextHigherLayer();
 				} else {
 					pointInTime = minPointInTime;
 				}
-			} else if (!globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
+			} else {
 				pointInTime = maxPointInTime;
 			}
 			// set point in time for senders side
@@ -463,13 +463,12 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 					// if the packet was sent, the first message (depending on which layers are
 					// involved) gets an active border
 					activeBorder = (layerNumber == layerOfActiveBorder) ? true : false;
-					arrowPointsDown = true;
 				} else {
 					// active border will not be here (but around the square message for the
 					// "received" visualisation, see creation in visualisationForwarded()
 					activeBorder = false;
-					arrowPointsDown = false;
 				}
+				arrowPointsDown = LAYER_PATH_PANEL.isSent() ? true : false;
 			}
 			// if the packet was forwarded
 			else {

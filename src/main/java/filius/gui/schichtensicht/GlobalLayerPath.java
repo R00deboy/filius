@@ -81,7 +81,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		currentLocalPanelPathIndex = localPanelPath.indexOf(MAIN_LOCAL_PANEL);
 		MAIN_DIALOG.setVisible(true);
 	}
-	
+
 	public boolean isActiveBorderOfNextPanelAtEnd() {
 		return activeBorderOfNextPanelAtEnd;
 	}
@@ -174,9 +174,10 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		if ((systemSoftware.getKnoten()).equals(MAIN_NODE)) {
 			localPanelPath.add(MAIN_LOCAL_PANEL);
 		} else {
-			if (!localPanelPath.contains(MAIN_LOCAL_PANEL)) {
-				activeBorderOfNextPanelAtEnd = true;
-			}
+			// If the main panel is not (yet) contained in the list, the active border of
+			// the next panel should be at the end (the latest point in time), since if it
+			// shows up, it happened through the "back" button.
+			activeBorderOfNextPanelAtEnd = !localPanelPath.contains(MAIN_LOCAL_PANEL) ? true : false;
 			localPanelPath.add(new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this));
 		}
 	}

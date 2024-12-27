@@ -8,8 +8,10 @@ import filius.hardware.knoten.InternetKnoten;
 import filius.hardware.knoten.Knoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
+import filius.software.netzzugangsschicht.Ethernet;
 import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.system.SystemSoftware;
+import filius.software.vermittlungsschicht.ArpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 
 /**
@@ -31,7 +33,6 @@ import filius.software.vermittlungsschicht.IpPaket;
 
 public class GlobalLayerPath extends JPanel implements I18n {
 	private static final Lauscher LAUSCHER = Lauscher.getLauscher();
-	private static final String ETHERNET_BROADCAST = "FF:FF:FF:FF:FF:FF";
 	private static final int MAX_TTL = 64;
 
 	private final JFrame OWNER;
@@ -91,9 +92,11 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	 * packet.
 	 */
 	private void fillFramePath() {
-		// frame was received via ethernet broadcast (e.g. ARP, DHCP)
-		if (MAIN_FRAME.getZielMacAdresse().equals(ETHERNET_BROADCAST)
-				&& !MAIN_FRAME.getQuellMacAdresse().equals(MAIN_INTERFACE_ID)) {
+		// if frame is an ARP packet or was received via ethernet broadcast (possible
+		// with ARP and DHCP)
+		if (MAIN_FRAME.getDaten() instanceof ArpPaket
+				|| (MAIN_FRAME.getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)
+						&& !MAIN_FRAME.getQuellMacAdresse().equals(MAIN_INTERFACE_ID))) {
 			addToFramePath(MAIN_FRAME);
 		} else if (MAIN_FRAME.getDaten() instanceof IpPaket) {
 			EthernetFrame originalframe = LAUSCHER.getFrame(MAIN_INTERFACE_ID, MAIN_FRAME_NUMBER);
@@ -114,7 +117,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	 */
 	private void fillLocalPanelsPath() {
 		// frame was received via ethernet broadcast
-		if (MAIN_FRAME.getZielMacAdresse().equals(ETHERNET_BROADCAST)
+		if (MAIN_FRAME.getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)
 				&& !MAIN_FRAME.getQuellMacAdresse().equals(MAIN_INTERFACE_ID)) {
 			// add sender
 			String interfaceId = MAIN_FRAME.getQuellMacAdresse();

@@ -135,9 +135,9 @@ public class EthernetFrame implements Serializable {
 				if (data instanceof IpPaket) {
 					return samePayload(frame, ((IpPaket) data).getTtl());
 				} else if (data instanceof ArpPaket) {
-					ArpPaket arpPaket1 = (ArpPaket) frame.getDaten();
-					ArpPaket arpPaket2 = (ArpPaket) this.getDaten();
-					return arpPaket1.sameContent(arpPaket2);
+					ArpPaket thisArpPacket = (ArpPaket) this.getDaten();
+					ArpPaket argumentArpPacket = (ArpPaket) frame.getDaten();
+					return thisArpPacket.sameContent(argumentArpPacket);
 				} else {
 					return false;
 				}

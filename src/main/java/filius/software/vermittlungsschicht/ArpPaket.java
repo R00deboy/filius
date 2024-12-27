@@ -144,10 +144,12 @@ public class ArpPaket implements Serializable {
 		} else {
 			ArpPaket arpPaket = (ArpPaket) o;
 
-			return this.getProtokollTyp() == arpPaket.getProtokollTyp()
-					&& this.getOperation() == arpPaket.getOperation() && this.getSenderMAC() == arpPaket.getSenderMAC()
-					&& this.getSenderIP() == arpPaket.getSenderIP() && this.getTargetMAC() == arpPaket.getTargetMAC()
-					&& this.getTargetIP() == arpPaket.getTargetIP();
+			return this.getProtokollTyp().equals(arpPaket.getProtokollTyp())
+					&& this.getOperation() == arpPaket.getOperation()
+					&& this.getSenderMAC().equals(arpPaket.getSenderMAC())
+					&& this.getSenderIP().equals(arpPaket.getSenderIP())
+					&& this.getTargetMAC().equals(arpPaket.getTargetMAC())
+					&& this.getTargetIP().equals(arpPaket.getTargetIP());
 		}
 	}
 }

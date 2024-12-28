@@ -217,7 +217,7 @@ public class GUIMainMenu implements Serializable, I18n {
         geschwindigkeit.setVisible(true);
         geschwindigkeit.setToolTipText(messages.getString("guimainmemu_msg15"));
         geschwindigkeit.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-        geschwindigkeit.setBounds(612, 10, 120, 44);
+        geschwindigkeit.setBounds(612, 10, 50, 44);
 
         simulationSpeedInPercent = new JSlider(0, 100);
         simulationSpeedInPercent.setToolTipText(messages.getString("guimainmemu_msg16"));

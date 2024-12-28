@@ -193,6 +193,9 @@
 										<include>**/*</include>
 									</includes>
 								</resource>
+								<resource>
+									<directory>src/main/resources</directory>
+								</resource>
 							</resources>
 						</configuration>
 					</execution>
@@ -356,7 +359,7 @@
 							<execution>
 								<phase>package</phase>
 								<goals>
-									<goal>attached</goal>
+									<goal>single</goal>
 								</goals>
 							</execution>
 						</executions>

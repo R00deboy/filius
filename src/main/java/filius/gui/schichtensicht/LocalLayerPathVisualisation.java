@@ -231,7 +231,11 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			xCoord2 = X_OFFSET + 2;
 			xCoord3 = X_OFFSET + 3;
 			// colored layer indicators
-			coloredLayerIndicators(1, SQUARE_SIDE_LENGTH, true);
+			if (globalLayerPath == null) {
+				coloredLayerIndicators(1, SQUARE_SIDE_LENGTH, true);
+			} else {
+				coloredLayerIndicators(1, 4 * SQUARE_SIDE_LENGTH + RECTANGLE_WIDTH + GAP_BETWEEN_CELLS, true);
+			}
 			coloredLayerIndicators(3, SQUARE_SIDE_LENGTH, false);
 			coloredLayerIndicators(4, SQUARE_SIDE_LENGTH, false);
 			coloredLayerIndicators(5, SQUARE_SIDE_LENGTH, false);
@@ -246,7 +250,11 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			coloredLayerIndicators(X_OFFSET, SQUARE_SIDE_LENGTH, false);
 			coloredLayerIndicators(X_OFFSET + 1, SQUARE_SIDE_LENGTH, false);
 			coloredLayerIndicators(X_OFFSET + 2, SQUARE_SIDE_LENGTH, false);
-			coloredLayerIndicators(X_OFFSET + 4, SQUARE_SIDE_LENGTH, true);
+			if (globalLayerPath == null) {
+				coloredLayerIndicators(X_OFFSET + 4, SQUARE_SIDE_LENGTH, true);
+			} else {
+				coloredLayerIndicators(X_OFFSET + 4, 4 * SQUARE_SIDE_LENGTH + RECTANGLE_WIDTH + GAP_BETWEEN_CELLS, true);
+			}
 		}
 
 		// node name cell with empty cell above and below

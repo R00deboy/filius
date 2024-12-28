@@ -151,15 +151,20 @@ public class TcpSegment extends Segment implements Serializable {
 	}
 
 	/**
-	 * Equal if subjacent segments are equal and if seqNummer, ackNummer,
-	 * dataOffset, reservedField, urg, ack, psh, rst, syn, fin, window and
-	 * urgentPointer are equal.
+	 * Checks if the TCP segment in the argument has the same content (which
+	 * consists of the content of the subjacent segment (of type {@code Segment})
+	 * and seqNummer, ackNummer, dataOffset, reservedField, urg, ack, psh, rst, syn,
+	 * fin, window and urgentPointer).
 	 * 
+	 * @param o TCP segment to be compared to <it>this</i> TCP segment
+	 * @return true if the content of the subjacent segment (of type
+	 *         {@code Segment}) and seqNummer, ackNummer, dataOffset, reservedField,
+	 *         urg, ack, psh, rst, syn, fin, window and urgentPointer are the same
+	 *         as in <it>this</i> TCP segment
 	 * @author Christoph Irniger
 	 */
 	@Override
 	public boolean sameContent(Object o) {
-
 		if (o == this) {
 			return true;
 		}

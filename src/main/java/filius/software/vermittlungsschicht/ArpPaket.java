@@ -34,6 +34,9 @@ public class ArpPaket implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/** counter of the identification number of the IP packet */
+	private static long identificationCounter;
+
 	/** Protokoll-Typ der Vermittlungsschicht */
 	private String protokollTyp;
 
@@ -54,6 +57,18 @@ public class ArpPaket implements Serializable {
 	 * wird
 	 */
 	private String targetIP;
+
+	/** identification number of the IP packet */
+	private final long identification;
+
+	public ArpPaket() {
+		this.identification = setIdentCounter();
+	}
+
+	private static synchronized long setIdentCounter() {
+		identificationCounter++;
+		return identificationCounter - 1;
+	}
 
 	public String getProtokollTyp() {
 		return protokollTyp;
@@ -109,13 +124,17 @@ public class ArpPaket implements Serializable {
 	}
 
 	/**
-	 * Equal if protokollTyp, operation, senderMAC, senderIP, targetMAC and targetIP
-	 * are equal.
+	 * Checks if the whole content (which consists of protokollTyp, operation,
+	 * senderMAC, senderIP, targetMAC and targetIP) of <i>this</i> ARP packet is
+	 * equal to the ARP packet in the argument (generally given as an Object).
 	 * 
+	 * @param o ARP packet to be compared to <it>this</i> IP packet
+	 * @return true, if protokollTyp, operation, senderMAC, senderIP, targetMAC and
+	 *         targetIP in the ARP packet in the argument are the same as in
+	 *         <it>this</i> ARP packet
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContent(Object o) {
-
 		if (o == this) {
 			return true;
 		}
@@ -125,10 +144,12 @@ public class ArpPaket implements Serializable {
 		} else {
 			ArpPaket arpPaket = (ArpPaket) o;
 
-			return this.getProtokollTyp() == arpPaket.getProtokollTyp()
-					&& this.getOperation() == arpPaket.getOperation() && this.getSenderMAC() == arpPaket.getSenderMAC()
-					&& this.getSenderIP() == arpPaket.getSenderIP() && this.getTargetMAC() == arpPaket.getTargetMAC()
-					&& this.getTargetIP() == arpPaket.getTargetIP();
+			return this.getProtokollTyp().equals(arpPaket.getProtokollTyp())
+					&& this.getOperation() == arpPaket.getOperation()
+					&& this.getSenderMAC().equals(arpPaket.getSenderMAC())
+					&& this.getSenderIP().equals(arpPaket.getSenderIP())
+					&& this.getTargetMAC().equals(arpPaket.getTargetMAC())
+					&& this.getTargetIP().equals(arpPaket.getTargetIP());
 		}
 	}
 }

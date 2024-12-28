@@ -60,7 +60,7 @@ public abstract class Anwendung extends Thread {
     /**
      * Das Betriebssystem des Rechners/Vermittlungsrechner, auf dem die Anwendung ausgefuehrt wird.
      */
-    private InternetKnotenBetriebssystem betriebssystem;
+    protected InternetKnotenBetriebssystem betriebssystem;
 
     /** Beobachter der Anwendung */
     private AnwendungObservable observable = new AnwendungObservable();

@@ -61,11 +61,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
-import filius.gui.schichtensicht.LocalPathDialog;
+import filius.gui.schichtensicht.GlobalLayerPath;
+import filius.gui.schichtensicht.LocalLayerPathPanel;
+import filius.gui.schichtensicht.LayerPathDialog;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.rahmenprogramm.nachrichten.LauscherBeobachter;
+import filius.software.netzzugangsschicht.Ethernet;
 import filius.software.system.SystemSoftware;
 
 public class AggregatedMessageTable extends JTable implements LauscherBeobachter, I18n {
@@ -509,13 +512,13 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 			if (typeOfColor == "foregroundColor") {
 				color = valueOf(layerName).foregroundColor;
 			} else if (typeOfColor == "backgroundColor") {
-				color =  valueOf(layerName).backgroundColor;
+				color = valueOf(layerName).backgroundColor;
 			} else if (typeOfColor == "backgroundColorFine") {
-				color =  valueOf(layerName).backgroundColorFine;
+				color = valueOf(layerName).backgroundColorFine;
 			} else if (typeOfColor == "backgroundColorUltraFine") {
-				color =  valueOf(layerName).backgroundColorUltraFine;
+				color = valueOf(layerName).backgroundColorUltraFine;
 			} else if (typeOfColor == "borderColor") {
-				color =  valueOf(layerName).borderColor;
+				color = valueOf(layerName).borderColor;
 			}
 			return color;
 		}
@@ -552,32 +555,41 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * Local view of the path through layers
+	 * Local view of the path through layers.
+	 * 
+	 * @param systemSoftware      system software of the node
+	 * @param selectedFrameNumber number of the selected frame in the data exchange
+	 *                            (starts with 1)
 	 * 
 	 * @author Christoph Irniger
 	 */
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LocalPathDialog(filius.gui.JMainFrame.getJMainFrame(), systemSoftware, interfaceId, selectedFrameNumber);
+		new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, selectedFrameNumber,
+				null);
 	}
 
 	/**
-	 * Global view of the path through layers
+	 * Global view of the path through layers.
+	 * 
+	 * @param systemSoftware      system software of the node
+	 * @param selectedFrameNumber number of the selected frame in the data exchange
+	 *                            (starts with 1)
 	 * 
 	 * @author Christoph Irniger
 	 */
 	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
-
-	}
-
-	/**
-	 * Verification that message has arrived at destination IP address (for global
-	 * view)
-	 * 
-	 * @author Christoph Irniger
-	 */
-	private Boolean hasMessageArrived(int messageNumber) {
-		return false;
+		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
+				+ " (AggregatedMessageTable), showGlobalPathThroughLayers()");
+		// if the frame was sent and destination MAC of the frame is broadcast, global
+		// view is not possible
+		if (LocalLayerPathPanel.isFrameSent(interfaceId, selectedFrameNumber) && Lauscher.getLauscher()
+				.getFrame(interfaceId, selectedFrameNumber).getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)) {
+			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("nachrichtentabelle_msg12"));
+		} else {
+			new GlobalLayerPath(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware,
+					selectedFrameNumber);
+		}
 	}
 }

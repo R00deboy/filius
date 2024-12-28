@@ -86,7 +86,7 @@ public class Firewall extends Anwendung implements I18n {
 
     protected void initFirewallThreads() {
         for (NetzwerkInterface nic : getAllNetworkInterfaces()) {
-            FirewallThread thread = new FirewallThread(this, nic);
+            FirewallThread thread = new FirewallThread(this, nic, this.betriebssystem);
             addAndStartThread(thread);
         }
     }

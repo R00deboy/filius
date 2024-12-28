@@ -116,7 +116,7 @@ public class Ethernet extends Protokoll {
                         nic.getPort().holeAusgangsPuffer().add(ethernetFrame);
                         nic.getPort().holeAusgangsPuffer().notify();
                     }
-                    Lauscher.getLauscher().addDatenEinheit(nic.getMac(), ethernetFrame);
+                    Lauscher.getLauscher().addDatenEinheit(nic, holeSystemSoftware(), ethernetFrame);
                 }
             }
         }
@@ -138,7 +138,7 @@ public class Ethernet extends Protokoll {
             knoten = (InternetKnoten) holeSystemSoftware().getKnoten();
 
             for (NetzwerkInterface nic : knoten.getNetzwerkInterfaces()) {
-                interfaceBeobachter = new EthernetThread(this, nic);
+                interfaceBeobachter = new EthernetThread(this, nic, holeSystemSoftware());
                 interfaceBeobachter.starten();
                 try {
                     threads.add(interfaceBeobachter);

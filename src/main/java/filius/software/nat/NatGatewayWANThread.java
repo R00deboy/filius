@@ -30,50 +30,52 @@ import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.firewall.FirewallThread;
 import filius.software.netzzugangsschicht.EthernetFrame;
+import filius.software.system.SystemSoftware;
 import filius.software.vermittlungsschicht.IpPaket;
 import filius.software.vermittlungsschicht.VermittlungsProtokoll;
 
 public class NatGatewayWANThread extends FirewallThread implements I18n {
-    private NatGateway natGateway;
+	private NatGateway natGateway;
 
-    private NetzwerkInterface lanNic;
-    private NetzwerkInterface wanNic;
+	private NetzwerkInterface lanNic;
+	private NetzwerkInterface wanNic;
 
-    /** Init thread for the WAN network interface */
-    public NatGatewayWANThread(NatGateway natGateway, NetzwerkInterface nic, NetzwerkInterface lanNic) {
-        super(natGateway, nic);
-        this.natGateway = natGateway;
-        this.wanNic = nic;
-        this.lanNic = lanNic;
-    }
+	/** Init thread for the WAN network interface */
+	public NatGatewayWANThread(NatGateway natGateway, NetzwerkInterface nic, NetzwerkInterface lanNic,
+			SystemSoftware systemSoftware) {
+		super(natGateway, nic, systemSoftware);
+		this.natGateway = natGateway;
+		this.wanNic = nic;
+		this.lanNic = lanNic;
+	}
 
-    @Override
-    protected void verarbeiteDatenEinheit(EthernetFrame frame) {
-        Lauscher.getLauscher().addDatenEinheit(wanNic.getMac(), frame);
-        if (!checkToLANAddress(frame) && !checkDiscardByFirewall(frame)) {
-            modifyIncomingFrame(frame);
-            forwardFrame(frame);
-        }
-    }
+	@Override
+	protected void verarbeiteDatenEinheit(EthernetFrame frame) {
+		Lauscher.getLauscher().addDatenEinheit(wanNic, this.systemSoftware, frame);
+		if (!checkToLANAddress(frame) && !checkDiscardByFirewall(frame)) {
+			modifyIncomingFrame(frame);
+			forwardFrame(frame);
+		}
+	}
 
-    private void modifyIncomingFrame(EthernetFrame frame) {
-        if (frame.getDaten() instanceof IpPaket) {
-            IpPaket packet = (IpPaket) frame.getDaten();
-            if (packet.getEmpfaenger().contentEquals(wanNic.getIp())) {
-                natGateway.replaceDestination(packet);
-            }
-        }
-    }
+	private void modifyIncomingFrame(EthernetFrame frame) {
+		if (frame.getDaten() instanceof IpPaket) {
+			IpPaket packet = (IpPaket) frame.getDaten();
+			if (packet.getEmpfaenger().contentEquals(wanNic.getIp())) {
+				natGateway.replaceDestination(packet);
+			}
+		}
+	}
 
-    private boolean checkToLANAddress(EthernetFrame frame) {
-        boolean toLANAddress = false;
-        if (null != lanNic && frame.getDaten() instanceof IpPaket) {
-            IpPaket packet = (IpPaket) frame.getDaten();
-            if (VermittlungsProtokoll.gleichesRechnernetz(packet.getEmpfaenger(), lanNic.getIp(),
-                    lanNic.getSubnetzMaske())) {
-                toLANAddress = true;
-            }
-        }
-        return toLANAddress;
-    }
+	private boolean checkToLANAddress(EthernetFrame frame) {
+		boolean toLANAddress = false;
+		if (null != lanNic && frame.getDaten() instanceof IpPaket) {
+			IpPaket packet = (IpPaket) frame.getDaten();
+			if (VermittlungsProtokoll.gleichesRechnernetz(packet.getEmpfaenger(), lanNic.getIp(),
+					lanNic.getSubnetzMaske())) {
+				toLANAddress = true;
+			}
+		}
+		return toLANAddress;
+	}
 }

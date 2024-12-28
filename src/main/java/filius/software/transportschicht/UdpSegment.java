@@ -43,15 +43,20 @@ public class UdpSegment extends Segment implements Serializable {
 	public void setLaenge(int laenge) {
 		this.laenge = laenge;
 	}
-	
+
 	/**
-	 * Equal if subjacent segments are equal and if laenge is equal.
+	 * Checks if the UDP segment in the argument has the same content (which
+	 * consists of the content of the subjacent segment (of type {@code Segment})
+	 * and laenge).
 	 * 
+	 * @param o UDP segment to be compared to <it>this</i> UDP segment
+	 * @return true if the content of the subjacent segment (of type
+	 *         {@code Segment}) and laenge are the same as in <it>this</i> UDP
+	 *         segment
 	 * @author Christoph Irniger
 	 */
 	@Override
 	public boolean sameContent(Object o) {
-
 		if (o == this) {
 			return true;
 		}

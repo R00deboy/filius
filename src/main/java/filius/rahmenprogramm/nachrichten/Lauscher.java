@@ -45,6 +45,7 @@ import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.Information;
 import filius.software.netzzugangsschicht.EthernetFrame;
+import filius.software.system.SystemSoftware;
 import filius.software.transportschicht.TcpSegment;
 import filius.software.transportschicht.UdpSegment;
 import filius.software.vermittlungsschicht.ArpPaket;
@@ -79,6 +80,9 @@ public class Lauscher implements I18n {
 	private HashMap<String, LinkedList<Object[]>> datenEinheiten = new HashMap<String, LinkedList<Object[]>>();
 	private List<Object[]> droppedDataUnits = new LinkedList<>();
 
+	private HashMap<String, NetzwerkInterface> InterfaceByID = new HashMap<String, NetzwerkInterface>();
+	private HashMap<String, SystemSoftware> SystemSoftwareByID = new HashMap<String, SystemSoftware>();
+
 	private Lauscher() {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", constr: Lauscher()");
 		reset();
@@ -100,6 +104,14 @@ public class Lauscher implements I18n {
 			lauscher = new Lauscher();
 		}
 		return lauscher;
+	}
+
+	public NetzwerkInterface getInterfaceByID(String interfaceId) {
+		return InterfaceByID.get(interfaceId);
+	}
+
+	public SystemSoftware getSystemSoftwareByID(String interfaceId) {
+		return SystemSoftwareByID.get(interfaceId);
 	}
 
 	public void removeIdentifier(String identifier) {
@@ -139,11 +151,13 @@ public class Lauscher implements I18n {
 	/**
 	 * Hinzufuegen von einem EthernetFrame zu den Daten
 	 * 
-	 * @param interfaceId Uebergeben wird der String des NetzwerkInterface nach
-	 *                    Aufruf von toString()
+	 * @param networkInterface
+	 * @param systemSoftware
 	 * @param frame
 	 */
-	public void addDatenEinheit(String interfaceId, EthernetFrame frame) {
+	public void addDatenEinheit(NetzwerkInterface networkInterface, SystemSoftware systemSoftware,
+			EthernetFrame frame) {
+		String interfaceId = networkInterface.getMac();
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", addDatenEinheit(" + interfaceId + "," + frame
 				+ ")");
 		if (!frame.isReadByLauscherForMac(interfaceId)) {
@@ -157,10 +171,11 @@ public class Lauscher implements I18n {
 			synchronized (liste) {
 				liste.addLast(frameMitZeitstempel);
 			}
-
 			frame.setReadByLauscherForMac(interfaceId);
 			benachrichtigeBeobachter(interfaceId);
 		}
+		storeInterfaceByID(interfaceId, networkInterface);
+		storeSystemSoftwareByID(interfaceId, systemSoftware);
 	}
 
 	public void addDroppedDataUnit(EthernetFrame frame) {
@@ -492,41 +507,44 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * General: If a frame was forwarded by the node, given a (received / sent)
-	 * frame, the method finds the (sent / received) frame with the same content.
+	 * General: If a frame was forwarded by the node (this means that it is a
+	 * router), given a (received / sent) frame, the method finds the (sent /
+	 * received) frame with the same encapsuled IP packet on another interface of
+	 * the node.
 	 * 
-	 * Specific: Given an interface ID and the frame number in the aggregated
-	 * message table (Datenaustausch), the Lauscher will be searched on other
-	 * network interfaces of the same node for a frame which has the same content
-	 * (except for TTL). <br \> The first entry of the returned array indicates the
-	 * network interface ID {@code interfaceId} and the second entry the number of
-	 * the frame {@code frameNumber} in the Aggregated Message Table
-	 * (Datenaustausch). If the two entries are the null pointer each, it means that
+	 * Specific: Given an interface ID and the frame number in the data exchange
+	 * window (Datenaustausch), other interfaces of the node will be searched for a
+	 * frame which has the same content apart from TTL). <br \> The first entry of
+	 * the returned array contains the network interface ID {@code interfaceId} and
+	 * the second entry the number of the frame {@code frameNumber} in the data
+	 * exchange window. If the two entries are the null pointer each, it means that
 	 * the layer 2 (IP or ICMP) packet was originally sent or received by this node,
 	 * i.e. that there is no corresponding frame.
 	 * 
 	 * @param originalInterfaceId MAC address of the network interface
-	 * @param originalFrameNumber number of the frame in the aggregated message
-	 *                            table (Datenaustausch)
+	 * @param originalFrameNumber number of the frame in the data exchange window
+	 *                            (Datenaustausch)
 	 * @param node                The node whose message details table
 	 *                            (Datenaustausch) we are on
-	 * @return Array with first entry {@code interfaceId} and second entry
-	 *         {@code frameNumber}. If no corresponding frame exists, the two
-	 *         entries are the null pointer each.
+	 * @return Array of length two. First entry is the interface ID, second entry
+	 *         the frame number in the data exchange window (starts with 1). If no
+	 *         corresponding frame exists, the two entries are null.
 	 * @author Christoph Irniger
 	 */
 	public Object[] getCorrespondingFrame(String originalInterfaceId, int originalFrameNumber, InternetKnoten node) {
 		Object[] interfaceIdAndFrameNumber = new Object[2];
 		EthernetFrame originalFrame = getFrame(originalInterfaceId, originalFrameNumber);
 
-		// ARP packets (instance variable {@code typ} is "0x806") cannot be forwarded
-		if (!originalFrame.getTyp().equals("0x806")) {
+		Object data = originalFrame.getDaten();
+		// Only IP packets can be forwarded
+		if ((data instanceof IpPaket)) {
 
-			// Only execute if the content of the frame (the IpPaket) was either originally
-			// sent or received by the node
+			// Only execute if the node was not the original sender or receiver of the
+			// encapsuled IP packet (e.g. has forwarded the packet)
 			if (!packetOnlyReceivedOrOnlySent(originalFrame, node)) {
 				List<NetzwerkInterface> netzwerkInterfaces = node.getNetzwerkInterfaces();
 
+				boolean found = false;
 				for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
 					String interfaceId = netzwerkInterface.getMac();
 
@@ -534,25 +552,60 @@ public class Lauscher implements I18n {
 						LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
 
 						if (framesMitZeitstempel != null) {
-							int frameNumber;
+							boolean sent = originalFrame.getQuellMacAdresse().equals(originalInterfaceId);
+							boolean received = originalFrame.getZielMacAdresse().equals(originalInterfaceId);
 
-							for (frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+							for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
 								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
-								// check payload if frame payload is an IP packet (instance variable {@code typ}
-								// is "0x800")
-								if (frame.getTyp().equals("0x800") && originalFrame.samePayloadDifferentTTL(frame)) {
+								// if the original frame was sent, the TTL of the desired frame (the received
+								// one) has to be one more than the one of the original frame, if received (the
+								// sent one) one less
+								int originalTTL = ((IpPaket) data).getTtl();
+								if (frame.samePayload(originalFrame, originalTTL + 1) && sent
+										|| frame.samePayload(originalFrame, originalTTL - 1) && received) {
+									found = true;
+									interfaceIdAndFrameNumber[0] = (String) interfaceId;
+									interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
 									break;
 								}
 							}
-							interfaceIdAndFrameNumber[0] = (String) interfaceId;
-							interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
+							if (found) {
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
 		return interfaceIdAndFrameNumber;
+	}
+
+	/**
+	 * Returns the ethernet frame with the same payload as the frame in the first
+	 * argument but with a desired TTL. If the frame in the first argument does not
+	 * encapsule an IP packet (e.g. an ARP packet) the method returns null. If no
+	 * such frame exists it returns null as well.
+	 * 
+	 * @param originalFrame the frame whose data should be equal to the returned one
+	 * @param ttl           the desired TTL
+	 * @return frame with same data and specified TTL (null if it does not exist)
+	 */
+	public EthernetFrame getFrameWithSameContentAndSpecificTTL(EthernetFrame originalFrame, int ttl) {
+		if (originalFrame.getDaten() instanceof IpPaket) {
+			for (String interfaceId : getInterfaceIDs()) {
+				LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
+				if (framesMitZeitstempel != null) {
+					for (Object[] frameMitZeitstempel : framesMitZeitstempel) {
+						EthernetFrame frame = (EthernetFrame) frameMitZeitstempel[1];
+						if (frame.samePayload(originalFrame, ttl)) {
+							return frame;
+						}
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -587,12 +640,13 @@ public class Lauscher implements I18n {
 	}
 
 	/**
-	 * This helper method returns the frame that belongs to the network interface
-	 * indicated in the first parameter and the frame number in the aggregated
-	 * message table (Datenaustausch) in the second parameter.
+	 * This helper method returns the frame in the Lauscher data that belongs to the
+	 * network interface indicated in the first parameter and the frame number in
+	 * the aggregated message table (Datenaustausch) in the second parameter.
 	 * 
-	 * @param interfaceId MAC address of the network interface
-	 * @param frameNumber number of the frame in the aggregated message table
+	 * @param interfaceId MAC address of the network interface whose data exchange
+	 *                    should be searched for the frame
+	 * @param frameNumber number of the frame in the data exchange window
 	 *                    (Datenaustausch)
 	 * @return frame which belongs to the parameters
 	 * @author Christoph Irniger
@@ -600,5 +654,56 @@ public class Lauscher implements I18n {
 	public EthernetFrame getFrame(String interfaceId, int frameNumber) {
 		Object[] frameMitZeitstempel = datenEinheiten.get(interfaceId).get(frameNumber - 1);
 		return (EthernetFrame) frameMitZeitstempel[1];
+	}
+
+	/**
+	 * Returns the frame number (number of a frame in the data exchange window of an
+	 * interface) to a given interface ID and ethernet frame. Returns 0 if the frame
+	 * was not found.
+	 * 
+	 * @param interfaceId ID of the interface
+	 * @param frame       frame which the number should be computed for
+	 * @return the frame number in the data exchange window (starts with 1) or 0 if
+	 *         the frame was not found
+	 */
+	public int getFrameNumber(String interfaceId, EthernetFrame frame) {
+		LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
+		if (framesMitZeitstempel != null) {
+			for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+				if (((EthernetFrame) framesMitZeitstempel.get(frameNumber)[1]).sameContent(frame)) {
+					return frameNumber + 1;
+				}
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * Adds the pair {@code interfaceId} and {@code interface} of type
+	 * {@code NetzwerkInterface} to the HashMap InterfaceByID.
+	 * 
+	 * @param interfaceId      MAC address of the interface
+	 * @param networkInterface interface belonging to the interface ID
+	 * @author Christoph Irniger
+	 */
+	public void storeInterfaceByID(String interfaceId, NetzwerkInterface networkInterface) {
+		if (!InterfaceByID.keySet().contains(interfaceId)) {
+			InterfaceByID.put(interfaceId, networkInterface);
+		}
+	}
+
+	/**
+	 * Adds the pair {@code interfaceId} and {@code systemSoftware} of type
+	 * {@code SystemSoftware} to the HashMap InterfaceByID.
+	 * 
+	 * @param interfaceId    MAC address of the interface
+	 * @param systemSoftware systemSoftware (operating system) belonging to the
+	 *                       interface ID
+	 * @author Christoph Irniger
+	 */
+	public void storeSystemSoftwareByID(String interfaceId, SystemSoftware systemSoftware) {
+		if (!SystemSoftwareByID.keySet().contains(interfaceId)) {
+			SystemSoftwareByID.put(interfaceId, systemSoftware);
+		}
 	}
 }

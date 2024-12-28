@@ -507,7 +507,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Right and left side of the visualisation, indicating the layers and showing
+	 * Right and left side of the visualisation which indicate the layers and showing
 	 * the buttons "forth" and "back".
 	 * 
 	 * @param backOrForthButton "back" or "forth" button

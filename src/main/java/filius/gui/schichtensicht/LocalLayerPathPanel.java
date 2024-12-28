@@ -55,6 +55,9 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	/** frame number which was selected by mouse click, starts with 1 */
 	private final int SELECTED_FRAME_NUMBER;
 
+	/** if null, we are in the local layer path view */
+	private final GlobalLayerPath globalLayerPath;
+
 	/** if the node sent the frame, otherwise the node received the frame */
 	private final boolean SENT;
 	/** if the node forwarded an IP or ICMP packet */
@@ -87,8 +90,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	private final int MAX_LAYER_OF_OPERATION;
 
 	/**
-	 * current number of hidden layers 1 = Link, 2 = Link & Internet, 3 = Link &
-	 * Internet & Transport
+	 * current number of hidden layers (0 = none, 1 = Link, 2 = Link & Internet, 3 =
+	 * Link & Internet & Transport)
 	 */
 	private int hiddenLayers;
 
@@ -105,6 +108,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		NODE = systemSoftware.getKnoten();
 		this.INTERFACE_ID = interfaceId;
 		this.SELECTED_FRAME_NUMBER = selectedFrameNumber;
+		this.globalLayerPath = globalLayerPath;
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
@@ -148,10 +152,10 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		// set visualisation on top half of the SplitPane
 		SPLIT_PANE.setTopComponent(new JScrollPane(new LocalLayerPathVisualisation(this, globalLayerPath)));
 	}
-	
+
 	@Override
 	public String toString() {
-		return INTERFACE_ID + " " + NODE.toString() + " " + SELECTED_FRAME_NUMBER; 
+		return INTERFACE_ID + " " + NODE.toString() + " " + SELECTED_FRAME_NUMBER;
 	}
 
 	public Knoten getKnoten() {
@@ -185,7 +189,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	public boolean isForwarded() {
 		return FORWARDED;
 	}
-	
+
 	public int getDividerLocation() {
 		return DIVIDER_LOCATION;
 	}
@@ -377,23 +381,29 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 * the local path for the first time.
 	 */
 	private void setDefaultMessageDetails() {
+		// for the sender of a message
 		if (SENT && !FORWARDED) {
-
-			// for the sender of a message
 			updateMessageDetails(true);
 			if (NODE instanceof Host) {
-				for (int i = 1; i < MAX_LAYER_INSIDE_FRAME; i++) {
-					hideLayerData(i, tableSent);
+				// if in local view or in global view an active border does not start at end
+				// hide all layers except the maximum layer inside the frame (else show all
+				// layers)
+				if (globalLayerPath == null || !globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
+					for (int i = 1; i < MAX_LAYER_INSIDE_FRAME; i++) {
+						hideLayerData(i, tableSent);
+					}
+					hiddenLayers = MAX_LAYER_INSIDE_FRAME - 1;
+				} else {
+					hiddenLayers = 0;
 				}
-				hiddenLayers = MAX_LAYER_INSIDE_FRAME - 1;
 			} else if (NODE instanceof Vermittlungsrechner || NODE instanceof Gateway) {
 				hideLayerData(1, tableSent);
 				hiddenLayers = 1;
 			}
-		} else {
-
-			// for the receiver of a message
-			// for a router, which has forwarded an IP or ICMP packet
+		}
+		// for the receiver of a message or for a router, which has forwarded an IP or
+		// ICMP packet
+		else {
 			updateMessageDetails(false);
 		}
 	}

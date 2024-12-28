@@ -74,7 +74,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		MAIN_LOCAL_PANEL = MAIN_DIALOG.getLocalLayerPathPanel();
 
 		// overwrite title to "Globaler Weg durch die Schichten"
-		MAIN_DIALOG.setTitle(messages.getString("schichten_globaler_weg_msg2"));
+		MAIN_DIALOG.setTitle(messages.getString("schichten_globaler_weg_msg1"));
 
 		fillFramePath();
 		fillLocalPanelsPath();

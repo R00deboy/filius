@@ -251,6 +251,11 @@ public class ARP extends VermittlungsProtokoll {
                 bestNic = nic;
             }
         }
+        // If the IP address is not yet initialized, no NIC could be selected. So use the first NIC (required for DHCP)
+        if (null == bestNic) {
+            bestMask = IP.inetAton(((InternetKnotenBetriebssystem) holeSystemSoftware()).primarySubnetMask());
+            bestNic = ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces().get(0);
+        }
         return bestNic;
     }
 

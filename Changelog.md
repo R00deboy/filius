@@ -1,5 +1,22 @@
 # Changelog Filius
 
+## [2.7.1] - 2024-11-30
+### Fixed
+ * Start-up with Filius scenario as program argument fixed
+ 
+## [2.7.0] - 2024-11-23
+### Added
+ * New settings dialog to change the language
+ 
+### Changed
+ * Store changes automatically in personal profile when exiting the program
+ * Closing the program without prompt to store changes
+
+### Fixed
+ * Tracerout starts first ping with TTL 1
+ * Fix DHCP issues that are caused by not sending ARP requests without proper IP configuration
+ * Fix tooltip text: shortcut for info dialog
+ 
 ## [2.6.1] - 2024-08-23
 ### Changed
  * Shortcut to open info dialog changed to Ctrl+I

@@ -130,15 +130,6 @@ public class SzenarioVerwaltung extends Observable implements I18n {
             LOG.debug("ERROR (" + this.hashCode() + "): Speicherung der Projektdatei fehlgeschlagen!");
             erfolg = false;
         }
-
-        if (erfolg) {
-            pfad = datei;
-            geaendert = false;
-
-            this.setChanged();
-            this.notifyObservers();
-        }
-
         loescheDateien(tmpDir);
 
         return erfolg;
@@ -223,14 +214,18 @@ public class SzenarioVerwaltung extends Observable implements I18n {
         }
 
         if (erfolg) {
-            pfad = datei;
-            geaendert = false;
-
-            this.setChanged();
-            this.notifyObservers();
+            setCurrentFile(datei, false);
         }
 
         return erfolg;
+    }
+
+    public void setCurrentFile(String scenarioPath, boolean changeStatus) {
+        pfad = scenarioPath;
+        geaendert = changeStatus;
+
+        this.setChanged();
+        this.notifyObservers();
     }
 
     private static boolean netzwerkLaden(String datei, List<GUIKnotenItem> hardwareItems, List<GUIKabelItem> kabelItems,

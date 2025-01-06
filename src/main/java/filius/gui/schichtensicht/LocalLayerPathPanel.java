@@ -377,15 +377,15 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 	/**
 	 * Determines and sets the message details ({@code messageDetailsSent} or
-	 * {@code messageDetailsReceived}) are visible when opening the whole window of
-	 * the local path for the first time.
+	 * {@code messageDetailsReceived}) which are visible when opening the whole
+	 * window of the local path for the first time.
 	 */
 	private void setDefaultMessageDetails() {
 		// for the sender of a message
 		if (SENT && !FORWARDED) {
 			updateMessageDetails(true);
 			if (NODE instanceof Host) {
-				// if in local view or in global view an active border does not start at end
+				// if in local view or if in global view and active border does not start at end
 				// hide all layers except the maximum layer inside the frame (else show all
 				// layers)
 				if (globalLayerPath == null || !globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
@@ -406,6 +406,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		else {
 			updateMessageDetails(false);
 		}
+		tableSent.updatedGreyedOutCells();
+		tableReceived.updatedGreyedOutCells();
 	}
 
 	/**
@@ -435,7 +437,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 	/**
 	 * Sets the layers in {@code tableSent} and {@code tableReceived} which are not
-	 * needed invisible according to {@code maxLayer}.
+	 * needed invisible according to {@code MAX_LAYER_INSIDE_FRAME}.
 	 */
 	private void setLayersInTablesInvisible() {
 
@@ -457,7 +459,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		tables.add(tableReceived);
 		for (MessageDetailsTable table : tables) {
 			for (Component component : table.getComponents()) {
-				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
+				if (columns.contains(table.GRID_BAG_LAYOUT.getConstraints(component).gridx)) {
 					component.setVisible(false);
 				}
 			}
@@ -470,9 +472,11 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 */
 	public void hideNextHigherLayer() {
 		if (hiddenLayers <= 2 && hiddenLayers >= 0) {
-			hideLayerData(hiddenLayers + 1, tableSent);
-			hideLayerData(hiddenLayers + 1, tableReceived);
 			hiddenLayers++;
+			tableSent.updatedGreyedOutCells();
+			tableReceived.updatedGreyedOutCells();
+			hideLayerData(hiddenLayers, tableSent);
+			hideLayerData(hiddenLayers, tableReceived);
 		}
 	}
 
@@ -482,9 +486,11 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 */
 	public void showNextLowerLayer() {
 		if (hiddenLayers <= 3 && hiddenLayers >= 1) {
-			showLayerData(hiddenLayers, tableSent);
-			showLayerData(hiddenLayers, tableReceived);
 			hiddenLayers--;
+			tableSent.updatedGreyedOutCells();
+			tableReceived.updatedGreyedOutCells();
+			showLayerData(hiddenLayers + 1, tableSent);
+			showLayerData(hiddenLayers + 1, tableReceived);
 		}
 	}
 
@@ -510,8 +516,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 			// hide columns
 			for (Component component : table.getComponents()) {
-				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)
-						&& table.gridBagLayout.getConstraints(component).gridy > 1) {
+				if (columns.contains(table.GRID_BAG_LAYOUT.getConstraints(component).gridx)
+						&& table.GRID_BAG_LAYOUT.getConstraints(component).gridy > 1) {
 
 					// set foreground and background to main background (such that the component
 					// gets invisible)
@@ -546,8 +552,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 			// show columns
 			for (Component component : table.getComponents()) {
-				if (columns.contains(table.gridBagLayout.getConstraints(component).gridx)) {
-					int gridy = table.gridBagLayout.getConstraints(component).gridy;
+				if (columns.contains(table.GRID_BAG_LAYOUT.getConstraints(component).gridx)) {
+					int gridy = table.GRID_BAG_LAYOUT.getConstraints(component).gridy;
 					if (gridy > 1) {
 
 						// set colors
@@ -643,13 +649,15 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 * Class for the table at the bottom of the SplitPane for the message details.
 	 */
 	private class MessageDetailsTable extends JPanel {
-		private final GridBagLayout gridBagLayout;
+		private final GridBagLayout GRID_BAG_LAYOUT;
 		private GridBagConstraints c;
 
+		private final Color GREYED_OUT_COLOR = Color.decode("#A6A6A6");
+
 		private MessageDetailsTable(String[][] messageDetails) {
-			gridBagLayout = new GridBagLayout();
+			GRID_BAG_LAYOUT = new GridBagLayout();
 			c = new GridBagConstraints();
-			setLayout(gridBagLayout);
+			setLayout(GRID_BAG_LAYOUT);
 			setBackground(Color.WHITE);
 
 			// Storage for creating the Labels (cells with little content) and
@@ -854,16 +862,101 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 			c.gridheight = height;
 		}
 
-		// bold and italic Font
+		/**
+		 * Set the font to bold and italic for a component.
+		 * 
+		 * @param comp
+		 */
 		private void setBoldAndItalic(Component comp) {
 			Font boldFont = new Font(comp.getFont().getName(), Font.BOLD + Font.ITALIC, comp.getFont().getSize());
 			comp.setFont(boldFont);
 		}
 
-		// normal Font
+		/**
+		 * Set the font to plain (normal) for a component.
+		 * 
+		 * @param comp
+		 */
 		private void setPlain(Component comp) {
 			Font boldFont = new Font(comp.getFont().getName(), Font.PLAIN, comp.getFont().getSize());
 			comp.setFont(boldFont);
+		}
+
+		/**
+		 * Set all cells which represent content of the message (i.e. the ones with y
+		 * coordinate greater than 1) greyed out according to {@code hiddenlayers} and
+		 * {@code MAX_LAYER_INSIDE_FRAME}.
+		 */
+		protected void updatedGreyedOutCells() {
+			// determine columns to be greyed out
+			Set<Integer> columns = new HashSet<>();
+			for (int columnNo = (hiddenLayers + 1) * 2; columnNo <= 6; columnNo++) {
+				columns.add(columnNo);
+			}
+
+			// grey out those components
+			for (Component component : this.getComponents()) {
+				int xCoord = GRID_BAG_LAYOUT.getConstraints(component).gridx;
+				int yCoord = GRID_BAG_LAYOUT.getConstraints(component).gridy;
+				if (yCoord >= 2) {
+					if (columns.contains(xCoord)) {
+						// if content is in the internet layer
+						if (xCoord >= 2 && xCoord <= 3) {
+							setComponentGreyedOut(component, 2);
+						}
+						// if content is in the transport layer
+						else if (xCoord >= 4 && xCoord <= 5) {
+							setComponentGreyedOut(component, 3);
+						}
+						// if content is in the application layer
+						else if (xCoord == 6) {
+							setComponentGreyedOut(component, 4);
+						}
+					}
+					// if it is not the last column
+					else if (xCoord != 7) {
+						// if content is in the internet layer
+						if (xCoord >= 2 && xCoord <= 3) {
+							resetComponentFromGreyedOut(component, 2);
+						}
+						// if content is in the transport layer
+						else if (xCoord >= 4 && xCoord <= 5) {
+							resetComponentFromGreyedOut(component, 3);
+						}
+						// if content is in the application layer
+						else if (xCoord == 6) {
+							resetComponentFromGreyedOut(component, 4);
+						}
+					}
+				}
+			}
+		}
+
+		/**
+		 * Set a components' foreground color (font color) to "greyed out" and the
+		 * background color to the corresponding background color in ultra fine variant.
+		 * 
+		 * @param comp
+		 * @param layerNumber
+		 */
+		private void setComponentGreyedOut(Component comp, int layerNumber) {
+			comp.setForeground(GREYED_OUT_COLOR);
+			comp.setBackground(getLayerColorVar("backgroundColorUltraFine", layerNumber));
+		}
+
+		/**
+		 * Reset a components' foreground color (font color) to black and the background
+		 * color to the corresponding background color.
+		 * 
+		 * @param comp
+		 * @param layerNumber
+		 */
+		private void resetComponentFromGreyedOut(Component comp, int layerNumber) {
+			// only reset if not hidden
+			if (hiddenLayers < layerNumber) {
+				comp.setForeground(Color.BLACK);
+				comp.setBackground(getLayerColorVar("backgroundColor", layerNumber));
+			}
 		}
 	}
 }

@@ -112,6 +112,20 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	}
 
 	/**
+	 * Adds the frame to the frame path.
+	 * 
+	 * @param frame frame to be added to {@code framePath}
+	 */
+	private void addToFramePath(EthernetFrame frame) {
+		// if frame is exactly the same (incl. TTL) as the main frame
+		if (frame.sameContent(MAIN_FRAME)) {
+			framePath.add(MAIN_FRAME);
+		} else {
+			framePath.add(frame);
+		}
+	}
+
+	/**
 	 * Fills the LocalPanels path list with all the LocalPanels involved in
 	 * delivering the IP packet.
 	 */
@@ -146,20 +160,6 @@ public class GlobalLayerPath extends JPanel implements I18n {
 				frameNumber = LAUSCHER.getFrameNumber(interfaceId, frame);
 				addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
 			}
-		}
-	}
-
-	/**
-	 * Adds the frame to the frame path.
-	 * 
-	 * @param frame frame to be added to {@code framePath}
-	 */
-	private void addToFramePath(EthernetFrame frame) {
-		// if frame is exactly the same (incl. TTL) as the main frame
-		if (frame.sameContent(MAIN_FRAME)) {
-			framePath.add(MAIN_FRAME);
-		} else {
-			framePath.add(frame);
 		}
 	}
 

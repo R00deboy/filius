@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>filius</groupId>
 	<artifactId>filius</artifactId>
 	<version>2.7.1</version>
+	<inceptionYear>2007</inceptionYear>
 	<properties>
 		<buildDate>30.11.2024</buildDate>
 		<publisher>Stefan Freischlad</publisher>
@@ -18,10 +17,13 @@
 		<java.version>17</java.version>
 		<execJre.version>17</execJre.version>
 		<mavenJar.version>2.4</mavenJar.version>
-		<launch4j.version>2.3.2</launch4j.version>
+		<launch4j.version>2.5.2</launch4j.version>
 		<launch4j.starterName>Filius.exe</launch4j.starterName>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 	</properties>
+	<organization>
+		<name>Lernsoftware Filius</name>
+	</organization>
 	<packaging>jar</packaging>
 	<name>Filius</name>
 	<description>Lernsoftware zu Rechnernetzen</description>
@@ -235,6 +237,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.8.1</version>
 				<executions>
 					<execution>
 						<id>copy-product-dependencies</id>
@@ -318,15 +321,9 @@
 									</classPath>
 									<chdir>.</chdir>
 									<jre>
-										<!-- If the runtime is not bundled,
-										launch4j will start with the 
-											available JRE. -->
 										<path>java-runtime</path>
-										<bundledJre64Bit>true</bundledJre64Bit>
-										<bundledJreAsFallback>false</bundledJreAsFallback>
-										<runtimeBits>64</runtimeBits>
+										<requires64Bit>true</requires64Bit>
 										<minVersion>${execJre.version}</minVersion>
-										<jdkPreference>preferJdk</jdkPreference>
 									</jre>
 									<versionInfo>
 										<fileVersion>${project.version}.0</fileVersion>
@@ -432,9 +429,7 @@
 								<phase>prepare-package</phase>
 								<configuration>
 									<target>
-										<gzip
-											destfile="${project.build.directory}/changelog.gz"
-											src="${project.basedir}/Changelog.md" />
+										<gzip destfile="${project.build.directory}/changelog.gz" src="${project.basedir}/Changelog.md" />
 									</target>
 								</configuration>
 								<goals>

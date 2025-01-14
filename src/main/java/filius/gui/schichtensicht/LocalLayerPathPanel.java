@@ -402,7 +402,11 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		}
 		// for the receiver of a message
 		else {
-			updateMessageDetails(false);
+			if (globalLayerPath != null && globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
+				updateMessageDetails(true);
+			} else {
+				updateMessageDetails(false);
+			}
 		}
 		tableSent.updatedGreyedOutCells();
 		tableReceived.updatedGreyedOutCells();

@@ -344,8 +344,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Only has an effect if the node is a router (or home router). If the IP or
-	 * ICMP packet was forwarded, this method sets {@code forwarded} to true.
+	 * Determines if the frame was forwarded.
 	 * 
 	 * @param corrInterfaceId corresponding interface ID
 	 * @param corrFrameNumber corresponding frame number
@@ -382,7 +381,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 */
 	private void setDefaultMessageDetails() {
 		// for the sender of a message
-		if (SENT && !FORWARDED) {
+		if (SENT) {
 			updateMessageDetails(true);
 			if (NODE instanceof Host) {
 				// if in local view or if in global view and active border does not start at end
@@ -401,8 +400,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 				hiddenLayers = 1;
 			}
 		}
-		// for the receiver of a message or for a router, which has forwarded an IP or
-		// ICMP packet
+		// for the receiver of a message
 		else {
 			updateMessageDetails(false);
 		}

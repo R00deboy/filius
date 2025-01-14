@@ -147,13 +147,14 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		} else {
 			EthernetFrame firstFrame = framePath.getFirst();
 
-			// add sender
+			// add original sender
 			String interfaceId = firstFrame.getQuellMacAdresse();
 			SystemSoftware systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
 			int frameNumber = LAUSCHER.getFrameNumber(interfaceId, firstFrame);
 			addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
 
-			// add routers and receiver
+			// add routers and final receiver (both always corresponding to the destination
+			// MAC of the frame in the list)
 			for (EthernetFrame frame : framePath) {
 				interfaceId = frame.getZielMacAdresse();
 				systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);
@@ -173,16 +174,31 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	 *                       with 1)
 	 */
 	private void addToLocalPanelPath(String interfaceId, SystemSoftware systemSoftware, int frameNumber) {
-		// if the interface is on the main node, add the main panel
+		// if the interface is on the main node and the TTL corresponds to the one of
+		// the main frame (depending if the frame was sent or received), add the main
+		// panel
+		EthernetFrame frame = LAUSCHER.getFrame(interfaceId, frameNumber);
 		if ((systemSoftware.getKnoten()).equals(MAIN_NODE)) {
-			localPanelPath.add(MAIN_LOCAL_PANEL);
-		} else {
-			// If the main panel is not (yet) contained in the list, the active border of
-			// the next panel should be at the end (the latest point in time), since if it
-			// shows up, it happened through the "back" button.
-			activeBorderOfNextPanelAtEnd = !localPanelPath.contains(MAIN_LOCAL_PANEL) ? true : false;
-			localPanelPath.add(new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this));
+			if (!MAIN_LOCAL_PANEL.isForwarded()) {
+				localPanelPath.add(MAIN_LOCAL_PANEL);
+				return;
+			} else {
+				if (MAIN_FRAME.getDaten() instanceof IpPaket) {
+					if ((MAIN_LOCAL_PANEL.isSent()
+							&& ((IpPaket) MAIN_FRAME.getDaten()).getTtl() == ((IpPaket) frame.getDaten()).getTtl() - 1)
+							|| (!MAIN_LOCAL_PANEL.isSent() && ((IpPaket) MAIN_FRAME.getDaten())
+									.getTtl() == ((IpPaket) frame.getDaten()).getTtl())) {
+						localPanelPath.add(MAIN_LOCAL_PANEL);
+						return;
+					}
+				}
+			}
 		}
+		// If the main panel is not (yet) contained in the list, the active border of
+		// the next panel should be at the end (the latest point in time), since if it
+		// shows up, it happened through the "back" button.
+		activeBorderOfNextPanelAtEnd = !localPanelPath.contains(MAIN_LOCAL_PANEL) ? true : false;
+		localPanelPath.add(new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this));
 	}
 
 	/**

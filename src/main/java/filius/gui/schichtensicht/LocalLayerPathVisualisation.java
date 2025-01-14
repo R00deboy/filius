@@ -185,7 +185,6 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			if (globalLayerPath == null || !globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
 				if (LAYER_PATH_PANEL.isSent()) {
 					pointInTime = minPointInTime + 3;
-					LAYER_PATH_PANEL.hideNextHigherLayer();
 				} else {
 					pointInTime = minPointInTime;
 				}

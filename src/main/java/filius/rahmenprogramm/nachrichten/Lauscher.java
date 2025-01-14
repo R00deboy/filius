@@ -548,31 +548,29 @@ public class Lauscher implements I18n {
 				for (NetzwerkInterface netzwerkInterface : netzwerkInterfaces) {
 					String interfaceId = netzwerkInterface.getMac();
 
-					if (!(originalInterfaceId.equals(interfaceId))) {
-						LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
+					LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);
 
-						if (framesMitZeitstempel != null) {
-							boolean sent = originalFrame.getQuellMacAdresse().equals(originalInterfaceId);
-							boolean received = originalFrame.getZielMacAdresse().equals(originalInterfaceId);
+					if (framesMitZeitstempel != null) {
+						boolean sent = originalFrame.getQuellMacAdresse().equals(originalInterfaceId);
+						boolean received = originalFrame.getZielMacAdresse().equals(originalInterfaceId);
 
-							for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
-								EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
+						for (int frameNumber = 0; frameNumber < framesMitZeitstempel.size(); frameNumber++) {
+							EthernetFrame frame = (EthernetFrame) framesMitZeitstempel.get(frameNumber)[1];
 
-								// if the original frame was sent, the TTL of the desired frame (the received
-								// one) has to be one more than the one of the original frame, if received (the
-								// sent one) one less
-								int originalTTL = ((IpPaket) data).getTtl();
-								if (frame.samePayload(originalFrame, originalTTL + 1) && sent
-										|| frame.samePayload(originalFrame, originalTTL - 1) && received) {
-									found = true;
-									interfaceIdAndFrameNumber[0] = (String) interfaceId;
-									interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
-									break;
-								}
-							}
-							if (found) {
+							// if the original frame was sent, the TTL of the desired frame (the received
+							// one) has to be one more than the one of the original frame, if received (the
+							// sent one) one less
+							int originalTTL = ((IpPaket) data).getTtl();
+							if (frame.samePayload(originalFrame, originalTTL + 1) && sent
+									|| frame.samePayload(originalFrame, originalTTL - 1) && received) {
+								found = true;
+								interfaceIdAndFrameNumber[0] = (String) interfaceId;
+								interfaceIdAndFrameNumber[1] = (Integer) frameNumber + 1;
 								break;
 							}
+						}
+						if (found) {
+							break;
 						}
 					}
 				}

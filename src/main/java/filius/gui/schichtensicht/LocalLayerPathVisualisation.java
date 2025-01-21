@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
 
+import filius.gui.nachrichtensicht.MessageDetailsTable;
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
@@ -111,11 +112,11 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		// set BorderLayout
 		BorderLayout borderLayout = new BorderLayout();
 		setLayout(borderLayout);
-		setBackground(LAYER_PATH_PANEL.getBackgroundColor());
+		setBackground(LocalLayerPathPanel.getBackgroundColor());
 
 		// set GridBagLayout for CENTER_PANEL
 		CENTER_PANEL.setLayout(GB_LAYOUT_CENTER_PANEL);
-		CENTER_PANEL.setBackground(LAYER_PATH_PANEL.getBackgroundColor());
+		CENTER_PANEL.setBackground(LocalLayerPathPanel.getBackgroundColor());
 		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.NONE;
 
@@ -381,13 +382,13 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		// The right arrow is located at y coordinate 9 (see above). Thus skip i = 9.
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 5, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 4));
+		label.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", 4));
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 7, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 3));
+		label.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", 3));
 		label = setLabel(CENTER_PANEL, "", X_OFFSET + 4, 11, 1, 1, false);
 		setSize(label, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
-		label.setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 1));
+		label.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", 1));
 
 		add(CENTER_PANEL, BorderLayout.CENTER);
 	}
@@ -410,13 +411,13 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		for (int layerNumber = 4; layerNumber >= 2; layerNumber--) {
 			label = setLabel(CENTER_PANEL, "", xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, width, RECTANGLE_HEIGHT);
-			label.setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", layerNumber));
+			label.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", layerNumber));
 		}
 		// layer 1
 		if (includingLayer1) {
 			label = setLabel(CENTER_PANEL, "", xCoord + 0, 11, 1, 1, false);
 			setSize(label, width, RECTANGLE_HEIGHT);
-			label.setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 1));
+			label.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", 1));
 		}
 	}
 
@@ -526,7 +527,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			label = setLabel(CENTER_PANEL, layers[4 - layerNumber], xCoord + 0, 5 + 2 * (4 - layerNumber), 1, 1, false);
 			setSize(label, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorFine", layerNumber));
+			label.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorFine", layerNumber));
 			label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		}
 	}
@@ -951,7 +952,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			// Otherwise the rectangle stays insivisble.
 			if (layerNumber <= LAYER_PATH_PANEL.getMaxLayerInsideFrame()
 					&& layerNumber <= LAYER_PATH_PANEL.getMaxLayerOfOperation()) {
-				rect.setFillColor(LAYER_PATH_PANEL.getLayerColorVar("backgroundColor", layerNumber));
+				rect.setFillColor(MessageDetailsTable.getLayerColorVar("backgroundColor", layerNumber));
 				rect.paintFilledRectangle(g, width, height);
 				if (layerNumber < LAYER_PATH_PANEL.getMaxLayerInsideFrame()) {
 					// set other layer rectangles
@@ -969,14 +970,14 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 						}
 						rect.setX(xPos);
 						rect.setY(yPos);
-						rect.setFillColor(LAYER_PATH_PANEL.getLayerColorVar("backgroundColor", i));
+						rect.setFillColor(MessageDetailsTable.getLayerColorVar("backgroundColor", i));
 
 						rect.paintFilledRectangle(g, width, height);
 					}
 				}
 			} else {
 				setOpaque(true);
-				setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", layerNumber));
+				setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", layerNumber));
 			}
 		}
 
@@ -1085,7 +1086,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			} else if (pointsRight != null && pointsRight) {
 				// right arrows are needed on the internet layer
 				setOpaque(true);
-				setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 2));
+				setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", 2));
 				// right arrow
 				g.fillRect(0, yMiddle - arrowRectangleWidth / 2, overallLength - headHeight, arrowRectangleWidth);
 				// head
@@ -1124,14 +1125,14 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		@Override
 		public void paintComponent(Graphics g) {
 			setOpaque(true);
-			setBackground(LAYER_PATH_PANEL.getLayerColorVar("backgroundColorUltraFine", 1));
+			setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", 1));
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
 			g.setColor(Color.BLACK);
 
 			// wire (ground)
-			g.setColor(LAYER_PATH_PANEL.getLayerColorVar("backgroundColor", 1));
+			g.setColor(MessageDetailsTable.getLayerColorVar("backgroundColor", 1));
 			g.fillRect(0, this.rectangleHeight - 3 * MAIN_BORDER_WIDTH, this.rectangleWidth, 3 * MAIN_BORDER_WIDTH);
 		}
 	}

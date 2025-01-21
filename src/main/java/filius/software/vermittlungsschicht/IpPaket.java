@@ -26,9 +26,6 @@
 package filius.software.vermittlungsschicht;
 
 import java.io.Serializable;
-import java.math.BigInteger;
-
-import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.transportschicht.Segment;
 import filius.software.transportschicht.TcpSegment;
 import filius.software.transportschicht.UdpSegment;

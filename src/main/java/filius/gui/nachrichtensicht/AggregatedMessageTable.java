@@ -557,39 +557,38 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	/**
 	 * Local view of the path through layers.
 	 * 
-	 * @param systemSoftware      system software of the node
-	 * @param selectedFrameNumber number of the selected frame in the data exchange
-	 *                            (starts with 1)
+	 * @param systemSoftware system software of the node
+	 * @param frameNumber    number of the selected frame in the data exchange
+	 *                       (starts with 1)
 	 * 
 	 * @author Christoph Irniger
 	 */
-	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
+	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int frameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, selectedFrameNumber,
+		new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, frameNumber,
 				null);
 	}
 
 	/**
 	 * Global view of the path through layers.
 	 * 
-	 * @param systemSoftware      system software of the node
-	 * @param selectedFrameNumber number of the selected frame in the data exchange
-	 *                            (starts with 1)
+	 * @param systemSoftware system software of the node
+	 * @param frameNumber    number of the selected frame in the data exchange
+	 *                       (starts with 1)
 	 * 
 	 * @author Christoph Irniger
 	 */
-	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int selectedFrameNumber) {
+	private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int frameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showGlobalPathThroughLayers()");
 		// if the frame was sent and destination MAC of the frame is broadcast, global
 		// view is not possible
-		if (LocalLayerPathPanel.isFrameSent(interfaceId, selectedFrameNumber) && Lauscher.getLauscher()
-				.getFrame(interfaceId, selectedFrameNumber).getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)) {
+		if (LocalLayerPathPanel.isFrameSent(interfaceId, frameNumber) && Lauscher.getLauscher()
+				.getFrame(interfaceId, frameNumber).getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)) {
 			JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("nachrichtentabelle_msg12"));
 		} else {
-			new GlobalLayerPath(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware,
-					selectedFrameNumber);
+			new GlobalLayerPath(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, frameNumber);
 		}
 	}
 }

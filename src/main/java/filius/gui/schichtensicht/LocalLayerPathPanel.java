@@ -41,7 +41,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	private final String INTERFACE_ID;
 
 	/** frame number which was selected by mouse click, starts with 1 */
-	private final int SELECTED_FRAME_NUMBER;
+	private final int FRAME_NUMBER;
 
 	/** if null, we are in the local layer path view */
 	private final GlobalLayerPath globalLayerPath;
@@ -54,17 +54,18 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	private final JSplitPane SPLIT_PANE;
 	private static final int DIVIDER_LOCATION = 450;
 
-	/** details of the sent message */
+	/** details of the sent message (if it exists) */
 	private String[][] messageDetailsSent = new String[6][8];
-	/** details of the received message */
+	/** details of the received message (if it exists) */
 	private String[][] messageDetailsReceived = new String[6][8];
 
+	// graphical message details tables
 	private MessageDetailsTable tableSent;
 	private MessageDetailsTable tableReceived;
 
 	// info about the corresponding frame
-	private final Object[] CORR_FRAME_DATA;
 	private final String CORR_INTERFACE_ID;
+	private final Integer CORR_FRAME_NUMBER;
 
 	/**
 	 * maximum layer inside the frame (1 = link, 2 = internet, 3 = transport, 4 =
@@ -84,7 +85,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	private int hiddenLayers;
 
 	private final Color GREYED_OUT_COLOR = Color.decode("#A6A6A6");
-	
+
 	private static final Color BACKGROUND_COLOR = Color.WHITE;
 
 	public LocalLayerPathPanel(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int selectedFrameNumber,
@@ -94,28 +95,25 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		// inherit instance variables from super container (localPathDialog)
 		NODE = systemSoftware.getKnoten();
 		this.INTERFACE_ID = interfaceId;
-		this.SELECTED_FRAME_NUMBER = selectedFrameNumber;
+		this.FRAME_NUMBER = selectedFrameNumber;
 		this.globalLayerPath = globalLayerPath;
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
 		SENT = isFrameSent(interfaceId, selectedFrameNumber);
 
-		/*
-		 * Fill matrices messageDetailsReceived and messageDetailsSent. Both have an
-		 * empty second line (e.g. messageDetailsReceived[1][...] is Null), such that it
-		 * will match row and column numbers of the MessageDetailsTable, which will be
-		 * the visible element.
-		 */
+		// Fill matrix messageDetailsReceived or messageDetailsSent, depending if the
+		// frame was sent or received.
 		MAX_LAYER_INSIDE_FRAME = fill();
 
 		// determine if the packet (inside the frame) was forwarded
-		CORR_FRAME_DATA = Lauscher.getLauscher().getCorrespondingFrame(this.INTERFACE_ID, this.SELECTED_FRAME_NUMBER,
+		Object[] corrFrameData = Lauscher.getLauscher().getCorrespondingFrame(this.INTERFACE_ID, this.FRAME_NUMBER,
 				(InternetKnoten) this.NODE);
-		CORR_INTERFACE_ID = (String) CORR_FRAME_DATA[0];
-		Integer corrFrameNumber = (Integer) CORR_FRAME_DATA[1];
-		FORWARDED = isFrameForwarded(CORR_INTERFACE_ID, corrFrameNumber);
-		fillOtherIfForwarded(CORR_INTERFACE_ID, corrFrameNumber);
+		CORR_INTERFACE_ID = (String) corrFrameData[0];
+		CORR_FRAME_NUMBER = (Integer) corrFrameData[1];
+		FORWARDED = ((NODE instanceof Vermittlungsrechner || NODE instanceof Gateway)
+				&& (CORR_INTERFACE_ID != null && CORR_FRAME_NUMBER != null));
+		fillOtherIfForwarded();
 
 		// initialise tables for message details
 		tableSent = new MessageDetailsTable(messageDetailsSent, BACKGROUND_COLOR);
@@ -134,7 +132,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		// layout manager for this panel
 		setLayout(new BorderLayout(10, 10));
 
-		// add splitPane to the current JPanel
+		// add splitPane
 		add(SPLIT_PANE, BorderLayout.CENTER);
 
 		// set visualisation on top half of the SplitPane
@@ -172,7 +170,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	public int getDividerLocation() {
 		return DIVIDER_LOCATION;
 	}
-	
+
 	public static Color getBackgroundColor() {
 		return BACKGROUND_COLOR;
 	}
@@ -192,29 +190,31 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Fills {@code messageDetailsSent} and {@code messageDetailsReceived} with all
-	 * data of the frame(s) which is needed for the visualisation.
+	 * Fills the message details matrix with all data of the frame.
 	 * 
 	 * @return maximum layer that appears inside the frame
 	 */
 	private int fill() {
 		if (SENT) {
 			fillTitles(messageDetailsSent);
-			return fillMessageDetails(messageDetailsSent, this.INTERFACE_ID, this.SELECTED_FRAME_NUMBER);
+			return fillMessageDetails(messageDetailsSent, this.INTERFACE_ID, this.FRAME_NUMBER);
 		} else {
 			fillTitles(messageDetailsReceived);
-			return fillMessageDetails(messageDetailsReceived, this.INTERFACE_ID, this.SELECTED_FRAME_NUMBER);
+			return fillMessageDetails(messageDetailsReceived, this.INTERFACE_ID, this.FRAME_NUMBER);
 		}
 	}
 
 	/**
-	 * Fills either {@code messageDetailsSent} or {@code messageDetailsReceived}
-	 * with the values of the selected interface and frame number.
+	 * Fills the message details matrix with the values of the frame associated with
+	 * the interface id and frame number. The matrix will have an empty second line
+	 * (e.g. messageDetails[1][...] is Null), such that it will match row and column
+	 * numbers of the MessageDetailsTable, which will be the graphical variant.
 	 * 
-	 * @param messageDetails      Either {@code messageDetailsSent} or
-	 *                            {@code messageDetailsReceived}
-	 * @param interfaceId
-	 * @param selectedFrameNumber
+	 * @param messageDetails      the matrix which should be filled with the values
+	 * @param interfaceId         the interface id where the frame should be looked
+	 *                            up
+	 * @param selectedFrameNumber the number of the frame in the data exchange of
+	 *                            the interface (starts with 1)
 	 * @return maximum layer that appears inside the frame
 	 */
 	private int fillMessageDetails(String[][] messageDetails, String interfaceId, int selectedFrameNumber) {
@@ -283,11 +283,10 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Fills either {@code messageDetailsSent} or {@code messageDetailsReceived}
-	 * with the titles (column and cell labels) that are the same for both tables.
+	 * Fills the message details matrix with the titles (column and cell labels)
+	 * that are the same for both tables.
 	 * 
-	 * @param messageDetails Either {@code messageDetailsSent} or
-	 *                       {@code messageDetailsReceived}
+	 * @param messageDetails the matrix which should be filled with the titles
 	 */
 	private void fillTitles(String[][] messageDetails) {
 		// Schicht
@@ -327,17 +326,6 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Determines if the frame was forwarded.
-	 * 
-	 * @param corrInterfaceId corresponding interface ID
-	 * @param corrFrameNumber corresponding frame number
-	 */
-	private boolean isFrameForwarded(String corrInterfaceId, Integer corrFrameNumber) {
-		return ((NODE instanceof Vermittlungsrechner || NODE instanceof Gateway)
-				&& (corrInterfaceId != null && corrFrameNumber != null));
-	}
-
-	/**
 	 * Only has an effect if the node is a router (or home router). If
 	 * {@code forwarded} is true, sets the message details of the table which is not
 	 * yet filled ({@code messageDetailsSent} or {@code messageDetailsReceived}).
@@ -345,14 +333,14 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 * @param corrInterfaceId
 	 * @param corrFrameNumber
 	 */
-	private void fillOtherIfForwarded(String corrInterfaceId, Integer corrFrameNumber) {
+	private void fillOtherIfForwarded() {
 		if (FORWARDED) {
 			if (SENT) {
 				fillTitles(messageDetailsReceived);
-				fillMessageDetails(messageDetailsReceived, corrInterfaceId, corrFrameNumber);
+				fillMessageDetails(messageDetailsReceived, CORR_INTERFACE_ID, CORR_FRAME_NUMBER);
 			} else {
 				fillTitles(messageDetailsSent);
-				fillMessageDetails(messageDetailsSent, corrInterfaceId, corrFrameNumber);
+				fillMessageDetails(messageDetailsSent, CORR_INTERFACE_ID, CORR_FRAME_NUMBER);
 			}
 		}
 	}

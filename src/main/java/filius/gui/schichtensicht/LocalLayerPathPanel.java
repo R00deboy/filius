@@ -379,8 +379,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 				updateMessageDetails(false);
 			}
 		}
-		updatedGreyedOutCells(tableSent);
-		updatedGreyedOutCells(tableReceived);
+		updateGreyedOutCells(tableSent);
+		updateGreyedOutCells(tableReceived);
 	}
 
 	/**
@@ -442,8 +442,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	public void hideNextHigherLayer() {
 		if (hiddenLayers <= 2 && hiddenLayers >= 0) {
 			hiddenLayers++;
-			updatedGreyedOutCells(tableSent);
-			updatedGreyedOutCells(tableReceived);
+			updateGreyedOutCells(tableSent);
+			updateGreyedOutCells(tableReceived);
 			hideLayerData(hiddenLayers, tableSent);
 			hideLayerData(hiddenLayers, tableReceived);
 		}
@@ -456,8 +456,8 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	public void showNextLowerLayer() {
 		if (hiddenLayers <= 3 && hiddenLayers >= 1) {
 			hiddenLayers--;
-			updatedGreyedOutCells(tableSent);
-			updatedGreyedOutCells(tableReceived);
+			updateGreyedOutCells(tableSent);
+			updateGreyedOutCells(tableReceived);
 			showLayerData(hiddenLayers + 1, tableSent);
 			showLayerData(hiddenLayers + 1, tableReceived);
 		}
@@ -550,7 +550,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	 * 
 	 * @param table the table whose cells should be updated
 	 */
-	public void updatedGreyedOutCells(MessageDetailsTable table) {
+	private void updateGreyedOutCells(MessageDetailsTable table) {
 		// determine columns to be greyed out
 		Set<Integer> columns = new HashSet<>();
 		for (int columnNo = (hiddenLayers + 1) * 2; columnNo <= 6; columnNo++) {

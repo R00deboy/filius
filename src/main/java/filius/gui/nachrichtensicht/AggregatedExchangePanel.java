@@ -89,7 +89,7 @@ public class AggregatedExchangePanel extends JTabbedPane implements AggregatedEx
         final AggregatedMessageTable tabelle;
 
         system.addObserver(this);
-        final MessageDetailsPanel detailsPanel = new MessageDetailsPanel(identifier);
+        final MessageDetailsTable messageDetailsTable = new MessageDetailsTable(identifier, 0, Color.WHITE);
 
         if (openedTabs.get(identifier) == null) {
             tabelle = new AggregatedMessageTable(this, identifier, system);
@@ -98,9 +98,9 @@ public class AggregatedExchangePanel extends JTabbedPane implements AggregatedEx
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
                     if (tabelle.getSelectedRow() >= 0) {
-                        detailsPanel.update(tabelle.getValueAt(tabelle.getSelectedRow(), 0));
+                    	messageDetailsTable.updateTable(identifier, tabelle.getSelectedRow() + 1);
                     } else {
-                        detailsPanel.clear();
+                    	messageDetailsTable.clear();
                     }
                 }
             });
@@ -113,7 +113,7 @@ public class AggregatedExchangePanel extends JTabbedPane implements AggregatedEx
             JSplitPane splitPane = new JSplitPane();
             splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
             splitPane.setTopComponent(scrollPane);
-            splitPane.setBottomComponent(new JScrollPane(detailsPanel));
+            splitPane.setBottomComponent(new JScrollPane(messageDetailsTable));
 
             panel.add(splitPane, BorderLayout.CENTER);
 

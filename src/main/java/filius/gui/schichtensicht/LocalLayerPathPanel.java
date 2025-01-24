@@ -17,7 +17,6 @@ import filius.hardware.knoten.Host;
 import filius.hardware.knoten.InternetKnoten;
 import filius.hardware.knoten.Knoten;
 import filius.hardware.knoten.Vermittlungsrechner;
-import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.system.SystemSoftware;
 
@@ -35,7 +34,7 @@ import filius.software.system.SystemSoftware;
  * 
  * @author Christoph Irniger
  */
-public class LocalLayerPathPanel extends JPanel implements I18n {
+public class LocalLayerPathPanel extends JPanel {
 	private final Knoten NODE;
 
 	private final String INTERFACE_ID;
@@ -53,11 +52,6 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 	private final JSplitPane SPLIT_PANE;
 	private static final int DIVIDER_LOCATION = 450;
-
-	/** details of the sent message (if it exists) */
-	private String[][] messageDetailsSent = new String[6][8];
-	/** details of the received message (if it exists) */
-	private String[][] messageDetailsReceived = new String[6][8];
 
 	// graphical message details tables
 	private MessageDetailsTable tableSent;
@@ -104,7 +98,7 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 
 		// Fill matrix messageDetailsReceived or messageDetailsSent, depending if the
 		// frame was sent or received.
-		MAX_LAYER_INSIDE_FRAME = fill();
+		createPrimaryMessageDetailsTable();
 
 		// determine if the packet (inside the frame) was forwarded
 		Object[] corrFrameData = Lauscher.getLauscher().getCorrespondingFrame(this.INTERFACE_ID, this.FRAME_NUMBER,
@@ -113,11 +107,12 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 		CORR_FRAME_NUMBER = (Integer) corrFrameData[1];
 		FORWARDED = ((NODE instanceof Vermittlungsrechner || NODE instanceof Gateway)
 				&& (CORR_INTERFACE_ID != null && CORR_FRAME_NUMBER != null));
-		fillOtherIfForwarded();
+		createSecondaryMessageDetailsTable();
 
 		// initialise tables for message details
-		tableSent = new MessageDetailsTable(messageDetailsSent, BACKGROUND_COLOR);
-		tableReceived = new MessageDetailsTable(messageDetailsReceived, BACKGROUND_COLOR);
+		tableSent = new MessageDetailsTable(INTERFACE_ID, FRAME_NUMBER, BACKGROUND_COLOR);
+		tableReceived = new MessageDetailsTable(INTERFACE_ID, FRAME_NUMBER, BACKGROUND_COLOR);
+		MAX_LAYER_INSIDE_FRAME = tableSent.getMaxLayerInsideFrame();
 		setLayersInTablesInvisible(tableSent);
 		setLayersInTablesInvisible(tableReceived);
 
@@ -190,157 +185,30 @@ public class LocalLayerPathPanel extends JPanel implements I18n {
 	}
 
 	/**
-	 * Fills the message details matrix with all data of the frame.
+	 * Creates the primary message details table which is seen right after opening
+	 * the local view.
 	 * 
 	 * @return maximum layer that appears inside the frame
 	 */
-	private int fill() {
+	private void createPrimaryMessageDetailsTable() {
 		if (SENT) {
-			fillTitles(messageDetailsSent);
-			return fillMessageDetails(messageDetailsSent, this.INTERFACE_ID, this.FRAME_NUMBER);
+			tableSent = new MessageDetailsTable(INTERFACE_ID, FRAME_NUMBER, BACKGROUND_COLOR);
 		} else {
-			fillTitles(messageDetailsReceived);
-			return fillMessageDetails(messageDetailsReceived, this.INTERFACE_ID, this.FRAME_NUMBER);
+			tableReceived = new MessageDetailsTable(INTERFACE_ID, FRAME_NUMBER, BACKGROUND_COLOR);
 		}
-	}
-
-	/**
-	 * Fills the message details matrix with the values of the frame associated with
-	 * the interface id and frame number. The matrix will have an empty second line
-	 * (e.g. messageDetails[1][...] is Null), such that it will match row and column
-	 * numbers of the MessageDetailsTable, which will be the graphical variant.
-	 * 
-	 * @param messageDetails      the matrix which should be filled with the values
-	 * @param interfaceId         the interface id where the frame should be looked
-	 *                            up
-	 * @param selectedFrameNumber the number of the frame in the data exchange of
-	 *                            the interface (starts with 1)
-	 * @return maximum layer that appears inside the frame
-	 */
-	private int fillMessageDetails(String[][] messageDetails, String interfaceId, int selectedFrameNumber) {
-		Object[][] daten = Lauscher.getLauscher().getDaten(interfaceId, false, 0);
-		String selectedFrameNumberAsString = Integer.toString(selectedFrameNumber);
-		int maxLayerInsideFrame = 1;
-
-		for (int i = 0; i < daten.length; i++) {
-			if (daten[i][0].equals(selectedFrameNumberAsString)) {
-
-				// -----Netzzugangs-Daten-----
-				// Quelle
-				messageDetails[3][1] = daten[i][2].toString();
-				// Ziel
-				messageDetails[4][1] = daten[i][3].toString();
-				// Bemerkungen / Details
-				messageDetails[5][1] = daten[i][6].toString();
-
-				// -----Vermittlungs-Daten (falls existent)-----
-				if (i + 1 < daten.length && daten[i + 1][0].equals(selectedFrameNumberAsString)) {
-					// Protokoll
-					messageDetails[2][2] = daten[i + 1][4].toString();
-					// set maxLayer, can increase later in this method
-					if (messageDetails[2][2] != null) {
-						maxLayerInsideFrame = 2;
-					}
-					// Quelle
-					messageDetails[3][3] = daten[i + 1][2].toString();
-					// Ziel
-					messageDetails[4][3] = daten[i + 1][3].toString();
-					// Bemerkungen / Details
-					messageDetails[5][3] = daten[i + 1][6].toString();
-				}
-
-				// -----Transport-Daten (falls existent)-----
-				if (i + 2 < daten.length && daten[i + 2][0].equals(selectedFrameNumberAsString)) {
-					// Protokoll
-					messageDetails[2][4] = daten[i + 2][4].toString();
-					// set maxLayer, can increase later in this method
-					if (messageDetails[2][4] != null) {
-						maxLayerInsideFrame = 3;
-					}
-					// Quelle
-					messageDetails[3][5] = daten[i + 2][2].toString();
-					// Ziel
-					messageDetails[4][5] = daten[i + 2][3].toString();
-					// Bemerkungen / Details
-					messageDetails[5][5] = daten[i + 2][6].toString();
-				}
-
-				// -----Anwendungs-Daten (falls existent)-----
-				if (i + 3 < daten.length && daten[i + 3][0].equals(selectedFrameNumberAsString)) {
-					// Protokoll
-					messageDetails[2][6] = daten[i + 3][4].toString();
-					// set maxLayer
-					if (messageDetails[2][6] != null) {
-						maxLayerInsideFrame = 4;
-					}
-					// Daten
-					messageDetails[3][6] = daten[i + 3][6].toString();
-				}
-				break;
-			}
-		}
-		return maxLayerInsideFrame;
-	}
-
-	/**
-	 * Fills the message details matrix with the titles (column and cell labels)
-	 * that are the same for both tables.
-	 * 
-	 * @param messageDetails the matrix which should be filled with the titles
-	 */
-	private void fillTitles(String[][] messageDetails) {
-		// Schicht
-		messageDetails[0][7] = messages.getString("schichten_lokaler_weg_msg2");
-		// Protokoll
-		messageDetails[2][7] = messages.getString("schichten_lokaler_weg_msg3");
-		// Daten
-		messageDetails[3][7] = messages.getString("schichten_lokaler_weg_msg4");
-		// Netzzugang
-		messageDetails[0][0] = messages.getString("rp_lauscher_msg8");
-		// Vermittlung
-		messageDetails[0][2] = messages.getString("rp_lauscher_msg9");
-		// Transport
-		messageDetails[0][4] = messages.getString("rp_lauscher_msg10");
-		// Anwendung
-		messageDetails[0][6] = messages.getString("rp_lauscher_msg11");
-		// Ethernet
-		messageDetails[2][0] = messages.getString("schichten_lokaler_weg_msg5");
-		// Quelle (Netzzugang)
-		messageDetails[3][0] = messages.getString("rp_lauscher_msg3") + ":";
-		// Ziel (Netzzugang)
-		messageDetails[4][0] = messages.getString("rp_lauscher_msg4") + ":";
-		// Bemerkungen / Details (Netzzugang)
-		messageDetails[5][0] = messages.getString("rp_lauscher_msg7") + ":";
-		// Quelle (Vermittlung)
-		messageDetails[3][2] = messages.getString("rp_lauscher_msg3") + ":";
-		// Ziel (Vermittlung)
-		messageDetails[4][2] = messages.getString("rp_lauscher_msg4") + ":";
-		// Bemerkungen / Details (Vermittlung)
-		messageDetails[5][2] = messages.getString("rp_lauscher_msg7") + ":";
-		// Quelle (Transport)
-		messageDetails[3][4] = messages.getString("rp_lauscher_msg3") + ":";
-		// Ziel (Transport)
-		messageDetails[4][4] = messages.getString("rp_lauscher_msg4") + ":";
-		// Bemerkungen / Details (Transport)
-		messageDetails[5][4] = messages.getString("rp_lauscher_msg7") + ":";
 	}
 
 	/**
 	 * Only has an effect if the node is a router (or home router). If
-	 * {@code forwarded} is true, sets the message details of the table which is not
-	 * yet filled ({@code messageDetailsSent} or {@code messageDetailsReceived}).
-	 * 
-	 * @param corrInterfaceId
-	 * @param corrFrameNumber
+	 * {@code forwarded} is true, creates the secondary message details table for
+	 * the other side (sent / received).
 	 */
-	private void fillOtherIfForwarded() {
+	private void createSecondaryMessageDetailsTable() {
 		if (FORWARDED) {
 			if (SENT) {
-				fillTitles(messageDetailsReceived);
-				fillMessageDetails(messageDetailsReceived, CORR_INTERFACE_ID, CORR_FRAME_NUMBER);
+				tableReceived = new MessageDetailsTable(CORR_INTERFACE_ID, CORR_FRAME_NUMBER, BACKGROUND_COLOR);
 			} else {
-				fillTitles(messageDetailsSent);
-				fillMessageDetails(messageDetailsSent, CORR_INTERFACE_ID, CORR_FRAME_NUMBER);
+				tableSent = new MessageDetailsTable(CORR_INTERFACE_ID, CORR_FRAME_NUMBER, BACKGROUND_COLOR);
 			}
 		}
 	}

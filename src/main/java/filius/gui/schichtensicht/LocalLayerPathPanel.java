@@ -96,8 +96,8 @@ public class LocalLayerPathPanel extends JPanel {
 		// determine if frame was sent or received
 		SENT = isFrameSent(interfaceId, selectedFrameNumber);
 
-		// Fill matrix messageDetailsReceived or messageDetailsSent, depending if the
-		// frame was sent or received.
+		// Depending on wheter the message was sent or received, create the primary
+		// message details table (first visible)
 		createPrimaryMessageDetailsTable();
 
 		// determine if the packet (inside the frame) was forwarded
@@ -107,6 +107,10 @@ public class LocalLayerPathPanel extends JPanel {
 		CORR_FRAME_NUMBER = (Integer) corrFrameData[1];
 		FORWARDED = ((NODE instanceof Vermittlungsrechner || NODE instanceof Gateway)
 				&& (CORR_INTERFACE_ID != null && CORR_FRAME_NUMBER != null));
+
+		// If the message was forwarded, create the secondary message details table
+		// (only visible if switched to other interface by using the forth or back
+		// button)
 		createSecondaryMessageDetailsTable();
 
 		// initialise tables for message details
@@ -201,7 +205,7 @@ public class LocalLayerPathPanel extends JPanel {
 	/**
 	 * Only has an effect if the node is a router (or home router). If
 	 * {@code forwarded} is true, creates the secondary message details table for
-	 * the other side (sent / received).
+	 * the other involved interface on the node.
 	 */
 	private void createSecondaryMessageDetailsTable() {
 		if (FORWARDED) {
@@ -214,9 +218,36 @@ public class LocalLayerPathPanel extends JPanel {
 	}
 
 	/**
-	 * Determines and sets the message details ({@code messageDetailsSent} or
-	 * {@code messageDetailsReceived}) which are visible when opening the whole
-	 * window of the local path for the first time.
+	 * Sets the layers of the table which are not needed permamently invisible if
+	 * they do not appear inside the frame.
+	 * 
+	 * @param table the table whose layers should be made invisible
+	 */
+	private void setLayersInTablesInvisible(MessageDetailsTable table) {
+		// determine columns to deactivate
+		Set<Integer> columns = new HashSet<>();
+		if (MAX_LAYER_INSIDE_FRAME == 4) {
+			return;
+		} else if (MAX_LAYER_INSIDE_FRAME == 3) {
+			columns.add(6); // application data
+		} else if (MAX_LAYER_INSIDE_FRAME == 2) {
+			columns.add(4); // transport data left side
+			columns.add(5); // transport data right side
+			columns.add(6); // application data
+		}
+
+		// deactivate columns
+		for (Component component : table.getComponents()) {
+			if (columns.contains(table.getGridBagLayout().getConstraints(component).gridx)) {
+				component.setVisible(false);
+			}
+		}
+	}
+
+	/**
+	 * Determines which message details ({@code messageDetailsSent} or
+	 * {@code messageDetailsReceived}) are shown after opening the window of the
+	 * local path for the first time and hides according layers.
 	 */
 	private void setDefaultMessageDetails() {
 		// for the sender of a message
@@ -252,7 +283,7 @@ public class LocalLayerPathPanel extends JPanel {
 	}
 
 	/**
-	 * Updates the message details (e.g. if one of the "forth" or "back" button was
+	 * Updates the message details (e.g. if the "forth" or "back" button was
 	 * pressed).
 	 * 
 	 * @param senderSideIsActive If true, the visualisation is on the sender side,
@@ -273,33 +304,6 @@ public class LocalLayerPathPanel extends JPanel {
 			SPLIT_PANE.setBottomComponent(new JScrollPane(tableReceived));
 			// set old divider location
 			SPLIT_PANE.setDividerLocation(currentDividerLocation);
-		}
-	}
-
-	/**
-	 * Sets the layers in the table which are not needed invisible according to
-	 * {@code MAX_LAYER_INSIDE_FRAME}.
-	 * 
-	 * @param table the table whose layers should be made invisible
-	 */
-	private void setLayersInTablesInvisible(MessageDetailsTable table) {
-		// determine columns to deactivate
-		Set<Integer> columns = new HashSet<>();
-		if (MAX_LAYER_INSIDE_FRAME == 4) {
-			return;
-		} else if (MAX_LAYER_INSIDE_FRAME == 3) {
-			columns.add(6); // application data
-		} else if (MAX_LAYER_INSIDE_FRAME == 2) {
-			columns.add(4); // transport data left side
-			columns.add(5); // transport data right side
-			columns.add(6); // application data
-		}
-
-		// deactivate columns
-		for (Component component : table.getComponents()) {
-			if (columns.contains(table.getGridBagLayout().getConstraints(component).gridx)) {
-				component.setVisible(false);
-			}
 		}
 	}
 
@@ -336,8 +340,7 @@ public class LocalLayerPathPanel extends JPanel {
 	 * transport.
 	 * 
 	 * @param layerNumber number for layer
-	 * @param table       table in which layer data should be hidden (either the
-	 *                    table for the sent or the received message)
+	 * @param table       table in which layer data should be hidden
 	 * @throws NoSuchElementException
 	 */
 	private void hideLayerData(int layerNumber, MessageDetailsTable table) throws NoSuchElementException {

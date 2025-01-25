@@ -67,7 +67,7 @@ public class AggregatedExchangeDialog extends JDialog implements ExchangeCompone
         setTitle(messages.getString("lauscherdialog_msg1"));
         int screenHeight = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         int screenWidth = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        setBounds(screenWidth / 2, screenHeight / 10, screenWidth / 2, 4 * screenHeight / 5);
+        setBounds(5 * screenWidth / 18, screenHeight / 8, 13 * screenWidth / 18, 3 * screenHeight / 4);
         image = Toolkit.getDefaultToolkit()
                 .getImage(getClass().getResource("/gfx/allgemein/nachrichtenfenster_icon.png"));
         setIconImage(image);

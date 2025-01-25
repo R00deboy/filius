@@ -6,6 +6,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -177,12 +180,6 @@ public class MessageDetailsTable extends JPanel implements I18n {
 	 * @param messageDetails the matrix which should be filled with the titles
 	 */
 	private void setTitles() {
-		// Schicht
-		messageDetailsMatrix[0][7] = messages.getString("schichten_lokaler_weg_msg2");
-		// Protokoll
-		messageDetailsMatrix[2][7] = messages.getString("schichten_lokaler_weg_msg3");
-		// Daten
-		messageDetailsMatrix[3][7] = messages.getString("schichten_lokaler_weg_msg4");
 		// Netzzugang
 		messageDetailsMatrix[0][0] = messages.getString("rp_lauscher_msg8");
 		// Vermittlung
@@ -213,6 +210,12 @@ public class MessageDetailsTable extends JPanel implements I18n {
 			// Bemerkungen / Details (Transport)
 			messageDetailsMatrix[5][4] = messages.getString("rp_lauscher_msg7") + ":";
 		}
+		// Schicht
+		messageDetailsMatrix[0][7] = messages.getString("schichten_lokaler_weg_msg2");
+		// Protokoll
+		messageDetailsMatrix[2][7] = messages.getString("schichten_lokaler_weg_msg3");
+		// Daten
+		messageDetailsMatrix[3][7] = messages.getString("schichten_lokaler_weg_msg4");
 	}
 
 	/**
@@ -325,6 +328,32 @@ public class MessageDetailsTable extends JPanel implements I18n {
 				((JLabel) component).setText(text);
 			} else if (component instanceof JTextArea) {
 				((JTextArea) component).setText(text);
+			}
+		}
+		setLayersInvisible();
+	}
+
+	/**
+	 * Sets the layers which are not needed invisible if they do not appear inside
+	 * the frame.
+	 */
+	public void setLayersInvisible() {
+		// determine columns to deactivate
+		Set<Integer> columns = new HashSet<>();
+		if (maxLayerInsideFrame == 4) {
+			return;
+		} else if (maxLayerInsideFrame == 3) {
+			columns.add(6); // application data
+		} else if (maxLayerInsideFrame == 2) {
+			columns.add(4); // transport data left side
+			columns.add(5); // transport data right side
+			columns.add(6); // application data
+		}
+
+		// deactivate columns
+		for (Component component : getComponents()) {
+			if (columns.contains(getGridBagLayout().getConstraints(component).gridx)) {
+				component.setVisible(false);
 			}
 		}
 	}

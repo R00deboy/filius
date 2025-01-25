@@ -117,8 +117,8 @@ public class LocalLayerPathPanel extends JPanel {
 		tableSent = new MessageDetailsTable(INTERFACE_ID, FRAME_NUMBER, BACKGROUND_COLOR);
 		tableReceived = new MessageDetailsTable(INTERFACE_ID, FRAME_NUMBER, BACKGROUND_COLOR);
 		MAX_LAYER_INSIDE_FRAME = tableSent.getMaxLayerInsideFrame();
-		setLayersInTablesInvisible(tableSent);
-		setLayersInTablesInvisible(tableReceived);
+		tableSent.setLayersInvisible();
+		tableReceived.setLayersInvisible();
 
 		// SplitPane (for visualisation in upper and message details in lower part)
 		SPLIT_PANE = new JSplitPane();
@@ -213,33 +213,6 @@ public class LocalLayerPathPanel extends JPanel {
 				tableReceived = new MessageDetailsTable(CORR_INTERFACE_ID, CORR_FRAME_NUMBER, BACKGROUND_COLOR);
 			} else {
 				tableSent = new MessageDetailsTable(CORR_INTERFACE_ID, CORR_FRAME_NUMBER, BACKGROUND_COLOR);
-			}
-		}
-	}
-
-	/**
-	 * Sets the layers of the table which are not needed permamently invisible if
-	 * they do not appear inside the frame.
-	 * 
-	 * @param table the table whose layers should be made invisible
-	 */
-	private void setLayersInTablesInvisible(MessageDetailsTable table) {
-		// determine columns to deactivate
-		Set<Integer> columns = new HashSet<>();
-		if (MAX_LAYER_INSIDE_FRAME == 4) {
-			return;
-		} else if (MAX_LAYER_INSIDE_FRAME == 3) {
-			columns.add(6); // application data
-		} else if (MAX_LAYER_INSIDE_FRAME == 2) {
-			columns.add(4); // transport data left side
-			columns.add(5); // transport data right side
-			columns.add(6); // application data
-		}
-
-		// deactivate columns
-		for (Component component : table.getComponents()) {
-			if (columns.contains(table.getGridBagLayout().getConstraints(component).gridx)) {
-				component.setVisible(false);
 			}
 		}
 	}

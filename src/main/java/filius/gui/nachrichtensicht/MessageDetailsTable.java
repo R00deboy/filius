@@ -140,9 +140,13 @@ public class MessageDetailsTable extends JPanel implements I18n {
 							messageDetailsMatrix[2][6] = daten[i + 3][4].toString();
 							// Daten
 							messageDetailsMatrix[3][6] = daten[i + 3][6].toString();
+							break;
 						}
+					} else {
 						break;
 					}
+				} else {
+					break;
 				}
 			}
 		}

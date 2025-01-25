@@ -444,7 +444,6 @@ public class MessageDetailsTable extends JPanel implements I18n {
 			double height_multiplier) {
 		JTextArea textArea = new JTextArea(text);
 
-		setStandards(textArea, x_pos, y_pos, width, height, width_multiplier, height_multiplier);
 		textArea.setOpaque(true);
 		textArea.setWrapStyleWord(true);
 		textArea.setLineWrap(true);
@@ -452,6 +451,8 @@ public class MessageDetailsTable extends JPanel implements I18n {
 		textArea.setFocusable(false);
 
 		setBorderVisible(textArea, true);
+
+		setStandards(textArea, x_pos, y_pos, width, height, width_multiplier, height_multiplier);
 		add(textArea, c);
 
 		return textArea;
@@ -473,10 +474,11 @@ public class MessageDetailsTable extends JPanel implements I18n {
 			double height_multiplier) {
 		JLabel label = new JLabel();
 
-		setStandards(label, x_pos, y_pos, width, height, width_multiplier, height_multiplier);
 		label.setOpaque(false);
 
 		label.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+
+		setStandards(label, x_pos, y_pos, width, height, width_multiplier, height_multiplier);
 		add(label, c);
 
 		return label;
@@ -498,8 +500,6 @@ public class MessageDetailsTable extends JPanel implements I18n {
 		Dimension dimensionOfComponent = new Dimension((int) (width_multiplier * width * MSG_DETAILS_CELL_WIDTH),
 				(int) (height_multiplier * height * MSG_DETAILS_CELL_HEIGHT));
 		component.setPreferredSize(dimensionOfComponent);
-		component.setMinimumSize(dimensionOfComponent);
-		component.setMaximumSize(dimensionOfComponent);
 		c.gridx = x_pos;
 		c.gridy = y_pos;
 		c.gridwidth = width;

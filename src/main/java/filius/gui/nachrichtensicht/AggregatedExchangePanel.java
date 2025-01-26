@@ -69,364 +69,369 @@ import filius.software.system.InternetKnotenBetriebssystem;
 import filius.software.system.SystemSoftware;
 
 /**
- * This class is used to show exchanged messages between components. Its functionality shall be akin to that of
- * wireshark.
+ * This class is used to show exchanged messages between components. Its
+ * functionality shall be akin to that of wireshark.
  * 
  * @author stefan
  */
 @SuppressWarnings({ "serial", "deprecation" })
 public class AggregatedExchangePanel extends JTabbedPane implements AggregatedExchangeComponent, I18n, Observer {
 
-    private Hashtable<String, JPanel> openedTabs = new Hashtable<String, JPanel>();
-    private Hashtable<String, InternetKnotenBetriebssystem> systems = new Hashtable<String, InternetKnotenBetriebssystem>();
-    private Hashtable<String, AggregatedMessageTable> tabellen = new Hashtable<String, AggregatedMessageTable>();
+	private Hashtable<String, JPanel> openedTabs = new Hashtable<String, JPanel>();
+	private Hashtable<String, InternetKnotenBetriebssystem> systems = new Hashtable<String, InternetKnotenBetriebssystem>();
+	private Hashtable<String, AggregatedMessageTable> tabellen = new Hashtable<String, AggregatedMessageTable>();
 
-    /**
-     * Diese Methode fuegt eine Tabelle hinzu
-     */
-    @Override
-    public void addTable(SystemSoftware system, String identifier) {
-        final AggregatedMessageTable tabelle;
+	/**
+	 * Diese Methode fuegt eine Tabelle hinzu
+	 */
+	@Override
+	public void addTable(SystemSoftware system, String identifier) {
+		final AggregatedMessageTable tabelle;
 
-        system.addObserver(this);
-        final MessageDetailsTable messageDetailsTable = new MessageDetailsTable(identifier, 0, Color.WHITE);
+		system.addObserver(this);
+		final MessageDetailsTable messageDetailsTable = new MessageDetailsTable(identifier, 0, Color.WHITE);
 
-        if (openedTabs.get(identifier) == null) {
-            tabelle = new AggregatedMessageTable(this, identifier, system);
-            tabelle.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		if (openedTabs.get(identifier) == null) {
+			tabelle = new AggregatedMessageTable(this, identifier, system);
+			tabelle.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    if (tabelle.getSelectedRow() >= 0) {
-                    	messageDetailsTable.updateTable(identifier, tabelle.getSelectedRow() + 1);
-                    } else {
-                    	messageDetailsTable.clear();
-                    }
-                }
-            });
-            JPanel panel = new JPanel(new BorderLayout());
+				@Override
+				public void valueChanged(ListSelectionEvent e) {
+					if (tabelle.getSelectedRow() >= 0) {
+						messageDetailsTable.updateTable(identifier, tabelle.getSelectedRow() + 1);
+					} else {
+						messageDetailsTable.clear();
+					}
+				}
+			});
+			JPanel panel = new JPanel(new BorderLayout());
 
-            JScrollPane scrollPane;
-            scrollPane = new JScrollPane(tabelle);
-            tabelle.setScrollPane(scrollPane);
+			JScrollPane scrollPane;
+			scrollPane = new JScrollPane(tabelle);
+			tabelle.setScrollPane(scrollPane);
 
-            JSplitPane splitPane = new JSplitPane();
-            splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-            splitPane.setTopComponent(scrollPane);
-            splitPane.setBottomComponent(new JScrollPane(messageDetailsTable));
+			JSplitPane splitPane = new JSplitPane();
+			splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+			splitPane.setTopComponent(scrollPane);
+			splitPane.setBottomComponent(new JScrollPane(messageDetailsTable));
 
-            panel.add(splitPane, BorderLayout.CENTER);
+			panel.add(splitPane, BorderLayout.CENTER);
 
-            add(panel);
-            setSelectedComponent(panel);
+			add(panel);
+			setSelectedComponent(panel);
 
-            TabTitle title = new TabTitle(this, identifier);
-            setTabComponentAt(getSelectedIndex(), title);
+			TabTitle title = new TabTitle(this, identifier);
+			setTabComponentAt(getSelectedIndex(), title);
 
-            openedTabs.put(identifier, panel);
-            systems.put(identifier, (InternetKnotenBetriebssystem) system);
-            tabellen.put(identifier, tabelle);
+			openedTabs.put(identifier, panel);
+			systems.put(identifier, (InternetKnotenBetriebssystem) system);
+			tabellen.put(identifier, tabelle);
 
-            if (openedTabs.size() > 0) {
-                setVisible(true);
-            }
+			if (openedTabs.size() > 0) {
+				setVisible(true);
+			}
 
-            updateTabTitle();
-        } else {
-            // if there is already a tab opened for this system set it to selected
-            setSelectedComponent(openedTabs.get(identifier));
-            tabellen.get(identifier).update();
-        }
-    }
+			updateTabTitle();
+		} else {
+			// if there is already a tab opened for this system set it to selected
+			setSelectedComponent(openedTabs.get(identifier));
+			tabellen.get(identifier).update();
+		}
+	}
 
-    void updateTabTitle() {
-        for (int i = 0; i < getTabCount(); i++) {
-            for (String identifier : openedTabs.keySet()) {
-                if (getComponentAt(i).equals(openedTabs.get(identifier))) {
-                    SystemSoftware system = systems.get(identifier);
-                    String ipAddress = ((InternetKnoten) system.getKnoten()).getNetzwerkInterfaceByMac(identifier)
-                            .getIp();
-                    String tabTitle;
-                    if (system.getKnoten() instanceof Host && ((Host) system.getKnoten()).isUseIPAsName()) {
-                        tabTitle = ipAddress;
-                    } else {
-                        tabTitle = system.getKnoten().holeAnzeigeName() + " - " + ipAddress;
-                    }
-                    TabTitle titlePanel = (TabTitle) getTabComponentAt(i);
-                    titlePanel.setTitle(tabTitle);
-                    break;
-                }
-            }
-        }
-    }
+	void updateTabTitle() {
+		for (int i = 0; i < getTabCount(); i++) {
+			for (String identifier : openedTabs.keySet()) {
+				if (getComponentAt(i).equals(openedTabs.get(identifier))) {
+					SystemSoftware system = systems.get(identifier);
+					String ipAddress = ((InternetKnoten) system.getKnoten()).getNetzwerkInterfaceByMac(identifier)
+							.getIp();
+					String tabTitle;
+					if (system.getKnoten() instanceof Host && ((Host) system.getKnoten()).isUseIPAsName()) {
+						tabTitle = ipAddress;
+					} else {
+						tabTitle = system.getKnoten().holeAnzeigeName() + " - " + ipAddress;
+					}
+					TabTitle titlePanel = (TabTitle) getTabComponentAt(i);
+					titlePanel.setTitle(tabTitle);
+					break;
+				}
+			}
+		}
+	}
 
-    void clearUnavailableComponents() {
-        for (Entry<String, InternetKnotenBetriebssystem> system : systems.entrySet()) {
-            if (!system.getValue().isStarted()) {
-                removeTable(system.getKey());
-            }
-        }
-    }
+	void clearUnavailableComponents() {
+		for (Entry<String, InternetKnotenBetriebssystem> system : systems.entrySet()) {
+			if (!system.getValue().isStarted()) {
+				removeTable(system.getKey());
+			}
+		}
+	}
 
-    private void removeTable(String mac) {
-        removeTable(mac, openedTabs.get(mac));
-    }
+	private void removeTable(String mac) {
+		removeTable(mac, openedTabs.get(mac));
+	}
 
-    @Override
-    public void removeTable(String mac, JPanel panel) {
-        if (mac != null) {
-            openedTabs.remove(mac);
-            tabellen.remove(mac);
-            remove(panel);
-            if (openedTabs.size() == 0) {
-                setVisible(false);
-            }
+	@Override
+	public void removeTable(String mac, JPanel panel) {
+		if (mac != null) {
+			openedTabs.remove(mac);
+			tabellen.remove(mac);
+			remove(panel);
+			if (openedTabs.size() == 0) {
+				setVisible(false);
+			}
 
-        }
-    }
+		}
+	}
 
-    public String getTabTitle(String interfaceId) {
-        String title = interfaceId.replaceAll(":", "-");
-        for (int i = 0; i < getTabCount(); i++) {
-            Component tab = getComponentAt(i);
-            if (tab == openedTabs.get(interfaceId)) {
-                title = ((TabTitle) getTabComponentAt(i)).getTitle();
-                break;
-            }
-        }
-        return title;
-    }
+	public String getTabTitle(String interfaceId) {
+		String title = interfaceId.replaceAll(":", "-");
+		for (int i = 0; i < getTabCount(); i++) {
+			Component tab = getComponentAt(i);
+			if (tab == openedTabs.get(interfaceId)) {
+				title = ((TabTitle) getTabComponentAt(i)).getTitle();
+				break;
+			}
+		}
+		return title;
+	}
 
-    @Override
-    public void reset() {}
+	@Override
+	public void reset() {
+	}
 
-    private class TabTitle extends JPanel {
-        private JLabel label;
+	private class TabTitle extends JPanel {
+		private JLabel label;
 
-        TabTitle(AggregatedExchangePanel parent, String identifier) {
-            setOpaque(false);
-            label = new JLabel();
-            add(label, BorderLayout.WEST);
-            JButton btnClose = new JButton("X");
-            btnClose.setUI(new BasicButtonUI());
-            btnClose.setForeground(Color.GRAY);
-            btnClose.setBorder(BorderFactory.createEmptyBorder());
-            btnClose.setPreferredSize(new Dimension(18, 18));
-            btnClose.setToolTipText(messages.getString("buttontabcomponent_msg1"));
-            add(btnClose, BorderLayout.EAST);
-            btnClose.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    parent.removeTable(identifier);
-                }
-            });
-        }
+		TabTitle(AggregatedExchangePanel parent, String identifier) {
+			setOpaque(false);
+			label = new JLabel();
+			add(label, BorderLayout.WEST);
+			JButton btnClose = new JButton("X");
+			btnClose.setUI(new BasicButtonUI());
+			btnClose.setForeground(Color.GRAY);
+			btnClose.setBorder(BorderFactory.createEmptyBorder());
+			btnClose.setPreferredSize(new Dimension(18, 18));
+			btnClose.setToolTipText(messages.getString("buttontabcomponent_msg1"));
+			add(btnClose, BorderLayout.EAST);
+			btnClose.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					parent.removeTable(identifier);
+				}
+			});
+		}
 
-        void setTitle(String title) {
-            label.setText(title);
-        }
+		void setTitle(String title) {
+			label.setText(title);
+		}
 
-        String getTitle() {
-            return label.getText();
-        }
-    }
+		String getTitle() {
+			return label.getText();
+		}
+	}
 
-    private class MessageDetailsPanel extends JPanel {
-        private String macAddress;
+	/**
+	 * Not used anymore, since this presentation of the message details was replaced
+	 * with class MessageDetailsTable.
+	 */
+	private class MessageDetailsPanel extends JPanel {
+		private String macAddress;
 
-        public MessageDetailsPanel(String macAddress) {
-            this.macAddress = macAddress;
-            this.setLayout(new BorderLayout());
-            this.setBackground(Color.WHITE);
-        }
+		public MessageDetailsPanel(String macAddress) {
+			this.macAddress = macAddress;
+			this.setLayout(new BorderLayout());
+			this.setBackground(Color.WHITE);
+		}
 
-        public void clear() {
-            removeAll();
-            updateUI();
-        }
+		public void clear() {
+			removeAll();
+			updateUI();
+		}
 
-        public void update(Object messageNo) {
-            if (messageNo != null) {
-                Object[][] daten = Lauscher.getLauscher().getDaten(macAddress, false, 0);
-                int number = Integer.parseInt(messageNo.toString());
-                int dataSetNo = 0;
-                int currNo = 0;
-                for (; dataSetNo < daten.length; dataSetNo++) {
-                    currNo = Integer.parseInt(daten[dataSetNo][0].toString());
-                    if (currNo == number)
-                        break;
-                }
+		public void update(Object messageNo) {
+			if (messageNo != null) {
+				Object[][] daten = Lauscher.getLauscher().getDaten(macAddress, false, 0);
+				int number = Integer.parseInt(messageNo.toString());
+				int dataSetNo = 0;
+				int currNo = 0;
+				for (; dataSetNo < daten.length; dataSetNo++) {
+					currNo = Integer.parseInt(daten[dataSetNo][0].toString());
+					if (currNo == number)
+						break;
+				}
 
-                Object[] dataSet = daten[dataSetNo];
-                DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(messages.getString("rp_lauscher_msg1")
-                        + ": " + dataSet[0] + " / " + messages.getString("rp_lauscher_msg2") + ": " + dataSet[1]);
-                for (; dataSetNo < daten.length
-                        && Integer.parseInt(daten[dataSetNo][0].toString()) == number; dataSetNo++) {
-                    dataSet = daten[dataSetNo];
-                    DefaultMutableTreeNode layerNode = new DefaultMutableTreeNode(dataSet[5], true);
-                    DefaultMutableTreeNode dateNode;
-                    DefaultMutableTreeNode labelNode;
-                    if (dataSet[2] != null && !dataSet[2].toString().isEmpty()) {
-                        String srcLabel = String.format("%-15s", messages.getString("rp_lauscher_msg3") + ": ");
-                        dateNode = new DefaultMutableTreeNode(srcLabel + dataSet[2]);
-                        layerNode.add(dateNode);
-                    }
-                    if (dataSet[3] != null && !dataSet[3].toString().isEmpty()) {
-                        String destLabel = String.format("%-15s", messages.getString("rp_lauscher_msg4") + ": ");
-                        dateNode = new DefaultMutableTreeNode(destLabel + dataSet[3]);
-                        layerNode.add(dateNode);
-                    }
-                    if (dataSet[4] != null && !dataSet[4].toString().isEmpty()) {
-                        String protocolLabel = String.format("%-15s", messages.getString("rp_lauscher_msg5") + ": ");
-                        dateNode = new DefaultMutableTreeNode(protocolLabel + dataSet[4]);
-                        layerNode.add(dateNode);
-                    }
-                    if (dataSet[6] != null && !dataSet[6].toString().isEmpty()) {
-                        String contentLabel = messages.getString("rp_lauscher_msg7");
-                        if (dataSet[5] == Lauscher.PROTOKOLL_SCHICHTEN[3]) {
-                            contentLabel += " (" + dataSet[6].toString().length() + " Bytes)";
-                        }
-                        contentLabel += ": ";
-                        if (dataSet[6].toString().contains("\n") || dataSet[6].toString().length() > 60) {
-                            labelNode = new DefaultMutableTreeNode(contentLabel);
-                            dateNode = new DefaultMutableTreeNode(dataSet[6]);
-                            labelNode.add(dateNode);
-                            layerNode.add(labelNode);
-                        } else {
-                            dateNode = new DefaultMutableTreeNode(String.format("%-15s", contentLabel) + dataSet[6]);
-                            layerNode.add(dateNode);
-                        }
-                    }
-                    rootNode.add(layerNode);
-                }
-                JTree detailsTree = new JTree(rootNode);
-                for (int i = 0; i < detailsTree.getRowCount(); i++) {
-                    detailsTree.expandRow(i);
-                }
-                detailsTree.setCellRenderer(new MultiLineCellRenderer());
-                this.removeAll();
-                this.add(detailsTree, BorderLayout.WEST);
-                this.updateUI();
-            }
-        }
-    }
+				Object[] dataSet = daten[dataSetNo];
+				DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(messages.getString("rp_lauscher_msg1")
+						+ ": " + dataSet[0] + " / " + messages.getString("rp_lauscher_msg2") + ": " + dataSet[1]);
+				for (; dataSetNo < daten.length
+						&& Integer.parseInt(daten[dataSetNo][0].toString()) == number; dataSetNo++) {
+					dataSet = daten[dataSetNo];
+					DefaultMutableTreeNode layerNode = new DefaultMutableTreeNode(dataSet[5], true);
+					DefaultMutableTreeNode dateNode;
+					DefaultMutableTreeNode labelNode;
+					if (dataSet[2] != null && !dataSet[2].toString().isEmpty()) {
+						String srcLabel = String.format("%-15s", messages.getString("rp_lauscher_msg3") + ": ");
+						dateNode = new DefaultMutableTreeNode(srcLabel + dataSet[2]);
+						layerNode.add(dateNode);
+					}
+					if (dataSet[3] != null && !dataSet[3].toString().isEmpty()) {
+						String destLabel = String.format("%-15s", messages.getString("rp_lauscher_msg4") + ": ");
+						dateNode = new DefaultMutableTreeNode(destLabel + dataSet[3]);
+						layerNode.add(dateNode);
+					}
+					if (dataSet[4] != null && !dataSet[4].toString().isEmpty()) {
+						String protocolLabel = String.format("%-15s", messages.getString("rp_lauscher_msg5") + ": ");
+						dateNode = new DefaultMutableTreeNode(protocolLabel + dataSet[4]);
+						layerNode.add(dateNode);
+					}
+					if (dataSet[6] != null && !dataSet[6].toString().isEmpty()) {
+						String contentLabel = messages.getString("rp_lauscher_msg7");
+						if (dataSet[5] == Lauscher.PROTOKOLL_SCHICHTEN[3]) {
+							contentLabel += " (" + dataSet[6].toString().length() + " Bytes)";
+						}
+						contentLabel += ": ";
+						if (dataSet[6].toString().contains("\n") || dataSet[6].toString().length() > 60) {
+							labelNode = new DefaultMutableTreeNode(contentLabel);
+							dateNode = new DefaultMutableTreeNode(dataSet[6]);
+							labelNode.add(dateNode);
+							layerNode.add(labelNode);
+						} else {
+							dateNode = new DefaultMutableTreeNode(String.format("%-15s", contentLabel) + dataSet[6]);
+							layerNode.add(dateNode);
+						}
+					}
+					rootNode.add(layerNode);
+				}
+				JTree detailsTree = new JTree(rootNode);
+				for (int i = 0; i < detailsTree.getRowCount(); i++) {
+					detailsTree.expandRow(i);
+				}
+				detailsTree.setCellRenderer(new MultiLineCellRenderer());
+				this.removeAll();
+				this.add(detailsTree, BorderLayout.WEST);
+				this.updateUI();
+			}
+		}
+	}
 
-    // This code is based on an example published at
-    // http://www.java2s.com/Code/Java/Swing-Components/MultiLineTreeExample.htm
-    class MultiLineCellRenderer extends JPanel implements TreeCellRenderer {
-        protected JLabel icon;
+	// This code is based on an example published at
+	// http://www.java2s.com/Code/Java/Swing-Components/MultiLineTreeExample.htm
+	class MultiLineCellRenderer extends JPanel implements TreeCellRenderer {
+		protected JLabel icon;
 
-        protected TreeTextArea text;
+		protected TreeTextArea text;
 
-        public MultiLineCellRenderer() {
-            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-            icon = new JLabel() {
-                public void setBackground(Color color) {
-                    if (color instanceof ColorUIResource)
-                        color = null;
-                    super.setBackground(color);
-                }
-            };
-            add(icon);
-            add(Box.createHorizontalStrut(4));
-            add(text = new TreeTextArea());
-        }
+		public MultiLineCellRenderer() {
+			setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+			icon = new JLabel() {
+				public void setBackground(Color color) {
+					if (color instanceof ColorUIResource)
+						color = null;
+					super.setBackground(color);
+				}
+			};
+			add(icon);
+			add(Box.createHorizontalStrut(4));
+			add(text = new TreeTextArea());
+		}
 
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
-                boolean leaf, int row, boolean hasFocus) {
-            String stringValue = tree.convertValueToText(value, isSelected, expanded, leaf, row, hasFocus);
-            setEnabled(tree.isEnabled());
-            text.setText(stringValue);
-            text.setSelect(isSelected);
-            text.setFocus(hasFocus);
-            return this;
-        }
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
+				boolean leaf, int row, boolean hasFocus) {
+			String stringValue = tree.convertValueToText(value, isSelected, expanded, leaf, row, hasFocus);
+			setEnabled(tree.isEnabled());
+			text.setText(stringValue);
+			text.setSelect(isSelected);
+			text.setFocus(hasFocus);
+			return this;
+		}
 
-        public Dimension getPreferredSize() {
-            Dimension iconD = icon.getPreferredSize();
-            Dimension textD = text.getPreferredSize();
-            int height = iconD.height < textD.height ? textD.height : iconD.height;
-            return new Dimension(iconD.width + textD.width, height);
-        }
+		public Dimension getPreferredSize() {
+			Dimension iconD = icon.getPreferredSize();
+			Dimension textD = text.getPreferredSize();
+			int height = iconD.height < textD.height ? textD.height : iconD.height;
+			return new Dimension(iconD.width + textD.width, height);
+		}
 
-        public void setBackground(Color color) {
-            if (color instanceof ColorUIResource)
-                color = null;
-            super.setBackground(color);
-        }
+		public void setBackground(Color color) {
+			if (color instanceof ColorUIResource)
+				color = null;
+			super.setBackground(color);
+		}
 
-        class TreeTextArea extends JTextArea {
-            Dimension preferredSize;
+		class TreeTextArea extends JTextArea {
+			Dimension preferredSize;
 
-            TreeTextArea() {
-                setLineWrap(true);
-                setWrapStyleWord(true);
-                setOpaque(true);
-                Font font = getFont();
-                setFont(new Font(Font.MONOSPACED, Font.BOLD, font.getSize()));
-            }
+			TreeTextArea() {
+				setLineWrap(true);
+				setWrapStyleWord(true);
+				setOpaque(true);
+				Font font = getFont();
+				setFont(new Font(Font.MONOSPACED, Font.BOLD, font.getSize()));
+			}
 
-            public void setBackground(Color color) {
-                if (color instanceof ColorUIResource)
-                    color = null;
-                super.setBackground(color);
-            }
+			public void setBackground(Color color) {
+				if (color instanceof ColorUIResource)
+					color = null;
+				super.setBackground(color);
+			}
 
-            public void setPreferredSize(Dimension d) {
-                if (d != null) {
-                    preferredSize = d;
-                }
-            }
+			public void setPreferredSize(Dimension d) {
+				if (d != null) {
+					preferredSize = d;
+				}
+			}
 
-            public Dimension getPreferredSize() {
-                return preferredSize;
-            }
+			public Dimension getPreferredSize() {
+				return preferredSize;
+			}
 
-            public void setText(String str) {
-                Font font = getFont();
-                FontMetrics fm = getToolkit().getFontMetrics(font);
-                BufferedReader br = new BufferedReader(new StringReader(str));
-                String line;
-                int maxWidth = 0, lines = 0;
-                try {
-                    while ((line = br.readLine()) != null) {
-                        int width = SwingUtilities.computeStringWidth(fm, line);
-                        if (maxWidth < width) {
-                            maxWidth = width;
-                        }
-                        lines++;
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-                lines = (lines < 1) ? 1 : lines;
-                int height = fm.getHeight() * lines;
-                setPreferredSize(new Dimension(maxWidth + 12, height));
-                super.setText(str);
-            }
+			public void setText(String str) {
+				Font font = getFont();
+				FontMetrics fm = getToolkit().getFontMetrics(font);
+				BufferedReader br = new BufferedReader(new StringReader(str));
+				String line;
+				int maxWidth = 0, lines = 0;
+				try {
+					while ((line = br.readLine()) != null) {
+						int width = SwingUtilities.computeStringWidth(fm, line);
+						if (maxWidth < width) {
+							maxWidth = width;
+						}
+						lines++;
+					}
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+				lines = (lines < 1) ? 1 : lines;
+				int height = fm.getHeight() * lines;
+				setPreferredSize(new Dimension(maxWidth + 12, height));
+				super.setText(str);
+			}
 
-            void setSelect(boolean isSelected) {
-                Color bColor;
-                if (isSelected) {
-                    bColor = UIManager.getColor("Tree.selectionBackground");
-                } else {
-                    bColor = UIManager.getColor("Tree.textBackground");
-                }
-                super.setBackground(bColor);
-            }
+			void setSelect(boolean isSelected) {
+				Color bColor;
+				if (isSelected) {
+					bColor = UIManager.getColor("Tree.selectionBackground");
+				} else {
+					bColor = UIManager.getColor("Tree.textBackground");
+				}
+				super.setBackground(bColor);
+			}
 
-            void setFocus(boolean hasFocus) {
-                if (hasFocus) {
-                    Color lineColor = UIManager.getColor("Tree.selectionBorderColor");
-                    setBorder(BorderFactory.createLineBorder(lineColor));
-                } else {
-                    setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-                }
-            }
-        }
-    }
+			void setFocus(boolean hasFocus) {
+				if (hasFocus) {
+					Color lineColor = UIManager.getColor("Tree.selectionBorderColor");
+					setBorder(BorderFactory.createLineBorder(lineColor));
+				} else {
+					setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+				}
+			}
+		}
+	}
 
-    @Override
-    public void update(Observable o, Object arg) {
-        updateTabTitle();
-    }
+	@Override
+	public void update(Observable o, Object arg) {
+		updateTabTitle();
+	}
 }

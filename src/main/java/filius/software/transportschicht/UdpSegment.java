@@ -27,9 +27,6 @@ package filius.software.transportschicht;
 
 import java.io.Serializable;
 
-import filius.software.vermittlungsschicht.IcmpPaket;
-import filius.software.vermittlungsschicht.IpPaket;
-
 public class UdpSegment extends Segment implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -46,42 +43,19 @@ public class UdpSegment extends Segment implements Serializable {
 
 	/**
 	 * Checks if the UDP segment in the argument has the same content (which
-	 * consists of the content of the subjacent segment (of type {@code Segment})
-	 * and laenge).
+	 * consists of the content of the subjacent segment of type {@code Segment} and
+	 * laenge) as <i>this</i> UDP segment.
 	 * 
-	 * @param o UDP segment to be compared to <it>this</i> UDP segment
+	 * @param segment UDP segment to be compared to <it>this</i> UDP segment
+	 *                (generally given as a Segment)
 	 * @return true if the content of the subjacent segment (of type
 	 *         {@code Segment}) and laenge are the same as in <it>this</i> UDP
 	 *         segment
 	 * @author Christoph Irniger
 	 */
-	@Override
-	public boolean sameContent(Object o) {
-		if (o == this) {
-			return true;
-		}
-
-		if (!(o instanceof UdpSegment)) {
-			return false;
-		}
-
-		// check super class first
-		if (o instanceof Segment) {
-			Segment segment = (Segment) o;
-
-			if (super.sameContent(segment)) {
-
-				// then rest
-				if (o instanceof UdpSegment) {
-					UdpSegment udpSegment = (UdpSegment) o;
-
-					return this.getLaenge() == udpSegment.getLaenge();
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
+	public boolean sameContent(UdpSegment udpSegment) {
+		if (super.sameSegmentContent(udpSegment)) {
+			return laenge == udpSegment.getLaenge();
 		} else {
 			return false;
 		}

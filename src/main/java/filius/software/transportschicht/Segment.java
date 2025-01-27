@@ -27,8 +27,6 @@ package filius.software.transportschicht;
 
 import java.io.Serializable;
 
-import filius.software.vermittlungsschicht.ArpPaket;
-
 @SuppressWarnings("serial")
 public class Segment implements Serializable {
 
@@ -72,34 +70,23 @@ public class Segment implements Serializable {
 	/**
 	 * Checks if the whole content (which consists of quellPort, zielPort,
 	 * pruefSumme and daten) of <i>this</i> segment is equal to the segment in the
-	 * argument (generally given as an Object).
+	 * argument.
 	 * 
-	 * @param o segment to be compared to <it>this</i> segment
+	 * @param segment segment to be compared to <it>this</i> segment
 	 * @return true if quellPort, zielPort, pruefSumme and daten in the segment in
 	 *         the argument are the same as in <it>this</i> IP packet
 	 * @author Christoph Irniger
 	 */
-	public boolean sameContent(Object o) {
-		if (o == this) {
-			return true;
-		}
-
-		if (!(o instanceof Segment)) {
-			return false;
+	public boolean sameSegmentContent(Segment segment) {
+		// if both are null, there is no content on layer 4 (application)
+		if (daten == null && segment.getDaten() == null) {
+			return quellPort == segment.getQuellPort() && zielPort == segment.getZielPort()
+					&& pruefSumme == segment.getPruefSumme();
+		} else if (!(daten == null || segment.getDaten() == null)) {
+			return quellPort == segment.getQuellPort() && zielPort == segment.getZielPort()
+					&& pruefSumme == segment.getPruefSumme() && daten.equals(segment.getDaten());
 		} else {
-			Segment segment = (Segment) o;
-
-			// if both are null, there is no content on layer 4 (application)
-			if (this.getDaten() == null && segment.getDaten() == null) {
-				return this.getQuellPort() == segment.getQuellPort() && this.getZielPort() == segment.getZielPort()
-						&& this.getPruefSumme() == segment.getPruefSumme();
-			} else if (!(this.getDaten() == null || segment.getDaten() == null)) {
-				return this.getQuellPort() == segment.getQuellPort() && this.getZielPort() == segment.getZielPort()
-						&& this.getPruefSumme() == segment.getPruefSumme()
-						&& this.getDaten().equals(segment.getDaten());
-			} else {
-				return false;
-			}
+			return false;
 		}
 	}
 }

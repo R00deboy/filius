@@ -149,8 +149,8 @@ public class IcmpPaket extends IpPaket {
 		// check super class first
 		if (super.sameContentApartFromTTL(packet)) {
 			// then the rest
-			return this.getSeqNr() == packet.getSeqNr() && this.getIcmpType() == packet.getIcmpType()
-					&& this.getIcmpCode() == packet.getIcmpCode();
+			return seqNr == packet.getSeqNr() && icmpType == packet.getIcmpType()
+					&& icmpCode == packet.getIcmpCode();
 		} else {
 			return false;
 		}

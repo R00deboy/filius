@@ -157,11 +157,11 @@ public class IpPaket implements Serializable, Cloneable {
 	 */
 	public boolean sameContentApartFromTTL(IpPaket packet) {
 		// Check header
-		if (this.getSender().equals(packet.getSender()) && this.getEmpfaenger().equals(packet.getEmpfaenger())
-				&& this.getProtocol() == packet.getProtocol()) {
+		if (sender.equals(packet.getSender()) && empfaenger.equals(packet.getEmpfaenger())
+				&& protocol == packet.getProtocol()) {
 
 			// Check data
-			Segment segment1 = this.getSegment();
+			Segment segment1 = data;
 			Segment segment2 = packet.getSegment();
 			if (segment1 instanceof TcpSegment && segment2 instanceof TcpSegment) {
 				return ((TcpSegment) segment1).sameContent((TcpSegment) segment2);

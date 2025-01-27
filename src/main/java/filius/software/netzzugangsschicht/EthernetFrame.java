@@ -126,16 +126,16 @@ public class EthernetFrame implements Serializable {
 			EthernetFrame frame = (EthernetFrame) o;
 
 			// check header
-			if (this.getZielMacAdresse().equals(frame.getZielMacAdresse())
-					&& this.getQuellMacAdresse().equals(frame.getQuellMacAdresse())
-					&& this.getTyp().equals(frame.getTyp())) {
+			if (zielMacAdresse.equals(frame.getZielMacAdresse())
+					&& quellMacAdresse.equals(frame.getQuellMacAdresse())
+					&& typ.equals(frame.getTyp())) {
 
 				Object data = frame.getDaten();
 				// check payload
-				if (data instanceof IpPaket) {
+				if (daten instanceof IpPaket && data instanceof IpPaket) {
 					return samePayload(frame, ((IpPaket) data).getTtl());
-				} else if (data instanceof ArpPaket) {
-					ArpPaket thisArpPacket = (ArpPaket) this.getDaten();
+				} else if (daten instanceof ArpPaket && data instanceof ArpPaket) {
+					ArpPaket thisArpPacket = (ArpPaket) daten;
 					ArpPaket argumentArpPacket = (ArpPaket) frame.getDaten();
 					return thisArpPacket.sameContent(argumentArpPacket);
 				} else {
@@ -163,18 +163,17 @@ public class EthernetFrame implements Serializable {
 	 * @author Christoph Irniger
 	 */
 	public boolean samePayload(EthernetFrame frame, int ttl) {
-		Object thisPacket = this.getDaten();
-		Object argumentPacket = frame.getDaten();
+		Object framePayload = frame.getDaten();
 
 		// if both frames are of type IP
-		if (thisPacket instanceof IpPaket && argumentPacket instanceof IpPaket) {
-			IpPaket thisIpPacket = (IpPaket) thisPacket;
-			IpPaket argumentIpPacket = (IpPaket) argumentPacket;
-			if (!(thisPacket instanceof IcmpPaket) && !(argumentPacket instanceof IcmpPaket)) {
+		if (daten instanceof IpPaket && framePayload instanceof IpPaket) {
+			if (!(daten instanceof IcmpPaket) && !(framePayload instanceof IcmpPaket)) {
+				IpPaket thisIpPacket = (IpPaket) daten;
+				IpPaket argumentIpPacket = (IpPaket) framePayload;
 				return thisIpPacket.sameContentApartFromTTL(argumentIpPacket) && thisIpPacket.getTtl() == ttl;
-			} else if (thisPacket instanceof IcmpPaket && argumentPacket instanceof IcmpPaket) {
-				IcmpPaket thisIcmpPacket = (IcmpPaket) thisPacket;
-				IcmpPaket argumentIcmpPacket = (IcmpPaket) argumentPacket;
+			} else if (daten instanceof IcmpPaket && framePayload instanceof IcmpPaket) {
+				IcmpPaket thisIcmpPacket = (IcmpPaket) daten;
+				IcmpPaket argumentIcmpPacket = (IcmpPaket) framePayload;
 				return thisIcmpPacket.sameContentApartFromTTL(argumentIcmpPacket) && thisIcmpPacket.getTtl() == ttl;
 			} else {
 				return false;

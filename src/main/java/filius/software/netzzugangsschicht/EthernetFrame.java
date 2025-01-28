@@ -109,40 +109,25 @@ public class EthernetFrame implements Serializable {
 	 * quellMacAdresse and daten) of <i>this</i> frame is equal to the frame in the
 	 * argument (generally given as an Object).
 	 * 
-	 * @param o frame to be compared to <i>this</i> frame
+	 * @param frame frame to be compared to <i>this</i> frame
 	 * @return true if zielMacAdresse, quellMacAdresse and daten are equal
 	 * @author Christoph Irniger
 	 */
-	public boolean sameContent(Object o) {
-		if (o == this) {
-			return true;
-		}
+	public boolean sameContent(EthernetFrame frame) {
+		// check header
+		if (zielMacAdresse.equals(frame.getZielMacAdresse()) && quellMacAdresse.equals(frame.getQuellMacAdresse())
+				&& typ.equals(frame.getTyp())) {
 
-		if (!(o instanceof EthernetFrame)) {
-			return false;
-		}
-
-		if (o instanceof EthernetFrame) {
-			EthernetFrame frame = (EthernetFrame) o;
-
-			// check header
-			if (zielMacAdresse.equals(frame.getZielMacAdresse())
-					&& quellMacAdresse.equals(frame.getQuellMacAdresse())
-					&& typ.equals(frame.getTyp())) {
-
-				Object data = frame.getDaten();
-				// check payload
-				if (daten instanceof IpPaket && data instanceof IpPaket) {
-					IpPaket thisIpPacket = (IpPaket) daten;
-					IpPaket argumentIpPacket = (IpPaket) frame.getDaten();
-					return thisIpPacket.getIdentification() == argumentIpPacket.getIdentification();
-				} else if (daten instanceof ArpPaket && data instanceof ArpPaket) {
-					ArpPaket thisArpPacket = (ArpPaket) daten;
-					ArpPaket argumentArpPacket = (ArpPaket) frame.getDaten();
-					return thisArpPacket.getArpPacketNumber() == argumentArpPacket.getArpPacketNumber();
-				} else {
-					return false;
-				}
+			Object data = frame.getDaten();
+			// check payload
+			if (daten instanceof IpPaket && data instanceof IpPaket) {
+				IpPaket thisIpPacket = (IpPaket) daten;
+				IpPaket argumentIpPacket = (IpPaket) frame.getDaten();
+				return thisIpPacket.getIdentification() == argumentIpPacket.getIdentification();
+			} else if (daten instanceof ArpPaket && data instanceof ArpPaket) {
+				ArpPaket thisArpPacket = (ArpPaket) daten;
+				ArpPaket argumentArpPacket = (ArpPaket) frame.getDaten();
+				return thisArpPacket.getArpPacketNumber() == argumentArpPacket.getArpPacketNumber();
 			} else {
 				return false;
 			}
@@ -152,14 +137,13 @@ public class EthernetFrame implements Serializable {
 	}
 
 	/**
-	 * This method checks wheter the frame in the first argument has the same
-	 * payload as <i>this</i> frame and a specific TTL. Returns false if the frame
-	 * in the first argument or <i>this</i> frame is not an IP packet (e.g. an ARP
-	 * packet).
+	 * If <i>this</i> frame and the frame in the first argument both encapsule an IP
+	 * packet, this method checks if the packets have the same content and if the IP
+	 * packet inside <i>this</i> frame has a specific TTL.
 	 * 
 	 * @param frame the frame whose payload should be compared to <i>this</i>
 	 *              payload
-	 * @param ttl   the desired TTL of the frame in the first argument
+	 * @param ttl   the desired TTL of <i>this</i> frame in the first argument
 	 * @return true if the frame in the first argument has the same payload and the
 	 *         specified TTL
 	 * @author Christoph Irniger

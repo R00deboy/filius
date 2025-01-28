@@ -133,11 +133,13 @@ public class EthernetFrame implements Serializable {
 				Object data = frame.getDaten();
 				// check payload
 				if (daten instanceof IpPaket && data instanceof IpPaket) {
-					return samePayload(frame, ((IpPaket) data).getTtl());
+					IpPaket thisIpPacket = (IpPaket) daten;
+					IpPaket argumentIpPacket = (IpPaket) frame.getDaten();
+					return thisIpPacket.getIdentification() == argumentIpPacket.getIdentification();
 				} else if (daten instanceof ArpPaket && data instanceof ArpPaket) {
 					ArpPaket thisArpPacket = (ArpPaket) daten;
 					ArpPaket argumentArpPacket = (ArpPaket) frame.getDaten();
-					return thisArpPacket.sameContent(argumentArpPacket);
+					return thisArpPacket.getArpPacketNumber() == argumentArpPacket.getArpPacketNumber();
 				} else {
 					return false;
 				}

@@ -53,7 +53,7 @@ public class IpPaket implements Serializable, Cloneable {
 
 	public IpPaket(int protocol, long identification) {
 		this.protocol = protocol;
-		// only use identification if it is not negative
+		// only use identification argument if it is not negative
 		this.identification = identification < 0 ? getIdentCounter() : identification;
 	}
 
@@ -64,7 +64,7 @@ public class IpPaket implements Serializable, Cloneable {
 
 	@Override
 	public IpPaket clone() {
-		IpPaket clone = new IpPaket(protocol, -1);
+		IpPaket clone = new IpPaket(protocol, identification);
 		copyIpPacketAttributes(clone);
 		return clone;
 	}

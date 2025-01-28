@@ -25,10 +25,6 @@
  */
 package filius.software.vermittlungsschicht;
 
-import filius.software.transportschicht.Segment;
-import filius.software.transportschicht.TcpSegment;
-import filius.software.transportschicht.UdpSegment;
-
 /** Diese Klasse umfasst die Attribute eines ICMP-Pakets */
 @SuppressWarnings("serial")
 public class IcmpPaket extends IpPaket {

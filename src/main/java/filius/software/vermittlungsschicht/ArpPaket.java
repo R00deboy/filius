@@ -34,8 +34,8 @@ public class ArpPaket implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	/** counter of the identification number of the IP packet */
-	private static long identificationCounter;
+	/** counter for the arp packet number */
+	private static long arpPacketNumberCounter;
 
 	/** Protokoll-Typ der Vermittlungsschicht */
 	private String protokollTyp;
@@ -58,16 +58,16 @@ public class ArpPaket implements Serializable {
 	 */
 	private String targetIP;
 
-	/** identification number of the IP packet */
-	private final long identification;
+	/** ARP packet number (does not exist in reality) */
+	private final long arpPacketNumber;
 
 	public ArpPaket() {
-		this.identification = setIdentCounter();
+		this.arpPacketNumber = setIdentCounter();
 	}
 
 	private static synchronized long setIdentCounter() {
-		identificationCounter++;
-		return identificationCounter - 1;
+		arpPacketNumberCounter++;
+		return arpPacketNumberCounter - 1;
 	}
 
 	public String getProtokollTyp() {
@@ -109,6 +109,10 @@ public class ArpPaket implements Serializable {
 	public void setTargetMAC(String zielMacAdresse) {
 		this.targetMAC = zielMacAdresse;
 	}
+	
+	public long getArpPacketNumber() {
+		return arpPacketNumber;
+	}
 
 	public String toString() {
 		return "[op=" + (operation == REQUEST ? "REQUEST" : "REPLY") + ", sender=" + senderMAC + "|" + senderIP
@@ -121,35 +125,5 @@ public class ArpPaket implements Serializable {
 
 	public void setOperation(int operation) {
 		this.operation = operation;
-	}
-
-	/**
-	 * Checks if the whole content (which consists of protokollTyp, operation,
-	 * senderMAC, senderIP, targetMAC and targetIP) of <i>this</i> ARP packet is
-	 * equal to the ARP packet in the argument (generally given as an Object).
-	 * 
-	 * @param o ARP packet to be compared to <it>this</i> IP packet
-	 * @return true, if protokollTyp, operation, senderMAC, senderIP, targetMAC and
-	 *         targetIP in the ARP packet in the argument are the same as in
-	 *         <it>this</i> ARP packet
-	 * @author Christoph Irniger
-	 */
-	public boolean sameContent(Object o) {
-		if (o == this) {
-			return true;
-		}
-
-		if (!(o instanceof ArpPaket)) {
-			return false;
-		} else {
-			ArpPaket arpPaket = (ArpPaket) o;
-
-			return protokollTyp.equals(arpPaket.getProtokollTyp())
-					&& operation == arpPaket.getOperation()
-					&& senderMAC.equals(arpPaket.getSenderMAC())
-					&& senderIP.equals(arpPaket.getSenderIP())
-					&& targetMAC.equals(arpPaket.getTargetMAC())
-					&& targetIP.equals(arpPaket.getTargetIP());
-		}
 	}
 }

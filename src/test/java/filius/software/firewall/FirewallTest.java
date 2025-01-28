@@ -23,7 +23,7 @@ public class FirewallTest {
     public void testAcceptIPPacket_Syn_Accept() throws Exception {
         TcpSegment segment = new TcpSegment();
         segment.setSyn(true);
-        IpPaket ipPacket = new IpPaket(IpPaket.TCP);
+        IpPaket ipPacket = new IpPaket(IpPaket.TCP, -1);
         ipPacket.setSegment(segment);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
@@ -74,7 +74,7 @@ public class FirewallTest {
 
     @Test
     public void testCheckAcceptIcmp_IsNOTIcmpAndDropIcmp_DoAccept() throws Exception {
-        IpPaket paket = new IpPaket(IpPaket.TCP);
+        IpPaket paket = new IpPaket(IpPaket.TCP, -1);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
         firewall.setDropICMP(true);
@@ -165,7 +165,7 @@ public class FirewallTest {
     }
 
     private IpPaket createIPPacketTcp(String sender, String dest, int port) {
-        IpPaket paket = new IpPaket(IpPaket.TCP);
+        IpPaket paket = new IpPaket(IpPaket.TCP, -1);
         paket.setSender(sender);
         paket.setEmpfaenger(dest);
         TcpSegment segment = new TcpSegment();
@@ -255,7 +255,7 @@ public class FirewallTest {
     }
 
     private IpPaket createIPPacketUDP(String sender, String dest, int port) {
-        IpPaket paket = new IpPaket(IpPaket.UDP);
+        IpPaket paket = new IpPaket(IpPaket.UDP, -1);
         paket.setSender(sender);
         paket.setEmpfaenger(dest);
         UdpSegment segment = new UdpSegment();

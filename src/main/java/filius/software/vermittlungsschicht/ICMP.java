@@ -112,7 +112,7 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
     }
 
     private void sendeICMP(int typ, int code, int ttl, int seqNr, String quellIP, String zielIP) {
-        IcmpPaket icmpPaket = new IcmpPaket();
+        IcmpPaket icmpPaket = new IcmpPaket(-1);
         icmpPaket.setEmpfaenger(zielIP);
         icmpPaket.setIcmpType(typ);
         icmpPaket.setIcmpCode(code);

@@ -50,13 +50,13 @@ public class IcmpPaket extends IpPaket {
 	 */
 	private int icmpCode;
 
-	public IcmpPaket() {
-		super(ICMP_PROTOCOL, -1);
+	public IcmpPaket(long identification) {
+		super(ICMP_PROTOCOL, identification);
 	}
 
 	@Override
 	public IcmpPaket clone() {
-		IcmpPaket clone = new IcmpPaket();
+		IcmpPaket clone = new IcmpPaket(identification);
 		copyIpPacketAttributes(clone);
 		copyIcmpAttributes(clone);
 		return clone;

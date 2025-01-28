@@ -49,7 +49,7 @@ public class IpPaket implements Serializable, Cloneable {
 	private final int protocol;
 	private Segment data;
 	/** identification number of the IP packet */
-	private final long identification;
+	protected final long identification;
 
 	public IpPaket(int protocol, long identification) {
 		this.protocol = protocol;

@@ -51,9 +51,10 @@ public class IpPaket implements Serializable, Cloneable {
 	/** identification number of the IP packet */
 	private final long identification;
 
-	public IpPaket(int protocol) {
+	public IpPaket(int protocol, long identification) {
 		this.protocol = protocol;
-		this.identification = getIdentCounter();
+		// only use identification if it is not negative
+		this.identification = identification < 0 ? getIdentCounter() : identification;
 	}
 
 	private static synchronized long getIdentCounter() {
@@ -63,7 +64,7 @@ public class IpPaket implements Serializable, Cloneable {
 
 	@Override
 	public IpPaket clone() {
-		IpPaket clone = new IpPaket(protocol);
+		IpPaket clone = new IpPaket(protocol, -1);
 		copyIpPacketAttributes(clone);
 		return clone;
 	}
@@ -110,6 +111,10 @@ public class IpPaket implements Serializable, Cloneable {
 	public void setSegment(Segment data) {
 		this.data = data;
 	}
+	
+	public long getIdentification() {
+		return identification;
+	}
 
 	public String toString() {
 		return "[" + "ttl=" + ttl + ", " + "protocol=" + protocol + ", " + "empfaenger=" + empfaenger + ", " + "sender="
@@ -118,32 +123,6 @@ public class IpPaket implements Serializable, Cloneable {
 
 	public void decrementTtl() {
 		ttl--;
-	}
-
-	/**
-	 * Checks if the whole content (which consists of sender, empfaenger, TTL,
-	 * protocol and data) of <i>this</i> IP packet is equal to the IP packet in the
-	 * argument (generally given as an Object).
-	 * 
-	 * @param o IP packet to be compared to <it>this</i> IP packet
-	 * @return true if sender, empfaenger, TTL, protocol and data in the IP packet
-	 *         in the argument are the same as in <it>this</i> IP packet
-	 * @author Christoph Irniger
-	 */
-	public boolean sameContent(Object o) {
-		if (o == this) {
-			return true;
-		}
-
-		if (!(o instanceof IpPaket)) {
-			return false;
-		}
-
-		IpPaket packet = (IpPaket) o;
-
-		boolean sameContent = sameContentApartFromTTL(packet);
-
-		return sameContent && (this.getTtl() == packet.getTtl());
 	}
 
 	/**

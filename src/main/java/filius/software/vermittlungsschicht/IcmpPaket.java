@@ -55,7 +55,7 @@ public class IcmpPaket extends IpPaket {
 	private int icmpCode;
 
 	public IcmpPaket() {
-		super(ICMP_PROTOCOL);
+		super(ICMP_PROTOCOL, -1);
 	}
 
 	@Override
@@ -107,33 +107,6 @@ public class IcmpPaket extends IpPaket {
 	public String toString() {
 		return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
 				+ "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + "]";
-	}
-
-	/**
-	 * Checks if the ICMP packet in the argument has the same content (which
-	 * consists of the content of the subjacent IP packet and seqNr, icmpType and
-	 * icmpCode).
-	 * 
-	 * @param o ICMP packet to be compared to <it>this</i> ICMP packet
-	 * @return true if the content of the subjacent IP packet and seqNr, icmpType
-	 *         and icmpCode are the same as in <it>this</i> ICMP packet
-	 * @author Christoph Irniger
-	 */
-	@Override
-	public boolean sameContent(Object o) {
-		if (o == this) {
-			return true;
-		}
-
-		if (!(o instanceof IcmpPaket)) {
-			return false;
-		}
-
-		IcmpPaket packet = (IcmpPaket) o;
-
-		boolean sameContent = sameContentApartFromTTL(packet);
-
-		return sameContent && (this.getTtl() == packet.getTtl());
 	}
 
 	/**

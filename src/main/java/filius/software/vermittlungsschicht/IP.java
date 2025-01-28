@@ -246,7 +246,7 @@ public class IP extends VermittlungsProtokoll implements I18n {
      * @throws VerbindungsException
      */
     public void senden(String zielIp, String quellIp, int protokoll, int ttl, Segment segment) {
-        IpPaket paket = new IpPaket(protokoll);
+        IpPaket paket = new IpPaket(protokoll, -1);
         paket.setEmpfaenger(zielIp);
         paket.setTtl(ttl);
         paket.setSegment(segment);

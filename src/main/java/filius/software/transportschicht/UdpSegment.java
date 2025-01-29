@@ -53,6 +53,10 @@ public class UdpSegment extends Segment implements Serializable {
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContent(UdpSegment udpSegment) {
+		if (udpSegment == this) {
+			return true;
+		}
+		
 		if (super.sameSegmentContent(udpSegment)) {
 			return laenge == udpSegment.getLaenge();
 		} else {

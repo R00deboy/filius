@@ -114,6 +114,10 @@ public class EthernetFrame implements Serializable {
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContent(EthernetFrame frame) {
+		if (frame == this) {
+			return true;
+		}
+
 		// check header
 		if (zielMacAdresse.equals(frame.getZielMacAdresse()) && quellMacAdresse.equals(frame.getQuellMacAdresse())
 				&& typ.equals(frame.getTyp())) {
@@ -121,12 +125,7 @@ public class EthernetFrame implements Serializable {
 			Object argumentData = frame.getDaten();
 			// check payload
 			if (daten instanceof IpPaket && argumentData instanceof IpPaket) {
-				IpPaket thisIpPacket = (IpPaket) daten;
-				IpPaket argumentIpPacket = (IpPaket) argumentData;
-				return thisIpPacket.sameContentApartFromTTL(argumentIpPacket)
-						&& thisIpPacket.getTtl() == argumentIpPacket.getTtl();
-//				return thisIpPacket.getIdentification() == argumentIpPacket.getIdentification()
-//						&& thisIpPacket.getTtl() == argumentIpPacket.getTtl();
+				return samePayload(frame, ((IpPaket) argumentData).getTtl());
 			} else if (daten instanceof ArpPaket && argumentData instanceof ArpPaket) {
 				ArpPaket thisArpPacket = (ArpPaket) daten;
 				ArpPaket argumentArpPacket = (ArpPaket) frame.getDaten();
@@ -159,10 +158,6 @@ public class EthernetFrame implements Serializable {
 			if (!(daten instanceof IcmpPaket) && !(framePayload instanceof IcmpPaket)) {
 				IpPaket thisIpPacket = (IpPaket) daten;
 				IpPaket argumentIpPacket = (IpPaket) framePayload;
-				System.out.println(thisIpPacket.sameContentApartFromTTL(argumentIpPacket));
-				System.out.println(thisIpPacket.getTtl());
-				System.out.println(ttl);
-				System.out.println();
 				return thisIpPacket.sameContentApartFromTTL(argumentIpPacket) && thisIpPacket.getTtl() == ttl;
 			} else if (daten instanceof IcmpPaket && framePayload instanceof IcmpPaket) {
 				IcmpPaket thisIcmpPacket = (IcmpPaket) daten;

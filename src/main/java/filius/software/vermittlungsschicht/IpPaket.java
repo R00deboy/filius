@@ -135,6 +135,10 @@ public class IpPaket implements Serializable, Cloneable {
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContentApartFromTTL(IpPaket packet) {
+		if (packet == this) {
+			return true;
+		}
+		
 		// Check header
 		if (sender.equals(packet.getSender()) && empfaenger.equals(packet.getEmpfaenger())
 				&& protocol == packet.getProtocol()) {

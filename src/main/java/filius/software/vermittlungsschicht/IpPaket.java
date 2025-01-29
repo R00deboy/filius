@@ -134,7 +134,7 @@ public class IpPaket implements Serializable, Cloneable {
 	 *         packet in the argument apart from the TTL field
 	 * @author Christoph Irniger
 	 */
-	public boolean sameContentApartFromTTL(IpPaket packet) {
+	public boolean sameContentApartFromTtl(IpPaket packet) {
 		if (packet == this) {
 			return true;
 		}

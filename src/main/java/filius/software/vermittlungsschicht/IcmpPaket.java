@@ -114,13 +114,13 @@ public class IcmpPaket extends IpPaket {
 	 *         apart from the TTL field
 	 * @author Christoph Irniger
 	 */
-	public boolean sameContentApartFromTTL(IcmpPaket packet) {
+	public boolean sameContentApartFromTtl(IcmpPaket packet) {
 		if (packet == this) {
 			return true;
 		}
 		
 		// check super class first
-		if (super.sameContentApartFromTTL(packet)) {
+		if (super.sameContentApartFromTtl(packet)) {
 			// then the rest
 			return seqNr == packet.getSeqNr() && icmpType == packet.getIcmpType()
 					&& icmpCode == packet.getIcmpCode();

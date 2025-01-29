@@ -62,10 +62,10 @@ public class ArpPaket implements Serializable {
 	private final long arpPacketNumber;
 
 	public ArpPaket() {
-		this.arpPacketNumber = setIdentCounter();
+		this.arpPacketNumber = setArpPacketCounter();
 	}
 
-	private static synchronized long setIdentCounter() {
+	private static synchronized long setArpPacketCounter() {
 		arpPacketNumberCounter++;
 		return arpPacketNumberCounter - 1;
 	}

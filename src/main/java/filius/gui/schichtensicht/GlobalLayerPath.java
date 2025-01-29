@@ -153,8 +153,8 @@ public class GlobalLayerPath extends JPanel implements I18n {
 			int frameNumber = LAUSCHER.getFrameNumber(interfaceId, firstFrame);
 			addToLocalPanelPath(interfaceId, systemSoftware, frameNumber);
 
-			// add routers and final receiver (both always corresponding to the destination
-			// MAC of the frame in the list)
+			// add routers (corresponding to the destination MAC of the frame in the list,
+			// starting with the first) and the final receiver
 			for (EthernetFrame frame : framePath) {
 				interfaceId = frame.getZielMacAdresse();
 				systemSoftware = LAUSCHER.getSystemSoftwareByID(interfaceId);

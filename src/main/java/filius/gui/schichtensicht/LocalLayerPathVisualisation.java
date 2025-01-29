@@ -140,7 +140,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		backAndForth();
 
 		// deactivate back button in local view if the frame was received
-		if (globalLayerPath == null && !LAYER_PATH_PANEL.isSent()) {
+		if (globalLayerPath == null
+				&& (!LAYER_PATH_PANEL.isSent() || (!LAYER_PATH_PANEL.isForwarded() && LAYER_PATH_PANEL.isSent()))) {
 			BACK_IN_TIME.setEnabled(false);
 		}
 
@@ -253,7 +254,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			if (globalLayerPath == null) {
 				coloredLayerIndicators(X_OFFSET + 4, SQUARE_SIDE_LENGTH, true);
 			} else {
-				coloredLayerIndicators(X_OFFSET + 4, 4 * SQUARE_SIDE_LENGTH + RECTANGLE_WIDTH + GAP_BETWEEN_CELLS, true);
+				coloredLayerIndicators(X_OFFSET + 4, 4 * SQUARE_SIDE_LENGTH + RECTANGLE_WIDTH + GAP_BETWEEN_CELLS,
+						true);
 			}
 		}
 
@@ -507,8 +509,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Right and left side of the visualisation which indicate the layers and showing
-	 * the buttons "forth" and "back".
+	 * Right and left side of the visualisation which indicate the layers and
+	 * showing the buttons "forth" and "back".
 	 * 
 	 * @param backOrForthButton "back" or "forth" button
 	 * @param xCoord            x coordinate inside the GridBag layout

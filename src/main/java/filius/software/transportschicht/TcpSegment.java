@@ -164,6 +164,10 @@ public class TcpSegment extends Segment implements Serializable {
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContent(TcpSegment tcpSegment) {
+		if (tcpSegment == this) {
+			return true;
+		}
+		
 		if (super.sameSegmentContent(tcpSegment)) {
 				return seqNummer == tcpSegment.getSeqNummer()
 						&& ackNummer == tcpSegment.getAckNummer()

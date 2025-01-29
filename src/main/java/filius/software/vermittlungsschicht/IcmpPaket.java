@@ -115,6 +115,10 @@ public class IcmpPaket extends IpPaket {
 	 * @author Christoph Irniger
 	 */
 	public boolean sameContentApartFromTTL(IcmpPaket packet) {
+		if (packet == this) {
+			return true;
+		}
+		
 		// check super class first
 		if (super.sameContentApartFromTTL(packet)) {
 			// then the rest

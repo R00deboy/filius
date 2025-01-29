@@ -78,6 +78,10 @@ public class Segment implements Serializable {
 	 * @author Christoph Irniger
 	 */
 	public boolean sameSegmentContent(Segment segment) {
+		if (segment == this) {
+			return true;
+		}
+		
 		// if both are null, there is no content on layer 4 (application)
 		if (daten == null && segment.getDaten() == null) {
 			return quellPort == segment.getQuellPort() && zielPort == segment.getZielPort()

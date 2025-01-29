@@ -126,7 +126,6 @@ public class MessageDetailsTable extends JPanel implements I18n {
 					if (i + 2 < daten.length && daten[i + 2][0].equals(frameNumberAsString)) {
 						// Protokoll
 						messageDetailsMatrix[2][4] = daten[i + 2][4].toString();
-						// set maximum layer, can increase later in this method
 						// Quelle
 						messageDetailsMatrix[3][5] = daten[i + 2][2].toString();
 						// Ziel

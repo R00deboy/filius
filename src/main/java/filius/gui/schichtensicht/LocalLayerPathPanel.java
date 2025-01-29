@@ -114,11 +114,16 @@ public class LocalLayerPathPanel extends JPanel {
 		createSecondaryMessageDetailsTable();
 
 		// initialise tables for message details
-		tableSent = new MessageDetailsTable(INTERFACE_ID, FRAME_NUMBER, BACKGROUND_COLOR);
-		tableReceived = new MessageDetailsTable(INTERFACE_ID, FRAME_NUMBER, BACKGROUND_COLOR);
-		MAX_LAYER_INSIDE_FRAME = tableSent.getMaxLayerInsideFrame();
-		tableSent.setLayersInvisible();
-		tableReceived.setLayersInvisible();
+		if (SENT) {
+			MAX_LAYER_INSIDE_FRAME = tableSent.getMaxLayerInsideFrame();
+			tableSent.setLayersInvisible();
+			if (FORWARDED) {
+				tableReceived.setLayersInvisible();
+			}
+		} else {
+			MAX_LAYER_INSIDE_FRAME = tableReceived.getMaxLayerInsideFrame();
+			tableReceived.setLayersInvisible();
+		}
 
 		// SplitPane (for visualisation in upper and message details in lower part)
 		SPLIT_PANE = new JSplitPane();
@@ -251,8 +256,15 @@ public class LocalLayerPathPanel extends JPanel {
 				updateMessageDetails(false);
 			}
 		}
-		updateGreyedOutCells(tableSent);
-		updateGreyedOutCells(tableReceived);
+		// update greyed out cells (cells invisible to the layer)
+		if (SENT) {
+			updateGreyedOutCells(tableSent);
+			if (FORWARDED) {
+				updateGreyedOutCells(tableReceived);
+			}
+		} else {
+			updateGreyedOutCells(tableReceived);
+		}
 	}
 
 	/**
@@ -287,10 +299,17 @@ public class LocalLayerPathPanel extends JPanel {
 	public void hideNextHigherLayer() {
 		if (hiddenLayers <= 2 && hiddenLayers >= 0) {
 			hiddenLayers++;
-			updateGreyedOutCells(tableSent);
-			updateGreyedOutCells(tableReceived);
-			hideLayerData(hiddenLayers, tableSent);
-			hideLayerData(hiddenLayers, tableReceived);
+			if (SENT) {
+				updateGreyedOutCells(tableSent);
+				hideLayerData(hiddenLayers, tableSent);
+				if (FORWARDED) {
+					updateGreyedOutCells(tableReceived);
+					hideLayerData(hiddenLayers, tableReceived);
+				}
+			} else {
+				updateGreyedOutCells(tableReceived);
+				hideLayerData(hiddenLayers, tableReceived);
+			}
 		}
 	}
 
@@ -301,10 +320,17 @@ public class LocalLayerPathPanel extends JPanel {
 	public void showNextLowerLayer() {
 		if (hiddenLayers <= 3 && hiddenLayers >= 1) {
 			hiddenLayers--;
-			updateGreyedOutCells(tableSent);
-			updateGreyedOutCells(tableReceived);
-			showLayerData(hiddenLayers + 1, tableSent);
-			showLayerData(hiddenLayers + 1, tableReceived);
+			if (SENT) {
+				updateGreyedOutCells(tableSent);
+				showLayerData(hiddenLayers + 1, tableSent);
+				if (FORWARDED) {
+					updateGreyedOutCells(tableReceived);
+					showLayerData(hiddenLayers + 1, tableReceived);
+				}
+			} else {
+				updateGreyedOutCells(tableReceived);
+				showLayerData(hiddenLayers + 1, tableReceived);
+			}
 		}
 	}
 

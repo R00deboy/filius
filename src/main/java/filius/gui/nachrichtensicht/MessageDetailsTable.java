@@ -500,6 +500,8 @@ public class MessageDetailsTable extends JPanel implements I18n {
 		Dimension dimensionOfComponent = new Dimension((int) (width_multiplier * width * MSG_DETAILS_CELL_WIDTH),
 				(int) (height_multiplier * height * MSG_DETAILS_CELL_HEIGHT));
 		component.setPreferredSize(dimensionOfComponent);
+		component.setMinimumSize(dimensionOfComponent);
+		component.setMaximumSize(dimensionOfComponent);
 		c.gridx = x_pos;
 		c.gridy = y_pos;
 		c.gridwidth = width;

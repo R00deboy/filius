@@ -156,8 +156,7 @@ public class TcpSegment extends Segment implements Serializable {
 	 * seqNummer, ackNummer, dataOffset, reservedField, urg, ack, psh, rst, syn,
 	 * fin, window and urgentPointer) as <i>this</i> TCP segment.
 	 * 
-	 * @param segment TCP segment to be compared to <it>this</i> TCP segment
-	 *                (generally given as a Segment)
+	 * @param tcpSegment TCP segment to be compared to <it>this</i> TCP segment
 	 * @return true if the content of the subjacent segment (of type
 	 *         {@code Segment}) and seqNummer, ackNummer, dataOffset, reservedField,
 	 *         urg, ack, psh, rst, syn, fin, window and urgentPointer are the same

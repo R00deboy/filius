@@ -46,8 +46,7 @@ public class UdpSegment extends Segment implements Serializable {
 	 * consists of the content of the subjacent segment of type {@code Segment} and
 	 * laenge) as <i>this</i> UDP segment.
 	 * 
-	 * @param segment UDP segment to be compared to <it>this</i> UDP segment
-	 *                (generally given as a Segment)
+	 * @param udpSegment UDP segment to be compared to <it>this</i> UDP segment
 	 * @return true if the content of the subjacent segment (of type
 	 *         {@code Segment}) and laenge are the same as in <it>this</i> UDP
 	 *         segment

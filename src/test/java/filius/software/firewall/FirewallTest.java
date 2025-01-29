@@ -44,7 +44,7 @@ public class FirewallTest {
 
     @Test
     public void testAcceptIPPacket_ICMP_Drop() throws Exception {
-        IpPaket ipPacket = new IcmpPaket();
+        IpPaket ipPacket = new IcmpPaket(-1);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
         firewall.setDropICMP(true);
@@ -54,7 +54,7 @@ public class FirewallTest {
 
     @Test
     public void testCheckAcceptIcmp_IsIcmpAndDropIcmp_DoNOTAccept() throws Exception {
-        IcmpPaket icmp = new IcmpPaket();
+        IcmpPaket icmp = new IcmpPaket(-1);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
         firewall.setDropICMP(true);
@@ -64,7 +64,7 @@ public class FirewallTest {
 
     @Test
     public void testCheckAcceptIcmp_IsIcmpAndNOTDropIcmp_DoAccept() throws Exception {
-        IcmpPaket icmp = new IcmpPaket();
+        IcmpPaket icmp = new IcmpPaket(-1);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
         firewall.setDropICMP(false);
@@ -84,7 +84,7 @@ public class FirewallTest {
 
     @Test
     public void testCheckAcceptTCP_IsIcmp_Accept() throws Exception {
-        IpPaket paket = new IcmpPaket();
+        IpPaket paket = new IcmpPaket(-1);
 
         Firewall firewall = createActiveFirewall(DROP);
 

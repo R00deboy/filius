@@ -537,7 +537,7 @@ public class Lauscher implements I18n {
 
 		Object data = originalFrame.getDaten();
 		// Only IP packets can be forwarded
-		if ((data instanceof IpPaket)) {
+		if (data instanceof IpPaket) {
 
 			// Only execute if the node was not the original sender or receiver of the
 			// encapsuled IP packet (e.g. has forwarded the packet)

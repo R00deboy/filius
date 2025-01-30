@@ -58,8 +58,7 @@ public class IpPaket implements Serializable, Cloneable {
 	}
 
 	private static synchronized long getIdentCounter() {
-		identificationCounter++;
-		return identificationCounter - 1;
+		return ++identificationCounter;
 	}
 
 	@Override

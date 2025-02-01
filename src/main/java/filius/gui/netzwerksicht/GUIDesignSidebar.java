@@ -32,6 +32,9 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.event.MouseInputAdapter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import filius.gui.GUIContainer;
 import filius.gui.GUIEvents;
 import filius.hardware.Kabel;
@@ -41,6 +44,7 @@ import filius.hardware.knoten.Notebook;
 import filius.hardware.knoten.Rechner;
 import filius.hardware.knoten.Switch;
 import filius.hardware.knoten.Vermittlungsrechner;
+import filius.rahmenprogramm.IconMode;
 import filius.rahmenprogramm.Information;
 
 /**
@@ -50,16 +54,16 @@ import filius.rahmenprogramm.Information;
  * @author Johannes Bade & Thomas Gerding
  */
 public class GUIDesignSidebar extends GUISidebar {
+    private static Logger LOG = LoggerFactory.getLogger(GUIDesignSidebar.class);
 
     public static final String KABEL = "gfx/hardware/kabel.png";
-    public static final String RECHNER = "gfx/hardware/server.png";
-    public static final String SWITCH = "gfx/hardware/switch.png";
+    public static final String RECHNER = "gfx/hardware/server";
+    public static final String SWITCH = "gfx/hardware/switch";
     public static final String SWITCH_CLOUD = "gfx/hardware/cloud.png";
-    public static final String VERMITTLUNGSRECHNER = "gfx/hardware/router.png";
-    public static final String NOTEBOOK = "gfx/hardware/laptop.png";
-    public static final String MODEM = "gfx/hardware/vermittlungsrechner-out.png";
-    public static final String GATEWAY = "gfx/hardware/gateway.png";
-
+    public static final String VERMITTLUNGSRECHNER = "gfx/hardware/router";
+    public static final String NOTEBOOK = "gfx/hardware/laptop";
+    public static final String MODEM = "gfx/hardware/modem";
+    public static final String GATEWAY = "gfx/hardware/gateway";
     private JLabel newCableCursor;
 
     private static GUIDesignSidebar sidebar;
@@ -100,14 +104,15 @@ public class GUIDesignSidebar extends GUISidebar {
     }
 
     private void addComponentItemsToSidebar() {
-        addHardwareComponent(RECHNER, Rechner.TYPE);
-        addHardwareComponent(NOTEBOOK, Notebook.TYPE);
-        addHardwareComponent(SWITCH, Switch.TYPE);
+        IconMode mode = Information.getInformation().getIconMode();
+        addHardwareComponent(RECHNER + mode.suffix(), Rechner.TYPE);
+        addHardwareComponent(NOTEBOOK + mode.suffix(), Notebook.TYPE);
+        addHardwareComponent(SWITCH + mode.suffix(), Switch.TYPE);
         if (Information.getInformation().isGatewayAvailable()) {
-            addHardwareComponent(GATEWAY, Gateway.TYPE);
+            addHardwareComponent(GATEWAY + mode.suffix(), Gateway.TYPE);
         }
-        addHardwareComponent(VERMITTLUNGSRECHNER, Vermittlungsrechner.TYPE);
-        addHardwareComponent(MODEM, Modem.TYPE);
+        addHardwareComponent(VERMITTLUNGSRECHNER + mode.suffix(), Vermittlungsrechner.TYPE);
+        addHardwareComponent(MODEM + mode.suffix(), Modem.TYPE);
     }
 
     private void addHardwareComponent(String imageResourcePath, String hardwareType) {

@@ -142,6 +142,8 @@ public class Information implements Serializable {
 
     private boolean gatewayAvailable = true;
 
+    private IconMode iconMode = IconMode.DEFAULT;
+
     public boolean isGatewayAvailable() {
         return gatewayAvailable;
     }
@@ -689,5 +691,14 @@ public class Information implements Serializable {
 
     public void setLastOpenedDirectory(String lastOpenedDirectory) {
         this.lastOpenedDirectory = lastOpenedDirectory;
+    }
+
+    public void setIconMode(IconMode mode) {
+        this.iconMode = mode;
+    }
+
+    public IconMode getIconMode() {
+        // TODO Auto-generated method stub
+        return iconMode;
     }
 }

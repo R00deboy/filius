@@ -40,6 +40,8 @@ import filius.hardware.Hardware;
 import filius.hardware.knoten.Host;
 import filius.hardware.knoten.Notebook;
 import filius.hardware.knoten.Rechner;
+import filius.rahmenprogramm.IconMode;
+import filius.rahmenprogramm.Information;
 import filius.software.system.Betriebssystem;
 
 @SuppressWarnings({ "serial", "deprecation" })
@@ -72,11 +74,12 @@ public class GUIDesktopWindow extends JFrame implements Observer {
         Hardware hardware;
         String imageFile = null;
 
+        IconMode mode = Information.getInformation().getIconMode();
         hardware = bs.getKnoten();
         if (hardware instanceof Rechner) {
-            imageFile = GUIDesignSidebar.RECHNER;
+            imageFile = GUIDesignSidebar.RECHNER + mode.suffix();
         } else if (hardware instanceof Notebook) {
-            imageFile = GUIDesignSidebar.NOTEBOOK;
+            imageFile = GUIDesignSidebar.NOTEBOOK + mode.suffix();
         }
 
         ImageIcon icon = new ImageIcon(getClass().getResource("/" + imageFile));

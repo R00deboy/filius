@@ -41,6 +41,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ import filius.gui.SplashScreen;
 import filius.hardware.Verbindung;
 import filius.rahmenprogramm.FiliusArgs;
 import filius.rahmenprogramm.I18n;
+import filius.rahmenprogramm.IconMode;
 import filius.rahmenprogramm.Information;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 
@@ -115,7 +117,13 @@ public class Main implements I18n {
                     if (programmKonfig.length >= 6 && (Boolean) programmKonfig[5]) {
                         editedSzenarioDatei = Information.getInformation().getArbeitsbereichPfad()
                                 + Information.FILENAME_EDITED_SZENARIO;
-                        ;
+                    }
+                    if (programmKonfig.length >= 7) {
+                        if (StringUtils.equals(programmKonfig[6].toString(), IconMode.ENTERPRISE.toString())) {
+                            Information.getInformation().setIconMode(IconMode.ENTERPRISE);
+                        } else if (StringUtils.equals(programmKonfig[6].toString(), IconMode.SYMBOL.toString())) {
+                            Information.getInformation().setIconMode(IconMode.SYMBOL);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -213,13 +221,14 @@ public class Main implements I18n {
                     GUIContainer.getGUIContainer().getDocuItems());
         }
         if (!abbruch) {
-            programmKonfig = new Object[6];
+            programmKonfig = new Object[7];
             programmKonfig[0] = JMainFrame.getJMainFrame().getBounds();
             programmKonfig[1] = SzenarioVerwaltung.getInstance().holePfad();
             programmKonfig[2] = Information.getInformation().getLocale().getLanguage();
             programmKonfig[3] = Information.getInformation().getLocale().getCountry();
             programmKonfig[4] = Information.getInformation().getLastOpenedDirectory();
             programmKonfig[5] = SzenarioVerwaltung.getInstance().istGeaendert();
+            programmKonfig[6] = Information.getInformation().getIconMode().toString();
 
             String applicationConfigPath = Information.getInformation().getArbeitsbereichPfad() + "konfig.xml";
             try (FileOutputStream fos = new FileOutputStream(applicationConfigPath);

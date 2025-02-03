@@ -26,6 +26,7 @@
 package filius.software.vermittlungsschicht;
 
 import java.io.Serializable;
+
 import filius.software.transportschicht.Segment;
 import filius.software.transportschicht.TcpSegment;
 import filius.software.transportschicht.UdpSegment;
@@ -47,9 +48,9 @@ public class IpPaket implements Serializable, Cloneable {
 	/** Time-to-Live */
 	private int ttl;
 	private final int protocol;
-	private Segment data;
 	/** identification number of the IP packet */
-	protected final long identification;
+	private final long identification;
+	private Segment data;
 
 	public IpPaket(int protocol, long identification) {
 		this.protocol = protocol;
@@ -102,6 +103,10 @@ public class IpPaket implements Serializable, Cloneable {
 	public void setTtl(int ttl) {
 		this.ttl = ttl;
 	}
+	
+	public long getIdentification() {
+		return identification;
+	}
 
 	public Segment getSegment() {
 		return data;
@@ -110,14 +115,10 @@ public class IpPaket implements Serializable, Cloneable {
 	public void setSegment(Segment data) {
 		this.data = data;
 	}
-	
-	public long getIdentification() {
-		return identification;
-	}
 
 	public String toString() {
 		return "[" + "ttl=" + ttl + ", " + "protocol=" + protocol + ", " + "empfaenger=" + empfaenger + ", " + "sender="
-				+ sender + "]";
+				+ sender + ", " + "identification=" + identification + "]";
 	}
 
 	public void decrementTtl() {

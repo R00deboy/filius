@@ -56,7 +56,7 @@ public class IcmpPaket extends IpPaket {
 
 	@Override
 	public IcmpPaket clone() {
-		IcmpPaket clone = new IcmpPaket(identification);
+		IcmpPaket clone = new IcmpPaket(getIdentification());
 		copyIpPacketAttributes(clone);
 		copyIcmpAttributes(clone);
 		return clone;
@@ -102,7 +102,8 @@ public class IcmpPaket extends IpPaket {
 
 	public String toString() {
 		return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
-				+ "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + "]";
+				+ "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + ", "
+				+ "identification=" + getIdentification() + "]";
 	}
 
 	/**
@@ -118,12 +119,11 @@ public class IcmpPaket extends IpPaket {
 		if (packet == this) {
 			return true;
 		}
-		
+
 		// check super class first
 		if (super.sameContentApartFromTtl(packet)) {
 			// then the rest
-			return seqNr == packet.getSeqNr() && icmpType == packet.getIcmpType()
-					&& icmpCode == packet.getIcmpCode();
+			return seqNr == packet.getSeqNr() && icmpType == packet.getIcmpType() && icmpCode == packet.getIcmpCode();
 		} else {
 			return false;
 		}

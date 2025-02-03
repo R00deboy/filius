@@ -166,7 +166,8 @@ public class EthernetFrame implements Serializable {
 			} else if (daten instanceof IcmpPaket && framePayload instanceof IcmpPaket) {
 				IcmpPaket thisIcmpPacket = (IcmpPaket) daten;
 				IcmpPaket argumentIcmpPacket = (IcmpPaket) framePayload;
-				return thisIcmpPacket.sameContentApartFromTtl(argumentIcmpPacket) && thisIcmpPacket.getTtl() == ttl;
+				return thisIcmpPacket.getIdentification() == argumentIcmpPacket.getIdentification()
+						&& thisIcmpPacket.getTtl() == ttl;
 			} else {
 				return false;
 			}

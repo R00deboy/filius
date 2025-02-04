@@ -54,6 +54,8 @@ import filius.hardware.Hardware;
 import filius.hardware.knoten.Switch;
 import filius.rahmenprogramm.EingabenUeberpruefung;
 import filius.rahmenprogramm.I18n;
+import filius.rahmenprogramm.IconMode;
+import filius.rahmenprogramm.Information;
 import filius.software.system.SwitchFirmware;
 
 public class JSwitchKonfiguration extends JKonfiguration implements I18n {
@@ -101,10 +103,13 @@ public class JSwitchKonfiguration extends JKonfiguration implements I18n {
             GUIContainer.getGUIContainer().getLabelforKnoten(((Switch) holeHardware()))
                     .setIcon(new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH_CLOUD)));
             ((Switch) holeHardware()).setCloud(true);
+            GUIContainer.getGUIContainer().updateViewport();
         } else {
+            IconMode mode = Information.getInformation().getIconMode();
             GUIContainer.getGUIContainer().getLabelforKnoten(((Switch) holeHardware()))
-                    .setIcon(new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH)));
+                    .setIcon(new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH + mode.suffix())));
             ((Switch) holeHardware()).setCloud(false);
+            GUIContainer.getGUIContainer().updateViewport();
         }
     }
 

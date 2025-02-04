@@ -41,6 +41,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 
 import filius.Main;
+import filius.rahmenprogramm.IconMode;
 import filius.rahmenprogramm.Information;
 
 @SuppressWarnings("serial")
@@ -52,6 +53,8 @@ public class LanguageSelectionDialog extends JDialog {
 
     private JLabel selectLanguageLabel = new JLabel();
     private JComboBox<String> languageSelection = new JComboBox<>();
+    private JLabel selectIconModeLabel = new JLabel();
+    private JComboBox<String> iconModeSelection = new JComboBox<>();
     private JLabel restartHint = new JLabel();
     private JButton confirm = new JButton();
     private JButton confirmAndExit = new JButton();
@@ -64,16 +67,48 @@ public class LanguageSelectionDialog extends JDialog {
         Image image = Toolkit.getDefaultToolkit()
                 .getImage(LanguageSelectionDialog.class.getResource("/gfx/hardware/kabel.png"));
         this.setIconImage(image);
-        this.setTitle("Sprache / Language / Langue");
+        if (restartMode) {
+            this.setTitle("Einstellungen / Settings / Paramètres");
+        } else {
+            this.setTitle("Sprache / Language / Langue");
+        }
         this.setResizable(false);
         initialize(restartMode);
         initializeText(Information.getInformation().getLocaleOrDefault());
+        initializeSettings();
+    }
+
+    private void initializeSettings() {
+        languageSelection.setSelectedItem(localeToLanguage(Information.getInformation().getLocaleOrDefault()));
+        if (Information.getInformation().getIconMode() == IconMode.DEFAULT) {
+            iconModeSelection.setSelectedIndex(0);
+        } else if (Information.getInformation().getIconMode() == IconMode.ENTERPRISE) {
+            iconModeSelection.setSelectedIndex(1);
+        } else {
+            iconModeSelection.setSelectedIndex(2);
+        }
     }
 
     private void initializeText(Locale locale) {
         ResourceBundle bundle = ResourceBundle.getBundle("filius.messages.MessagesBundle", locale);
 
         selectLanguageLabel.setText(bundle.getString("languageSelection_msg1"));
+        int selectedIndex = languageSelection.getSelectedIndex();
+        languageSelection.removeAllItems();
+        languageSelection.addItem(DEUTSCH);
+        languageSelection.addItem(ENGLISH);
+        languageSelection.addItem(FRANCAIS);
+        languageSelection.setSelectedIndex(selectedIndex);
+
+        selectIconModeLabel.setText(bundle.getString("settings_msg1"));
+        selectedIndex = iconModeSelection.getSelectedIndex();
+        iconModeSelection.removeAllItems();
+        ;
+        iconModeSelection.addItem(bundle.getString("settings_msg2"));
+        iconModeSelection.addItem(bundle.getString("settings_msg3"));
+        iconModeSelection.addItem(bundle.getString("settings_msg4"));
+        iconModeSelection.setSelectedIndex(selectedIndex);
+
         restartHint.setText("<html>" + bundle.getString("languageSelection_msg2") + "</html>");
         confirm.setText(bundle.getString("languageSelection_msg3"));
         confirmAndExit.setText(bundle.getString("languageSelection_msg4"));
@@ -89,10 +124,20 @@ public class LanguageSelectionDialog extends JDialog {
 
     private void apply() {
         String selectedValue = (String) languageSelection.getSelectedItem();
-        Information.getInformation().setLocale(languateToLocale(selectedValue));
+        Information.getInformation().setLocale(languageToLocale(selectedValue));
+        switch (iconModeSelection.getSelectedIndex()) {
+        case 1:
+            Information.getInformation().setIconMode(IconMode.ENTERPRISE);
+            break;
+        case 2:
+            Information.getInformation().setIconMode(IconMode.SYMBOL);
+            break;
+        default:
+            Information.getInformation().setIconMode(IconMode.DEFAULT);
+        }
     }
 
-    private Locale languateToLocale(String language) {
+    private Locale languageToLocale(String language) {
         Locale locale = Locale.UK;
         if (FRANCAIS.equals(language)) {
             locale = Locale.FRANCE;
@@ -116,7 +161,7 @@ public class LanguageSelectionDialog extends JDialog {
 
     private void initialize(boolean restartMode) {
         Box verticalBox = Box.createVerticalBox();
-        verticalBox.setPreferredSize(new Dimension(400, 240));
+        verticalBox.setPreferredSize(new Dimension(400, 280));
         getContentPane().add(verticalBox);
         pack();
 
@@ -131,18 +176,13 @@ public class LanguageSelectionDialog extends JDialog {
 
         verticalBox.add(Box.createVerticalStrut(10));
 
-        Box labelBox = Box.createHorizontalBox();
-        labelBox.add(Box.createHorizontalStrut(10));
-        labelBox.add(selectLanguageLabel);
-        labelBox.add(Box.createGlue());
-        verticalBox.add(labelBox);
+        Box languageLabelBox = Box.createHorizontalBox();
+        languageLabelBox.add(Box.createHorizontalStrut(10));
+        languageLabelBox.add(selectLanguageLabel);
+        languageLabelBox.add(Box.createGlue());
+        verticalBox.add(languageLabelBox);
 
         verticalBox.add(Box.createVerticalStrut(10));
-
-        languageSelection.addItem(DEUTSCH);
-        languageSelection.addItem(ENGLISH);
-        languageSelection.addItem(FRANCAIS);
-        languageSelection.setSelectedItem(localeToLanguage(Information.getInformation().getLocaleOrDefault()));
         languageSelection.setMaximumSize(new Dimension(380, 30));
         languageSelection.setPreferredSize(new Dimension(380, 30));
         languageSelection.addActionListener(new ActionListener() {
@@ -150,15 +190,56 @@ public class LanguageSelectionDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LanguageSelectionDialog.this
-                        .initializeText(languateToLocale((String) languageSelection.getSelectedItem()));
+                        .initializeText(languageToLocale((String) languageSelection.getSelectedItem()));
             }
         });
 
-        Box selectBox = Box.createHorizontalBox();
-        selectBox.add(Box.createHorizontalStrut(10));
-        selectBox.add(languageSelection);
-        selectBox.add(Box.createGlue());
-        verticalBox.add(selectBox);
+        Box languageSelectBox = Box.createHorizontalBox();
+        languageSelectBox.add(Box.createHorizontalStrut(10));
+        languageSelectBox.add(languageSelection);
+        languageSelectBox.add(Box.createGlue());
+        verticalBox.add(languageSelectBox);
+
+        if (restartMode) {
+            verticalBox.add(Box.createVerticalStrut(10));
+
+            Box iconModeLabelBox = Box.createHorizontalBox();
+            iconModeLabelBox.add(Box.createHorizontalStrut(10));
+            iconModeLabelBox.add(selectIconModeLabel);
+            iconModeLabelBox.add(Box.createGlue());
+            verticalBox.add(iconModeLabelBox);
+
+            verticalBox.add(Box.createVerticalStrut(10));
+            iconModeSelection.setMaximumSize(new Dimension(380, 30));
+            iconModeSelection.setPreferredSize(new Dimension(380, 30));
+
+            Box iconModeSelectBox = Box.createHorizontalBox();
+            iconModeSelectBox.add(Box.createHorizontalStrut(10));
+            iconModeSelectBox.add(iconModeSelection);
+            iconModeSelectBox.add(Box.createGlue());
+            verticalBox.add(iconModeSelectBox);
+
+            // iconSelect.addItem(DEUTSCH);
+            // languageSelection.addItem(ENGLISH);
+            // languageSelection.addItem(FRANCAIS);
+            // languageSelection.setSelectedItem(localeToLanguage(Information.getInformation().getLocaleOrDefault()));
+            // languageSelection.setMaximumSize(new Dimension(380, 30));
+            // languageSelection.setPreferredSize(new Dimension(380, 30));
+            //
+            // String[] choices = { "home", "enterprise", "symbols" };
+            // iconSelect = new JComboBox(choices);
+            // iconSelect.setVisible(true);
+            // iconSelect.setBounds(520, 8, 90, 20);
+            // iconSelect.setActionCommand("iconselect");
+            // iconSelect.setToolTipText(messages.getString("guimainmemu_msg19"));
+            // iconSelect.addActionListener (new ActionListener () {
+            // public void actionPerformed(ActionEvent e) {
+            // iconTheme = iconSelect.getSelectedIndex();
+            // updateIcons();
+            // }
+            // });
+            Box iconModeBox = Box.createHorizontalBox();
+        }
 
         if (restartMode) {
             verticalBox.add(Box.createVerticalStrut(10));

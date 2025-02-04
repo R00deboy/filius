@@ -103,6 +103,7 @@ import filius.hardware.knoten.Rechner;
 import filius.hardware.knoten.Switch;
 import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.I18n;
+import filius.rahmenprogramm.IconMode;
 import filius.rahmenprogramm.Information;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
@@ -594,18 +595,20 @@ public class GUIContainer implements Serializable, I18n {
         // Auswahlrahmen löschen
         GUIEvents.getGUIEvents().cancelMultipleSelection();
 
+        IconMode mode = Information.getInformation().getIconMode();
         if (label.getTyp().equals(Switch.TYPE)) {
             neuerKnoten = new Switch();
-            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH));
+            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH + mode.suffix()));
         } else if (label.getTyp().equals(Rechner.TYPE)) {
             neuerKnoten = new Rechner();
-            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.RECHNER));
+            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.RECHNER + mode.suffix()));
         } else if (label.getTyp().equals(Notebook.TYPE)) {
             neuerKnoten = new Notebook();
-            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.NOTEBOOK));
+            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.NOTEBOOK + mode.suffix()));
         } else if (label.getTyp().equals(Vermittlungsrechner.TYPE)) {
             neuerKnoten = new Vermittlungsrechner();
-            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.VERMITTLUNGSRECHNER));
+            tempIcon = new ImageIcon(
+                    getClass().getResource("/" + GUIDesignSidebar.VERMITTLUNGSRECHNER + mode.suffix()));
 
             Object[] possibleValues = { "2", "3", "4", "5", "6", "7", "8" };
             Object selectedValue = JOptionPane.showInputDialog(JMainFrame.getJMainFrame(),
@@ -618,10 +621,10 @@ public class GUIContainer implements Serializable, I18n {
             }
         } else if (label.getTyp().equals(Modem.TYPE)) {
             neuerKnoten = new Modem();
-            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.MODEM));
+            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.MODEM + mode.suffix()));
         } else if (label.getTyp().equals(Gateway.TYPE)) {
             neuerKnoten = new Gateway();
-            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.GATEWAY));
+            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.GATEWAY + mode.suffix()));
         } else {
             LOG.debug("ERROR (" + this.hashCode() + "): " + "unbekannter Hardwaretyp " + label.getTyp()
                     + " konnte nicht erzeugt werden.");
@@ -688,21 +691,22 @@ public class GUIContainer implements Serializable, I18n {
     private void neueVorschau(String hardwareTyp, int x, int y) {
         String tmp;
 
+        IconMode mode = Information.getInformation().getIconMode();
         LOG.debug("GUIContainer: die Komponenten-Vorschau wird erstellt.");
         if (hardwareTyp.equals(Kabel.TYPE)) {
             tmp = GUIDesignSidebar.KABEL;
         } else if (hardwareTyp.equals(Switch.TYPE)) {
-            tmp = GUIDesignSidebar.SWITCH;
+            tmp = GUIDesignSidebar.SWITCH + mode.suffix();
         } else if (hardwareTyp.equals(Rechner.TYPE)) {
-            tmp = GUIDesignSidebar.RECHNER;
+            tmp = GUIDesignSidebar.RECHNER + mode.suffix();
         } else if (hardwareTyp.equals(Notebook.TYPE)) {
-            tmp = GUIDesignSidebar.NOTEBOOK;
+            tmp = GUIDesignSidebar.NOTEBOOK + mode.suffix();
         } else if (hardwareTyp.equals(Vermittlungsrechner.TYPE)) {
-            tmp = GUIDesignSidebar.VERMITTLUNGSRECHNER;
+            tmp = GUIDesignSidebar.VERMITTLUNGSRECHNER + mode.suffix();
         } else if (hardwareTyp.equals(Modem.TYPE)) {
-            tmp = GUIDesignSidebar.MODEM;
+            tmp = GUIDesignSidebar.MODEM + mode.suffix();
         } else if (hardwareTyp.equals(Gateway.TYPE)) {
-            tmp = GUIDesignSidebar.GATEWAY;
+            tmp = GUIDesignSidebar.GATEWAY + mode.suffix();
         } else {
             tmp = null;
             LOG.debug("GUIContainer: ausgewaehlte Hardware-Komponente unbekannt!");

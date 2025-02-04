@@ -555,7 +555,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * Local view of the path through layers.
+	 * Opens local view of the path through layers.
 	 * 
 	 * @param systemSoftware system software of the node
 	 * @param frameNumber    number of the selected frame in the data exchange
@@ -571,7 +571,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * Global view of the path through layers.
+	 * Opens global view of the path through layers.
 	 * 
 	 * @param systemSoftware system software of the node
 	 * @param frameNumber    number of the selected frame in the data exchange

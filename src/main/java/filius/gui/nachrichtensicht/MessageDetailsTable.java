@@ -82,7 +82,7 @@ public class MessageDetailsTable extends JPanel implements I18n {
 	}
 
 	/**
-	 * size of the whole table
+	 * Returns the size of the whole table based on the corresponding constants.
 	 * 
 	 * @return Dimension of the whole MessageDetailsTable
 	 */

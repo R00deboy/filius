@@ -124,39 +124,4 @@ public class IpPaket implements Serializable, Cloneable {
 	public void decrementTtl() {
 		ttl--;
 	}
-
-	/**
-	 * Checks if the whole content of <i>this</i> IP packet is equal to the IP
-	 * packet in the argument apart from the TTL field.
-	 * 
-	 * @param packet packet to be compared to <i>this</i> packet
-	 * @return true if the whole content of <i>this</i> IP packet is equal to the IP
-	 *         packet in the argument apart from the TTL field
-	 * @author Christoph Irniger
-	 */
-	public boolean sameContentApartFromTtl(IpPaket packet) {
-		if (packet == this) {
-			return true;
-		}
-		
-		// Check header
-		if (sender.equals(packet.getSender()) && empfaenger.equals(packet.getEmpfaenger())
-				&& protocol == packet.getProtocol()) {
-
-			// Check data
-			Segment segment1 = data;
-			Segment segment2 = packet.getSegment();
-			if (segment1 instanceof TcpSegment && segment2 instanceof TcpSegment) {
-				return ((TcpSegment) segment1).sameContent((TcpSegment) segment2);
-			} else if (segment1 instanceof UdpSegment && segment2 instanceof UdpSegment) {
-				return ((UdpSegment) segment1).sameContent((UdpSegment) segment2);
-			} else if (segment1 == null && segment2 == null){
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
 }

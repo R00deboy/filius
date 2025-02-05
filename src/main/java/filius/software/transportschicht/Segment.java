@@ -66,31 +66,4 @@ public class Segment implements Serializable {
 	public void setZielPort(int zielPort) {
 		this.zielPort = zielPort;
 	}
-
-	/**
-	 * Checks if the whole content (which consists of quellPort, zielPort,
-	 * pruefSumme and daten) of <i>this</i> segment is equal to the segment in the
-	 * argument.
-	 * 
-	 * @param segment segment to be compared to <it>this</i> segment
-	 * @return true if quellPort, zielPort, pruefSumme and daten in the segment in
-	 *         the argument are the same as in <it>this</i> IP packet
-	 * @author Christoph Irniger
-	 */
-	public boolean sameSegmentContent(Segment segment) {
-		if (segment == this) {
-			return true;
-		}
-		
-		// if both are null, there is no content on layer 4 (application)
-		if (daten == null && segment.getDaten() == null) {
-			return quellPort == segment.getQuellPort() && zielPort == segment.getZielPort()
-					&& pruefSumme == segment.getPruefSumme();
-		} else if (!(daten == null || segment.getDaten() == null)) {
-			return quellPort == segment.getQuellPort() && zielPort == segment.getZielPort()
-					&& pruefSumme == segment.getPruefSumme() && daten.equals(segment.getDaten());
-		} else {
-			return false;
-		}
-	}
 }

@@ -149,36 +149,4 @@ public class TcpSegment extends Segment implements Serializable {
 	public void setWindow(int window) {
 		this.window = window;
 	}
-
-	/**
-	 * Checks if the TCP segment in the argument has the same content (which
-	 * consists of the content of the subjacent segment of type {@code Segment} and
-	 * seqNummer, ackNummer, dataOffset, reservedField, urg, ack, psh, rst, syn,
-	 * fin, window and urgentPointer) as <i>this</i> TCP segment.
-	 * 
-	 * @param tcpSegment TCP segment to be compared to <it>this</i> TCP segment
-	 * @return true if the content of the subjacent segment (of type
-	 *         {@code Segment}) and seqNummer, ackNummer, dataOffset, reservedField,
-	 *         urg, ack, psh, rst, syn, fin, window and urgentPointer are the same
-	 *         as in <it>this</i> TCP segment
-	 * @author Christoph Irniger
-	 */
-	public boolean sameContent(TcpSegment tcpSegment) {
-		if (tcpSegment == this) {
-			return true;
-		}
-		
-		if (super.sameSegmentContent(tcpSegment)) {
-				return seqNummer == tcpSegment.getSeqNummer()
-						&& ackNummer == tcpSegment.getAckNummer()
-						&& reservedField == tcpSegment.getReservedField()
-						&& urg == tcpSegment.isUrg() && ack == tcpSegment.isAck()
-						&& psh == tcpSegment.isPsh() && rst == tcpSegment.isRst()
-						&& syn == tcpSegment.isSyn() && fin == tcpSegment.isFin()
-						&& window == tcpSegment.getWindow()
-						&& urgentPointer == tcpSegment.getUrgentPointer();
-		} else {
-			return false;
-		}
-	}
 }

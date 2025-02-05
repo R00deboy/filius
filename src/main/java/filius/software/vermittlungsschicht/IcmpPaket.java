@@ -105,27 +105,4 @@ public class IcmpPaket extends IpPaket {
 				+ "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + ", "
 				+ "identification=" + getIdentification() + "]";
 	}
-
-	/**
-	 * Checks if this ICMP packet is equal to the packet in the argument apart from
-	 * the TTL field.
-	 * 
-	 * @param packet packet to be compared to <i>this</i> packet
-	 * @return true if this ICMP packet is equal to the ICMP packet in the argument
-	 *         apart from the TTL field
-	 * @author Christoph Irniger
-	 */
-	public boolean sameContentApartFromTtl(IcmpPaket packet) {
-		if (packet == this) {
-			return true;
-		}
-
-		// check super class first
-		if (super.sameContentApartFromTtl(packet)) {
-			// then the rest
-			return seqNr == packet.getSeqNr() && icmpType == packet.getIcmpType() && icmpCode == packet.getIcmpCode();
-		} else {
-			return false;
-		}
-	}
 }

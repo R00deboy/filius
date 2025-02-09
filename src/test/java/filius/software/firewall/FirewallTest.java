@@ -136,6 +136,20 @@ public class FirewallTest {
     }
 
     @Test
+    public void testCheckAcceptTCP_RuleDoesNOTApply_DROP() throws Exception {
+        IpPaket paket = createIPPacketTcp(SENDER_IP_ADDRESS, DEST_IP_ADDRESS, 80);
+
+        Firewall firewall = createActiveFirewall(DROP);
+        firewall.setFilterSYNSegmentsOnly(false);
+        FirewallRule ruleAccept = createRule(DEST_IP_ADDRESS, SENDER_IP_ADDRESS, FirewallRule.ALL_PORTS,
+                FirewallRule.TCP, ACCEPT);
+
+        firewall.addRule(ruleAccept);
+
+        assertFalse(firewall.checkAcceptTCP(paket));
+    }
+
+    @Test
     public void testCheckAcceptTCP_IsTCPRuleAppliesNOSync_Accept() throws Exception {
         IpPaket paket = createIPPacketTcp(SENDER_IP_ADDRESS, DEST_IP_ADDRESS, 80);
 

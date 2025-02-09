@@ -176,10 +176,7 @@ public class Firewall extends Anwendung implements I18n {
                 FirewallRule firewallRule = ruleset.get(i);
                 boolean ruleToBeApplied = isProtocolApplicable(packet, firewallRule)
                         && (isEndpointsApplicable(packet.getSender(), packet.getEmpfaenger(), segment.getZielPort(),
-                                firewallRule)
-                                || isEndpointsApplicable(packet.getEmpfaenger(), packet.getSender(),
-                                        segment.getQuellPort(), firewallRule));
-
+                                firewallRule));
                 if (ruleToBeApplied) { // if rule matches to current packet, then
                     notifyRuleApplication(i, firewallRule);
                     accept = firewallRule.action == FirewallRule.ACCEPT;

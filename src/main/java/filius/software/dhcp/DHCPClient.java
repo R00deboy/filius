@@ -250,7 +250,7 @@ public class DHCPClient extends ClientAnwendung {
     }
 
     boolean validateOfferedAddress(ARP arp, String offeredAddress) {
-        String macAddress = arp.holeARPTabellenEintrag(offeredAddress, 1);
+        String macAddress = arp.holeARPTabellenEintrag(offeredAddress, 1, false);
         return null == macAddress;
     }
 }

@@ -146,12 +146,12 @@ public class ARP extends VermittlungsProtokoll {
      * passender Eintrag vorliegt, wird dieser zurueck gegeben. Andernfalls wird null zurueck gegeben.
      * 
      * @author Thomas Gerding
-     * @param ipAdresse
      * @param maxRetries
-     * 
+     * @param selectNicByAddress
+     * @param ipAdresse
      * @return MAC Adresse, zu der die IP Adresse gehoert, oder null, wenn keine MAC-Adresse bestimmt werden konnte
      */
-    public String holeARPTabellenEintrag(String zielIp, int maxRetries) {
+    public String holeARPTabellenEintrag(String zielIp, int maxRetries, boolean selectNicByAddress) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (ARP), holeARPTabellenEintrag(" + zielIp + ")");
         if (zielIp.equals("127.0.0.1")) {
             return ((InternetKnotenBetriebssystem) holeSystemSoftware()).primaryMACAddress();
@@ -168,14 +168,18 @@ public class ARP extends VermittlungsProtokoll {
         } else {
             // ARP-Broadcast und warte auf Antwort
             for (int i = 0; arpEntry == null && i < maxRetries; i++) {
-                LOG.debug("Send ARP query for " + (i + 1) + ". time.");
-                sendeARPBroadcast(zielIp);
-                synchronized (arpTabelle) {
-                    try {
-                        arpTabelle.wait(Verbindung.holeRTT());
-                    } catch (InterruptedException e) {
-                        LOG.debug("EXCEPTION (" + this.hashCode() + "): keine Anwort auf ARP-Broadcast fuer IP-Adresse "
-                                + zielIp + " eingegangen!", e);
+                if (!sendeARPBroadcast(zielIp, selectNicByAddress)) {
+                    LOG.debug("No ARP request sent. No applicable NIC.");
+                } else {
+                    LOG.debug("Send ARP query for " + (i + 1) + ". time.");
+                    synchronized (arpTabelle) {
+                        try {
+                            arpTabelle.wait(Verbindung.holeRTT());
+                        } catch (InterruptedException e) {
+                            LOG.debug("EXCEPTION (" + this.hashCode()
+                                    + "): keine Anwort auf ARP-Broadcast fuer IP-Adresse " + zielIp + " eingegangen!",
+                                    e);
+                        }
                     }
                 }
                 // Abfrage in ARP-Tabelle nach Broadcast
@@ -191,13 +195,24 @@ public class ARP extends VermittlungsProtokoll {
         return null;
     }
 
-    /** Hilfsmethode zum Versenden einer ARP-Anfrage */
-    private void sendeARPBroadcast(String suchIp) {
-        NetzwerkInterface nic = getBroadcastNic(suchIp);
-        if (nic == null) {
-            return;
+    /**
+     * Hilfsmethode zum Versenden einer ARP-Anfrage
+     * 
+     * @param selectNicByAddress
+     */
+    private boolean sendeARPBroadcast(String suchIp, boolean selectNicByAddress) {
+        NetzwerkInterface nic;
+        if (selectNicByAddress) {
+            nic = getBroadcastNic(suchIp);
+        } else {
+            nic = getDefaultNic();
         }
-        sendArpRequest(nic.getMac(), nic.getIp(), "FF:FF:FF:FF:FF:FF", suchIp);
+        boolean requestSent = false;
+        if (nic != null) {
+            sendArpRequest(nic.getMac(), nic.getIp(), "FF:FF:FF:FF:FF:FF", suchIp);
+            requestSent = true;
+        }
+        return requestSent;
     }
 
     public ArpPaket sendArpRequest(String senderMAC, String senderIP, String targetMAC, String lookupOrTargetIP) {
@@ -234,7 +249,7 @@ public class ARP extends VermittlungsProtokoll {
         return antwortArp;
     }
 
-    public NetzwerkInterface getBroadcastNic(String zielStr) {
+    NetzwerkInterface getBroadcastNic(String zielStr) {
         long netAddr, maskAddr, zielAddr = IP.inetAton(zielStr);
 
         long bestMask = -1;
@@ -251,12 +266,12 @@ public class ARP extends VermittlungsProtokoll {
                 bestNic = nic;
             }
         }
-        // If the IP address is not yet initialized, no NIC could be selected. So use the first NIC (required for DHCP)
-        if (null == bestNic) {
-            bestMask = IP.inetAton(((InternetKnotenBetriebssystem) holeSystemSoftware()).primarySubnetMask());
-            bestNic = ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces().get(0);
-        }
         return bestNic;
+    }
+
+    NetzwerkInterface getDefaultNic() {
+        // If the IP address is not yet initialized, no NIC could be selected. So use the first NIC (required for DHCP)
+        return ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces().get(0);
     }
 
     public ARPThread getARPThread() {

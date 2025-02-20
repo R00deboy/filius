@@ -329,4 +329,28 @@ public class Weiterleitungstabelle implements I18n {
             throw new RouteNotFoundException();
         }
     }
+
+	public void addPFEintrag(String protocol, String wanPort, String lanIp, String lanPort) {
+        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (Weiterleitungstabelle), addPFEintrag(" + protocol + "," + wanPort + "," + lanIp + "," + lanPort + ")");
+    	manuelleTabelle.addLast(new String[] {protocol,wanPort,lanIp,lanPort});
+	}
+
+    public boolean validatePF(String protocol, String wanPort, String lanIp, String lanPort) {
+    	try{
+    		Integer.parseInt(protocol);
+    	} catch (NumberFormatException e) {
+    		return false;
+    	}
+    	try{
+    		Integer.parseInt(wanPort);
+    	} catch (NumberFormatException e) {
+    		return false;
+    	}
+    	try{
+    		Integer.parseInt(lanPort);
+    	} catch (NumberFormatException e) {
+    		return false;
+    	}
+        return null != IP.ipCheck(lanIp);
+    }
 }

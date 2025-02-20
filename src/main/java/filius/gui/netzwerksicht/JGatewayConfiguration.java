@@ -33,6 +33,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -89,8 +90,12 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
     private JCheckBox dhcp;
 
     private JTabbedPane tpNetzwerkKarten;
+    
+    private JPortForwardingDialog portForwardingDialog;
 
     private Kabel highlightedCable = null;
+    
+    private JTextField retentionTime;
 
     protected JGatewayConfiguration(Hardware hardware) {
         super(hardware);
@@ -102,6 +107,30 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
 
         gateway.setName(name.getText());
         firmware.setStandardGateway(gatewayName.getText());
+        
+        /* Für den Fall, dass später zwischen Full cone und Restricted Cone unterschieden werden soll */
+        /*switch (coneTypeSelect.getSelectedIndex()) { // 
+        case 0:
+        	if (firmware.getNatMethod() != NatMethod.fullCone) {
+        		firmware.setNatMethodChanged(true);
+        	}
+        	firmware.setNatMethod(NatMethod.fullCone);
+        	break;
+        case 1:
+        	if (firmware.getNatMethod() != NatMethod.restrictedCone) {
+        		firmware.setNatMethodChanged(true);
+        	}
+        	firmware.setNatMethod(NatMethod.restrictedCone);
+        	break;
+        default:
+        	firmware.setNatMethod(NatMethod.fullCone);
+        }*/
+    	
+    try {
+    	firmware.setRetentionTime(Long.parseLong(retentionTime.getText())*1000);
+    } catch (NumberFormatException e) {
+		System.out.println(e);
+	}
 
         applyNICConfig(gateway.holeWANInterface(), ipAddressWANPort, netmaskWANPort);
         firmware.setDHCPKonfiguration(dhcp.isSelected());
@@ -134,6 +163,16 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         firewallDialog.updateRuleTable();
         firewallDialog.setVisible(true);
     }
+    
+    private void showPortForwardingDialog() {
+        LinkedList<String[]> staticNat = ((GatewayFirmware) ((Gateway) holeHardware()).getSystemSoftware()).getStaticNAT();
+    	portForwardingDialog = new JPortForwardingDialog(staticNat, JMainFrame.getJMainFrame());
+        portForwardingDialog.setBounds(100, 100, 550, 340);
+        portForwardingDialog.setName(messages.getString("jgatewayconfiguration_msg19"));
+
+        portForwardingDialog.createStaticTable();
+        portForwardingDialog.setVisible(true);
+    }
 
     private void showDhcpConfiguration() {
         JDHCPKonfiguration dhcpKonfig = new JDHCPKonfiguration(JMainFrame.getJMainFrame(),
@@ -148,6 +187,7 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         KeyAdapter ipAdresseKeyAdapter;
         KeyAdapter netzmaskeKeyAdapter;
         JButton btFirewall;
+        JButton btPortForwarding;
 
         JLabel tempLabel;
         Box tempBox;
@@ -234,6 +274,59 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         vBox.add(tempBox);
         vBox.add(Box.createVerticalStrut(5));
 
+        // retention time
+        tempBox = Box.createHorizontalBox();
+        tempBox.setMaximumSize(new Dimension(400, 40));
+        
+        tempLabel = new JLabel(messages.getString("jgatewayconfiguration_msg23"));
+        tempLabel.setPreferredSize(new Dimension(140, 20));
+        tempLabel.setVisible(true);
+        tempLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        tempBox.add(tempLabel);
+
+        retentionTime = new JTextField("30");
+        retentionTime.addActionListener(actionListener);
+        retentionTime.addFocusListener(focusListener);
+        retentionTime.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                checkRetentionTime();
+            }
+        });
+        tempBox.add(retentionTime);
+        
+        tempLabel = new JLabel(messages.getString("jgatewayconfiguration_msg27"));
+        tempLabel.setPreferredSize(new Dimension(140, 10));
+        tempLabel.setVisible(true);	
+        tempLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        tempBox.add(tempLabel);
+
+        vBox.add(tempBox);
+        vBox.add(Box.createVerticalStrut(10));
+
+        /* Für den Fall, dass später zwischen Full cone und Restricted Cone unterschieden werden soll */
+        // full-cone or (address)-restricted-cone NAT
+        /*ActionListener coneTypeActionListener = new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+            	aenderungenAnnehmen();
+                updateAttribute();
+            }
+        };
+        tempBox = Box.createHorizontalBox();
+        tempBox.setMaximumSize(new Dimension(400, 40));
+        tempLabel = new JLabel(messages.getString("jgatewayconfiguration_msg24"));
+        tempLabel.setPreferredSize(new Dimension(140, 20));
+        tempLabel.setVisible(true);
+        tempLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        tempBox.add(tempLabel);
+        String conetypeList[] = {messages.getString("jgatewayconfiguration_msg25"),messages.getString("jgatewayconfiguration_msg26")};
+        coneTypeSelect = new JComboBox<>(conetypeList);
+        coneTypeSelect.addActionListener(coneTypeActionListener);
+        
+        tempBox.setPreferredSize(new Dimension(140, 20));
+        tempBox.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        tempBox.add(coneTypeSelect);
+        vBox.add(tempBox);*/
+
         // IP forwarding status
         tempBox = Box.createHorizontalBox();
         tempBox.setMaximumSize(new Dimension(400, 40));
@@ -267,6 +360,16 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
             }
         });
         tempBox.add(btFirewall);
+
+        tempBox.add(Box.createHorizontalStrut(20));
+
+        btPortForwarding = new JButton(messages.getString("jgatewayconfiguration_msg19"));
+        btPortForwarding.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showPortForwardingDialog();
+            }
+        });
+        tempBox.add(btPortForwarding);
 
         vBox.add(tempBox);
 
@@ -434,6 +537,16 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         ipAddressWANPort.setEnabled(!dhcpEnabled);
         netmaskWANPort.setEnabled(!dhcpEnabled);
 
+        /* Für den Fall, dass später zwischen Full cone und Restricted Cone unterschieden werden soll */
+        /*switch (bs.getNatMethod()) {
+        case fullCone:
+        	coneTypeSelect.setSelectedIndex(0);
+        	break;
+        case restrictedCone:
+        	coneTypeSelect.setSelectedIndex(1);
+        	break;
+        }*/
+
         updateNICConfigPane("LAN", vRechner.holeLANInterface(), ipAddressLANPort, macAddressLANPort, netmaskLANPort,
                 connectedComponentLAN, LAN_TAB_IDX);
         updateNICConfigPane("WAN", vRechner.holeWANInterface(), ipAddressWANPort, macAddressWANPort, netmaskWANPort,
@@ -491,5 +604,9 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
             }
         }
         return null;
+    }
+
+    private boolean checkRetentionTime() {
+        return ueberpruefen(EingabenUeberpruefung.musterNurZahlen, retentionTime);
     }
 }

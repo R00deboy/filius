@@ -235,8 +235,8 @@ public class ReportGenerator {
                     addHeaderCell(I18n.messages.getString("jportforwarding_msg7"), portForwardingTable);
                     
                     boolean notEmpty = false;
-
-                    for (String[] routeEntry : systemSoftware.getWeiterleitungstabelle().holeTabelle()) {
+                    for (String[] routeEntry : ((GatewayFirmware) systemSoftware).getStaticNAT()) {
+                    	System.out.println(routeEntry[0]+" "+EingabenUeberpruefung.musterProtocol);
                     	if(EingabenUeberpruefung.isGueltig(routeEntry[0],EingabenUeberpruefung.musterProtocol)) {
                     		notEmpty = true;
                     		switch(routeEntry[0]) {

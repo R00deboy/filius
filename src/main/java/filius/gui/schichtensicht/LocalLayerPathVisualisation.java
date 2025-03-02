@@ -202,7 +202,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			visualisationForwarded();
 		}
 		if (globalLayerPath != null ) {
-			JLabel label = setLabel(this, messages.getString("schichten_lokaler_weg_msg11"), 0, 0, 12, 1, false);
+			JLabel label = setLabel(this, messages.getString("schichten_lokaler_weg_msg11"), 0, 0, 14, 1, false);
 			label.setFont(new Font("Dialog", Font.BOLD, 12));
 			label.setBackground(Color.BLACK);
 			label.setForeground(Color.WHITE);

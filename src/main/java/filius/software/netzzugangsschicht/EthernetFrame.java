@@ -105,9 +105,9 @@ public class EthernetFrame implements Serializable {
 	}
 
 	/**
-	 * Checks if the whole content (which consists of zielMacAdresse,
-	 * quellMacAdresse and daten) of <i>this</i> frame is equal to the frame in the
-	 * argument.
+	 * Checks if the whole content (which consists of {@code zielMacAdresse},
+	 * {@code quellMacAdresse} and {@code daten}) of <i>this</i> frame is equal to
+	 * the frame in the argument.
 	 * 
 	 * @param frame frame to be compared to <i>this</i> frame
 	 * @return true if zielMacAdresse, quellMacAdresse and daten are equal

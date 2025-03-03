@@ -508,8 +508,8 @@ public class Lauscher implements I18n {
 
 	/**
 	 * General: If a frame was forwarded by the node (this means that it is a
-	 * router), given a (received / sent) frame, the method finds the (sent /
-	 * received) frame with the same encapsuled IP packet on another interface of
+	 * router), given a received / sent frame, the method finds the sent /
+	 * received frame with the same encapsuled IP packet on another interface of
 	 * the node.
 	 * 
 	 * Specific: Given an interface ID and the frame number in the data exchange

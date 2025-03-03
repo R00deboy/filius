@@ -28,8 +28,6 @@ package filius.software.vermittlungsschicht;
 import java.io.Serializable;
 
 import filius.software.transportschicht.Segment;
-import filius.software.transportschicht.TcpSegment;
-import filius.software.transportschicht.UdpSegment;
 
 /**
  * Diese Klasse umfasst die Attribute bzw. Felder eines IP-Pakets
@@ -55,10 +53,15 @@ public class IpPaket implements Serializable, Cloneable {
 	public IpPaket(int protocol, long identification) {
 		this.protocol = protocol;
 		// only use identification argument if it is not negative
-		this.identification = identification < 0 ? getIdentCounter() : identification;
+		this.identification = identification < 0 ? getNextIdentCounter() : identification;
 	}
 
-	private static synchronized long getIdentCounter() {
+	/**
+	 * Gets the next identification number and increase global counter by 1.
+	 * 
+	 * @return next identification number
+	 */
+	private static synchronized long getNextIdentCounter() {
 		return ++identificationCounter;
 	}
 
@@ -103,7 +106,7 @@ public class IpPaket implements Serializable, Cloneable {
 	public void setTtl(int ttl) {
 		this.ttl = ttl;
 	}
-	
+
 	public long getIdentification() {
 		return identification;
 	}

@@ -508,18 +508,19 @@ public class Lauscher implements I18n {
 
 	/**
 	 * General: If a frame was forwarded by the node (this means that it is a
-	 * router), given a received / sent frame, the method finds the sent /
-	 * received frame with the same encapsuled IP packet on another interface of
-	 * the node.
+	 * router), given a received / sent frame, the method finds the sent / received
+	 * frame with the same encapsuled IP packet on another interface of the node.
 	 * 
 	 * Specific: Given an interface ID and the frame number in the data exchange
 	 * window (Datenaustausch), other interfaces of the node will be searched for a
-	 * frame which has the same content apart from TTL). <br \> The first entry of
-	 * the returned array contains the network interface ID {@code interfaceId} and
-	 * the second entry the number of the frame {@code frameNumber} in the data
-	 * exchange window. If the two entries are the null pointer each, it means that
-	 * the layer 2 (IP or ICMP) packet was originally sent or received by this node,
-	 * i.e. that there is no corresponding frame.
+	 * frame which has the same content and a TTL increased by 1 if the frame was
+	 * sent or a TTL decreased by 1 if the frame was received. <br \> The first
+	 * entry of the returned array contains the network interface ID
+	 * {@code interfaceId} and the second entry the number of the frame
+	 * {@code frameNumber} in the data exchange window. If the two entries are the
+	 * null pointer each, it means that the layer 2 (IP or ICMP) packet was
+	 * originally sent or ultimately received by this node, i.e. that there is no
+	 * corresponding frame.
 	 * 
 	 * @param originalInterfaceId MAC address of the network interface
 	 * @param originalFrameNumber number of the frame in the data exchange window

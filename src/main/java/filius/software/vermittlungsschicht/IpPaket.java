@@ -57,7 +57,7 @@ public class IpPaket implements Serializable, Cloneable {
 	}
 
 	/**
-	 * Gets the next identification number and increase global counter by 1.
+	 * Gets the next identification number and increases global counter by 1.
 	 * 
 	 * @return next identification number
 	 */

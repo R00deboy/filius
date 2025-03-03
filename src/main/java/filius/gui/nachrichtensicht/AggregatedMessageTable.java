@@ -449,7 +449,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * original Filius colors for the different layers
+	 * Original Filius colors for the different layers.
 	 */
 	public enum LayerColorOrig {
 		DEFAULT(Color.WHITE, Color.GRAY), LINK(Color.BLACK, new Color(0.9f, 0.9f, 0.9f)),
@@ -466,7 +466,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	}
 
 	/**
-	 * color variants for the different layers
+	 * Color variants for the different layers.
 	 * 
 	 * @author Christoph Irniger
 	 */

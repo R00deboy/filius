@@ -152,9 +152,7 @@ public class MessageDetailsTable extends JPanel implements I18n {
 	}
 
 	/**
-	 * Fills the message details matrix with the values of the frame. The matrix
-	 * will have an empty second line (e.g. messageDetails[1][...] is Null), such
-	 * that it will match row and column numbers of the graphical table.
+	 * Computes the maximum layer inside which appears inside the frame.
 	 * 
 	 * @return maximum layer that appears inside the frame
 	 */

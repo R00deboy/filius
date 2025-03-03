@@ -80,8 +80,8 @@ public class Lauscher implements I18n {
 	private HashMap<String, LinkedList<Object[]>> datenEinheiten = new HashMap<String, LinkedList<Object[]>>();
 	private List<Object[]> droppedDataUnits = new LinkedList<>();
 
-	private HashMap<String, NetzwerkInterface> InterfaceByID = new HashMap<String, NetzwerkInterface>();
-	private HashMap<String, SystemSoftware> SystemSoftwareByID = new HashMap<String, SystemSoftware>();
+	private HashMap<String, NetzwerkInterface> InterfaceById = new HashMap<String, NetzwerkInterface>();
+	private HashMap<String, SystemSoftware> SystemSoftwareById = new HashMap<String, SystemSoftware>();
 
 	private Lauscher() {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", constr: Lauscher()");
@@ -107,11 +107,11 @@ public class Lauscher implements I18n {
 	}
 
 	public NetzwerkInterface getInterfaceByID(String interfaceId) {
-		return InterfaceByID.get(interfaceId);
+		return InterfaceById.get(interfaceId);
 	}
 
 	public SystemSoftware getSystemSoftwareByID(String interfaceId) {
-		return SystemSoftwareByID.get(interfaceId);
+		return SystemSoftwareById.get(interfaceId);
 	}
 
 	public void removeIdentifier(String identifier) {
@@ -174,8 +174,8 @@ public class Lauscher implements I18n {
 			frame.setReadByLauscherForMac(interfaceId);
 			benachrichtigeBeobachter(interfaceId);
 		}
-		storeInterfaceByID(interfaceId, networkInterface);
-		storeSystemSoftwareByID(interfaceId, systemSoftware);
+		storeInterfaceById(interfaceId, networkInterface);
+		storeSystemSoftwareById(interfaceId, systemSoftware);
 	}
 
 	public void addDroppedDataUnit(EthernetFrame frame) {
@@ -641,12 +641,11 @@ public class Lauscher implements I18n {
 	/**
 	 * This helper method returns the frame in the Lauscher data that belongs to the
 	 * network interface indicated in the first parameter and the frame number in
-	 * the aggregated message table (Datenaustausch) in the second parameter.
+	 * the data exchange window in the second parameter.
 	 * 
 	 * @param interfaceId MAC address of the network interface whose data exchange
 	 *                    should be searched for the frame
 	 * @param frameNumber number of the frame in the data exchange window
-	 *                    (Datenaustausch)
 	 * @return frame which belongs to the parameters
 	 * @author Christoph Irniger
 	 */
@@ -679,30 +678,30 @@ public class Lauscher implements I18n {
 
 	/**
 	 * Adds the pair {@code interfaceId} and {@code interface} of type
-	 * {@code NetzwerkInterface} to the HashMap InterfaceByID.
+	 * {@code NetzwerkInterface} to the HashMap {@code InterfaceById}.
 	 * 
 	 * @param interfaceId      MAC address of the interface
 	 * @param networkInterface interface belonging to the interface ID
 	 * @author Christoph Irniger
 	 */
-	public void storeInterfaceByID(String interfaceId, NetzwerkInterface networkInterface) {
-		if (!InterfaceByID.keySet().contains(interfaceId)) {
-			InterfaceByID.put(interfaceId, networkInterface);
+	public void storeInterfaceById(String interfaceId, NetzwerkInterface networkInterface) {
+		if (!InterfaceById.keySet().contains(interfaceId)) {
+			InterfaceById.put(interfaceId, networkInterface);
 		}
 	}
 
 	/**
 	 * Adds the pair {@code interfaceId} and {@code systemSoftware} of type
-	 * {@code SystemSoftware} to the HashMap InterfaceByID.
+	 * {@code SystemSoftware} to the HashMap {@code SystemSoftwareById}.
 	 * 
 	 * @param interfaceId    MAC address of the interface
 	 * @param systemSoftware systemSoftware (operating system) belonging to the
 	 *                       interface ID
 	 * @author Christoph Irniger
 	 */
-	public void storeSystemSoftwareByID(String interfaceId, SystemSoftware systemSoftware) {
-		if (!SystemSoftwareByID.keySet().contains(interfaceId)) {
-			SystemSoftwareByID.put(interfaceId, systemSoftware);
+	public void storeSystemSoftwareById(String interfaceId, SystemSoftware systemSoftware) {
+		if (!SystemSoftwareById.keySet().contains(interfaceId)) {
+			SystemSoftwareById.put(interfaceId, systemSoftware);
 		}
 	}
 }

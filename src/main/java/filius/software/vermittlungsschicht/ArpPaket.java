@@ -62,12 +62,16 @@ public class ArpPaket implements Serializable {
 	private final long arpPacketNumber;
 
 	public ArpPaket() {
-		this.arpPacketNumber = setArpPacketCounter();
+		this.arpPacketNumber = getNextArpPacketCounter();
 	}
 
-	private static synchronized long setArpPacketCounter() {
-		arpPacketNumberCounter++;
-		return arpPacketNumberCounter - 1;
+	/**
+	 * Gets the next ARP packet number and increases global counter by 1.
+	 * 
+	 * @return next arp packet number
+	 */
+	private static synchronized long getNextArpPacketCounter() {
+		return ++arpPacketNumberCounter;
 	}
 
 	public String getProtokollTyp() {

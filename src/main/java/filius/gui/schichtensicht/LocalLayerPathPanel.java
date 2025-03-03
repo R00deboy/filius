@@ -26,12 +26,6 @@ import filius.software.system.SystemSoftware;
  * router). The idea was taken from the following website and with permission of
  * the creator: https://oinf.ch/interactive/tcp-ip-visualisierung/
  * 
- * This view corresponds to reality. In packet-switching networks like the
- * internet a single node in general cannot track the end-to-end path of a
- * packet. This follows immediately from the properties of the packet-switching
- * network model. The node can only reproduce the receiving, processing and
- * sending of a packet.
- * 
  * @author Christoph Irniger
  */
 public class LocalLayerPathPanel extends JPanel {
@@ -184,7 +178,7 @@ public class LocalLayerPathPanel extends JPanel {
 	}
 
 	/**
-	 * Checks if the selected frame is sent or received (= not sent).
+	 * Checks if the selected frame was sent or received (= not sent).
 	 * 
 	 * @return true if sent, false if received
 	 */
@@ -472,9 +466,9 @@ public class LocalLayerPathPanel extends JPanel {
 	 * @param comp
 	 * @param layerNumber
 	 */
-	private void setComponentGreyedOut(Component comp, int layerNumber) {
-		comp.setForeground(GREYED_OUT_COLOR);
-		comp.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", layerNumber));
+	private void setComponentGreyedOut(Component component, int layerNumber) {
+		component.setForeground(GREYED_OUT_COLOR);
+		component.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", layerNumber));
 	}
 
 	/**
@@ -484,11 +478,11 @@ public class LocalLayerPathPanel extends JPanel {
 	 * @param comp
 	 * @param layerNumber
 	 */
-	private void resetComponentFromGreyedOut(Component comp, int layerNumber) {
+	private void resetComponentFromGreyedOut(Component component, int layerNumber) {
 		// only reset if not hidden
 		if (hiddenLayers < layerNumber) {
-			comp.setForeground(Color.BLACK);
-			comp.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColor", layerNumber));
+			component.setForeground(Color.BLACK);
+			component.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColor", layerNumber));
 		}
 	}
 }

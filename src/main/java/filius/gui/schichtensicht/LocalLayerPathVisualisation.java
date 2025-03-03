@@ -39,6 +39,10 @@ import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.I18n;
 
+/**
+ * This class delivers the upper, visualised part of the local path through the
+ * layers of a message.
+ */
 public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private final LocalLayerPathPanel LAYER_PATH_PANEL;
 
@@ -201,7 +205,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			pointInTimeForSenderSide = minPointInTime + 3;
 			visualisationForwarded();
 		}
-		if (globalLayerPath != null ) {
+		if (globalLayerPath != null) {
 			JLabel label = setLabel(this, messages.getString("schichten_lokaler_weg_msg11"), 0, 0, 14, 1, false);
 			label.setFont(new Font("Dialog", Font.BOLD, 12));
 			label.setBackground(Color.BLACK);
@@ -222,7 +226,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Visualisation of a node if the packet was sent or received
+	 * Visualisation of a node if the packet was sent or received.
 	 */
 	private void visualisationSentOrReceived() {
 		c = new GridBagConstraints();
@@ -759,7 +763,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Updates "forth" and "back" buttons if button "forth" was pressed
+	 * Updates "forth" and "back" buttons if button "forth" was pressed.
 	 */
 	private void updateButtonsIfForth() {
 		BACK_IN_TIME.setEnabled(true);
@@ -777,7 +781,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Updates "forth" and "back" buttons if button "back" was pressed
+	 * Updates "forth" and "back" buttons if button "back" was pressed.
 	 */
 	private void updateButtonsIfBack() {
 		FORTH_IN_TIME.setEnabled(true);
@@ -795,7 +799,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Hide or show layers in message details if button "forth" was pressed
+	 * Hide or show layers in message details if button "forth" was pressed.
 	 */
 	private void hideOrShowLayersIfForth() {
 		// if not forwarded (means hosts or routers which have sent or received the
@@ -820,7 +824,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * Hide or show layers in message details if button "back" was pressed
+	 * Hide or show layers in message details if button "back" was pressed.
 	 */
 	private void hideOrShowLayersIfBack() {
 		// if not forwarded (means hosts or routers which have sent or received the
@@ -1127,7 +1131,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	}
 
 	/**
-	 * class for the visualisation of a grey wire (link layer) and an arrow
+	 * Class for the visualisation of a grey wire (link layer) and an arrow.
 	 */
 	protected class WireWithArrow extends Arrow {
 

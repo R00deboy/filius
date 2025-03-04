@@ -46,6 +46,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	private final LocalLayerPathPanel MAIN_LOCAL_PANEL;
 
 	private int currentLocalPanelPathIndex = 0;
+	private int currentLocalPanelParametersPathIndex = 0;
 
 	/** if the active border of the next local panel should be at the end */
 	private boolean activeBorderOfNextPanelAtEnd;
@@ -57,15 +58,28 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	ArrayList<EthernetFrame> framePath = new ArrayList<EthernetFrame>();
 
 	/**
-	 * list of {@code LocalLayerPathPanel} objects corresponding to the nodes
+	 * List of {@code LocalLayerPathPanel} objects corresponding to the nodes
 	 * involved in the path of a packet in chronological order (i.e. sender node
 	 * comes first, then all the routers and at last the receiver node).
+	 * {@code LocalLayerPathPanel} objects will be created only when they are needed
+	 * and then added to the list.
 	 */
 	ArrayList<LocalLayerPathPanel> localPanelPath = new ArrayList<LocalLayerPathPanel>();
+	/**
+	 * List of the parameters which are needed to create an object of
+	 * {@code LocalLayerPathPanel}. This list will get filled immediately after
+	 * opening the global view.
+	 */
+	ArrayList<Object[]> localPanelParametersPath = new ArrayList<Object[]>();
+	/**
+	 * The parameters needed to create the main local panel.
+	 */
+	Object[] MAIN_LOCAL_PANEL_PARAMETERS;
 
 	public GlobalLayerPath(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int frameNumber) {
 		this.OWNER = owner;
 		MAIN_NODE = (InternetKnoten) systemSoftware.getKnoten();
+		MAIN_LOCAL_PANEL_PARAMETERS = new Object[] { interfaceId, systemSoftware, frameNumber };
 		MAIN_INTERFACE_ID = interfaceId;
 		MAIN_FRAME_NUMBER = frameNumber;
 		MAIN_FRAME = LAUSCHER.getFrame(MAIN_INTERFACE_ID, MAIN_FRAME_NUMBER);
@@ -77,9 +91,11 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		MAIN_DIALOG.setTitle(messages.getString("schichten_globaler_weg_msg1"));
 
 		fillFramePath();
-		fillLocalPanelsPath();
+		localPanelPath.add(MAIN_LOCAL_PANEL);
+		fillLocalPanelParametersPath();
 
-		currentLocalPanelPathIndex = localPanelPath.indexOf(MAIN_LOCAL_PANEL);
+		// nächste Zeile wird überflüssig, da dort sowieso nur MAIN_LOCA_PANEL drin ist
+		currentLocalPanelParametersPathIndex = localPanelParametersPath.indexOf(MAIN_LOCAL_PANEL_PARAMETERS);
 		MAIN_DIALOG.setVisible(true);
 	}
 
@@ -99,9 +115,8 @@ public class GlobalLayerPath extends JPanel implements I18n {
 						&& !MAIN_FRAME.getQuellMacAdresse().equals(MAIN_INTERFACE_ID))) {
 			addToFramePath(MAIN_FRAME);
 		} else if (MAIN_FRAME.getDaten() instanceof IpPaket) {
-			EthernetFrame originalframe = LAUSCHER.getFrame(MAIN_INTERFACE_ID, MAIN_FRAME_NUMBER);
 			for (int ttl = MAX_TTL; ttl > 0; ttl--) {
-				EthernetFrame frame = LAUSCHER.getFrameWithSameContentAndSpecificTTL(originalframe, ttl);
+				EthernetFrame frame = LAUSCHER.getFrameWithSameContentAndSpecificTTL(MAIN_FRAME, ttl);
 				if (frame != null) {
 					addToFramePath(frame);
 				} else {
@@ -126,10 +141,10 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	}
 
 	/**
-	 * Fills the local panels path list with all the local panels involved in
-	 * delivering the IP packet.
+	 * Fills the local panel parameters array path list with all the parameter
+	 * arrays for the local panels involved in delivering the IP packet.
 	 */
-	private void fillLocalPanelsPath() {
+	private void fillLocalPanelParametersPath() {
 		// frame was received via ethernet broadcast
 		if (MAIN_FRAME.getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)
 				&& !MAIN_FRAME.getQuellMacAdresse().equals(MAIN_INTERFACE_ID)) {
@@ -180,7 +195,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		EthernetFrame frame = LAUSCHER.getFrame(interfaceId, frameNumber);
 		if ((systemSoftware.getKnoten()).equals(MAIN_NODE)) {
 			if (!MAIN_LOCAL_PANEL.isForwarded()) {
-				localPanelPath.add(MAIN_LOCAL_PANEL);
+				localPanelParametersPath.add(MAIN_LOCAL_PANEL_PARAMETERS);
 				return;
 			} else {
 				if (MAIN_FRAME.getDaten() instanceof IpPaket) {
@@ -188,7 +203,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 							&& ((IpPaket) MAIN_FRAME.getDaten()).getTtl() == ((IpPaket) frame.getDaten()).getTtl() - 1)
 							|| (!MAIN_LOCAL_PANEL.isSent() && ((IpPaket) MAIN_FRAME.getDaten())
 									.getTtl() == ((IpPaket) frame.getDaten()).getTtl())) {
-						localPanelPath.add(MAIN_LOCAL_PANEL);
+						localPanelParametersPath.add(MAIN_LOCAL_PANEL_PARAMETERS);
 						return;
 					}
 				}
@@ -197,38 +212,54 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		// If the main panel is not (yet) contained in the list, the active border of
 		// the next panel should be at the end (the latest point in time), since if it
 		// shows up, it happened through the "back" button.
-		activeBorderOfNextPanelAtEnd = !localPanelPath.contains(MAIN_LOCAL_PANEL) ? true : false;
-		localPanelPath.add(new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this));
+		localPanelParametersPath.add(new Object[] { interfaceId, systemSoftware, frameNumber });
 	}
 
 	/**
-	 * Switches to the view in the main JDialog window to the next or previous
-	 * LocalLayerPathPanel of the LocalPanels path list.
+	 * Switches to the view in the main dialog window to the next or previous
+	 * local panel of the local panel path list.
 	 * 
-	 * @param switchForward true, if one wants to switch forward, false if backward
+	 * @param switchForward true, if the view should switch forward to the next
+	 *                      local panel, false if it should switch back
 	 */
 	public void switchPanel(Boolean switchForward) {
 		LocalLayerPathPanel oldPanel = localPanelPath.get(currentLocalPanelPathIndex);
+		LocalLayerPathPanel newPanel;
 		oldPanel.setVisible(false);
 		MAIN_DIALOG.remove(oldPanel);
-		currentLocalPanelPathIndex = switchForward ? currentLocalPanelPathIndex + 1 : currentLocalPanelPathIndex - 1;
-		LocalLayerPathPanel newPanel = localPanelPath.get(currentLocalPanelPathIndex);
+		if (switchForward) {
+			currentLocalPanelPathIndex++;
+			currentLocalPanelParametersPathIndex++;
+			// if the old panel ist not the last element
+			if (currentLocalPanelPathIndex - 1 < localPanelPath.size() - 1) {
+				newPanel = localPanelPath.get(currentLocalPanelPathIndex);
+			} else {
+				Object[] parameters = localPanelParametersPath.get(currentLocalPanelParametersPathIndex);
+				String interfaceId = (String) parameters[0];
+				SystemSoftware systemSoftware = (SystemSoftware) parameters[1];
+				int frameNumber = (int) parameters[2];
+				activeBorderOfNextPanelAtEnd = false;
+				newPanel = new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this);
+				localPanelPath.add(newPanel);
+			}
+		} else {
+			currentLocalPanelParametersPathIndex--;
+			// if the old panel ist not the first element
+			if (currentLocalPanelPathIndex > 0) {
+				currentLocalPanelPathIndex--;
+				newPanel = localPanelPath.get(currentLocalPanelPathIndex);
+				MAIN_DIALOG.add(newPanel);
+			} else {
+				Object[] parameters = localPanelParametersPath.get(currentLocalPanelParametersPathIndex);
+				String interfaceId = (String) parameters[0];
+				SystemSoftware systemSoftware = (SystemSoftware) parameters[1];
+				int frameNumber = (int) parameters[2];
+				activeBorderOfNextPanelAtEnd = true;
+				newPanel = new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this);
+				localPanelPath.add(0, newPanel);
+			}
+		}
 		MAIN_DIALOG.add(newPanel);
 		newPanel.setVisible(true);
 	}
-
-//	@Override
-//	public Dimension getPreferredSize() {
-//		return new Dimension(480, 300);
-//	}
-//
-//	@Override
-//	public Dimension getMinimumSize() {
-//		return new Dimension(480, 300);
-//	}
-//
-//	@Override
-//	public Dimension getMaximumSize() {
-//		return new Dimension(480, 300);
-//	}
 }

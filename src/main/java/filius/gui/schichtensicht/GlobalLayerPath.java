@@ -126,7 +126,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	}
 
 	/**
-	 * Fills the LocalPanels path list with all the LocalPanels involved in
+	 * Fills the local panels path list with all the local panels involved in
 	 * delivering the IP packet.
 	 */
 	private void fillLocalPanelsPath() {

@@ -51,7 +51,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	private boolean activeBorderOfNextPanelAtEnd;
 
 	/**
-	 * Path of a packet represented as list of ethernet frames encapsulationg this
+	 * Path of a packet represented as list of ethernet frames encapsulating this
 	 * packet in chronological order of creation.
 	 */
 	ArrayList<EthernetFrame> framePath = new ArrayList<EthernetFrame>();

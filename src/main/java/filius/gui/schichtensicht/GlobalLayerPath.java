@@ -57,9 +57,9 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	ArrayList<EthernetFrame> framePath = new ArrayList<EthernetFrame>();
 
 	/**
-	 * list of LocalLayerPathPanels corresponding to the nodes involved in the path
-	 * of a packet in chronological order (i.e. sender node comes first, then all
-	 * the routers and at last the receiver node).
+	 * list of {@code LocalLayerPathPanel} objects corresponding to the nodes
+	 * involved in the path of a packet in chronological order (i.e. sender node
+	 * comes first, then all the routers and at last the receiver node).
 	 */
 	ArrayList<LocalLayerPathPanel> localPanelPath = new ArrayList<LocalLayerPathPanel>();
 

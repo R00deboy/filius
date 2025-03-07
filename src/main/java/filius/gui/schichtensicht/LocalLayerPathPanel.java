@@ -219,7 +219,8 @@ public class LocalLayerPathPanel extends JPanel {
 	/**
 	 * Determines which message details ({@code messageDetailsSent} or
 	 * {@code messageDetailsReceived}) are shown after opening the window of the
-	 * local path for the first time and hides layers according to the 
+	 * local path for the first time and hides and greys out layers depending on the
+	 * parameters.
 	 */
 	private void setDefaultMessageDetails() {
 		// for the sender of a message
@@ -240,6 +241,9 @@ public class LocalLayerPathPanel extends JPanel {
 			} else if (NODE instanceof Vermittlungsrechner || NODE instanceof Gateway) {
 				hideLayerData(1, tableSent);
 				hiddenLayers = 1;
+				if (FORWARDED) {
+					hideLayerData(1, tableReceived);
+				}
 			}
 		}
 		// for the receiver of a message
@@ -253,6 +257,7 @@ public class LocalLayerPathPanel extends JPanel {
 		// update greyed out cells (cells invisible to the layer)
 		if (SENT) {
 			updateGreyedOutCells(tableSent);
+			// if the IP packet was forwarded, also update the other table, since it could be needed
 			if (FORWARDED) {
 				updateGreyedOutCells(tableReceived);
 			}

@@ -854,7 +854,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	 * receiver side.
 	 */
 	private void updateSenderSide() {
-		senderSideIsActive = (pointInTime >= pointInTimeForSenderSide);
+		senderSideIsActive = pointInTime >= pointInTimeForSenderSide;
 	}
 
 	/**

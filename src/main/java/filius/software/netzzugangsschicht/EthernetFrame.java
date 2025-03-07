@@ -71,9 +71,23 @@ public class EthernetFrame implements Serializable {
 		this.daten = daten;
 	}
 
-	public void setReadByLauscherForMac(String mac) {
-		readByLauscherForMac.add(mac);
-	}
+    public EthernetFrame clone() {
+        Object clonedData;
+        if (daten instanceof IcmpPaket) {
+            clonedData = ((IcmpPaket) daten).clone();
+        } else if (daten instanceof IpPaket) {
+            clonedData = ((IpPaket) daten).clone();
+        } else {
+            clonedData = daten;
+        }
+        EthernetFrame clonedFrame = new EthernetFrame(clonedData, quellMacAdresse, zielMacAdresse, typ);
+        clonedFrame.readByLauscherForMac = readByLauscherForMac;
+        return clonedFrame;
+    }
+
+    public void setReadByLauscherForMac(String mac) {
+        readByLauscherForMac.add(mac);
+    }
 
 	public boolean isReadByLauscherForMac(String mac) {
 		return readByLauscherForMac.contains(mac);

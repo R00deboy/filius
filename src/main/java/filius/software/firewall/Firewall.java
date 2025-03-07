@@ -176,10 +176,7 @@ public class Firewall extends Anwendung implements I18n {
                 FirewallRule firewallRule = ruleset.get(i);
                 boolean ruleToBeApplied = isProtocolApplicable(packet, firewallRule)
                         && (isEndpointsApplicable(packet.getSender(), packet.getEmpfaenger(), segment.getZielPort(),
-                                firewallRule)
-                                || isEndpointsApplicable(packet.getEmpfaenger(), packet.getSender(),
-                                        segment.getQuellPort(), firewallRule));
-
+                                firewallRule));
                 if (ruleToBeApplied) { // if rule matches to current packet, then
                     notifyRuleApplication(i, firewallRule);
                     accept = firewallRule.action == FirewallRule.ACCEPT;
@@ -226,11 +223,14 @@ public class Firewall extends Anwendung implements I18n {
             Segment segment = (Segment) packet.getSegment();
             for (int i = 0; i < ruleset.size() && !foundRule; i++) {
                 FirewallRule firewallRule = ruleset.get(i);
+                // check if request is allowed
+                boolean applicableOnRequest = isEndpointsApplicable(packet.getSender(), packet.getEmpfaenger(),
+                        segment.getZielPort(), firewallRule);
+                // check if response is allowed (only if rule specifies port)
+                boolean applicableOnResponse = FirewallRule.ALL_PORTS != firewallRule.port && isEndpointsApplicable(
+                        packet.getEmpfaenger(), packet.getSender(), segment.getQuellPort(), firewallRule);
                 boolean ruleToBeApplied = isProtocolApplicable(packet, firewallRule)
-                        && (isEndpointsApplicable(packet.getSender(), packet.getEmpfaenger(), segment.getZielPort(),
-                                firewallRule)
-                                || isEndpointsApplicable(packet.getEmpfaenger(), packet.getSender(),
-                                        segment.getQuellPort(), firewallRule));
+                        && (applicableOnRequest || applicableOnResponse);
 
                 if (ruleToBeApplied) { // if rule matches to current packet, then
                     notifyRuleApplication(i, firewallRule);

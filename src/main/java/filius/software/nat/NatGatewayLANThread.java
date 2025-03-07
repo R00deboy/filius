@@ -52,16 +52,15 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
 		this.natGateway = natGateway;
 	}
 
-	@Override
-	protected void verarbeiteDatenEinheit(EthernetFrame frame) {
-		Lauscher.getLauscher().addDatenEinheit(lanNic, this.systemSoftware, frame);
-
-		if (!checkDiscardByFirewall(frame) && !checkTTLExceeded(frame)) {
-			updateNatTable(frame);
-			modifyOutgoingFrame(frame);
-			forwardFrame(frame);
-		}
-	}
+    @Override
+    protected void verarbeiteDatenEinheit(EthernetFrame frame) {
+        Lauscher.getLauscher().addDatenEinheit(lanNic, systemSoftware, frame);
+        if (!checkDiscardByFirewall(frame) && !checkTTLExceeded(frame)) {
+            updateNatTable(frame);
+            EthernetFrame modifiedFrame = modifyOutgoingFrame(frame);
+            forwardFrame(modifiedFrame);
+        }
+    }
 
 	boolean checkTTLExceeded(EthernetFrame frame) {
 		boolean exceeded = false;
@@ -79,15 +78,17 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
 		return exceeded;
 	}
 
-	protected void modifyOutgoingFrame(EthernetFrame frame) {
-		if (frame.getDaten() instanceof IpPaket
-				&& !((IpPaket) frame.getDaten()).getEmpfaenger().equals(wanNic.getIp())) {
-			IpPaket packet = (IpPaket) frame.getDaten();
-			if (isOutgoingPacket(packet)) {
-				natGateway.replaceSource(packet);
-			}
-		}
-	}
+    protected EthernetFrame modifyOutgoingFrame(EthernetFrame frame) {
+        EthernetFrame modifiedFrame = frame.clone();
+        if (modifiedFrame.getDaten() instanceof IpPaket
+                && !((IpPaket) modifiedFrame.getDaten()).getEmpfaenger().equals(wanNic.getIp())) {
+            IpPaket packet = (IpPaket) modifiedFrame.getDaten();
+            if (isOutgoingPacket(packet)) {
+                natGateway.replaceSource(packet);
+            }
+        }
+        return modifiedFrame;
+    }
 
 	protected void updateNatTable(EthernetFrame frame) {
 		if (frame.getDaten() instanceof IpPaket) {

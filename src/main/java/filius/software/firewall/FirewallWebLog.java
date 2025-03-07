@@ -70,7 +70,7 @@ public class FirewallWebLog extends WebServerPlugIn implements Observer, I18n {
                 + ")");
         if (arg1 instanceof Object[]) {
             logDaten.append("<br /> \n").append(((Object[]) arg1)[0]);
-        } else {
+        } else if (null != arg1) {
             logDaten.append("<br /> \n").append(arg1);
         }
 

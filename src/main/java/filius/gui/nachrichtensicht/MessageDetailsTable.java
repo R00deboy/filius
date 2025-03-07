@@ -25,6 +25,8 @@ import filius.rahmenprogramm.nachrichten.Lauscher;
 /**
  * Class for the colored message details table at the bottom of the data
  * exchange and the layer views.
+ * 
+ * @author Christoph Irniger
  */
 public class MessageDetailsTable extends JPanel implements I18n {
 	private final GridBagLayout GRID_BAG_LAYOUT;

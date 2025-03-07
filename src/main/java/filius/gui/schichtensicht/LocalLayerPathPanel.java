@@ -219,7 +219,7 @@ public class LocalLayerPathPanel extends JPanel {
 	/**
 	 * Determines which message details ({@code messageDetailsSent} or
 	 * {@code messageDetailsReceived}) are shown after opening the window of the
-	 * local path for the first time and hides according layers.
+	 * local path for the first time and hides layers according to the 
 	 */
 	private void setDefaultMessageDetails() {
 		// for the sender of a message
@@ -258,6 +258,9 @@ public class LocalLayerPathPanel extends JPanel {
 			}
 		} else {
 			updateGreyedOutCells(tableReceived);
+			if (FORWARDED) {
+				updateGreyedOutCells(tableSent);
+			}
 		}
 	}
 
@@ -303,6 +306,10 @@ public class LocalLayerPathPanel extends JPanel {
 			} else {
 				updateGreyedOutCells(tableReceived);
 				hideLayerData(hiddenLayers, tableReceived);
+				if (FORWARDED) {
+					updateGreyedOutCells(tableSent);
+					hideLayerData(hiddenLayers, tableSent);
+				}
 			}
 		}
 	}
@@ -324,6 +331,10 @@ public class LocalLayerPathPanel extends JPanel {
 			} else {
 				updateGreyedOutCells(tableReceived);
 				showLayerData(hiddenLayers + 1, tableReceived);
+				if (FORWARDED) {
+					updateGreyedOutCells(tableSent);
+					showLayerData(hiddenLayers + 1, tableSent);
+				}
 			}
 		}
 	}

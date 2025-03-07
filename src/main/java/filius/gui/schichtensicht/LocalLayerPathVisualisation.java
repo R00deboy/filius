@@ -56,8 +56,13 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private int minPointInTime;
 	private int maxPointInTime;
 
-	/** visualisation is on the sender side (otherwise receiver side) */
+	/** true if the visualisation is on the sender side, otherwise receiver side */
 	private boolean senderSideIsActive;
+	/**
+	 * true if the visualisation was on the sender side in the last step (if there
+	 * is no last step, it should have the same value as senderSideIsActive
+	 */
+	private boolean senderSideWasActive;
 	/**
 	 * for this and all greater points in time visualisation is on the sender side
 	 * (for smaller on receiver side)
@@ -155,6 +160,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 
 		// set initial value for senderSideIsActive
 		senderSideIsActive = LAYER_PATH_PANEL.isSent();
+		senderSideWasActive = senderSideIsActive;
 
 		// ---------- configuration of points in time and layout ----------
 		// if the packet was not forwarded (i.e. sent or received)
@@ -741,6 +747,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		if (pointInTime < maxPointInTime) {
 			pointInTime++;
 			updateButtonsIfForth();
+			updateSenderSide();
+			LAYER_PATH_PANEL.updateMessageDetailsDisplay(senderSideIsActive, senderSideWasActive);
 			hideOrShowLayersIfForth();
 			updateActiveBorder(true);
 		} else if (globalLayerPath != null) {
@@ -755,6 +763,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		if (pointInTime > minPointInTime) {
 			pointInTime--;
 			updateButtonsIfBack();
+			updateSenderSide();
+			LAYER_PATH_PANEL.updateMessageDetailsDisplay(senderSideIsActive, senderSideWasActive);
 			hideOrShowLayersIfBack();
 			updateActiveBorder(false);
 		} else if (globalLayerPath != null) {
@@ -776,8 +786,6 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 				}
 			}
 		}
-		updateSenderSide();
-		LAYER_PATH_PANEL.updateMessageDetails(senderSideIsActive);
 	}
 
 	/**
@@ -794,8 +802,6 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 				}
 			}
 		}
-		updateSenderSide();
-		LAYER_PATH_PANEL.updateMessageDetails(senderSideIsActive);
 	}
 
 	/**

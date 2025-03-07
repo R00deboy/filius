@@ -124,8 +124,8 @@ public class LocalLayerPathPanel extends JPanel {
 		SPLIT_PANE.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		SPLIT_PANE.setDividerLocation(DIVIDER_LOCATION);
 
-		// ScrollPane for bottom of SplitPane
-		setDefaultMessageDetails();
+		// ScrollPane for bottom of SplitPane for the message details
+		setFirstMessageDetails();
 
 		// layout manager for this panel
 		setLayout(new BorderLayout(10, 10));
@@ -218,14 +218,14 @@ public class LocalLayerPathPanel extends JPanel {
 
 	/**
 	 * Determines which message details ({@code messageDetailsSent} or
-	 * {@code messageDetailsReceived}) are shown after opening the window of the
-	 * local path for the first time and hides and greys out layers depending on the
-	 * parameters.
+	 * {@code messageDetailsReceived}) are shown first directly after opening the
+	 * window of the local path for the first time and hides and greys out layers
+	 * depending on the parameters.
 	 */
-	private void setDefaultMessageDetails() {
+	private void setFirstMessageDetails() {
 		// for the sender of a message
 		if (SENT) {
-			updateMessageDetails(true);
+			SPLIT_PANE.setBottomComponent(new JScrollPane(tableSent));
 			if (NODE instanceof Host) {
 				// if in local view or if in global view and active border does not start at end
 				// hide all layers except the maximum layer inside the frame (else show all
@@ -249,15 +249,16 @@ public class LocalLayerPathPanel extends JPanel {
 		// for the receiver of a message
 		else {
 			if (globalLayerPath != null && globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
-				updateMessageDetails(true);
+				SPLIT_PANE.setBottomComponent(new JScrollPane(tableSent));
 			} else {
-				updateMessageDetails(false);
+				SPLIT_PANE.setBottomComponent(new JScrollPane(tableReceived));
 			}
 		}
 		// update greyed out cells (cells invisible to the layer)
 		if (SENT) {
 			updateGreyedOutCells(tableSent);
-			// if the IP packet was forwarded, also update the other table, since it could be needed
+			// if the IP packet was forwarded, also update the other table, since it could
+			// be needed
 			if (FORWARDED) {
 				updateGreyedOutCells(tableReceived);
 			}
@@ -270,27 +271,31 @@ public class LocalLayerPathPanel extends JPanel {
 	}
 
 	/**
-	 * Updates the message details (e.g. if the "forth" or "back" button was
-	 * pressed).
+	 * Decides if the message details for the sent or the received message should be
+	 * displayed.
 	 * 
-	 * @param senderSideIsActive If true, the visualisation is on the sender side,
-	 *                           otherwise on the receiver side.
+	 * @param senderSideIsActive  If true, the visualisation is on the sender side,
+	 *                            otherwise on the receiver side.
+	 * @param senderSideWasActive If true, the visualisation was on the sender side
+	 *                            in the last step
 	 */
-	public void updateMessageDetails(boolean senderSideIsActive) {
-		if (senderSideIsActive) {
-			// save old divider location
-			int currentDividerLocation = SPLIT_PANE.getDividerLocation();
-			// set new table
-			SPLIT_PANE.setBottomComponent(new JScrollPane(tableSent));
-			// set old divider location
-			SPLIT_PANE.setDividerLocation(currentDividerLocation);
-		} else {
-			// save old divider location
-			int currentDividerLocation = SPLIT_PANE.getDividerLocation();
-			// set new table
-			SPLIT_PANE.setBottomComponent(new JScrollPane(tableReceived));
-			// set old divider location
-			SPLIT_PANE.setDividerLocation(currentDividerLocation);
+	public void updateMessageDetailsDisplay(boolean senderSideIsActive, boolean senderSideWasActive) {
+		if (senderSideIsActive != senderSideWasActive) {
+			if (senderSideIsActive) {
+				// save old divider location
+				int currentDividerLocation = SPLIT_PANE.getDividerLocation();
+				// set new table
+				SPLIT_PANE.setBottomComponent(new JScrollPane(tableSent));
+				// set old divider location
+				SPLIT_PANE.setDividerLocation(currentDividerLocation);
+			} else {
+				// save old divider location
+				int currentDividerLocation = SPLIT_PANE.getDividerLocation();
+				// set new table
+				SPLIT_PANE.setBottomComponent(new JScrollPane(tableReceived));
+				// set old divider location
+				SPLIT_PANE.setDividerLocation(currentDividerLocation);
+			}
 		}
 	}
 

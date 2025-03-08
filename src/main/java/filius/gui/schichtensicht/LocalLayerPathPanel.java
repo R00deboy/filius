@@ -72,8 +72,6 @@ public class LocalLayerPathPanel extends JPanel {
 	 */
 	private int hiddenLayers;
 
-	private final Color GREYED_OUT_COLOR = Color.decode("#A6A6A6");
-
 	private static final Color BACKGROUND_COLOR = Color.WHITE;
 
 	public LocalLayerPathPanel(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int selectedFrameNumber,
@@ -496,7 +494,7 @@ public class LocalLayerPathPanel extends JPanel {
 	 * @param layerNumber
 	 */
 	private void setComponentGreyedOut(Component component, int layerNumber) {
-		component.setForeground(GREYED_OUT_COLOR);
+		component.setForeground(MessageDetailsTable.getLayerColorVar("foregroundColorGreyedOut", layerNumber));
 		component.setBackground(MessageDetailsTable.getLayerColorVar("backgroundColorUltraFine", layerNumber));
 	}
 

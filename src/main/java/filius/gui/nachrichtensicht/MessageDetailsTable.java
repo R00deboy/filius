@@ -377,7 +377,7 @@ public class MessageDetailsTable extends JPanel implements I18n {
 	 * @param typeOfColor All types of colors defined in the enum class in class
 	 *                    AggregatedMessageTable: "foregroundColor",
 	 *                    "backgroundColor", "backgroundColorFine",
-	 *                    "backgroundColorUltraFine", "borderColor"
+	 *                    "backgroundColorUltraFine"
 	 * @param layerNumber number of the layer (1 = LINK, 2 = INTERNET, 3 =
 	 *                    TRANSPORT, 4 = APPLICATION)
 	 * @return the desired color
@@ -393,7 +393,7 @@ public class MessageDetailsTable extends JPanel implements I18n {
 	 * @param typeOfColor All types of colors defined in the enum class in class
 	 *                    AggregatedMessageTable: "foregroundColor",
 	 *                    "backgroundColor", "backgroundColorFine",
-	 *                    "backgroundColorUltraFine", "borderColor"
+	 *                    "backgroundColorUltraFine"
 	 * @param column      column of the MessageDetailsTable
 	 * @return the desired color
 	 */

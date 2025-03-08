@@ -471,21 +471,26 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	 * @author Christoph Irniger
 	 */
 	public enum LayerColorVar {
-		DEFAULT(Color.BLACK, Color.WHITE, Color.WHITE, Color.WHITE),
-		// old Fine colors: #EDEDED, #DAE3F3, #FBE5D6, #FFF2CC
-		LINK(Color.BLACK, Color.decode("#C9C9C9"), Color.decode("#DBDBDB"), Color.decode("#F2F2F2")),
-		INTERNET(Color.BLACK, Color.decode("#8FAADC"), Color.decode("#B4C6E7"), Color.decode("#D9E2F3")),
-		TRANSPORT(Color.BLACK, Color.decode("#F4B183"), Color.decode("#F7CAAC"), Color.decode("#FBE4D5")),
-		APPLICATION(Color.BLACK, Color.decode("#FFD966"), Color.decode("#FFE599"), Color.decode("#FFF2CC"));
+		DEFAULT(Color.BLACK, Color.decode("#A6A6A6"), Color.WHITE, Color.WHITE, Color.WHITE),
+		LINK(Color.BLACK, Color.decode("#A6A6A6"), Color.decode("#C9C9C9"), Color.decode("#DBDBDB"),
+				Color.decode("#F2F2F2")),
+		INTERNET(Color.BLACK, Color.decode("#A6A6A6"), Color.decode("#8FAADC"), Color.decode("#B4C6E7"),
+				Color.decode("#D9E2F3")),
+		TRANSPORT(Color.BLACK, Color.decode("#A6A6A6"), Color.decode("#F4B183"), Color.decode("#F7CAAC"),
+				Color.decode("#FBE4D5")),
+		APPLICATION(Color.BLACK, Color.decode("#A6A6A6"), Color.decode("#FFD966"), Color.decode("#FFE599"),
+				Color.decode("#FFF2CC"));
 
 		public final Color foregroundColor;
+		public final Color foregroundColorGreyedOut;
 		public final Color backgroundColor;
 		public final Color backgroundColorFine;
 		public final Color backgroundColorUltraFine;
 
-		private LayerColorVar(Color foregroundColor, Color backgroundColor, Color backgroundColorFine,
-				Color backgroundColorUltraFine) {
+		private LayerColorVar(Color foregroundColor, Color foregroundColorGreyedOut, Color backgroundColor,
+				Color backgroundColorFine, Color backgroundColorUltraFine) {
 			this.foregroundColor = foregroundColor;
+			this.foregroundColorGreyedOut = foregroundColorGreyedOut;
 			this.backgroundColor = backgroundColor;
 			this.backgroundColorFine = backgroundColorFine;
 			this.backgroundColorUltraFine = backgroundColorUltraFine;
@@ -505,6 +510,8 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 			Color color = null;
 			if (typeOfColor == "foregroundColor") {
 				color = valueOf(layerName).foregroundColor;
+			}  else if (typeOfColor == "foregroundColorGreyedOut") {
+				color = valueOf(layerName).foregroundColorGreyedOut;
 			} else if (typeOfColor == "backgroundColor") {
 				color = valueOf(layerName).backgroundColor;
 			} else if (typeOfColor == "backgroundColorFine") {
@@ -558,8 +565,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int frameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, frameNumber,
-				null);
+		new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, frameNumber, null);
 	}
 
 	/**

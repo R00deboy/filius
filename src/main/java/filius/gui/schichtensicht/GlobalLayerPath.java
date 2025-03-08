@@ -259,6 +259,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 				localPanelPath.add(0, newPanel);
 			}
 		}
+		newPanel.setDividerLocation(oldPanel.getDividerLocation());
 		MAIN_DIALOG.add(newPanel);
 		newPanel.setVisible(true);
 	}

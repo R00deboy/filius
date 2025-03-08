@@ -45,7 +45,7 @@ public class LocalLayerPathPanel extends JPanel {
 	private final boolean FORWARDED;
 
 	private final JSplitPane SPLIT_PANE;
-	private static final int DIVIDER_LOCATION = 450;
+	private static final int DEFAULT_DIVIDER_LOCATION = 450;
 
 	// graphical message details tables
 	private MessageDetailsTable tableSent;
@@ -122,7 +122,7 @@ public class LocalLayerPathPanel extends JPanel {
 		// SplitPane (for visualisation in upper and message details in lower part)
 		SPLIT_PANE = new JSplitPane();
 		SPLIT_PANE.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		SPLIT_PANE.setDividerLocation(DIVIDER_LOCATION);
+		SPLIT_PANE.setDividerLocation(DEFAULT_DIVIDER_LOCATION);
 
 		// ScrollPane for bottom of SplitPane for the message details
 		setFirstMessageDetails();
@@ -165,8 +165,16 @@ public class LocalLayerPathPanel extends JPanel {
 		return FORWARDED;
 	}
 
+	public int getDefaultDividerLocation() {
+		return DEFAULT_DIVIDER_LOCATION;
+	}
+	
+	public void setDividerLocation(int dividerLocation) {
+		SPLIT_PANE.setDividerLocation(dividerLocation);
+	}
+	
 	public int getDividerLocation() {
-		return DIVIDER_LOCATION;
+		return SPLIT_PANE.getDividerLocation();
 	}
 
 	public static Color getBackgroundColor() {

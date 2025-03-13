@@ -47,7 +47,7 @@ public class LocalLayerPathPanel extends JPanel {
 	private final boolean FORWARDED;
 
 	private final JSplitPane SPLIT_PANE;
-	private static final int DEFAULT_DIVIDER_LOCATION = 450;
+	private static final int DEFAULT_DIVIDER_LOCATION = 475;
 
 	// graphical message details tables
 	private MessageDetailsTable tableSent;

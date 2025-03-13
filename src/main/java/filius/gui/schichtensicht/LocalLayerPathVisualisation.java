@@ -113,8 +113,14 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	/** node info cell ratio of width to height */
 	private static final int NODE_INFO_CELL_HEIGHT = (int) Math.round(RECTANGLE_WIDTH / 1.935);
 	
-	/** background color of main node name box (only relevant if this is the main node) */
-	private static final Color MAIN_NODE_NAME_BG_COLOR = Color.decode("#9EE8A8");
+	/** background color of main node name cell (only relevant if this is the main node) */
+	private static final Color MAIN_NODE_NAME_BG_COLOR = Color.decode("#AEECB7");
+	/** backgroundcolor of main node info cell (only relevant if this is the main node) */
+	private static final Color MAIN_NODE_INFO_BG_COLOR = Color.decode("#ECFAEE");
+	/** background color of non main node name cell (only relevant if this is the main node) */
+	private static final Color NODE_NAME_BG_COLOR = Color.decode("#D7D7D7");
+	/** backgroundcolor of non main node info cell (only relevant if this is the main node) */
+	private static final Color NODE_INFO_BG_COLOR = Color.decode("#F7F7F7");
 	
 	private final JButton FORTH_IN_TIME;
 	private final JButton BACK_IN_TIME;
@@ -291,6 +297,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		if (LAYER_PATH_PANEL.isMainNode()) {
 			label.setBackground(MAIN_NODE_NAME_BG_COLOR);
+		} else {
+			label.setBackground(NODE_NAME_BG_COLOR);
 		}
 		label = setEmptyCell(this, xCoord0, 2 + Y_OFFSET, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
@@ -299,6 +307,11 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		String nodeInfo = createNodeInfoByMac(LAYER_PATH_PANEL.getInterfaceId());
 		editorPane = setEditorPane(this, nodeInfo, xCoord0, 3 + Y_OFFSET, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
+		if (LAYER_PATH_PANEL.isMainNode()) {
+			editorPane.setBackground(MAIN_NODE_INFO_BG_COLOR);
+		} else {
+			editorPane.setBackground(NODE_INFO_BG_COLOR);
+		}
 		label = setEmptyCell(this, xCoord0, 4 + Y_OFFSET, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
@@ -377,6 +390,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		if (LAYER_PATH_PANEL.isMainNode()) {
 			label.setBackground(MAIN_NODE_NAME_BG_COLOR);
+		} else {
+			label.setBackground(NODE_NAME_BG_COLOR);
 		}
 		label = setEmptyCell(this, X_OFFSET + 3, 2 + Y_OFFSET, 3, 1);
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
@@ -394,9 +409,19 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		editorPane = setEditorPane(this, nodeInfoLeft, X_OFFSET + 3, 3 + Y_OFFSET, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
 		label = setEmptyCell(this, X_OFFSET + 3, 4 + Y_OFFSET, 1, 1);
+		if (LAYER_PATH_PANEL.isMainNode()) {
+			editorPane.setBackground(MAIN_NODE_INFO_BG_COLOR);
+		} else {
+			editorPane.setBackground(NODE_INFO_BG_COLOR);
+		}
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 		editorPane = setEditorPane(this, nodeInfoRight, X_OFFSET + 5, 3 + Y_OFFSET, 1, 1, true);
 		setSize(editorPane, RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT);
+		if (LAYER_PATH_PANEL.isMainNode()) {
+			editorPane.setBackground(MAIN_NODE_INFO_BG_COLOR);
+		} else {
+			editorPane.setBackground(NODE_INFO_BG_COLOR);
+		}
 		label = setEmptyCell(this, X_OFFSET + 5, 4 + Y_OFFSET, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 

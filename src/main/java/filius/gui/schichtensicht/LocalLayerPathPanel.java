@@ -130,7 +130,7 @@ public class LocalLayerPathPanel extends JPanel {
 		SPLIT_PANE = new JSplitPane();
 		SPLIT_PANE.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		SPLIT_PANE.setDividerLocation(DEFAULT_DIVIDER_LOCATION);
-		// prevent the SplitPane to get user input (mainly to lock the divider(
+		// prevent the SplitPane to get user input (mainly to lock the divider)
 		SPLIT_PANE.setEnabled(false);
 
 		// ScrollPane for bottom of SplitPane for the message details

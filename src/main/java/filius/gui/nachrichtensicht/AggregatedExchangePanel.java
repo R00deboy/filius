@@ -111,9 +111,13 @@ public class AggregatedExchangePanel extends JTabbedPane implements AggregatedEx
 			tabelle.setScrollPane(scrollPane);
 
 			JSplitPane splitPane = new JSplitPane();
+			// prevent the SplitPane to get user input (mainly to lock the divider)
+			splitPane.setEnabled(false);
+			splitPane.setDividerLocation(500);
 			splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 			splitPane.setTopComponent(scrollPane);
 			splitPane.setBottomComponent(new JScrollPane(messageDetailsTable));
+			splitPane.setOneTouchExpandable(true);
 
 			panel.add(splitPane, BorderLayout.CENTER);
 

@@ -87,7 +87,6 @@ public class AggregatedExchangeDialog extends JDialog implements ExchangeCompone
                 AggregatedExchangeDialog.this.exchangePanel.clearUnavailableComponents();
             }
         });
-
     }
 
     @Override

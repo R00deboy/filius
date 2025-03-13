@@ -9,7 +9,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import filius.gui.nachrichtensicht.MessageDetailsTable;
 import filius.hardware.knoten.Gateway;
@@ -131,6 +130,8 @@ public class LocalLayerPathPanel extends JPanel {
 		SPLIT_PANE = new JSplitPane();
 		SPLIT_PANE.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		SPLIT_PANE.setDividerLocation(DEFAULT_DIVIDER_LOCATION);
+		// prevent the SplitPane to get user input (mainly to lock the divider(
+		SPLIT_PANE.setEnabled(false);
 
 		// ScrollPane for bottom of SplitPane for the message details
 		setFirstMessageDetails();
@@ -142,7 +143,7 @@ public class LocalLayerPathPanel extends JPanel {
 		add(SPLIT_PANE, BorderLayout.CENTER);
 
 		// set visualisation on top half of the SplitPane
-		SPLIT_PANE.setTopComponent(new JScrollPane(new LocalLayerPathVisualisation(this, globalLayerPath)));
+		SPLIT_PANE.setTopComponent(new LocalLayerPathVisualisation(this, globalLayerPath));
 	}
 
 	public Knoten getKnoten() {
@@ -249,7 +250,7 @@ public class LocalLayerPathPanel extends JPanel {
 	private void setFirstMessageDetails() {
 		// for the sender of a message
 		if (SENT) {
-			SPLIT_PANE.setBottomComponent(new JScrollPane(tableSent));
+			SPLIT_PANE.setBottomComponent(tableSent);
 			if (NODE instanceof Host) {
 				// if in local view or if in global view and active border does not start at end
 				// hide all layers except the maximum layer inside the frame (else show all
@@ -273,9 +274,9 @@ public class LocalLayerPathPanel extends JPanel {
 		// for the receiver of a message
 		else {
 			if (globalLayerPath != null && globalLayerPath.isActiveBorderOfNextPanelAtEnd()) {
-				SPLIT_PANE.setBottomComponent(new JScrollPane(tableSent));
+				SPLIT_PANE.setBottomComponent(tableSent);
 			} else {
-				SPLIT_PANE.setBottomComponent(new JScrollPane(tableReceived));
+				SPLIT_PANE.setBottomComponent(tableReceived);
 			}
 		}
 		// update greyed out cells (cells invisible to the layer)
@@ -309,14 +310,14 @@ public class LocalLayerPathPanel extends JPanel {
 				// save old divider location
 				int currentDividerLocation = SPLIT_PANE.getDividerLocation();
 				// set new table
-				SPLIT_PANE.setBottomComponent(new JScrollPane(tableSent));
+				SPLIT_PANE.setBottomComponent(tableSent);
 				// set old divider location
 				SPLIT_PANE.setDividerLocation(currentDividerLocation);
 			} else {
 				// save old divider location
 				int currentDividerLocation = SPLIT_PANE.getDividerLocation();
 				// set new table
-				SPLIT_PANE.setBottomComponent(new JScrollPane(tableReceived));
+				SPLIT_PANE.setBottomComponent(tableReceived);
 				// set old divider location
 				SPLIT_PANE.setDividerLocation(currentDividerLocation);
 			}

@@ -50,24 +50,32 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
     @Override
     protected void verarbeiteDatenEinheit(EthernetFrame frame) {
         Lauscher.getLauscher().addDatenEinheit(wanNic.getMac(), frame);
+<<<<<<< src/main/java/filius/software/nat/NatGatewayWANThread.java
         boolean check = true;
         if (frame.getDaten() instanceof IpPaket) {
             IpPaket packet = (IpPaket) frame.getDaten();
             check = (natGateway.eintragExistiert(packet));
         }
         if (!checkToLANAddress(frame) && !checkDiscardByFirewall(frame) && check) {
-            modifyIncomingFrame(frame);
-            forwardFrame(frame);
+            EthernetFrame modifiedFrame = modifyIncomingFrame(frame);
+            forwardFrame(modifiedFrame);
+=======
+        if (!checkToLANAddress(frame) && !checkDiscardByFirewall(frame)) {
+            EthernetFrame modifiedFrame = modifyIncomingFrame(frame);
+            forwardFrame(modifiedFrame);
+>>>>>>> src/main/java/filius/software/nat/NatGatewayWANThread.java
         }
     }
 
-    private void modifyIncomingFrame(EthernetFrame frame) {
-        if (frame.getDaten() instanceof IpPaket) {
-            IpPaket packet = (IpPaket) frame.getDaten();
+    private EthernetFrame modifyIncomingFrame(EthernetFrame frame) {
+        EthernetFrame modifiedFrame = frame.clone();
+        if (modifiedFrame.getDaten() instanceof IpPaket) {
+            IpPaket packet = (IpPaket) modifiedFrame.getDaten();
             if (packet.getEmpfaenger().contentEquals(wanNic.getIp())) {
                 natGateway.replaceDestination(packet);
             }
         }
+        return modifiedFrame;
     }
 
     private boolean checkToLANAddress(EthernetFrame frame) {

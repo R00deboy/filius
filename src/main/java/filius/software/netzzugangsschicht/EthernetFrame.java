@@ -32,6 +32,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import filius.software.vermittlungsschicht.IcmpPaket;
+import filius.software.vermittlungsschicht.IpPaket;
+
 /**
  * Diese Klasse implementiert einen Frame auf der Netzzugangsschicht.
  */
@@ -65,6 +68,20 @@ public class EthernetFrame implements Serializable {
         this.quellMacAdresse = quellMacAdresse;
         this.typ = typ;
         this.daten = daten;
+    }
+
+    public EthernetFrame clone() {
+        Object clonedData;
+        if (daten instanceof IcmpPaket) {
+            clonedData = ((IcmpPaket) daten).clone();
+        } else if (daten instanceof IpPaket) {
+            clonedData = ((IpPaket) daten).clone();
+        } else {
+            clonedData = daten;
+        }
+        EthernetFrame clonedFrame = new EthernetFrame(clonedData, quellMacAdresse, zielMacAdresse, typ);
+        clonedFrame.readByLauscherForMac = readByLauscherForMac;
+        return clonedFrame;
     }
 
     public void setReadByLauscherForMac(String mac) {

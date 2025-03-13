@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -44,6 +45,7 @@ import filius.rahmenprogramm.I18n;
  * layers of a message.
  */
 public class LocalLayerPathVisualisation extends JPanel implements I18n {
+	/** corresponding local layer path panel object */
 	private final LocalLayerPathPanel LAYER_PATH_PANEL;
 
 	/** if null, we are in the local layer path view */
@@ -113,7 +115,10 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private static final int NODE_NAME_CELL_HEIGHT = (int) (0.3 * RECTANGLE_HEIGHT);
 	/** node info cell ratio of width to height */
 	private static final int NODE_INFO_CELL_HEIGHT = (int) Math.round(RECTANGLE_WIDTH / 1.935);
-
+	
+	/** background color of main node name box (only relevant if this is the main node) */
+	private static final Color MAIN_NODE_NAME_BG_COLOR = Color.decode("#9EE8A8");
+	
 	private final JButton FORTH_IN_TIME;
 	private final JButton BACK_IN_TIME;
 
@@ -145,7 +150,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		Image arrowRight = arrowRightBI.getScaledInstance(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT, Image.SCALE_SMOOTH);
 		Image arrowLeft = arrowLeftBI.getScaledInstance(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT, Image.SCALE_SMOOTH);
 		FORTH_IN_TIME = new JButton(new ImageIcon(arrowRight));
+		FORTH_IN_TIME.setFocusable(false);
 		BACK_IN_TIME = new JButton(new ImageIcon(arrowLeft));
+		BACK_IN_TIME.setFocusable(false);
 		FORTH_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT));
 		BACK_IN_TIME.setPreferredSize(new Dimension(RECTANGLE_WIDTH, NODE_INFO_CELL_HEIGHT));
 
@@ -285,6 +292,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		label = setLabel(this, LAYER_PATH_PANEL.getKnoten().holeAnzeigeName(), xCoord0, 1 + Y_OFFSET, 1, 1, true);
 		setSize(label, RECTANGLE_WIDTH, NODE_NAME_CELL_HEIGHT);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
+		if (LAYER_PATH_PANEL.isMainNode()) {
+			label.setBackground(MAIN_NODE_NAME_BG_COLOR);
+		}
 		label = setEmptyCell(this, xCoord0, 2 + Y_OFFSET, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
@@ -368,6 +378,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		label = setLabel(this, LAYER_PATH_PANEL.getKnoten().holeAnzeigeName(), X_OFFSET + 3, 1 + Y_OFFSET, 3, 1, true);
 		setSize(label, 2 * RECTANGLE_WIDTH + GAP_BETWEEN_CELLS, NODE_NAME_CELL_HEIGHT);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
+		if (LAYER_PATH_PANEL.isMainNode()) {
+			label.setBackground(MAIN_NODE_NAME_BG_COLOR);
+		}
 		label = setEmptyCell(this, X_OFFSET + 3, 2 + Y_OFFSET, 3, 1);
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
@@ -702,39 +715,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			}
 		});
 
-		FORTH_IN_TIME.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				forthButtonPressLogic();
-			}
-		});
-
 		BACK_IN_TIME.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				backButtonPressLogic();
-			}
-		});
-
-		BACK_IN_TIME.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
 				backButtonPressLogic();
 			}
 		});

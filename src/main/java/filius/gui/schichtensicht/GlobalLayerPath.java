@@ -84,8 +84,9 @@ public class GlobalLayerPath extends JPanel implements I18n {
 		MAIN_FRAME_NUMBER = frameNumber;
 		MAIN_FRAME = LAUSCHER.getFrame(MAIN_INTERFACE_ID, MAIN_FRAME_NUMBER);
 
-		MAIN_DIALOG = new LayerPathDialog(owner, interfaceId, systemSoftware, frameNumber, this);
+		MAIN_DIALOG = new LayerPathDialog(owner, interfaceId, systemSoftware, frameNumber, this, true);
 		MAIN_LOCAL_PANEL = MAIN_DIALOG.getLocalLayerPathPanel();
+		MAIN_LOCAL_PANEL.setAsMainNode(true);
 
 		// overwrite title to "Globaler Weg durch die Schichten"
 		MAIN_DIALOG.setTitle(messages.getString("schichten_globaler_weg_msg1"));
@@ -216,8 +217,8 @@ public class GlobalLayerPath extends JPanel implements I18n {
 	}
 
 	/**
-	 * Switches to the view in the main dialog window to the next or previous
-	 * local panel of the local panel path list.
+	 * Switches to the view in the main dialog window to the next or previous local
+	 * panel of the local panel path list.
 	 * 
 	 * @param switchForward true, if the view should switch forward to the next
 	 *                      local panel, false if it should switch back
@@ -239,7 +240,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 				SystemSoftware systemSoftware = (SystemSoftware) parameters[1];
 				int frameNumber = (int) parameters[2];
 				activeBorderOfNextPanelAtEnd = false;
-				newPanel = new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this);
+				newPanel = new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this, false);
 				localPanelPath.add(newPanel);
 			}
 		} else {
@@ -255,7 +256,7 @@ public class GlobalLayerPath extends JPanel implements I18n {
 				SystemSoftware systemSoftware = (SystemSoftware) parameters[1];
 				int frameNumber = (int) parameters[2];
 				activeBorderOfNextPanelAtEnd = true;
-				newPanel = new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this);
+				newPanel = new LocalLayerPathPanel(OWNER, interfaceId, systemSoftware, frameNumber, this, false);
 				localPanelPath.add(0, newPanel);
 			}
 		}

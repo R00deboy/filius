@@ -21,7 +21,7 @@ public class LayerPathDialog extends JDialog implements I18n {
 	private final LocalLayerPathPanel LOCAL_LAYER_PATH_PANEL;
 
 	public LayerPathDialog(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int selectedFrameNumber,
-			GlobalLayerPath globalLayerPath) {
+			GlobalLayerPath globalLayerPath, boolean isMainNode) {
 		super(owner, true);
 
 		// user can resize the JDialog
@@ -35,7 +35,7 @@ public class LayerPathDialog extends JDialog implements I18n {
 		setTitle(messages.getString("schichten_lokaler_weg_msg1"));
 
 		LOCAL_LAYER_PATH_PANEL = new LocalLayerPathPanel(owner, interfaceId, systemSoftware, selectedFrameNumber,
-				globalLayerPath);
+				globalLayerPath, isMainNode);
 
 		// set size and positioning properties of outer JDialog
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -49,7 +49,8 @@ public class LayerPathDialog extends JDialog implements I18n {
 		// Panel is in the center of the BorderLayout
 		add(LOCAL_LAYER_PATH_PANEL, BorderLayout.CENTER);
 
-		// When in global view Dialog will be set visible inside the global view class
+		// When in global view this Dialog will be set visible inside the
+		// GlobalLayerPath class
 		if (globalLayerPath == null) {
 			setVisible(true);
 		}

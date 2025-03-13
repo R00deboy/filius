@@ -36,7 +36,10 @@ public class LocalLayerPathPanel extends JPanel {
 	/** frame number which was selected by mouse click, starts with 1 */
 	private final int FRAME_NUMBER;
 
-	/** if null, we are in the local layer path view */
+	/**
+	 * Corresponding global layer path object, if it exists. If null, we are in the
+	 * local layer path view.
+	 */
 	private final GlobalLayerPath globalLayerPath;
 
 	/** if the node sent the frame, otherwise the node received the frame */
@@ -74,8 +77,14 @@ public class LocalLayerPathPanel extends JPanel {
 
 	private static final Color BACKGROUND_COLOR = Color.WHITE;
 
+	/**
+	 * determines if this node should be highlighted as the main node (default is
+	 * false)
+	 */
+	private boolean isMainNode;
+
 	public LocalLayerPathPanel(JFrame owner, String interfaceId, SystemSoftware systemSoftware, int selectedFrameNumber,
-			GlobalLayerPath globalLayerPath) {
+			GlobalLayerPath globalLayerPath, boolean isMainNode) {
 		super();
 
 		// inherit instance variables from super container (localPathDialog)
@@ -83,6 +92,7 @@ public class LocalLayerPathPanel extends JPanel {
 		this.INTERFACE_ID = interfaceId;
 		this.FRAME_NUMBER = selectedFrameNumber;
 		this.globalLayerPath = globalLayerPath;
+		this.isMainNode = isMainNode;
 		MAX_LAYER_OF_OPERATION = ((InternetKnoten) getKnoten()).getMaxLayerOfOperation();
 
 		// determine if frame was sent or received
@@ -166,17 +176,25 @@ public class LocalLayerPathPanel extends JPanel {
 	public int getDefaultDividerLocation() {
 		return DEFAULT_DIVIDER_LOCATION;
 	}
-	
+
 	public void setDividerLocation(int dividerLocation) {
 		SPLIT_PANE.setDividerLocation(dividerLocation);
 	}
-	
+
 	public int getDividerLocation() {
 		return SPLIT_PANE.getDividerLocation();
 	}
 
 	public static Color getBackgroundColor() {
 		return BACKGROUND_COLOR;
+	}
+
+	public boolean isMainNode() {
+		return isMainNode;
+	}
+
+	public void setAsMainNode(boolean isMainNode) {
+		this.isMainNode = isMainNode;
 	}
 
 	public Dimension getSizeOfMessageDetailsTable() {

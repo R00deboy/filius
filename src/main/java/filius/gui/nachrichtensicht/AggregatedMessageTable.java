@@ -510,7 +510,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 			Color color = null;
 			if (typeOfColor == "foregroundColor") {
 				color = valueOf(layerName).foregroundColor;
-			}  else if (typeOfColor == "foregroundColorGreyedOut") {
+			} else if (typeOfColor == "foregroundColorGreyedOut") {
 				color = valueOf(layerName).foregroundColorGreyedOut;
 			} else if (typeOfColor == "backgroundColor") {
 				color = valueOf(layerName).backgroundColor;
@@ -565,7 +565,8 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 	private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int frameNumber) {
 		LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
 				+ " (AggregatedMessageTable), showLocalPathThroughLayers()");
-		new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, frameNumber, null);
+		new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, frameNumber, null,
+				true);
 	}
 
 	/**

@@ -120,7 +120,7 @@ public class WebBrowser extends ClientAnwendung implements I18n {
             try {
                 socket.senden(nachricht.toString());
 
-                String responseData = socket.empfangen();
+                String responseData = socket != null ? socket.empfangen() : null;
                 if (responseData == null) {
                     HTTPNachricht response = new HTTPNachricht(HTTPNachricht.CLIENT);
                     response.setDaten(erzeugeHtmlFehlermeldung(0));

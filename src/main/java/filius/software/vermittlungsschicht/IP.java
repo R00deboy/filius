@@ -323,6 +323,16 @@ public class IP extends VermittlungsProtokoll implements I18n {
     public void starten() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (IP), starten()");
 
+        // ensure that there are no pdu's left from last run!
+        if (ipPaketListeTCP.size() > 0) {
+            LOG.debug("Clear TCP buffer. Still data left from last run.");
+            ipPaketListeTCP.clear();
+        }
+        if (ipPaketListeUDP.size() > 0) {
+            LOG.debug("Clear UDP buffer. Still data left from last run.");
+            ipPaketListeUDP.clear();
+        }
+
         thread = new IPThread(this);
         thread.starten();
     }

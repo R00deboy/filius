@@ -220,6 +220,9 @@ public abstract class TransportProtokoll extends Protokoll implements I18n, Runn
     public void starten() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (TransportProtokoll), starten()");
 
+        // ensure that there are no pdu's left from last run!
+        segmentListe.clear();
+
         thread = new TransportProtokollThread(this);
         thread.starten();
 

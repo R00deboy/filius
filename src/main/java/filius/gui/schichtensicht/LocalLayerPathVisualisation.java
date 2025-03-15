@@ -99,7 +99,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	 * instance variables for nested messages visualisation: border width of
 	 * standard border around nested messages
 	 */
-	private static final int MAIN_BORDER_WIDTH = 2;
+	private static final int MAIN_BORDER_WIDTH = 1;
 	/** left gap around a nested message */
 	private static final int INDENT_NESTED_MSGS = 20;
 	/** upper, lower and right gap between neighbouring nested messages */
@@ -112,16 +112,39 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	private static final int NODE_NAME_CELL_HEIGHT = (int) (0.3 * RECTANGLE_HEIGHT);
 	/** node info cell ratio of width to height */
 	private static final int NODE_INFO_CELL_HEIGHT = (int) Math.round(RECTANGLE_WIDTH / 1.935);
-	
-	/** background color of main node name cell (only relevant if this is the main node) */
+
+	/** color of active border on the outside */
+	private static final Color ACTIVE_BORDER_COLOR_OUTSIDE = Color.decode("#00E000");
+	/** color of active border on the inside */
+	private static final Color ACTIVE_BORDER_COLOR_INSIDE = Color.decode("#00CCC00");
+	/** color of border around nested messages */
+	private static final Color INACTIVE_BORDER_COLOR = Color.decode("#8C8C8C");
+	/** color of arrows */
+	private static final Color INACTIVE_ARROW_COLOR = Color.BLACK;
+	/** color of arrows */
+	private static final Color ACTIVE_ARROW_COLOR = ACTIVE_BORDER_COLOR_INSIDE;
+
+	/**
+	 * background color of main node name cell (only relevant if this is the main
+	 * node)
+	 */
 	private static final Color MAIN_NODE_NAME_BG_COLOR = Color.decode("#AEECB7");
-	/** backgroundcolor of main node info cell (only relevant if this is the main node) */
+	/**
+	 * backgroundcolor of main node info cell (only relevant if this is the main
+	 * node)
+	 */
 	private static final Color MAIN_NODE_INFO_BG_COLOR = Color.decode("#ECFAEE");
-	/** background color of non main node name cell (only relevant if this is the main node) */
+	/**
+	 * background color of non main node name cell (only relevant if this is the
+	 * main node)
+	 */
 	private static final Color NODE_NAME_BG_COLOR = Color.decode("#D7D7D7");
-	/** backgroundcolor of non main node info cell (only relevant if this is the main node) */
+	/**
+	 * backgroundcolor of non main node info cell (only relevant if this is the main
+	 * node)
+	 */
 	private static final Color NODE_INFO_BG_COLOR = Color.decode("#F7F7F7");
-	
+
 	private final JButton FORTH_IN_TIME;
 	private final JButton BACK_IN_TIME;
 
@@ -248,7 +271,6 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		c = new GridBagConstraints();
 		JLabel label;
 		JEditorPane editorPane;
-		boolean activeBorder;
 
 		// coordinates for the placement inside the GridBagLayout
 		int xCoord0;
@@ -257,6 +279,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		int xCoord3;
 
 		if (LAYER_PATH_PANEL.isSent()) {
+			// from middle to right
 			xCoord0 = X_OFFSET + 0;
 			xCoord1 = X_OFFSET + 1;
 			xCoord2 = X_OFFSET + 2;
@@ -272,6 +295,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			coloredLayerIndicators(5, SQUARE_SIDE_LENGTH, false);
 			coloredLayerIndicators(6, SQUARE_SIDE_LENGTH, true);
 		} else {
+			// from middle to left
 			xCoord0 = X_OFFSET + 3;
 			xCoord1 = X_OFFSET + 2;
 			xCoord2 = X_OFFSET + 1;
@@ -319,20 +343,21 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		// between
 		createRectangularNestedMessages(xCoord0, null);
 
-		// create first wire
-		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
+		// create first wire and if this visualisation is part of the global view before
+		// the main panel, create active arrow here
+		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH,
+				globalLayerPath != null && globalLayerPath.isActiveBorderOfNextPanelAtEnd());
 		setFinishedLabel(this, label, xCoord1, 11 + Y_OFFSET, 1, 1);
 
 		// create square nested messages and if packet was received or this
 		// visualisation is part of the global view before the main panel, create active
 		// border here
-		activeBorder = !LAYER_PATH_PANEL.isSent()
-				|| (globalLayerPath != null && globalLayerPath.isActiveBorderOfNextPanelAtEnd());
-		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, activeBorder);
+		label = new NestedMessagesVisualisation(1, SQUARE_SIDE_LENGTH, 1, !LAYER_PATH_PANEL.isSent()
+				|| (globalLayerPath != null && globalLayerPath.isActiveBorderOfNextPanelAtEnd()));
 		setFinishedLabel(this, label, xCoord2, 11 + Y_OFFSET, 1, 1);
 
-		// create second wire
-		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
+		// create second wire and if packet was received, create active arrow here
+		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, !LAYER_PATH_PANEL.isSent());
 		setFinishedLabel(this, label, xCoord3, 11 + Y_OFFSET, 1, 1);
 	}
 
@@ -356,11 +381,14 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		coloredLayerIndicators(X_OFFSET + 8, SQUARE_SIDE_LENGTH, false);
 		coloredLayerIndicators(X_OFFSET + 9, SQUARE_SIDE_LENGTH, true);
 
-		// create first wire on the left
-		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
+		// create first wire on the left and if packet was received and either not part
+		// of the global view or part of the global view but not before the main panel,
+		// create active arrow here
+		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, !LAYER_PATH_PANEL.isSent()
+				&& (globalLayerPath == null || !globalLayerPath.isActiveBorderOfNextPanelAtEnd()));
 		setFinishedLabel(this, label, X_OFFSET + 0, 11 + Y_OFFSET, 1, 1);
 		// create last (fourth) wire on the right
-		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
+		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, false);
 		setFinishedLabel(this, label, X_OFFSET + 8, 11 + Y_OFFSET, 1, 1);
 
 		// create left side square nested messages and if packet was received and either
@@ -376,10 +404,12 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		setFinishedLabel(this, label, X_OFFSET + 7, 11 + Y_OFFSET, 1, 1);
 
 		// create second wire on the left
-		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
+		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, false);
 		setFinishedLabel(this, label, X_OFFSET + 2, 11 + Y_OFFSET, 1, 1);
-		// create second last (third) wire on the right
-		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH);
+		// create second last (third) wire on the right and if this visualisation is
+		// part of the global view before the main panel, create active arrow here
+		label = new WireWithArrow(null, true, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH,
+				globalLayerPath != null && globalLayerPath.isActiveBorderOfNextPanelAtEnd());
 		setFinishedLabel(this, label, X_OFFSET + 6, 11 + Y_OFFSET, 1, 1);
 
 		// with GridBag width of 3: node name cell with empty cell above and below
@@ -430,8 +460,11 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		createRectangularNestedMessages(X_OFFSET + 3, false);
 		createRectangularNestedMessages(X_OFFSET + 5, true);
 
-		// set right arrow in the middle (on layer 2)
-		label = new Arrow(null, true, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT);
+		// set right arrow in the middle (on layer 2) and if the packet was sent and
+		// this visualisation is part of the global view before the main panel, create
+		// active arrow here
+		label = new Arrow(null, true, GAP_BETWEEN_CELLS, RECTANGLE_HEIGHT, LAYER_PATH_PANEL.isSent()
+				&& (globalLayerPath == null || !globalLayerPath.isActiveBorderOfNextPanelAtEnd()));
 		setFinishedLabel(this, label, X_OFFSET + 4, 9 + Y_OFFSET, 1, 1);
 
 		// The right arrow is located at y coordinate 9 (see above). Thus skip i = 9.
@@ -553,7 +586,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			int maxLayerOfOperation = ((InternetKnoten) LAYER_PATH_PANEL.getKnoten()).getMaxLayerOfOperation();
 			if (layerNumber <= Math.min(LAYER_PATH_PANEL.getMaxLayerInsideFrame(), maxLayerOfOperation)
 					&& layerNumber >= 2) {
-				label = new Arrow(arrowPointsDown, null, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
+				label = new Arrow(arrowPointsDown, null, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS, false);
 				setFinishedLabel(this, label, xCoord, 6 + 2 * (4 - layerNumber) + Y_OFFSET, 1, 1);
 			}
 		}
@@ -880,26 +913,38 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 
 		// list with all the coordinates of the components with a possible active border
 		List<int[]> gridBagCoordsWithBorders;
+		// all incoming arrows for the components of list gridBagCoordsWithBorders
+		List<int[]> gridBagCoordsWithIncomingArrows;
 		if (!LAYER_PATH_PANEL.isForwarded()) {
 			if (LAYER_PATH_PANEL.isSent()) {
 				gridBagCoordsWithBorders = Collections
 						.unmodifiableList(Arrays.asList(new int[] { X_OFFSET + 0, Y_OFFSET + 5 },
 								new int[] { X_OFFSET + 0, Y_OFFSET + 7 }, new int[] { X_OFFSET + 0, Y_OFFSET + 9 },
 								new int[] { X_OFFSET + 0, Y_OFFSET + 11 }, new int[] { X_OFFSET + 2, Y_OFFSET + 11 }));
+				gridBagCoordsWithIncomingArrows = Collections.unmodifiableList(Arrays.asList(new int[] { -1, -1 },
+						new int[] { X_OFFSET + 0, Y_OFFSET + 6 }, new int[] { X_OFFSET + 0, Y_OFFSET + 8 },
+						new int[] { X_OFFSET + 0, Y_OFFSET + 10 }, new int[] { X_OFFSET + 1, Y_OFFSET + 11 }));
 			} else {
 				gridBagCoordsWithBorders = Collections
 						.unmodifiableList(Arrays.asList(new int[] { X_OFFSET + 1, Y_OFFSET + 11 },
 								new int[] { X_OFFSET + 3, Y_OFFSET + 11 }, new int[] { X_OFFSET + 3, Y_OFFSET + 9 },
 								new int[] { X_OFFSET + 3, Y_OFFSET + 7 }, new int[] { X_OFFSET + 3, Y_OFFSET + 5 }));
+				gridBagCoordsWithIncomingArrows = Collections
+						.unmodifiableList(Arrays.asList(new int[] { X_OFFSET + 0, Y_OFFSET + 11 },
+								new int[] { X_OFFSET + 2, Y_OFFSET + 11 }, new int[] { X_OFFSET + 3, Y_OFFSET + 10 },
+								new int[] { X_OFFSET + 3, Y_OFFSET + 8 }, new int[] { X_OFFSET + 3, Y_OFFSET + 6 }));
 			}
 		} else {
 			gridBagCoordsWithBorders = Collections.unmodifiableList(
 					Arrays.asList(new int[] { X_OFFSET + 1, Y_OFFSET + 11 }, new int[] { X_OFFSET + 3, Y_OFFSET + 11 },
 							new int[] { X_OFFSET + 3, Y_OFFSET + 9 }, new int[] { X_OFFSET + 5, Y_OFFSET + 9 },
 							new int[] { X_OFFSET + 5, Y_OFFSET + 11 }, new int[] { X_OFFSET + 7, Y_OFFSET + 11 }));
+			gridBagCoordsWithIncomingArrows = Collections.unmodifiableList(
+					Arrays.asList(new int[] { X_OFFSET + 0, Y_OFFSET + 11 }, new int[] { X_OFFSET + 2, Y_OFFSET + 11 },
+							new int[] { X_OFFSET + 3, Y_OFFSET + 10 }, new int[] { X_OFFSET + 4, Y_OFFSET + 9 },
+							new int[] { X_OFFSET + 5, Y_OFFSET + 10 }, new int[] { X_OFFSET + 6, Y_OFFSET + 11 }));
 		}
 
-		// active border --> black, next active border --> red
 		// go through all components
 		for (Component component : this.getComponents()) {
 			int gridx = GB_LAYOUT.getConstraints(component).gridx;
@@ -908,20 +953,22 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			// compare coordinates with list
 			if (gridx == gridBagCoordsWithBorders.get(pointInTime)[0]
 					&& gridy == gridBagCoordsWithBorders.get(pointInTime)[1]) {
-				// make current active border red
-				try {
-					((NestedMessagesVisualisation) component).createAndSetBorder(true);
-				} catch (Exception e) {
-					System.out.println("component is not an instance of NestedMessagesVisualisation");
-				}
+				// set current active border to active color
+				((NestedMessagesVisualisation) component).createAndSetBorder(true);
 			} else if (gridx == gridBagCoordsWithBorders.get(lastPointInTime)[0]
 					&& gridy == gridBagCoordsWithBorders.get(lastPointInTime)[1]) {
-				// make previous active border black
-				try {
-					((NestedMessagesVisualisation) component).createAndSetBorder(false);
-				} catch (Exception e) {
-					System.out.println("component is not an instance of NestedMessagesVisualisation");
-				}
+				// set previous active border to standard color
+				((NestedMessagesVisualisation) component).createAndSetBorder(false);
+			} else if (gridx == gridBagCoordsWithIncomingArrows.get(pointInTime)[0]
+					&& gridy == gridBagCoordsWithIncomingArrows.get(pointInTime)[1]) {
+				// set current active arrow to active color
+				((Arrow) component).setColor(ACTIVE_ARROW_COLOR);
+				((Arrow) component).repaint();
+			} else if (gridx == gridBagCoordsWithIncomingArrows.get(lastPointInTime)[0]
+					&& gridy == gridBagCoordsWithIncomingArrows.get(lastPointInTime)[1]) {
+				// set previous active arrow to standard color
+				((Arrow) component).setColor(INACTIVE_ARROW_COLOR);
+				((Arrow) component).repaint();
 			}
 		}
 	}
@@ -1013,11 +1060,11 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			// draw the (main or active) border around the message
 			Border border;
 			if (activeBorder) {
-				MatteBorder outside = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#5AD86C"));
-				MatteBorder inside = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#75DF83"));
+				MatteBorder outside = BorderFactory.createMatteBorder(1, 1, 1, 1, ACTIVE_BORDER_COLOR_OUTSIDE);
+				MatteBorder inside = BorderFactory.createMatteBorder(2, 2, 2, 2, ACTIVE_BORDER_COLOR_INSIDE);
 				border = BorderFactory.createCompoundBorder(outside, inside);
 			} else {
-				border = BorderFactory.createMatteBorder(2, 2, 2, 2, Color.BLACK);
+				border = BorderFactory.createMatteBorder(1, 1, 1, 1, INACTIVE_BORDER_COLOR);
 			}
 			setBorder(border);
 		}
@@ -1061,11 +1108,23 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		private Boolean pointsDown; // if false points up, if null points left or right
 		private Boolean pointsRight; // if false points left, if null points down or up
 
-		private Arrow(Boolean pointsDown, Boolean pointsRight, int rectangleWidth, int rectangleHeight) {
+		private Color color;
+
+		private Arrow(Boolean pointsDown, Boolean pointsRight, int rectangleWidth, int rectangleHeight,
+				boolean activeArrow) {
 			this.pointsDown = pointsDown;
 			this.pointsRight = pointsRight;
 			this.rectangleWidth = rectangleWidth;
 			this.rectangleHeight = rectangleHeight;
+			if (activeArrow) {
+				this.color = ACTIVE_ARROW_COLOR;
+			} else {
+				this.color = INACTIVE_ARROW_COLOR;
+			}
+		}
+
+		private void setColor(Color color) {
+			this.color = color;
 		}
 
 		@Override
@@ -1078,7 +1137,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 			// Let UI Delegate paint first, which includes background filling since this
 			// component is opaque.
 			super.paintComponent(g);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 
 			int xMiddle = rectangleWidth / 2;
 			int yMiddle = rectangleHeight / 2;
@@ -1146,8 +1205,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	 */
 	protected class WireWithArrow extends Arrow {
 
-		private WireWithArrow(Boolean pointsDown, Boolean pointsRight, int rectangleWidth, int rectangleHeight) {
-			super(pointsDown, pointsRight, rectangleWidth, rectangleHeight);
+		private WireWithArrow(Boolean pointsDown, Boolean pointsRight, int rectangleWidth, int rectangleHeight,
+				boolean activeArrow) {
+			super(pointsDown, pointsRight, rectangleWidth, rectangleHeight, activeArrow);
 		}
 
 		@Override

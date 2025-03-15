@@ -1,5 +1,19 @@
 # Changelog Filius
 
+## [2.8.0] - 2025-03-15
+### Added
+ * Experimental feature for additional icon sets (select via settings)
+ 
+### Changed
+ * Handling of UDP rules by firewall
+
+### Fixed
+ * Overlapping widgets fixed
+ * Remove firewall ui log "null"
+ * Send ARP requests from host to unknown network in case of DHCP
+ * Do not change pdu's in network traffic viewer after NAT manipulation
+ * Ensure that no packets from previous simulation run are processed after simulation start
+
 ## [2.7.1] - 2024-11-30
 ### Fixed
  * Start-up with Filius scenario as program argument fixed

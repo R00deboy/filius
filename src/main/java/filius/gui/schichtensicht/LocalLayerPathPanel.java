@@ -133,7 +133,6 @@ public class LocalLayerPathPanel extends JPanel {
 		// prevent the SplitPane to get user input (mainly to lock the divider)
 		SPLIT_PANE.setEnabled(false);
 
-		// ScrollPane for bottom of SplitPane for the message details
 		setFirstMessageDetails();
 
 		// layout manager for this panel
@@ -302,7 +301,7 @@ public class LocalLayerPathPanel extends JPanel {
 	 * @param senderSideIsActive  If true, the visualisation is on the sender side,
 	 *                            otherwise on the receiver side.
 	 * @param senderSideWasActive If true, the visualisation was on the sender side
-	 *                            in the last step
+	 *                            in the last step.
 	 */
 	public void updateMessageDetailsDisplay(boolean senderSideIsActive, boolean senderSideWasActive) {
 		if (senderSideIsActive != senderSideWasActive) {

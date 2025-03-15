@@ -134,6 +134,20 @@ public class Ethernet extends Protokoll {
         InternetKnoten knoten;
         EthernetThread interfaceBeobachter;
 
+        // ensure that there are no pdu's left from last run!
+        if (arpPakete.size() > 0) {
+            LOG.debug("Clear ARP buffer. Still data left from last run.");
+            arpPakete.clear();
+        }
+        if (icmpPakete.size() > 0) {
+            LOG.debug("Clear ICMP buffer. Still data left from last run.");
+            icmpPakete.clear();
+        }
+        if (ipPakete.size() > 0) {
+            LOG.debug("Clear IP buffer. Still data left from last run.");
+            ipPakete.clear();
+        }
+
         if (holeSystemSoftware().getKnoten() instanceof InternetKnoten) {
             knoten = (InternetKnoten) holeSystemSoftware().getKnoten();
 

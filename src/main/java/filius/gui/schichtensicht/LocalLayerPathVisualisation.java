@@ -1161,7 +1161,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 
 			// wire (ground)
 			g.setColor(MessageDetailsTable.getLayerColorVar("backgroundColor", 1));
-			g.fillRect(0, this.rectangleHeight - 3 * MAIN_BORDER_WIDTH, this.rectangleWidth, 3 * MAIN_BORDER_WIDTH);
+			g.fillRect(0, this.rectangleHeight - 6, this.rectangleWidth, 6);
 		}
 	}
 }

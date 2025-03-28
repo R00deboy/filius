@@ -580,6 +580,7 @@ public class Lauscher implements I18n {
 	 * @param originalFrame the frame whose data should be equal to the returned one
 	 * @param ttl           the desired TTL
 	 * @return frame with same data and specified TTL (null if it does not exist)
+	 * @author Christoph Irniger
 	 */
 	public EthernetFrame getFrameWithSameContentAndSpecificTTL(EthernetFrame originalFrame, int ttl) {
 		if (originalFrame.getDaten() instanceof IpPaket) {
@@ -654,6 +655,7 @@ public class Lauscher implements I18n {
 	 * @param frame       frame which the number should be computed for
 	 * @return the frame number in the data exchange window (starts with 1) or 0 if
 	 *         the frame was not found
+	 * @author Christoph Irniger
 	 */
 	public int getFrameNumber(String interfaceId, EthernetFrame frame) {
 		LinkedList<Object[]> framesMitZeitstempel = datenEinheiten.get(interfaceId);

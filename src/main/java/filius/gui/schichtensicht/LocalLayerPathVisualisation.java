@@ -74,9 +74,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	 */
 	private final static int X_OFFSET = 2;
 
-	/**
-	 * constant to be able to shift the whole visualisation down
-	 */
+	/** constant to be able to shift the whole visualisation down */
 	private final static int Y_OFFSET = 1;
 
 	/**

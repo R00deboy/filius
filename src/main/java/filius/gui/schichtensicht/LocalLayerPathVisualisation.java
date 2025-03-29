@@ -337,8 +337,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		label = setEmptyCell(this, xCoord0, 4 + Y_OFFSET, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
-		// create visualisations of rectangular nested messages including the arrows in
-		// between
+		// from here until the end of the method: create visualisations of rectangular
+		// nested messages and the arrows in between
+
 		createRectangularNestedMessages(xCoord0, null);
 
 		// create first wire and if this visualisation is part of the global view before
@@ -453,8 +454,9 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 		label = setEmptyCell(this, X_OFFSET + 5, 4 + Y_OFFSET, 1, 1);
 		setSize(label, RECTANGLE_WIDTH, GAP_BETWEEN_CELLS);
 
-		// visualisations of rectangular nested messages including the arrows
-		// in between
+		// from here until the end of the method: create visualisations of rectangular
+		// nested messages and the arrows in between
+		
 		createRectangularNestedMessages(X_OFFSET + 3, false);
 		createRectangularNestedMessages(X_OFFSET + 5, true);
 

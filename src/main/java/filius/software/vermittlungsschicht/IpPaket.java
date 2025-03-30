@@ -51,6 +51,7 @@ public class IpPaket extends ProtocolDataUnit implements Cloneable {
     @Override
     public IpPaket clone() {
         IpPaket clone = new IpPaket(protocol);
+        clone.setRcvNic(getRcvNic());
         copyIpPacketAttributes(clone);
         return clone;
     }

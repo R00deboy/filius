@@ -25,8 +25,10 @@
  */
 package filius.software.system;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -144,8 +146,7 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
      */
     public InternetKnotenBetriebssystem() {
         super();
-        LOG.trace("INVOKED-2 (" + this.hashCode() + ") " + getClass()
-                + " (InternetKnotenBetriebssystem), constr: InternetKnotenBetriebssystem()");
+        LOG.trace("(InternetKnotenBetriebssystem), constr: InternetKnotenBetriebssystem()");
 
         installierteAnwendung = new HashMap<String, Anwendung>();
 
@@ -168,10 +169,7 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
         dhcpServer = new DHCPServer();
         dhcpServer.setSystemSoftware(this);
 
-        LOG.debug("DEBUG: InternetKnotenBetriebssystem (" + this.hashCode() + ")\n" + "\tEthernet: "
-                + ethernet.hashCode() + "\n" + "\tARP: " + arpVermittlung.hashCode() + "\n" + "\tIP: "
-                + vermittlung.hashCode() + "\n" + "\tICMP: " + icmpVermittlung.hashCode() + "\n" + "\tTCP: "
-                + tcp.hashCode() + "\n" + "\tUDP: " + udp.hashCode());
+        LOG.trace("InternetKnotenBetriebssystem initialized");
     }
 
     /**
@@ -181,7 +179,7 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
      */
     public void beenden() {
         super.beenden();
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (InternetKnotenBetriebssystem), beenden()");
+        LOG.trace("(InternetKnotenBetriebssystem), beenden()");
 
         // Die einzelnen Protokoll-Threads werden beginnend
         // mit der untersten Schicht beendet.
@@ -228,7 +226,7 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
     @Override
     public synchronized void starten() {
         super.starten();
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (InternetKnotenBetriebssystem), starten()");
+        LOG.trace("(InternetKnotenBetriebssystem), starten()");
 
         dateisystem.fixDirectory(dateisystem.getRoot());
 
@@ -616,6 +614,15 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
         return null == nic ? null : nic.getMac();
     }
 
+    public List<NetzwerkInterface> allNetworkInterfaces() {
+        List<NetzwerkInterface> nicList = Collections.emptyList();
+        if (getKnoten() instanceof InternetKnoten) {
+            InternetKnoten knoten = (InternetKnoten) getKnoten();
+            nicList = knoten.getNetzwerkInterfaces();
+        }
+        return nicList;
+    }
+
     public String dhcpEnabledMACAddress() {
         return primaryMACAddress();
     }
@@ -625,7 +632,7 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
      * Entwurfsmusters Fassade
      */
     public String getDNSServer() {
-        LOG.debug(
+        LOG.trace(
                 "INVOKED (" + this.hashCode() + ") " + getClass() + " (InternetKnotenBetriebssystem), getDNSServer()");
         InternetKnoten knoten;
 

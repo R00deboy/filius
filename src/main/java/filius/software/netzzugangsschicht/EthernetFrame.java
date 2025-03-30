@@ -56,12 +56,12 @@ public class EthernetFrame extends ProtocolDataUnit {
     private String typ;
 
     /** die Nutzdaten */
-    private Object daten;
+    private ProtocolDataUnit daten;
 
     private Set<String> readByLauscherForMac = new HashSet<>();
 
     /** Konstruktor zur Initialisierung der Attribute des Frames */
-    public EthernetFrame(Object daten, String quellMacAdresse, String zielMacAdresse, String typ) {
+    public EthernetFrame(ProtocolDataUnit daten, String quellMacAdresse, String zielMacAdresse, String typ) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (EthernetFrame), constr: EthernetFrame(" + daten
                 + "," + quellMacAdresse + "," + zielMacAdresse + "," + typ + ")");
         this.zielMacAdresse = zielMacAdresse;
@@ -71,7 +71,7 @@ public class EthernetFrame extends ProtocolDataUnit {
     }
 
     public EthernetFrame clone() {
-        Object clonedData;
+        ProtocolDataUnit clonedData;
         if (daten instanceof IcmpPaket) {
             clonedData = ((IcmpPaket) daten).clone();
         } else if (daten instanceof IpPaket) {
@@ -81,6 +81,7 @@ public class EthernetFrame extends ProtocolDataUnit {
         }
         EthernetFrame clonedFrame = new EthernetFrame(clonedData, quellMacAdresse, zielMacAdresse, typ);
         clonedFrame.readByLauscherForMac = readByLauscherForMac;
+        clonedFrame.setRcvNic(getRcvNic());
         return clonedFrame;
     }
 
@@ -93,7 +94,7 @@ public class EthernetFrame extends ProtocolDataUnit {
     }
 
     /** Zugriff auf die Daten, die mit dem Frame verschickt werden */
-    public Object getDaten() {
+    public ProtocolDataUnit getDaten() {
         return daten;
     }
 

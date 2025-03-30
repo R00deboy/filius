@@ -80,9 +80,10 @@ public class DHCPServer extends UDPServerAnwendung {
     /** Liste mit IP-Adressen, die von anderen Servern angeboten wurden. */
     List<DHCPAddressAssignment> blacklist = new ArrayList<DHCPAddressAssignment>();
 
-    /** Konstruktor, in dem der UDP-Port 67 gesetzt wird. */
+    /**
+     * Konstruktor, in dem der UDP-Port 67 gesetzt wird.
+     */
     public DHCPServer() {
-        super();
         port = DHCP_SERVER_PORT;
     }
 

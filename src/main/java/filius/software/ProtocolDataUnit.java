@@ -27,7 +27,19 @@ package filius.software;
 
 import java.io.Serializable;
 
+import filius.hardware.NetzwerkInterface;
+
 @SuppressWarnings("serial")
 public abstract class ProtocolDataUnit implements Serializable {
 
+    /** The receiving network interface, set on ethernet layer or whenever the PDU is extracted from lower layer PDU. */
+    private transient NetzwerkInterface rcvNic;
+
+    public NetzwerkInterface getRcvNic() {
+        return rcvNic;
+    }
+
+    public void setRcvNic(NetzwerkInterface rcvNic) {
+        this.rcvNic = rcvNic;
+    }
 }

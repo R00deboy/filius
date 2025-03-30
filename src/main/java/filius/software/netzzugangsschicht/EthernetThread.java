@@ -67,6 +67,7 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
                 && !etp.getZielMacAdresse().equals(this.netzwerkInterface.getMac())) {
             return;
         }
+        etp.getDaten().setRcvNic(netzwerkInterface);
 
         if (etp.getTyp().equals(EthernetFrame.IP)) {
             IpPaket ipPacket = (IpPaket) etp.getDaten();
@@ -74,8 +75,6 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
                 synchronized (ethernet.holeICMPPuffer()) {
                     ethernet.holeICMPPuffer().add((IcmpPaket) ipPacket);
                     ethernet.holeICMPPuffer().notifyAll();
-                    // 'all' means: Terminal ping command (if any in this instance) and default network packet
-                    // processing
                 }
             } else {
                 synchronized (ethernet.holeIPPuffer()) {
@@ -84,24 +83,8 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
                 }
             }
         } else if (etp.getTyp().equals(EthernetFrame.ARP)) {
-            // if ARP packet is not addressed to this specific NIC, but possibly
-            // another NIC of this node, then return
-            // (this is meant to prevent routers from responding to all ARP
-            // packets meant for some of their NICs
-            // without even having received the packet on this specific NIC,
-            // i.e., without physical connection)
-            ArpPaket arpPDU = (ArpPaket) etp.getDaten();
-            String zielIp = arpPDU.getTargetIP();
-            if (!zielIp.equals(netzwerkInterface.getIp()) && !"0.0.0.0".equals(netzwerkInterface.getIp())) {
-                LOG.debug("received ARP packet from (" + arpPDU.getSenderIP() + "," + arpPDU.getSenderMAC()
-                        + ") is not addressed to this NIC (" + netzwerkInterface.getIp() + ","
-                        + netzwerkInterface.getMac() + ") and will be discarded");
-                return;
-            }
-            // otherwise process ARP packet
-            arpPDU.setRcvNic(netzwerkInterface);
             synchronized (ethernet.holeARPPuffer()) {
-                ethernet.holeARPPuffer().add(arpPDU);
+                ethernet.holeARPPuffer().add((ArpPaket) etp.getDaten());
                 ethernet.holeARPPuffer().notify();
             }
         } else {

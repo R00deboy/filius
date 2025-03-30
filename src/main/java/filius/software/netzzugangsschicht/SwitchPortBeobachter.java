@@ -56,8 +56,7 @@ public class SwitchPortBeobachter extends ProtokollThread<EthernetFrame> {
      */
     public SwitchPortBeobachter(SwitchFirmware switchFirmware, Port anschluss) {
         super(anschluss.holeEingangsPuffer());
-        LOG.trace("INVOKED-2 (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
-                + " (SwitchPortBeobachter), constr: SwitchPortBeobachter(" + switchFirmware + "," + anschluss + ")");
+        LOG.trace("SwitchPortBeobachter, constr: SwitchPortBeobachter(" + switchFirmware + "," + anschluss + ")");
 
         this.switchFirmware = switchFirmware;
         this.anschluss = anschluss;
@@ -77,8 +76,7 @@ public class SwitchPortBeobachter extends ProtokollThread<EthernetFrame> {
      * </ol>
      */
     public void verarbeiteDatenEinheit(EthernetFrame etp) {
-        LOG.trace("INVOKED (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
-                + " (SwitchPortBeobachter), verarbeiteDatenEinheit(" + etp.toString() + ")");
+        LOG.trace("(SwitchPortBeobachter), verarbeiteDatenEinheit(" + etp.toString() + ")");
 
         if (!switchFirmware.holeDurchgelaufeneFrames().contains(etp)) {
             switchFirmware.holeDurchgelaufeneFrames().add(etp);

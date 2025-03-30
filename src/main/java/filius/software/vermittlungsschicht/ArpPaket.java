@@ -25,7 +25,6 @@
  */
 package filius.software.vermittlungsschicht;
 
-import filius.hardware.NetzwerkInterface;
 import filius.software.ProtocolDataUnit;
 
 /** Diese Klasse umfasst die Attribute eines ARP-Pakets */
@@ -54,17 +53,6 @@ public class ArpPaket extends ProtocolDataUnit {
      * Ziel-IP-Adresse bzw. die Adresse des Knotens, zu dem die MAC-Adresse gesucht wird
      */
     private String targetIP;
-
-    /** The receiving network interface, set by ethernet layer. */
-    private transient NetzwerkInterface rcvNic;
-
-    public NetzwerkInterface getRcvNic() {
-        return rcvNic;
-    }
-
-    public void setRcvNic(NetzwerkInterface rcvNic) {
-        this.rcvNic = rcvNic;
-    }
 
     public String getProtokollTyp() {
         return protokollTyp;

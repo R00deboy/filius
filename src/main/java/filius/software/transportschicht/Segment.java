@@ -25,10 +25,10 @@
  */
 package filius.software.transportschicht;
 
-import java.io.Serializable;
+import filius.software.ProtocolDataUnit;
 
 @SuppressWarnings("serial")
-public class Segment implements Serializable {
+public class Segment extends ProtocolDataUnit {
 
     private int quellPort;
     private int zielPort;

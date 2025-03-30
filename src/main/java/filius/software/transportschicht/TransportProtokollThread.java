@@ -51,6 +51,7 @@ public class TransportProtokollThread extends ProtokollThread<IpPaket> {
                 + " (TransportProtokollThread), verarbeiteDatenEinheit(" + paket.toString() + ")");
 
         Segment segment = (Segment) paket.getSegment();
+        segment.setRcvNic(paket.getRcvNic());
         try {
             SocketSchnittstelle socket = protokoll.holeSocket(segment.getZielPort());
             socket.hinzufuegen(paket.getSender(), segment.getQuellPort(), segment);

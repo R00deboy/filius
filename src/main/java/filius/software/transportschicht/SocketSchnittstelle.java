@@ -26,33 +26,30 @@
 package filius.software.transportschicht;
 
 /**
- * Die SocketSchnittstelle beschreibt die Methoden, die von UDP- und TCP-Socket
- * (auch Server-Socket) bereitgestellt werden. Das Transportprotokoll verwendet
- * die Methode hinzufuegen() zur Weitergabe von eintreffenden Segmenten, die
+ * Die SocketSchnittstelle beschreibt die Methoden, die von UDP- und TCP-Socket (auch Server-Socket) bereitgestellt
+ * werden. Das Transportprotokoll verwendet die Methode hinzufuegen() zur Weitergabe von eintreffenden Segmenten, die
  * dort dem Ziel-Socket zugeordnet werden.
  */
 public interface SocketSchnittstelle {
 
-	/**
-	 * Methode zur Weitergabe von Segmenten an den Socket, der die Schnittstelle
-	 * zur Anwendung darstellt.
-	 * 
-	 * @param startIp
-	 *            IP-Adresse von der das Segment eingetroffen ist
-	 * @param startPort
-	 *            Port von der das Segment verschickt wurde
-	 * @param segment
-	 *            das eingetroffene Segment
-	 */
-	public void hinzufuegen(String startIp, int startPort, Object segment);
+    /**
+     * Methode zur Weitergabe von Segmenten an den Socket, der die Schnittstelle zur Anwendung darstellt.
+     * 
+     * @param startIp
+     *            IP-Adresse von der das Segment eingetroffen ist
+     * @param startPort
+     *            Port von der das Segment verschickt wurde
+     * @param segment
+     *            das eingetroffene Segment
+     */
+    public void hinzufuegen(String startIp, int startPort, Segment segment);
 
-	/** Methode zum schliessen eines Sockets. */
-	public void schliessen();
+    /** Methode zum schliessen eines Sockets. */
+    public void schliessen();
 
-	/**
-	 * Methode zum Beenden eines Sockets beim Wechsel vom Aktions- in den
-	 * Entwurfsmodus. Der Zustand des Sockets danach ist nicht bestimmt. Er
-	 * sollte daher nicht weiter verwendet werden!
-	 */
-	public void beenden();
+    /**
+     * Methode zum Beenden eines Sockets beim Wechsel vom Aktions- in den Entwurfsmodus. Der Zustand des Sockets danach
+     * ist nicht bestimmt. Er sollte daher nicht weiter verwendet werden!
+     */
+    public void beenden();
 }

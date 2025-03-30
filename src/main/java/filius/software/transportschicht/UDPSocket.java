@@ -108,7 +108,8 @@ public class UDPSocket extends Socket {
      * 
      * @author carsten
      */
-    public void hinzufuegen(String startIp, int startPort, Object segment) {
+    @Override
+    public void hinzufuegen(String startIp, int startPort, Segment segment) {
         LOG.trace("UDP data received from " + startIp + ":" + startPort + ", data: " + segment);
         zielIp = startIp;
         zielPort = startPort;

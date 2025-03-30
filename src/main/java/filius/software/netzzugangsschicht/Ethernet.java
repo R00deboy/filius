@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.nachrichten.Lauscher;
+import filius.software.ProtocolDataUnit;
 import filius.software.Protokoll;
 import filius.software.system.SystemSoftware;
 import filius.software.vermittlungsschicht.ArpPaket;
@@ -94,9 +95,9 @@ public class Ethernet extends Protokoll {
      * durch die Quell-MAC-Adresse spezifiziert wird.
      * 
      * @param useNic
-     *            TODO
+     *            the network interface controller with which the PDU must be sent
      */
-    public void senden(Object daten, String startMAC, String zielMAC, String typ, NetzwerkInterface useNic) {
+    public void senden(ProtocolDataUnit daten, String startMAC, String zielMAC, String typ, NetzwerkInterface useNic) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (Ethernet), senden(" + daten + "," + startMAC
                 + "," + zielMAC + "," + typ + ")");
 
@@ -121,7 +122,6 @@ public class Ethernet extends Protokoll {
             for (NetzwerkInterface nic : ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces()) {
                 if (nic.getMac().equalsIgnoreCase(startMAC)) {
                     senderNICs.add(nic);
-                    Lauscher.getLauscher().addDatenEinheit(nic.getMac(), ethernetFrame);
                 }
             }
         }
@@ -131,6 +131,7 @@ public class Ethernet extends Protokoll {
                 nic.getPort().holeAusgangsPuffer().add(ethernetFrame);
                 nic.getPort().holeAusgangsPuffer().notify();
             }
+            Lauscher.getLauscher().addDatenEinheit(nic.getMac(), ethernetFrame);
         }
     }
 

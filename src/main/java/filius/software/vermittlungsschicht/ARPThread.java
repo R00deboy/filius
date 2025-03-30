@@ -55,12 +55,12 @@ public class ARPThread extends ProtokollThread<ArpPaket> {
                 + " (ARPThread), verarbeiteDatenEinheit(" + arpPaket.toString() + ")");
 
         InternetKnotenBetriebssystem bs = (InternetKnotenBetriebssystem) vermittlung.holeSystemSoftware();
-        NetzwerkInterface nic = vermittlung.getBroadcastNic(arpPaket.getSenderIP());
+        NetzwerkInterface nic = arpPaket.getRcvNic();
+
         if (nic != null && !VermittlungsProtokoll.getSubnetForIp(nic.getIp(), nic.getSubnetzMaske())
                 .equals(arpPaket.getSenderIP())) {
             // Aus jedem ARP-Paket, mit dem eine eigene IP-Adresse abgefragt wird oder das eine Antwort ist, wird ein
-            // neuer
-            // ARP-Eintrag erzeugt
+            // neuer ARP-Eintrag erzeugt
             if (arpPaket.getTargetIP().equals(nic.getIp()) || arpPaket.getOperation() == ArpPaket.REPLY
                     && !arpPaket.getSenderIP().equalsIgnoreCase("0.0.0.0")) {
                 LOG.debug("ARP data received, will insert data for sender: {}", arpPaket);
@@ -72,8 +72,12 @@ public class ARPThread extends ProtokollThread<ArpPaket> {
             if (arpPaket.getTargetMAC().equalsIgnoreCase("ff:ff:ff:ff:ff:ff")
                     && arpPaket.getTargetIP().equalsIgnoreCase(nic.getIp())) {
                 bs.holeARP().sendArpReply(nic.getMac(), nic.getIp(), arpPaket.getSenderMAC(), arpPaket.getSenderIP(),
-                        arpPaket.getRcvNic());
+                        nic);
+            } else {
+                LOG.debug("ARP: do not respond on NIC '{}' for ARP request ({})", nic.getIp(), arpPaket);
             }
+        } else {
+            LOG.debug("ARP packet discarded ({})", arpPaket);
         }
     }
 }

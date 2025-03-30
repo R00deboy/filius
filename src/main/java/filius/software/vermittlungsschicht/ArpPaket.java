@@ -25,10 +25,11 @@
  */
 package filius.software.vermittlungsschicht;
 
-import java.io.Serializable;
+import filius.hardware.NetzwerkInterface;
+import filius.software.ProtocolDataUnit;
 
 /** Diese Klasse umfasst die Attribute eines ARP-Pakets */
-public class ArpPaket implements Serializable {
+public class ArpPaket extends ProtocolDataUnit {
 
     public static int REQUEST = 1, REPLY = 2;
 
@@ -53,6 +54,17 @@ public class ArpPaket implements Serializable {
      * Ziel-IP-Adresse bzw. die Adresse des Knotens, zu dem die MAC-Adresse gesucht wird
      */
     private String targetIP;
+
+    /** The receiving network interface, set by ethernet layer. */
+    private transient NetzwerkInterface rcvNic;
+
+    public NetzwerkInterface getRcvNic() {
+        return rcvNic;
+    }
+
+    public void setRcvNic(NetzwerkInterface rcvNic) {
+        this.rcvNic = rcvNic;
+    }
 
     public String getProtokollTyp() {
         return protokollTyp;

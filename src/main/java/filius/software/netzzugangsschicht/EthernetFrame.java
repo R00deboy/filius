@@ -25,20 +25,20 @@
  */
 package filius.software.netzzugangsschicht;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import filius.software.ProtocolDataUnit;
 import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 
 /**
  * Diese Klasse implementiert einen Frame auf der Netzzugangsschicht.
  */
-public class EthernetFrame implements Serializable {
+public class EthernetFrame extends ProtocolDataUnit {
     private static Logger LOG = LoggerFactory.getLogger(EthernetFrame.class);
 
     private static final long serialVersionUID = 1L;

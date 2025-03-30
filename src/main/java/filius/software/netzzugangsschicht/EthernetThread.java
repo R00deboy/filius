@@ -90,20 +90,22 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
             // packets meant for some of their NICs
             // without even having received the packet on this specific NIC,
             // i.e., without physical connection)
-            String zielIp = ((ArpPaket) etp.getDaten()).getTargetIP();
+            ArpPaket arpPDU = (ArpPaket) etp.getDaten();
+            String zielIp = arpPDU.getTargetIP();
             if (!zielIp.equals(netzwerkInterface.getIp()) && !"0.0.0.0".equals(netzwerkInterface.getIp())) {
-                LOG.debug("received ARP packet from (" + ((ArpPaket) etp.getDaten()).getSenderIP() + ","
-                        + ((ArpPaket) etp.getDaten()).getSenderMAC() + ") is not addressed to this NIC ("
-                        + netzwerkInterface.getIp() + "," + netzwerkInterface.getMac() + ") and will be discarded");
+                LOG.debug("received ARP packet from (" + arpPDU.getSenderIP() + "," + arpPDU.getSenderMAC()
+                        + ") is not addressed to this NIC (" + netzwerkInterface.getIp() + ","
+                        + netzwerkInterface.getMac() + ") and will be discarded");
                 return;
             }
             // otherwise process ARP packet
+            arpPDU.setRcvNic(netzwerkInterface);
             synchronized (ethernet.holeARPPuffer()) {
-                ethernet.holeARPPuffer().add((ArpPaket) etp.getDaten());
+                ethernet.holeARPPuffer().add(arpPDU);
                 ethernet.holeARPPuffer().notify();
             }
         } else {
-            LOG.debug("ERROR (" + this.hashCode() + "): Paket konnte nicht zugeordnet werden");
+            LOG.info("Paket konnte nicht zugeordnet werden");
         }
     }
 

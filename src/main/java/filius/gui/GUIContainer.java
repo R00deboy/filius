@@ -626,8 +626,7 @@ public class GUIContainer implements Serializable, I18n {
             neuerKnoten = new Gateway();
             tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.GATEWAY + mode.suffix()));
         } else {
-            LOG.debug("ERROR (" + this.hashCode() + "): " + "unbekannter Hardwaretyp " + label.getTyp()
-                    + " konnte nicht erzeugt werden.");
+            LOG.warn("unbekannter Hardwaretyp " + label.getTyp() + " konnte nicht erzeugt werden.");
         }
 
         if (tempIcon != null && neuerKnoten != null) {
@@ -680,9 +679,6 @@ public class GUIContainer implements Serializable, I18n {
     public static GUIContainer getGUIContainer(int width, int height) {
         if (ref == null) {
             ref = new GUIContainer(width, height);
-            if (ref == null) {
-                LOG.debug("ERROR (static) getGUIContainer(): Fehler!!! ref==null");
-            }
             ref.initialisieren();
         }
         return ref;

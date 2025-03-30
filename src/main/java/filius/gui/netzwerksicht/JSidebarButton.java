@@ -186,8 +186,7 @@ public class JSidebarButton extends JLabel implements Observer, I18n {
     }
 
     public void update(Observable o, Object arg) {
-        LOG.debug(
-                "INVOKED (" + this.hashCode() + ") " + getClass() + " (JSidebarButton), update(" + o + "," + arg + ")");
+        LOG.trace("(JSidebarButton), update(" + o + "," + arg + ")");
 
         if (arg != null && arg.equals(Boolean.TRUE)) {
             modemVerbunden = true;

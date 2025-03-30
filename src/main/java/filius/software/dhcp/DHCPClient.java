@@ -166,7 +166,7 @@ public class DHCPClient extends ClientAnwendung {
             }
         }
         if (fehlerzaehler == MAX_ERROR_COUNT || !running) {
-            LOG.debug("ERROR (" + this.hashCode() + "): kein DHCPACK erhalten");
+            LOG.error("kein DHCPACK erhalten");
             operatingSystem.setzeIPAdresse(oldIpAddress);
         }
         udpSocket.schliessen();

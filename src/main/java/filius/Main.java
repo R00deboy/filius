@@ -82,14 +82,14 @@ public class Main implements I18n {
      * </ol>
      */
     public static void starten(String szenarioDatei) {
-        LOG.trace("INVOKED (static) filius.Main, starten(" + szenarioDatei + ")");
+        LOG.debug("starten(" + szenarioDatei + ")");
         SplashScreen splashScreen;
         XMLDecoder xmldec;
 
         try {
             Information.getInformation().loadIni();
         } catch (IOException e1) {
-            LOG.debug("ini could not be read: " + e1.getMessage());
+            LOG.warn("ini could not be read: " + e1.getMessage());
         }
 
         String konfigPfad = Information.getInformation().getArbeitsbereichPfad() + "konfig.xml";
@@ -127,7 +127,7 @@ public class Main implements I18n {
                     }
                 }
             } catch (Exception e) {
-                LOG.debug("There is no user configuration available.");
+                LOG.info("There is no user configuration available.");
             }
         }
 
@@ -204,7 +204,7 @@ public class Main implements I18n {
      * </ol>
      */
     public static void beenden() {
-        LOG.trace("INVOKED (static) filius.Main, beenden()");
+        LOG.debug("beenden");
         Object[] programmKonfig;
         int entscheidung;
         boolean abbruch = false;
@@ -293,16 +293,15 @@ public class Main implements I18n {
         } catch (ParseException e) {
             filiusArgs.showUsageInformation();
         }
-        LOG.debug("------------------------------------------------------");
-        LOG.debug("\tJava Version: " + System.getProperty("java.version"));
-        LOG.debug("\tJava Directory: " + System.getProperty("java.home"));
-        LOG.debug("\tFILIUS Version: " + Information.getVersion());
-        LOG.debug("\tParameters: '" + filiusArgs.argsString.trim() + "'");
-        // +"\n\tWD Base: "+newWD
-        LOG.debug("\tFILIUS Installation: " + Information.getInformation().getProgrammPfad());
-        LOG.debug("\tFILIUS Working Directory: " + Information.getInformation().getArbeitsbereichPfad());
-        LOG.debug("\tFILIUS Temp Directory: " + Information.getInformation().getTempPfad());
-        LOG.debug("------------------------------------------------------\n");
+        LOG.info("------------------------------------------------------");
+        LOG.info("\tJava Version: " + System.getProperty("java.version"));
+        LOG.info("\tJava Directory: " + System.getProperty("java.home"));
+        LOG.info("\tFILIUS Version: " + Information.getVersion());
+        LOG.info("\tParameters: '" + filiusArgs.argsString.trim() + "'");
+        LOG.info("\tFILIUS Installation: " + Information.getInformation().getProgrammPfad());
+        LOG.info("\tFILIUS Working Directory: " + Information.getInformation().getArbeitsbereichPfad());
+        LOG.info("\tFILIUS Temp Directory: " + Information.getInformation().getTempPfad());
+        LOG.info("------------------------------------------------------\n");
     }
 
     public static void activateNativeLookAndFeel() {

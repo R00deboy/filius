@@ -922,7 +922,7 @@ public class Terminal extends ClientAnwendung implements I18n {
             }
         }
         if (null != targetMAC && null != senderIP) {
-            ArpPaket arpPacket = os.holeARP().sendArpReply(os.primaryMACAddress(), senderIP, targetMAC, targetIP);
+            ArpPaket arpPacket = os.holeARP().sendArpReply(os.primaryMACAddress(), senderIP, targetMAC, targetIP, null);
             benachrichtigeBeobachter("  >>> " + arpPacket);
         } else {
             usage("arpsend");

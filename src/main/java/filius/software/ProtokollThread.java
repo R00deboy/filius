@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author stefan
  * 
  */
-public abstract class ProtokollThread<T> extends Thread {
+public abstract class ProtokollThread<T extends ProtocolDataUnit> extends Thread {
     private static Logger LOG = LoggerFactory.getLogger(ProtokollThread.class);
 
     /** ob der Thread gerade am laufen ist */

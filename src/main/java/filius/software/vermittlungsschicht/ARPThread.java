@@ -71,7 +71,8 @@ public class ARPThread extends ProtokollThread<ArpPaket> {
             // IP-Adresse ist, wird eine Antwort verschickt
             if (arpPaket.getTargetMAC().equalsIgnoreCase("ff:ff:ff:ff:ff:ff")
                     && arpPaket.getTargetIP().equalsIgnoreCase(nic.getIp())) {
-                bs.holeARP().sendArpReply(nic.getMac(), nic.getIp(), arpPaket.getSenderMAC(), arpPaket.getSenderIP());
+                bs.holeARP().sendArpReply(nic.getMac(), nic.getIp(), arpPaket.getSenderMAC(), arpPaket.getSenderIP(),
+                        arpPaket.getRcvNic());
             }
         }
     }

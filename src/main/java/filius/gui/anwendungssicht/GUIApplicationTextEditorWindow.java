@@ -178,7 +178,7 @@ public class GUIApplicationTextEditorWindow extends GUIApplicationWindow {
                     aktuellerDateiname);
             changeCurrentFile(tmpFile);
         } else {
-            LOG.debug("ERROR (" + this.hashCode() + "): Fehler beim oeffnen einer Datei");
+            LOG.debug("Fehler beim oeffnen einer Datei");
         }
     }
 

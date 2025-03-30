@@ -153,13 +153,13 @@ public class UDPSocket extends Socket {
      * @return gibt den empfangenen Datenstring zurueck.
      */
     public synchronized String empfangen() {
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (UDPSocket), empfangen()");
+        LOG.trace("(UDPSocket), empfangen()");
         return empfangen(0);
     }
 
     /** Methode zum Senden einer Nachricht ueber UDP */
     public synchronized void senden(String nachricht) {
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (UDPSocket), senden(" + nachricht + ")");
+        LOG.trace("(UDPSocket), senden(" + nachricht + ")");
         UdpSegment segment;
 
         segment = new UdpSegment();
@@ -176,8 +176,7 @@ public class UDPSocket extends Socket {
     }
 
     public synchronized void sendeBroadcast(String quellIp, String nachricht) {
-        LOG.debug(
-                "INVOKED (" + this.hashCode() + ") " + getClass() + " (UDPSocket), sendeBroadcast(" + nachricht + ")");
+        LOG.trace("(UDPSocket), sendeBroadcast(" + nachricht + ")");
         UdpSegment segment;
 
         segment = new UdpSegment();
@@ -192,7 +191,7 @@ public class UDPSocket extends Socket {
      * Methode zum Schliessen eines Sockets. Der Port wird wieder freigegeben!
      */
     public void schliessen() {
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (UDPSocket), schliessen()");
+        LOG.trace("(UDPSocket), schliessen()");
         stopListening = true;
         synchronized (puffer) {
             puffer.notifyAll();

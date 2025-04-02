@@ -40,6 +40,8 @@ import filius.rahmenprogramm.I18n;
 /**
  * This class delivers the upper, visualised part of the local path through the
  * layers of a message.
+ * 
+ * @author Christoph Irniger
  */
 public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	/** corresponding local layer path panel object */
@@ -456,7 +458,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 
 		// from here until the end of the method: create visualisations of rectangular
 		// nested messages and the arrows in between
-		
+
 		createRectangularNestedMessages(X_OFFSET + 3, false);
 		createRectangularNestedMessages(X_OFFSET + 5, true);
 

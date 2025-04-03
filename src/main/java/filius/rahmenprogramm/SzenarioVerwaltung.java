@@ -117,17 +117,17 @@ public class SzenarioVerwaltung extends Observable implements I18n {
         (new File(tmpDir)).mkdirs();
 
         if (!kopiereVerzeichnis(Information.getInformation().getAnwendungenPfad(), tmpDir + "anwendungen")) {
-            LOG.debug("ERROR (" + this.hashCode() + "): Speicherung der eigenen Anwendungen fehlgeschlagen!");
+            LOG.error("Speicherung der eigenen Anwendungen fehlgeschlagen!");
             erfolg = false;
         }
 
         if (!netzwerkSpeichern(tmpDir + "konfiguration.xml", hardwareItems, kabelItems, docuItems)) {
-            LOG.debug("ERROR (" + this.hashCode() + "): Speicherung des Netzwerks fehlgeschlagen!");
+            LOG.error("Speicherung des Netzwerks fehlgeschlagen!");
             erfolg = false;
         }
 
         if (!erzeugeZipArchiv(tmpDir, datei)) {
-            LOG.debug("ERROR (" + this.hashCode() + "): Speicherung der Projektdatei fehlgeschlagen!");
+            LOG.error("Speicherung der Projektdatei fehlgeschlagen!");
             erfolg = false;
         }
         loescheDateien(tmpDir);
@@ -195,21 +195,21 @@ public class SzenarioVerwaltung extends Observable implements I18n {
         loescheDateien(tmpDir + "projekt");
 
         if (erfolg && !loescheVerzeichnisInhalt(Information.getInformation().getAnwendungenPfad())) {
-            LOG.debug("ERROR (" + this.hashCode() + "): Loeschen vorhandener Anwendungen fehlgeschlagen");
+            LOG.error("Loeschen vorhandener Anwendungen fehlgeschlagen");
         }
 
         if (!entpackeZipArchiv(datei, tmpDir)) {
-            LOG.debug("ERROR (" + this.hashCode() + "): Entpacken des Zip-Archivs fehlgeschlagen");
+            LOG.error("Entpacken des Zip-Archivs fehlgeschlagen");
             erfolg = false;
         }
 
         if (erfolg && !kopiereVerzeichnis(tmpDir + "projekt/anwendungen",
                 Information.getInformation().getAnwendungenPfad())) {
-            LOG.debug("ERROR (" + this.hashCode() + "): Kopieren der Anwendungen fehlgeschlagen");
+            LOG.error("Kopieren der Anwendungen fehlgeschlagen");
         }
 
         if (erfolg && !netzwerkLaden(tmpDir + "projekt/konfiguration.xml", hardwareItems, kabelItems, docuItems)) {
-            LOG.debug("ERROR (" + this.hashCode() + "): Laden der Netzwerkkonfiguration fehlgeschlagen");
+            LOG.error("Laden der Netzwerkkonfiguration fehlgeschlagen");
             erfolg = false;
         }
 

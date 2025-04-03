@@ -90,11 +90,11 @@ public class GUIApplicationImageViewerWindow extends GUIApplicationWindow {
                 backPanel.add(titelgrafik, BorderLayout.CENTER);
                 backPanel.updateUI();
             } else {
-                LOG.debug("ERROR (" + this.hashCode() + "): Fehler beim oeffnen einer Datei: keine Datei ausgewaehlt");
+                LOG.debug("Fehler beim oeffnen einer Datei: keine Datei ausgewaehlt");
             }
 
         } else {
-            LOG.debug("ERROR (" + this.hashCode() + "): Fehler beim oeffnen einer Datei");
+            LOG.debug("Fehler beim oeffnen einer Datei");
         }
     }
 

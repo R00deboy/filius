@@ -86,17 +86,16 @@ public class DHCPClient extends ClientAnwendung {
                 for (DHCPServer dhcpServer : getDHCPServers()) {
                     if (dhcpServer.isAktiv() && !dhcpServer.isStarted()) {
                         activeDHCPserversStarted = false;
-                        LOG.debug("WARNING (" + this.hashCode() + "): DHCP server on '"
+                        LOG.debug("DHCP client is waiting for DHCP server on '"
                                 + dhcpServer.getSystemSoftware().getKnoten().holeAnzeigeName()
-                                + "' has NOT been started --> waiting");
+                                + "'. Server has NOT yet started.");
                         break;
-                    } else {
-                        LOG.debug("DHCPClient:\tserver on '" + dhcpServer.getSystemSoftware().getKnoten().getName()
-                                + "' has been started");
                     }
                 }
                 Thread.sleep(100);
             }
+            LOG.debug("DHCP client on '" + getSystemSoftware().getKnoten().holeAnzeigeName()
+                    + "' finished check for DHCP server.");
         } catch (InterruptedException e) {
             LOG.debug("", e);
         }
@@ -166,7 +165,7 @@ public class DHCPClient extends ClientAnwendung {
             }
         }
         if (fehlerzaehler == MAX_ERROR_COUNT || !running) {
-            LOG.debug("ERROR (" + this.hashCode() + "): kein DHCPACK erhalten");
+            LOG.error("kein DHCPACK erhalten");
             operatingSystem.setzeIPAdresse(oldIpAddress);
         }
         udpSocket.schliessen();

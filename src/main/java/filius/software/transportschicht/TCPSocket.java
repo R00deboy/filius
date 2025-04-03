@@ -786,7 +786,8 @@ public class TCPSocket extends Socket implements Runnable {
      * von ESTABLISHED nach CLOSE_WAIT ausgeloest und die Methode zum Schliessen des Sockets beim Empfang eines
      * FIN-Segments aufgerufen.
      */
-    public void hinzufuegen(String startIp, int startPort, Object segment) {
+    @Override
+    public void hinzufuegen(String startIp, int startPort, Segment segment) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (TCPSocket), hinzufuegen(" + startIp + ","
                 + startPort + "," + segment + ")");
         TcpSegment tcpSegment = (TcpSegment) segment;

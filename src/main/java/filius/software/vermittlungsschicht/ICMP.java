@@ -158,11 +158,11 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
                 .getNetzwerkInterfaceByIp(route.getInterfaceIpAddress());
 
         if (isBroadcast(zielIp, route.getInterfaceIpAddress(), nic.getSubnetzMaske())) {
-            sendBroadcast(paket, zielIp, nic.getMac());
+            sendBroadcast(paket, zielIp, nic.getMac(), nic);
         } else if (gleichesRechnernetz(zielIp, route.getInterfaceIpAddress(), nic.getSubnetzMaske())) {
-            sendUnicastToNextHop(paket, paket.getEmpfaenger(), nic.getMac());
+            sendUnicastToNextHop(paket, paket.getEmpfaenger(), nic.getMac(), nic);
         } else {
-            sendUnicastToNextHop(paket, route.getGateway(), nic.getMac());
+            sendUnicastToNextHop(paket, route.getGateway(), nic.getMac(), nic);
         }
     }
 
@@ -174,8 +174,10 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
      * @param ziel
      *            die Ziel-IP
      * @param macOfNicToUse
+     * @param useNic
+     *            TODO
      */
-    private void sendUnicastToNextHop(IcmpPaket paket, String ziel, String macOfNicToUse) {
+    private void sendUnicastToNextHop(IcmpPaket paket, String ziel, String macOfNicToUse, NetzwerkInterface useNic) {
         InternetKnotenBetriebssystem bs = (InternetKnotenBetriebssystem) holeSystemSoftware();
         String zielMacAdresse = bs.holeARP().holeARPTabellenEintrag(ziel, 2, true);
 
@@ -183,7 +185,7 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
             placeLocalICMPPacket(paket);
         } else if (zielMacAdresse != null) {
             // MAC-Adresse konnte bestimmt werden
-            bs.holeEthernet().senden(paket, macOfNicToUse, zielMacAdresse, EthernetFrame.IP);
+            bs.holeEthernet().senden(paket, macOfNicToUse, zielMacAdresse, EthernetFrame.IP, useNic);
         } else {
             // Es konnte keine MAC-Adresse bestimmt werden.
             // Falls das weiterzuleitende Paket ein ICMP Echo Request ist,
@@ -197,10 +199,10 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
         }
     }
 
-    private void sendBroadcast(IcmpPaket paket, String ziel, String macOfNicToUse) {
+    private void sendBroadcast(IcmpPaket paket, String ziel, String macOfNicToUse, NetzwerkInterface useNic) {
         paket.setTtl(1);
         InternetKnotenBetriebssystem bs = (InternetKnotenBetriebssystem) holeSystemSoftware();
-        bs.holeEthernet().senden(paket, macOfNicToUse, ETHERNET_BROADCAST, EthernetFrame.IP);
+        bs.holeEthernet().senden(paket, macOfNicToUse, ETHERNET_BROADCAST, EthernetFrame.IP, useNic);
     }
 
     /**

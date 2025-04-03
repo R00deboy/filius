@@ -25,7 +25,9 @@
  */
 package filius.software.netzzugangsschicht;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import filius.hardware.NetzwerkInterface;
 import filius.hardware.knoten.InternetKnoten;
 import filius.rahmenprogramm.nachrichten.Lauscher;
+import filius.software.ProtocolDataUnit;
 import filius.software.Protokoll;
 import filius.software.system.SystemSoftware;
 import filius.software.vermittlungsschicht.ArpPaket;
@@ -90,35 +93,45 @@ public class Ethernet extends Protokoll {
      * sendet Pakete ueber als Ethernet-Frame weiter. Zuerst wird dazu ueberprueft, ob die Ziel-MAC-Adresse eine eigene
      * Netzwerkkarte adressiert. Wenn dies nicht der Fall ist, wird der Frame ueber die Netzwerkkarte verschickt, die
      * durch die Quell-MAC-Adresse spezifiziert wird.
+     * 
+     * @param useNic
+     *            the network interface controller with which the PDU must be sent
      */
-    public void senden(Object daten, String startMAC, String zielMAC, String typ) {
+    public void senden(ProtocolDataUnit daten, String startMAC, String zielMAC, String typ, NetzwerkInterface useNic) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (Ethernet), senden(" + daten + "," + startMAC
                 + "," + zielMAC + "," + typ + ")");
-        EthernetFrame ethernetFrame;
-        boolean gesendet = false;
 
-        ethernetFrame = new EthernetFrame(daten, startMAC, zielMAC, typ);
+        EthernetFrame ethernetFrame = new EthernetFrame(daten, startMAC, zielMAC, typ);
+        List<NetzwerkInterface> senderNICs = new ArrayList<>();
+        if (null != useNic) {
+            LOG.trace("Ethernet: send via specific nic {}", useNic);
+            senderNICs.add(useNic);
+        }
 
-        for (NetzwerkInterface nic : ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces()) {
-            if (nic.getMac().equalsIgnoreCase(zielMAC)) {
-                synchronized (nic.getPort().holeEingangsPuffer()) {
-                    nic.getPort().holeEingangsPuffer().add(ethernetFrame);
-                    nic.getPort().holeEingangsPuffer().notify();
+        // I do not understand the purpose of this code. It should never be used!
+        if (senderNICs.isEmpty()) {
+            for (NetzwerkInterface nic : ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces()) {
+                if (nic.getMac().equalsIgnoreCase(zielMAC)) {
+                    LOG.error("Ethernet: send via nic selected by target MAC ({})", zielMAC);
+                    senderNICs.add(nic);
                 }
-                gesendet = true;
             }
         }
 
-        if (!gesendet) {
+        if (senderNICs.isEmpty()) {
             for (NetzwerkInterface nic : ((InternetKnoten) holeSystemSoftware().getKnoten()).getNetzwerkInterfaces()) {
                 if (nic.getMac().equalsIgnoreCase(startMAC)) {
-                    synchronized (nic.getPort().holeAusgangsPuffer()) {
-                        nic.getPort().holeAusgangsPuffer().add(ethernetFrame);
-                        nic.getPort().holeAusgangsPuffer().notify();
-                    }
-                    Lauscher.getLauscher().addDatenEinheit(nic.getMac(), ethernetFrame);
+                    senderNICs.add(nic);
                 }
             }
+        }
+
+        for (NetzwerkInterface nic : senderNICs) {
+            synchronized (nic.getPort().holeAusgangsPuffer()) {
+                nic.getPort().holeAusgangsPuffer().add(ethernetFrame);
+                nic.getPort().holeAusgangsPuffer().notify();
+            }
+            Lauscher.getLauscher().addDatenEinheit(nic.getMac(), ethernetFrame);
         }
     }
 
@@ -133,6 +146,20 @@ public class Ethernet extends Protokoll {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (Ethernet), starten()");
         InternetKnoten knoten;
         EthernetThread interfaceBeobachter;
+
+        // ensure that there are no pdu's left from last run!
+        if (arpPakete.size() > 0) {
+            LOG.debug("Clear ARP buffer. Still data left from last run.");
+            arpPakete.clear();
+        }
+        if (icmpPakete.size() > 0) {
+            LOG.debug("Clear ICMP buffer. Still data left from last run.");
+            icmpPakete.clear();
+        }
+        if (ipPakete.size() > 0) {
+            LOG.debug("Clear IP buffer. Still data left from last run.");
+            ipPakete.clear();
+        }
 
         if (holeSystemSoftware().getKnoten() instanceof InternetKnoten) {
             knoten = (InternetKnoten) holeSystemSoftware().getKnoten();

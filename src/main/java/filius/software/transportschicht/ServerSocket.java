@@ -25,7 +25,9 @@
  */
 package filius.software.transportschicht;
 
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import filius.exception.ServerSocketException;
 import filius.exception.TimeOutException;
 import filius.exception.VerbindungsException;
+import filius.hardware.NetzwerkInterface;
 import filius.rahmenprogramm.I18n;
 import filius.software.system.InternetKnotenBetriebssystem;
 import filius.software.vermittlungsschicht.IpPaket;
@@ -73,6 +76,9 @@ public class ServerSocket implements SocketSchnittstelle, I18n {
      */
     private int lokalerPort;
 
+    /** bind nic as proxy for the bound IP address. if this list is empty, assume all nic / ip addresses. */
+    private List<NetzwerkInterface> boundNICs = Collections.emptyList();
+
     /**
      * Konstruktor fuer einen Server-Socket. Hier werden die lokalen Attribute initialisiert. Ausserdem wird der lokale
      * TCP-Port fuer diesen Socket reserviert. Wenn das nicht moeglich ist, weil er schon belegt ist, wird eine
@@ -82,12 +88,15 @@ public class ServerSocket implements SocketSchnittstelle, I18n {
      * @param betriebssystem
      * @param lokalerPort
      *            - Lokaler Port, auf dem der Server laufen soll. Bsp.: http-Anwendungen zumeist auf Port 80
+     * @param bind
      */
-    public ServerSocket(InternetKnotenBetriebssystem betriebssystem, int lokalerPort, int transportProtokoll) {
+    public ServerSocket(InternetKnotenBetriebssystem betriebssystem, int lokalerPort, int transportProtokoll,
+            List<NetzwerkInterface> bind) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (ServerSocket), constr: ServerSocket("
                 + betriebssystem + "," + lokalerPort + "," + transportProtokoll + ")");
         this.betriebssystem = betriebssystem;
         this.lokalerPort = lokalerPort;
+        this.boundNICs = bind;
 
         if (transportProtokoll == IpPaket.TCP) {
             protokoll = betriebssystem.holeTcp();
@@ -172,15 +181,23 @@ public class ServerSocket implements SocketSchnittstelle, I18n {
      * 'aktuellerSocket' weitergegeben. Dieser Socket wurde gerade erst erzeugt und wartet auf eingehende
      * Verbindungsanfragen.
      */
-    public void hinzufuegen(String startIp, int startPort, Object segment) {
+    @Override
+    public void hinzufuegen(String startIp, int startPort, Segment segment) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (ServerSocket), hinzufuegen(" + startIp + ","
                 + startPort + "," + segment + ")");
-        String start;
-        Socket socket;
 
-        start = startIp + ":" + startPort;
-        if (socketListe.containsKey(start)) {
-            socket = (Socket) socketListe.get(start);
+        boolean isForBoundIPAddress = boundNICs.isEmpty();
+        for (NetzwerkInterface netzwerkInterface : boundNICs) {
+            if (segment.getRcvNic().getIp().equals(netzwerkInterface.getIp())) {
+                isForBoundIPAddress = true;
+            }
+        }
+        String start = startIp + ":" + startPort;
+        if (!isForBoundIPAddress) {
+            LOG.debug("discard segment '{}' since it is not for bound ip address of this socket '{}'", segment,
+                    boundNICs);
+        } else if (socketListe.containsKey(start)) {
+            Socket socket = (Socket) socketListe.get(start);
             socket.hinzufuegen(startIp, startPort, segment);
         } else if (aktuellerSocket != null) {
             aktuellerSocket.hinzufuegen(startIp, startPort, segment);

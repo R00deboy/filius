@@ -119,12 +119,12 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
             if (ueberpruefen(EingabenUeberpruefung.musterIpAdresse, ipAdressen[i])) {
                 nic.setIp(ipAdressen[i].getText());
             } else {
-                LOG.debug("ERROR (" + this.hashCode() + "): IP-Adresse ungueltig " + ipAdressen[i].getText());
+                LOG.debug("IP-Adresse ungueltig " + ipAdressen[i].getText());
             }
             if (ueberpruefen(EingabenUeberpruefung.musterSubNetz, netzmasken[i])) {
                 nic.setSubnetzMaske(netzmasken[i].getText());
             } else {
-                LOG.debug("ERROR (" + this.hashCode() + "): Netzmaske ungueltig " + netzmasken[i].getText());
+                LOG.debug("Netzmaske ungueltig " + netzmasken[i].getText());
             }
         }
 
@@ -626,7 +626,7 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
                         return node.getKnoten();
                 }
             } else {
-                LOG.debug("ERROR (" + this.hashCode() + "): Knotentyp unbekannt.");
+                LOG.warn("Knotentyp unbekannt.");
             }
         }
         return null;

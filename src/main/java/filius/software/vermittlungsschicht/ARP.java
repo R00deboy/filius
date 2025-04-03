@@ -191,7 +191,7 @@ public class ARP extends VermittlungsProtokoll {
             }
         }
 
-        LOG.debug("ERROR (" + this.hashCode() + "): kein ARP-Tabellen-Eintrag fuer " + zielIp);
+        LOG.info("kein ARP-Tabellen-Eintrag fuer " + zielIp);
         return null;
     }
 
@@ -209,13 +209,13 @@ public class ARP extends VermittlungsProtokoll {
         }
         boolean requestSent = false;
         if (nic != null) {
-            sendArpRequest(nic.getMac(), nic.getIp(), "FF:FF:FF:FF:FF:FF", suchIp);
+            sendArpRequest(nic.getMac(), nic.getIp(), "FF:FF:FF:FF:FF:FF", suchIp, null);
             requestSent = true;
         }
         return requestSent;
     }
 
-    public ArpPaket sendArpRequest(String senderMAC, String senderIP, String targetMAC, String lookupOrTargetIP) {
+    public ArpPaket sendArpRequest(String senderMAC, String senderIP, String targetMAC, String lookupOrTargetIP, NetzwerkInterface useNic) {
         ArpPaket arpPaket = new ArpPaket();
         arpPaket.setOperation(ArpPaket.REQUEST);
         arpPaket.setProtokollTyp(EthernetFrame.IP);
@@ -225,11 +225,12 @@ public class ARP extends VermittlungsProtokoll {
         arpPaket.setSenderMAC(senderMAC);
 
         ((InternetKnotenBetriebssystem) holeSystemSoftware()).holeEthernet().senden(arpPaket, senderMAC,
-                arpPaket.getTargetMAC(), EthernetFrame.ARP);
+                arpPaket.getTargetMAC(), EthernetFrame.ARP, null);
         return arpPaket;
     }
 
-    public ArpPaket sendArpReply(String senderMAC, String senderIP, String targetMAC, String targetIP) {
+    public ArpPaket sendArpReply(String senderMAC, String senderIP, String targetMAC, String targetIP,
+            NetzwerkInterface useNic) {
         ArpPaket antwortArp = new ArpPaket();
         antwortArp.setOperation(ArpPaket.REPLY);
         antwortArp.setProtokollTyp(EthernetFrame.IP);
@@ -245,7 +246,7 @@ public class ARP extends VermittlungsProtokoll {
         }
 
         ((InternetKnotenBetriebssystem) holeSystemSoftware()).holeEthernet().senden(antwortArp, senderMAC,
-                antwortArp.getTargetMAC(), EthernetFrame.ARP);
+                antwortArp.getTargetMAC(), EthernetFrame.ARP, useNic);
         return antwortArp;
     }
 

@@ -67,7 +67,7 @@ public class Betriebssystem extends InternetKnotenBetriebssystem {
      */
     @Override
     public synchronized void starten() {
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (Betriebssystem), starten()");
+        LOG.trace("(Betriebssystem), starten()");
         super.starten();
     }
 
@@ -76,7 +76,7 @@ public class Betriebssystem extends InternetKnotenBetriebssystem {
      * aufgerufen und der DHCP-Server und -Client beendet.
      */
     public void beenden() {
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (Betriebssystem), beenden()");
+        LOG.trace("(Betriebssystem), beenden()");
         super.beenden();
     }
 

@@ -325,34 +325,29 @@ public class Information implements Serializable {
         pfad = getArbeitsbereichPfad();
         if (!(new java.io.File(pfad)).exists())
             if (!(new java.io.File(pfad)).mkdirs())
-                LOG.debug("ERROR (" + this.hashCode() + ") " + getClass() + "\n\t" + pfad
-                        + " konnte nicht erzeugt werden");
+                LOG.error(pfad + " konnte nicht erzeugt werden");
 
         pfad = getTempPfad();
         if (!(new java.io.File(pfad)).exists())
             if (!(new java.io.File(pfad)).mkdirs())
-                LOG.debug("ERROR (" + this.hashCode() + ") " + getClass() + "\n\t" + pfad
-                        + " konnte nicht erzeugt werden");
+                LOG.error(pfad + " konnte nicht erzeugt werden");
 
         pfad = getAnwendungenPfad();
         if (!(new java.io.File(pfad)).exists())
             if (!(new java.io.File(pfad)).mkdirs())
-                LOG.debug("ERROR (" + this.hashCode() + ") " + getClass() + "\n\t" + pfad
-                        + " konnte nicht erzeugt werden");
+                LOG.error(pfad + " konnte nicht erzeugt werden");
 
         pfad = getAnwendungenPfad() + "filius" + System.getProperty("file.separator") + "software"
                 + System.getProperty("file.separator") + "clientserver" + System.getProperty("file.separator");
         if (!(new java.io.File(pfad)).exists())
             if (!(new java.io.File(pfad)).mkdirs())
-                LOG.debug("ERROR (" + this.hashCode() + ") " + getClass() + "\n\t" + pfad
-                        + " konnte nicht erzeugt werden");
+                LOG.error(pfad + " konnte nicht erzeugt werden");
 
         pfad = getAnwendungenPfad() + "filius" + System.getProperty("file.separator") + "gui"
                 + System.getProperty("file.separator") + "anwendungssicht" + System.getProperty("file.separator");
         if (!(new java.io.File(pfad)).exists())
             if (!(new java.io.File(pfad)).mkdirs())
-                LOG.debug("ERROR (" + this.hashCode() + ") " + getClass() + "\n\t" + pfad
-                        + " konnte nicht erzeugt werden");
+                LOG.error(pfad + " konnte nicht erzeugt werden");
 
         pfad = getAnwendungenPfad() + "EigeneAnwendungen.txt";
         if (!(new java.io.File(pfad)).exists())

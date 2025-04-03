@@ -25,15 +25,14 @@
  */
 package filius.software.vermittlungsschicht;
 
-import java.io.Serializable;
-
+import filius.software.ProtocolDataUnit;
 import filius.software.transportschicht.Segment;
 
 /**
  * Diese Klasse umfasst die Attribute bzw. Felder eines IP-Pakets
  */
 @SuppressWarnings("serial")
-public class IpPaket implements Serializable, Cloneable {
+public class IpPaket extends ProtocolDataUnit implements Cloneable {
 
     public static final int UDP = 17, TCP = 6;
 
@@ -52,6 +51,7 @@ public class IpPaket implements Serializable, Cloneable {
     @Override
     public IpPaket clone() {
         IpPaket clone = new IpPaket(protocol);
+        clone.setRcvNic(getRcvNic());
         copyIpPacketAttributes(clone);
         return clone;
     }

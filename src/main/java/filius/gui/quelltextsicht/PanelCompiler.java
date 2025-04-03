@@ -170,7 +170,7 @@ public class PanelCompiler extends JPanel implements I18n, Runnable {
         jc = ToolProvider.getSystemJavaCompiler();
 
         if (jc == null) {
-            LOG.debug("ERROR (" + this.hashCode() + "): Kein Java-Compiler erzeugt!");
+            LOG.error("Kein Java-Compiler erzeugt!");
             fehlerfreiKompiliert = false;
 
             return false;

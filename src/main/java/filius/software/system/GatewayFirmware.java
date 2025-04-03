@@ -25,6 +25,7 @@
  */
 package filius.software.system;
 
+
 import java.beans.PropertyChangeEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,6 +36,8 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.List;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +121,7 @@ public class GatewayFirmware extends InternetKnotenBetriebssystem {
 
     public void setKnoten(Knoten gateway) {
         super.setKnoten(gateway);
+        getDHCPServer().bindAddress(List.of(((Gateway) gateway).holeLANInterface()));
     }
 
     /** The IP configuration with DHCP is supported on WAN port only. */

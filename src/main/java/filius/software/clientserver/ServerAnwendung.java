@@ -25,12 +25,15 @@
  */
 package filius.software.clientserver;
 
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.exception.ServerSocketException;
+import filius.hardware.NetzwerkInterface;
 import filius.rahmenprogramm.I18n;
 import filius.software.Anwendung;
 import filius.software.transportschicht.ServerSocket;
@@ -48,6 +51,8 @@ public abstract class ServerAnwendung extends Anwendung implements I18n {
 
     /** Konstante: UDP oder TCP der Klasse TransportProtokoll */
     protected int transportProtokoll;
+
+    private List<NetzwerkInterface> boundNICs = Collections.emptyList();
 
     /** der Socket zur Annahme eingehender Verbindungsanfragen */
     protected SocketSchnittstelle socket;
@@ -70,6 +75,10 @@ public abstract class ServerAnwendung extends Anwendung implements I18n {
         LOG.trace("INVOKED (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + ", constr: ServerAnwendung(" + transportProtokoll + ")");
         this.transportProtokoll = transportProtokoll;
+    }
+
+    public void bindAddress(List<NetzwerkInterface> bind) {
+        this.boundNICs = bind;
     }
 
     /**
@@ -197,7 +206,7 @@ public abstract class ServerAnwendung extends Anwendung implements I18n {
         while (running) {
             if (aktiv) {
                 if (socket == null) {
-                    socket = new ServerSocket(getSystemSoftware(), port, transportProtokoll);
+                    socket = new ServerSocket(getSystemSoftware(), port, transportProtokoll, boundNICs);
                 }
 
                 if (socket != null) {

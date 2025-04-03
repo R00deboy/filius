@@ -143,11 +143,11 @@ public class IP extends VermittlungsProtokoll implements I18n {
 
         InternetKnoten knoten = (InternetKnoten) holeSystemSoftware().getKnoten();
         for (NetzwerkInterface nic : knoten.getNetzwerkInterfaces()) {
-            sendBroadcastOverNic(nic, ipPaket);
+            sendBroadcastOverNic(ipPaket, nic);
         }
     }
 
-    private void sendBroadcastOverNic(NetzwerkInterface nic, IpPaket ipPaket) {
+    private void sendBroadcastOverNic(IpPaket ipPaket, NetzwerkInterface useNic) {
         // Damit Broadcast-Pakete nicht in Zyklen gesendet werden,
         // wird das Feld Time-to-Live (TTL) auf 1 gesetzt. Damit
         // wird es von keinem Knoten weitergeschickt
@@ -164,9 +164,9 @@ public class IP extends VermittlungsProtokoll implements I18n {
 
         InternetKnotenBetriebssystem bs = (InternetKnotenBetriebssystem) holeSystemSoftware();
         if (CURRENT_NETWORK.equals(ipPaket.getSender())
-                && (null == macAddressFilter || nic.getMac().equalsIgnoreCase(macAddressFilter))
-                || gleichesRechnernetz(ipPaket.getSender(), nic.getIp(), nic.getSubnetzMaske())) {
-            bs.holeEthernet().senden(ipPaket, nic.getMac(), ETHERNET_BROADCAST, EthernetFrame.IP);
+                && (null == macAddressFilter || useNic.getMac().equalsIgnoreCase(macAddressFilter))
+                || gleichesRechnernetz(ipPaket.getSender(), useNic.getIp(), useNic.getSubnetzMaske())) {
+            bs.holeEthernet().senden(ipPaket, useNic.getMac(), ETHERNET_BROADCAST, EthernetFrame.IP, useNic);
         }
     }
 
@@ -214,13 +214,13 @@ public class IP extends VermittlungsProtokoll implements I18n {
         }
     }
 
-    private void sendeUnicastLokal(IpPaket paket, String ziel, NetzwerkInterface nic) {
+    private void sendeUnicastLokal(IpPaket paket, String ziel, NetzwerkInterface useNic) {
         InternetKnotenBetriebssystem bs = (InternetKnotenBetriebssystem) holeSystemSoftware();
         String zielMacAdresse = bs.holeARP().holeARPTabellenEintrag(ziel, 2, true);
 
         if (zielMacAdresse != null) {
             // MAC-Adresse konnte bestimmt werden
-            bs.holeEthernet().senden(paket, nic.getMac(), zielMacAdresse, EthernetFrame.IP);
+            bs.holeEthernet().senden(paket, useNic.getMac(), zielMacAdresse, EthernetFrame.IP, useNic);
         } else {
             // Es konnte keine MAC-Adresse bestimmt werden.
             // Es muss ein ICMP Destination Unreachable: Host Unreachable
@@ -322,6 +322,16 @@ public class IP extends VermittlungsProtokoll implements I18n {
      */
     public void starten() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (IP), starten()");
+
+        // ensure that there are no pdu's left from last run!
+        if (ipPaketListeTCP.size() > 0) {
+            LOG.debug("Clear TCP buffer. Still data left from last run.");
+            ipPaketListeTCP.clear();
+        }
+        if (ipPaketListeUDP.size() > 0) {
+            LOG.debug("Clear UDP buffer. Still data left from last run.");
+            ipPaketListeUDP.clear();
+        }
 
         thread = new IPThread(this);
         thread.starten();

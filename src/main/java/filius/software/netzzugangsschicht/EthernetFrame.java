@@ -25,20 +25,20 @@
  */
 package filius.software.netzzugangsschicht;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import filius.software.ProtocolDataUnit;
 import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 
 /**
  * Diese Klasse implementiert einen Frame auf der Netzzugangsschicht.
  */
-public class EthernetFrame implements Serializable {
+public class EthernetFrame extends ProtocolDataUnit {
     private static Logger LOG = LoggerFactory.getLogger(EthernetFrame.class);
 
     private static final long serialVersionUID = 1L;
@@ -56,12 +56,12 @@ public class EthernetFrame implements Serializable {
     private String typ;
 
     /** die Nutzdaten */
-    private Object daten;
+    private ProtocolDataUnit daten;
 
     private Set<String> readByLauscherForMac = new HashSet<>();
 
     /** Konstruktor zur Initialisierung der Attribute des Frames */
-    public EthernetFrame(Object daten, String quellMacAdresse, String zielMacAdresse, String typ) {
+    public EthernetFrame(ProtocolDataUnit daten, String quellMacAdresse, String zielMacAdresse, String typ) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (EthernetFrame), constr: EthernetFrame(" + daten
                 + "," + quellMacAdresse + "," + zielMacAdresse + "," + typ + ")");
         this.zielMacAdresse = zielMacAdresse;
@@ -71,7 +71,7 @@ public class EthernetFrame implements Serializable {
     }
 
     public EthernetFrame clone() {
-        Object clonedData;
+        ProtocolDataUnit clonedData;
         if (daten instanceof IcmpPaket) {
             clonedData = ((IcmpPaket) daten).clone();
         } else if (daten instanceof IpPaket) {
@@ -81,6 +81,7 @@ public class EthernetFrame implements Serializable {
         }
         EthernetFrame clonedFrame = new EthernetFrame(clonedData, quellMacAdresse, zielMacAdresse, typ);
         clonedFrame.readByLauscherForMac = readByLauscherForMac;
+        clonedFrame.setRcvNic(getRcvNic());
         return clonedFrame;
     }
 
@@ -93,7 +94,7 @@ public class EthernetFrame implements Serializable {
     }
 
     /** Zugriff auf die Daten, die mit dem Frame verschickt werden */
-    public Object getDaten() {
+    public ProtocolDataUnit getDaten() {
         return daten;
     }
 

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author stefan
  * 
  */
-public abstract class ProtokollThread<T> extends Thread {
+public abstract class ProtokollThread<T extends ProtocolDataUnit> extends Thread {
     private static Logger LOG = LoggerFactory.getLogger(ProtokollThread.class);
 
     /** ob der Thread gerade am laufen ist */
@@ -69,8 +69,7 @@ public abstract class ProtokollThread<T> extends Thread {
      * mit dem Aufruf der Methode verarbeiteDatenEinheit() zur weiteren Verarbeitung weitergegeben.
      */
     public void run() {
-        LOG.debug(
-                "INVOKED (" + this.hashCode() + ", T" + this.getId() + ") " + getClass() + " (ProtkollThread), run()");
+        LOG.trace(getClass() + " (ProtkollThread), run()");
         while (running) {
             synchronized (puffer) {
                 if (puffer.size() < 1) {

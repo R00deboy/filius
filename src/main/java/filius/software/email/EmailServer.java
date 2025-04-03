@@ -408,7 +408,7 @@ public class EmailServer extends Anwendung implements I18n {
         if (konten != null) {
             setListeBenutzerkonten(stringZuListeBenutzerkonten(konten.getDateiInhalt()));
         } else {
-            LOG.debug("ERROR (" + this.hashCode() + "): Konten laden fehlgeschlagen");
+            LOG.error("Konten laden fehlgeschlagen");
         }
     }
 

@@ -6,7 +6,7 @@
 			<level>${FILIUS_LOG_LEVEL:-INFO}</level>
 		</filter>
 		<encoder>
-			<pattern>%msg%n</pattern>
+			<pattern>%-5level %msg%n</pattern>
 		</encoder>
 	</appender>
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">

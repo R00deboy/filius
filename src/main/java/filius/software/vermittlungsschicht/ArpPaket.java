@@ -25,10 +25,10 @@
  */
 package filius.software.vermittlungsschicht;
 
-import java.io.Serializable;
+import filius.software.ProtocolDataUnit;
 
 /** Diese Klasse umfasst die Attribute eines ARP-Pakets */
-public class ArpPaket implements Serializable {
+public class ArpPaket extends ProtocolDataUnit {
 
     public static int REQUEST = 1, REPLY = 2;
 

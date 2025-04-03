@@ -144,12 +144,12 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         if (ueberpruefen(EingabenUeberpruefung.musterIpAdresse, ipAddressTextfield)) {
             nic.setIp(ipAddressTextfield.getText());
         } else {
-            LOG.debug("ERROR (" + this.hashCode() + "): IP-Adresse ungueltig " + ipAddressTextfield.getText());
+            LOG.debug("IP-Adresse ungueltig " + ipAddressTextfield.getText());
         }
         if (ueberpruefen(EingabenUeberpruefung.musterSubNetz, netmaskTextfield)) {
             nic.setSubnetzMaske(netmaskTextfield.getText());
         } else {
-            LOG.debug("ERROR (" + this.hashCode() + "): Netzmaske ungueltig " + netmaskTextfield.getText());
+            LOG.debug("Netzmaske ungueltig " + netmaskTextfield.getText());
         }
     }
 

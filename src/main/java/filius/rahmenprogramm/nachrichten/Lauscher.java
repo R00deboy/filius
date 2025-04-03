@@ -346,8 +346,7 @@ public class Lauscher implements I18n {
                             neuerEintrag[5] = PROTOKOLL_SCHICHTEN[2];
                             neuerEintrag[6] = "";
                         } else {
-                            LOG.error("ERROR (" + this.hashCode() + "): Protokoll der Transportschicht ("
-                                    + ipPaket.getProtocol() + ") nicht bekannt.");
+                            LOG.warn("Protokoll der Transportschicht (" + ipPaket.getProtocol() + ") nicht bekannt.");
                         }
                         daten.addElement(neuerEintrag);
 

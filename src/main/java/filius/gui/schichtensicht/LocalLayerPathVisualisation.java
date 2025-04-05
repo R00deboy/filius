@@ -990,7 +990,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 
 		private NestedMessagesVisualisation(int layerNumber, int widthWithBorder, int ratio, boolean activeBorder) {
 			this.layerNumber = layerNumber;
-			this.isSquare = (ratio == 1);
+			this.isSquare = ratio == 1;
 			this.widthWithBorder = widthWithBorder;
 			this.heightWithBorder = widthWithBorder / ratio;
 			this.widthInsideBorder = widthWithBorder - 2 * MAIN_BORDER_WIDTH;

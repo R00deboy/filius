@@ -62,7 +62,7 @@ public abstract class Host extends InternetKnoten {
         this.setzeAnzahlAnschluesse(1);
         this.setSystemSoftware(new Betriebssystem());
         getSystemSoftware().setKnoten(this);
-        LOG.debug("DEBUG:  Host " + this.hashCode() + " has OS " + getSystemSoftware().hashCode());
+        LOG.debug("Host " + this.hashCode() + " has OS " + getSystemSoftware().hashCode());
     }
 
     @Override

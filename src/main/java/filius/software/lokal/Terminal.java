@@ -245,7 +245,7 @@ public class Terminal extends ClientAnwendung implements I18n {
         String destDir = Dateisystem.getDirectory(destString);
         String destFile = Dateisystem.getBasename(destString);
 
-        // LOG.debug("DEBUG: pureCopy: source '"+srcDir+"'-'"+srcFile+"', destination
+        // LOG.debug("pureCopy: source '"+srcDir+"'-'"+srcFile+"', destination
         // '"+destDir+"'-'"+destFile+"'");
         Datei sfile = this.getSystemSoftware().getDateisystem().holeDatei(srcString);
         if (sfile == null)
@@ -848,7 +848,7 @@ public class Terminal extends ClientAnwendung implements I18n {
                 }
                 if (timeDiff > 0) {
                     try {
-                        LOG.debug("DEBUG: Terminal waits for " + timeDiff + " ms");
+                        LOG.debug("Terminal waits for " + timeDiff + " ms");
                         Thread.sleep(timeDiff);
                     } catch (InterruptedException e) {}
                 }

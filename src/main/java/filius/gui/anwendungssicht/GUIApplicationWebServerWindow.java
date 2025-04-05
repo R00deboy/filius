@@ -116,10 +116,10 @@ public class GUIApplicationWebServerWindow extends GUIApplicationWindow {
         JScrollPane tableScrollPane = new JScrollPane(vHostTable);
         tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        LOG.debug("DEBUG message webserver_msg4='" + messages.getString("webserver_msg4") + "'");
+        LOG.debug("message webserver_msg4='" + messages.getString("webserver_msg4") + "'");
         vHostTable.getColumnModel().getColumn(0).setHeaderValue(messages.getString("webserver_msg4"));
         vHostTable.getColumnModel().getColumn(1).setHeaderValue(messages.getString("webserver_msg5"));
-        LOG.debug("DEBUG header value: '" + vHostTable.getColumnModel().getColumn(0).getHeaderValue() + "'");
+        LOG.debug("header value: '" + vHostTable.getColumnModel().getColumn(0).getHeaderValue() + "'");
         vHostTable.setIntercellSpacing(new java.awt.Dimension(5, 5));
         vHostTable.setRowHeight(26);
         vHostTable.setShowGrid(true);
@@ -158,7 +158,7 @@ public class GUIApplicationWebServerWindow extends GUIApplicationWindow {
     }
 
     public void updateVHostTable() {
-        LOG.trace("DEBUG GUIApplicationWebServerWindow, updateTable; vHostArray:\n"
+        LOG.trace("GUIApplicationWebServerWindow, updateTable; vHostArray:\n"
                 + ((WebServer) holeAnwendung()).printVHostTable());
         String[][] vhosts = ((WebServer) holeAnwendung()).getVHostArray();
         DefaultTableModel tablemodel = (DefaultTableModel) vHostTable.getModel();

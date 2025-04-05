@@ -200,7 +200,7 @@ public class Dateisystem implements Serializable {
         enumeration = root.preorderEnumeration();
         while (enumeration.hasMoreElements()) {
             node = (DefaultMutableTreeNode) enumeration.nextElement();
-            // LOG.debug("DEBUG: verzeichnisKnoten:\n\t'"+pfad+"' =?= '"+absoluterPfad(node)+"'");
+            // LOG.debug("verzeichnisKnoten:\n\t'"+pfad+"' =?= '"+absoluterPfad(node)+"'");
             if (pfad.equalsIgnoreCase(absoluterPfad(node))) {
                 return node;
             }
@@ -271,11 +271,11 @@ public class Dateisystem implements Serializable {
 
         node = verzeichnisKnoten(dateiPfad);
         if (node != null && (node.getUserObject() instanceof Datei)) {
-            // LOG.debug("DEBUG ("+this.hashCode()+") "+getClass()+", holeDatei: return='"+(Datei)
+            // LOG.debug("("+this.hashCode()+") "+getClass()+", holeDatei: return='"+(Datei)
             // node.getUserObject()+"'");
             return (Datei) node.getUserObject();
         } else {
-            // LOG.debug("DEBUG ("+this.hashCode()+") "+getClass()+", holeDatei: return=<null>");
+            // LOG.debug("("+this.hashCode()+") "+getClass()+", holeDatei: return=<null>");
             return null;
         }
     }
@@ -429,7 +429,7 @@ public class Dateisystem implements Serializable {
             } else {
                 neuerNode = new DefaultMutableTreeNode(neuesVerzeichnis);
                 node.add(neuerNode);
-                // LOG.debug("DEBUG ("+this.hashCode()+"): Verzeichnis "
+                // LOG.debug("("+this.hashCode()+"): Verzeichnis "
                 // + neuesVerzeichnis + " wurde erstellt.");
             }
             return true;

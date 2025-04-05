@@ -98,7 +98,7 @@ public abstract class SystemSoftware extends Observable implements Serializable 
 
     public void setKnoten(Knoten hardware) {
         this.hardware = hardware;
-        // LOG.debug("DEBUG: SystemSoftware ("+this.hashCode()+") now is connected to Knoten
+        // LOG.debug("SystemSoftware ("+this.hashCode()+") now is connected to Knoten
         // ("+hardware.hashCode()+")");
     }
 

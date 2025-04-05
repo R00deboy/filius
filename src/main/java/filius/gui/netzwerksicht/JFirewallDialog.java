@@ -365,7 +365,7 @@ public class JFirewallDialog extends JDialog implements I18n {
                     if (ruleTable.getSelectedRowCount() == 1) {
                         rowSel = ruleTable.getSelectedRow();
                         String idStr = (String) ruleTable.getValueAt(rowSel, 0);
-                        LOG.debug("DEBUG (" + this.hashCode() + ") " + getClass() + ", del action: rowSel=" + rowSel
+                        LOG.debug("(" + this.hashCode() + ") " + getClass() + ", del action: rowSel=" + rowSel
                                 + ", rows count=" + firewall.getRuleset().size());
                         firewall.deleteRule(Integer.parseInt(idStr) - 1);
                     }
@@ -444,7 +444,7 @@ public class JFirewallDialog extends JDialog implements I18n {
         model = (DefaultTableModel) this.ruleTable.getModel();
         model.setRowCount(0);
         for (int i = 0; i < ruleset.size(); i++) {
-            LOG.debug("DEBUG Rule #" + (i + 1) + ": " + ruleset.get(i).toString());
+            LOG.debug("Rule #" + (i + 1) + ": " + ruleset.get(i).toString());
             Vector<String> row = ruleAsVector(i + 1, ruleset.get(i));
             model.addRow(row);
         }

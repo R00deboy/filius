@@ -98,7 +98,7 @@ public class JSwitchKonfiguration extends JKonfiguration implements I18n {
     }
 
     public void changeAppearance() {
-        LOG.debug("DEBUG: changeAppearance invoked for Switch");
+        LOG.debug("changeAppearance invoked for Switch");
         if (checkCloud.isSelected()) {
             GUIContainer.getGUIContainer().getLabelforKnoten(((Switch) holeHardware()))
                     .setIcon(new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH_CLOUD)));

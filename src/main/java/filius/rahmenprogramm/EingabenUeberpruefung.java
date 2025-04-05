@@ -94,7 +94,7 @@ public class EingabenUeberpruefung implements I18n {
         LOG.trace("INVOKED (EingabenUeberpruefung), isValidSubnetmask(" + subnet + ")");
         String[] token = subnet.split("\\.");
         String binary = "";
-        LOG.debug("DEBUG (EingabenUeberpruefung), '" + token + "', length=" + token.length);
+        LOG.debug("(EingabenUeberpruefung), '" + token + "', length=" + token.length);
         if (token.length != 4)
             return false;
         try {
@@ -104,7 +104,7 @@ public class EingabenUeberpruefung implements I18n {
                     currBin = "0" + currBin;
                 binary += currBin;
                 LOG.debug(
-                        "DEBUG (EingabenUeberpruefung), '" + token[i] + "' ~~> binary (" + i + ") = '" + binary + "'");
+                        "(EingabenUeberpruefung), '" + token[i] + "' ~~> binary (" + i + ") = '" + binary + "'");
             }
         } catch (Exception e) {
             return false;

@@ -979,7 +979,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
 	/**
 	 * Class for a rectangular visualisation of nested messages.
 	 */
-	public class NestedMessagesVisualisation extends JLabel {
+	private class NestedMessagesVisualisation extends JLabel {
 
 		private int layerNumber;
 		private boolean isSquare;

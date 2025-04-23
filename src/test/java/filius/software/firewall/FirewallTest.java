@@ -23,7 +23,7 @@ public class FirewallTest {
     public void testAcceptIPPacket_Syn_Accept() throws Exception {
         TcpSegment segment = new TcpSegment();
         segment.setSyn(true);
-        IpPaket ipPacket = new IpPaket(IpPaket.TCP);
+        IpPaket ipPacket = new IpPaket(IpPaket.TCP, -1);
         ipPacket.setSegment(segment);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
@@ -44,7 +44,7 @@ public class FirewallTest {
 
     @Test
     public void testAcceptIPPacket_ICMP_Drop() throws Exception {
-        IpPaket ipPacket = new IcmpPaket();
+        IpPaket ipPacket = new IcmpPaket(-1);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
         firewall.setDropICMP(true);
@@ -54,7 +54,7 @@ public class FirewallTest {
 
     @Test
     public void testCheckAcceptIcmp_IsIcmpAndDropIcmp_DoNOTAccept() throws Exception {
-        IcmpPaket icmp = new IcmpPaket();
+        IcmpPaket icmp = new IcmpPaket(-1);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
         firewall.setDropICMP(true);
@@ -64,7 +64,7 @@ public class FirewallTest {
 
     @Test
     public void testCheckAcceptIcmp_IsIcmpAndNOTDropIcmp_DoAccept() throws Exception {
-        IcmpPaket icmp = new IcmpPaket();
+        IcmpPaket icmp = new IcmpPaket(-1);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
         firewall.setDropICMP(false);
@@ -74,7 +74,7 @@ public class FirewallTest {
 
     @Test
     public void testCheckAcceptIcmp_IsNOTIcmpAndDropIcmp_DoAccept() throws Exception {
-        IpPaket paket = new IpPaket(IpPaket.TCP);
+        IpPaket paket = new IpPaket(IpPaket.TCP, -1);
 
         Firewall firewall = createActiveFirewall(ACCEPT);
         firewall.setDropICMP(true);
@@ -84,7 +84,7 @@ public class FirewallTest {
 
     @Test
     public void testCheckAcceptTCP_IsIcmp_Accept() throws Exception {
-        IpPaket paket = new IcmpPaket();
+        IpPaket paket = new IcmpPaket(-1);
 
         Firewall firewall = createActiveFirewall(DROP);
 
@@ -179,7 +179,7 @@ public class FirewallTest {
     }
 
     private IpPaket createIPPacketTcp(String sender, String dest, int port) {
-        IpPaket paket = new IpPaket(IpPaket.TCP);
+        IpPaket paket = new IpPaket(IpPaket.TCP, -1);
         paket.setSender(sender);
         paket.setEmpfaenger(dest);
         TcpSegment segment = new TcpSegment();
@@ -269,7 +269,7 @@ public class FirewallTest {
     }
 
     private IpPaket createIPPacketUDP(String sender, String dest, int port) {
-        IpPaket paket = new IpPaket(IpPaket.UDP);
+        IpPaket paket = new IpPaket(IpPaket.UDP, -1);
         paket.setSender(sender);
         paket.setEmpfaenger(dest);
         UdpSegment segment = new UdpSegment();

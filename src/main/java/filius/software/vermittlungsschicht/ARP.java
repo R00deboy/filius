@@ -215,7 +215,8 @@ public class ARP extends VermittlungsProtokoll {
         return requestSent;
     }
 
-    public ArpPaket sendArpRequest(String senderMAC, String senderIP, String targetMAC, String lookupOrTargetIP, NetzwerkInterface useNic) {
+    public ArpPaket sendArpRequest(String senderMAC, String senderIP, String targetMAC, String lookupOrTargetIP,
+            NetzwerkInterface useNic) {
         ArpPaket arpPaket = new ArpPaket();
         arpPaket.setOperation(ArpPaket.REQUEST);
         arpPaket.setProtokollTyp(EthernetFrame.IP);

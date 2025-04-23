@@ -28,8 +28,8 @@ package filius.software;
 import filius.software.system.SystemSoftware;
 
 /**
- * Diese Klasse ist Oberklasse der Protokolle auf den verschiedenen Schichten.
- * Es werden Protokolle fuer vier Schichten implementiert:
+ * Diese Klasse ist Oberklasse der Protokolle auf den verschiedenen Schichten. Es werden Protokolle fuer vier Schichten
+ * implementiert:
  * <ol>
  * <li>Netzzugang</li>
  * <li>Vermittlung</li>
@@ -37,53 +37,46 @@ import filius.software.system.SystemSoftware;
  * <li>Anwendung</li>
  * </ol>
  * Die Anwendungsschicht wird durch die verschiedenen Anwendungen implementiert. <br />
- * Peterson und Davie beschreiben zwei moegliche Grundarten der Implementierung
- * des Protokollstapels mit Prozessen / Threads. Den ersten Ansatz nennen sie
- * Prozess-pro-Protokoll. D. h., fuer jede Schicht wird ein Prozess gestartet,
- * der Daten von der hoeheren und von der niedrigeren Schicht entgegen nimmt und
- * weitergibt. Der zweite Ansatz ist Prozess-pro-Nachricht. D. h. für jede
- * Nachricht existiert ein Prozess, der die Verarbeitung auf allen Schichten
+ * Peterson und Davie beschreiben zwei moegliche Grundarten der Implementierung des Protokollstapels mit Prozessen /
+ * Threads. Den ersten Ansatz nennen sie Prozess-pro-Protokoll. D. h., fuer jede Schicht wird ein Prozess gestartet, der
+ * Daten von der hoeheren und von der niedrigeren Schicht entgegen nimmt und weitergibt. Der zweite Ansatz ist
+ * Prozess-pro-Nachricht. D. h. für jede Nachricht existiert ein Prozess, der die Verarbeitung auf allen Schichten
  * veranlasst. <br />
- * Hier werden fuer die Weiterleitung der Daten zur naechst hoeheren Schicht
- * jeweils ein Thread implementiert. Der Versand der Daten von der obersten zur
- * untersten Schicht erfolgt durch den Thread der Anwendung. Damit ist das eine
+ * Hier werden fuer die Weiterleitung der Daten zur naechst hoeheren Schicht jeweils ein Thread implementiert. Der
+ * Versand der Daten von der obersten zur untersten Schicht erfolgt durch den Thread der Anwendung. Damit ist das eine
  * Verbindung der zwei beschriebenen Ansaetze.
  * 
  * @author stefan
  */
 public abstract class Protokoll {
 
-	/** Die Systemsoftware, die auf der Hardware-Komponente laeuft */
-	private SystemSoftware systemSoftware;
+    /** Die Systemsoftware, die auf der Hardware-Komponente laeuft */
+    private SystemSoftware systemSoftware;
 
-	/**
-	 * Konstruktor fuer Protokolle. Hier wird lediglich die Systemsoftware
-	 * initialisiert.
-	 * 
-	 * @param systemSoftware
-	 *            die Systemsoftware der Hardware-Komponente, auf der das
-	 *            Protokoll laeuft.
-	 */
-	public Protokoll(SystemSoftware systemSoftware) {
-		this.systemSoftware = systemSoftware;
-	}
+    /**
+     * Konstruktor fuer Protokolle. Hier wird lediglich die Systemsoftware initialisiert.
+     * 
+     * @param systemSoftware
+     *            die Systemsoftware der Hardware-Komponente, auf der das Protokoll laeuft.
+     */
+    public Protokoll(SystemSoftware systemSoftware) {
+        this.systemSoftware = systemSoftware;
+    }
 
-	/** Methode fuer den Zugriff auf die Systemsoftware */
-	public SystemSoftware holeSystemSoftware() {
-		return systemSoftware;
-	}
+    /** Methode fuer den Zugriff auf die Systemsoftware */
+    public SystemSoftware holeSystemSoftware() {
+        return systemSoftware;
+    }
 
-	/**
-	 * Methode zum Starten der Protokoll-Threads. Diese Methode wird beim
-	 * Wechsel vom Entwurfs- zum Aktionsmodus durch die Systemsoftware
-	 * aufgerufen. Hier werden die notwendigen Threads gestartet.
-	 */
-	public abstract void starten();
+    /**
+     * Methode zum Starten der Protokoll-Threads. Diese Methode wird beim Wechsel vom Entwurfs- zum Aktionsmodus durch
+     * die Systemsoftware aufgerufen. Hier werden die notwendigen Threads gestartet.
+     */
+    public abstract void starten();
 
-	/**
-	 * Methode zum Beenden der Protokoll-Threads. Diese Methode wird beim
-	 * Wechsel vom Entwurfs- zum Aktionsmodus durch die Systemsoftware
-	 * aufgerufen. Hier werden alle vorhandenen Threads dieser Schicht beendet.
-	 */
-	public abstract void beenden();
+    /**
+     * Methode zum Beenden der Protokoll-Threads. Diese Methode wird beim Wechsel vom Entwurfs- zum Aktionsmodus durch
+     * die Systemsoftware aufgerufen. Hier werden alle vorhandenen Threads dieser Schicht beendet.
+     */
+    public abstract void beenden();
 }

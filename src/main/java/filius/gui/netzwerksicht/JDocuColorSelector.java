@@ -16,88 +16,85 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
 // Implements a 
-public class JDocuColorSelector extends JMenu {		
+public class JDocuColorSelector extends JMenu {
 
-	private static final long serialVersionUID = 1L;
-	
-	private int sampleWidth = 30;
-	private int sampleHeight = 30;
-	
-	protected  Border standardBorder = new CompoundBorder(new MatteBorder(1, 1, 1, 1, getBackground()), 
-            											  new MatteBorder(1, 1, 1, 1, Color.DARK_GRAY));
-	protected  Border selectedBorder = new MatteBorder(3, 3, 3, 3, new Color(0.48f, 0.73f, 0.98f)); // Light blue border
-	protected  Border activeBorder   = new MatteBorder(2, 2, 2, 2, Color.BLACK);
-	
+    private static final long serialVersionUID = 1L;
+
+    private int sampleWidth = 30;
+    private int sampleHeight = 30;
+
+    protected Border standardBorder = new CompoundBorder(new MatteBorder(1, 1, 1, 1, getBackground()),
+            new MatteBorder(1, 1, 1, 1, Color.DARK_GRAY));
+    protected Border selectedBorder = new MatteBorder(3, 3, 3, 3, new Color(0.48f, 0.73f, 0.98f)); // Light blue border
+    protected Border activeBorder = new MatteBorder(2, 2, 2, 2, Color.BLACK);
+
     private Color color;
 
-	public JDocuColorSelector(String name, Color[] colors, int lineCount, Color selectedColor) {
-		super(name);
+    public JDocuColorSelector(String name, Color[] colors, int lineCount, Color selectedColor) {
+        super(name);
 
-		JPanel p = new JPanel();
-		p.setBorder(new EmptyBorder(5, 5, 5, 5));
-		p.setLayout(new GridLayout(lineCount, 1));		
-		
-		for (int i = 0; i < colors.length; i++) {
-			boolean sameColor = (colors[i].getRGB() == selectedColor.getRGB());
-			ColorPane pn = new ColorPane(colors[i], sameColor);
-			p.add(pn);
-		}
-				
-		add(p);
-	}
+        JPanel p = new JPanel();
+        p.setBorder(new EmptyBorder(5, 5, 5, 5));
+        p.setLayout(new GridLayout(lineCount, 1));
 
-	public Color getColor() {		
-		return color;
-	}
+        for (int i = 0; i < colors.length; i++) {
+            boolean sameColor = (colors[i].getRGB() == selectedColor.getRGB());
+            ColorPane pn = new ColorPane(colors[i], sameColor);
+            p.add(pn);
+        }
 
-	public void triggerMenuResponse(Color color) {
-		this.color = color;
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-		fireActionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED,	getActionCommand()));
-	}
+        add(p);
+    }
 
-	private class ColorPane extends JPanel implements MouseListener {		
+    public Color getColor() {
+        return color;
+    }
 
-		private static final long serialVersionUID = 1L;
-		
-		boolean selected;
+    public void triggerMenuResponse(Color color) {
+        this.color = color;
+        MenuSelectionManager.defaultManager().clearSelectedPath();
+        fireActionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, getActionCommand()));
+    }
 
-		public ColorPane(Color c, boolean selected) {
-			setBackground(c);
-			this.selected = selected;
-			setBorder(selected ? selectedBorder : standardBorder);
-			addMouseListener(this);
-		}
+    private class ColorPane extends JPanel implements MouseListener {
 
-		public Dimension getPreferredSize() {
-			return new Dimension(sampleWidth, sampleHeight);
-		}
+        private static final long serialVersionUID = 1L;
 
-		public Dimension getMaximumSize() {
-			return getPreferredSize();
-		}
+        boolean selected;
 
-		public Dimension getMinimumSize() {
-			return getPreferredSize();
-		}
+        public ColorPane(Color c, boolean selected) {
+            setBackground(c);
+            this.selected = selected;
+            setBorder(selected ? selectedBorder : standardBorder);
+            addMouseListener(this);
+        }
 
-		public void mousePressed(MouseEvent e) {
-		}
+        public Dimension getPreferredSize() {
+            return new Dimension(sampleWidth, sampleHeight);
+        }
 
-		public void mouseClicked(MouseEvent e) {
-		}
+        public Dimension getMaximumSize() {
+            return getPreferredSize();
+        }
 
-		public void mouseReleased(MouseEvent e) {
-			triggerMenuResponse(getBackground());
-		}
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
+        }
 
-		public void mouseEntered(MouseEvent e) {
-			setBorder(activeBorder);
-		}
+        public void mousePressed(MouseEvent e) {}
 
-		public void mouseExited(MouseEvent e) {			
-			setBorder(selected ? selectedBorder : standardBorder);
-		}
-	}
+        public void mouseClicked(MouseEvent e) {}
+
+        public void mouseReleased(MouseEvent e) {
+            triggerMenuResponse(getBackground());
+        }
+
+        public void mouseEntered(MouseEvent e) {
+            setBorder(activeBorder);
+        }
+
+        public void mouseExited(MouseEvent e) {
+            setBorder(selected ? selectedBorder : standardBorder);
+        }
+    }
 }
-

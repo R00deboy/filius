@@ -211,7 +211,8 @@ public class DHCPMessage {
      * angebotene Adresse mithilfe des Feldes DHCP: REQUESTED ADDRESS. Das Feld DHCP: SERVER IDENTIFIER enthält die
      * IP-Adresse des DHCP-Servers, der die Lease anbietet. (https://support.microsoft.com/de-de/kb/169289)
      */
-    static DHCPMessage createRequestMessage(String clientMacAddress, String requestedIpAddress, String serverIdentifier) {
+    static DHCPMessage createRequestMessage(String clientMacAddress, String requestedIpAddress,
+            String serverIdentifier) {
         DHCPMessage requestMessage = new DHCPMessage();
         requestMessage.type = DHCPMessageType.REQUEST;
         requestMessage.chaddr = clientMacAddress;
@@ -220,7 +221,8 @@ public class DHCPMessage {
         return requestMessage;
     }
 
-    static DHCPMessage createDeclineMessage(String clientMacAddress, String requestedIpAddress, String serverIdentifier) {
+    static DHCPMessage createDeclineMessage(String clientMacAddress, String requestedIpAddress,
+            String serverIdentifier) {
         DHCPMessage declineMessage = new DHCPMessage();
         declineMessage.type = DHCPMessageType.DECLINE;
         declineMessage.chaddr = clientMacAddress;
@@ -236,7 +238,8 @@ public class DHCPMessage {
      * Netzwerkkarte des Clients, der die Anforderung ausgegeben hat. Der Abschnitt "DHCP Option" bezeichnet das Paket
      * als "ACK". (https://support.microsoft.com/de-de/kb/169289)
      */
-    static DHCPMessage createAckMessage(String clientMacAddress, String acknowledgedIpAddress, String serverIdentifier) {
+    static DHCPMessage createAckMessage(String clientMacAddress, String acknowledgedIpAddress,
+            String serverIdentifier) {
         DHCPMessage ackMessage = new DHCPMessage();
         ackMessage.type = DHCPMessageType.ACK;
         ackMessage.chaddr = clientMacAddress;

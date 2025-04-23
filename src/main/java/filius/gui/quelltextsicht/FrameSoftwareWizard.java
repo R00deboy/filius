@@ -46,184 +46,184 @@ import filius.rahmenprogramm.SzenarioVerwaltung;
 
 public class FrameSoftwareWizard extends JDialog implements I18n {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final int VERWALTUNG = 1, QUELLTEXT = 2, COMPILER = 3;
+    public static final int VERWALTUNG = 1, QUELLTEXT = 2, COMPILER = 3;
 
-	private int zustand;
+    private int zustand;
 
-	private PanelCompiler pCompiler = null;
+    private PanelCompiler pCompiler = null;
 
-	private PanelVerwaltung pVerwaltung = null;
+    private PanelVerwaltung pVerwaltung = null;
 
-	private PanelQuelltext pQuelltext = null;
+    private PanelQuelltext pQuelltext = null;
 
-	private JLabel untertitel;
+    private JLabel untertitel;
 
-	private JButton vorButton, zurueckButton;
+    private JButton vorButton, zurueckButton;
 
-	private String anwendungsName, klassenName;
+    private String anwendungsName, klassenName;
 
-	private String[] quelltextDateien;
+    private String[] quelltextDateien;
 
-	public FrameSoftwareWizard() {
-		super(JMainFrame.getJMainFrame(), messages.getString("framesoftwarewizard_msg1"), true);
+    public FrameSoftwareWizard() {
+        super(JMainFrame.getJMainFrame(), messages.getString("framesoftwarewizard_msg1"), true);
 
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setSize(720, 600);
-		this.setLocation(screenSize.width / 2 - (this.getWidth() / 2), screenSize.height / 2 - (this.getHeight() / 2));
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setSize(720, 600);
+        this.setLocation(screenSize.width / 2 - (this.getWidth() / 2), screenSize.height / 2 - (this.getHeight() / 2));
 
-		initKomponenten();
+        initKomponenten();
 
-		SzenarioVerwaltung.getInstance().setzeGeaendert();
+        SzenarioVerwaltung.getInstance().setzeGeaendert();
 
-		setzeVerwaltung();
-	}
+        setzeVerwaltung();
+    }
 
-	private void initKomponenten() {
-		JPanel panel;
+    private void initKomponenten() {
+        JPanel panel;
 
-		getContentPane().removeAll();
+        getContentPane().removeAll();
 
-		untertitel = new JLabel();
-		untertitel.setBackground(Color.WHITE);
-		untertitel.setOpaque(true);
-		untertitel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
-		untertitel.setHorizontalAlignment(JLabel.CENTER);
-		getContentPane().add(untertitel, BorderLayout.NORTH);
+        untertitel = new JLabel();
+        untertitel.setBackground(Color.WHITE);
+        untertitel.setOpaque(true);
+        untertitel.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
+        untertitel.setHorizontalAlignment(JLabel.CENTER);
+        getContentPane().add(untertitel, BorderLayout.NORTH);
 
-		panel = new JPanel();
-		panel.setLayout(new FlowLayout());
+        panel = new JPanel();
+        panel.setLayout(new FlowLayout());
 
-		zurueckButton = new JButton(messages.getString("framesoftwarewizard_msg2"));
-		zurueckButton.setPreferredSize(new Dimension(150, 30));
-		zurueckButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				zurueck();
-			}
-		});
-		panel.add(zurueckButton);
+        zurueckButton = new JButton(messages.getString("framesoftwarewizard_msg2"));
+        zurueckButton.setPreferredSize(new Dimension(150, 30));
+        zurueckButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                zurueck();
+            }
+        });
+        panel.add(zurueckButton);
 
-		vorButton = new JButton(messages.getString("framesoftwarewizard_msg3"));
-		vorButton.setPreferredSize(new Dimension(150, 30));
-		vorButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				weiter();
-			}
-		});
-		panel.add(vorButton);
+        vorButton = new JButton(messages.getString("framesoftwarewizard_msg3"));
+        vorButton.setPreferredSize(new Dimension(150, 30));
+        vorButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                weiter();
+            }
+        });
+        panel.add(vorButton);
 
-		getContentPane().add(panel, BorderLayout.SOUTH);
-	}
+        getContentPane().add(panel, BorderLayout.SOUTH);
+    }
 
-	private void setzeVerwaltung() {
-		JScrollPane scrollPane;
+    private void setzeVerwaltung() {
+        JScrollPane scrollPane;
 
-		if (pVerwaltung == null) {
-			pVerwaltung = new PanelVerwaltung();
-		}
+        if (pVerwaltung == null) {
+            pVerwaltung = new PanelVerwaltung();
+        }
 
-		scrollPane = new JScrollPane(pVerwaltung);
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
-		this.validate();
+        scrollPane = new JScrollPane(pVerwaltung);
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
+        this.validate();
 
-		untertitel.setText(messages.getString("framesoftwarewizard_msg4"));
-		zurueckButton.setText(messages.getString("framesoftwarewizard_msg5"));
-		vorButton.setText(messages.getString("framesoftwarewizard_msg3"));
+        untertitel.setText(messages.getString("framesoftwarewizard_msg4"));
+        zurueckButton.setText(messages.getString("framesoftwarewizard_msg5"));
+        vorButton.setText(messages.getString("framesoftwarewizard_msg3"));
 
-		zustand = VERWALTUNG;
-	}
+        zustand = VERWALTUNG;
+    }
 
-	private void setzeEditor() {
-		if (pQuelltext == null) {
-			pQuelltext = new PanelQuelltext();
-			if (quelltextDateien.length == 2) {
-				pQuelltext.hinzuEditor(klassenName, quelltextDateien[0]);
-				pQuelltext.hinzuEditor("GUIApplication" + klassenName + "Window", quelltextDateien[1]);
-			} else {
-				pQuelltext.hinzuEditor(klassenName + "Mitarbeiter", quelltextDateien[0]);
-				pQuelltext.hinzuEditor(klassenName, quelltextDateien[1]);
-				pQuelltext.hinzuEditor("GUIApplication" + klassenName + "Window", quelltextDateien[2]);
+    private void setzeEditor() {
+        if (pQuelltext == null) {
+            pQuelltext = new PanelQuelltext();
+            if (quelltextDateien.length == 2) {
+                pQuelltext.hinzuEditor(klassenName, quelltextDateien[0]);
+                pQuelltext.hinzuEditor("GUIApplication" + klassenName + "Window", quelltextDateien[1]);
+            } else {
+                pQuelltext.hinzuEditor(klassenName + "Mitarbeiter", quelltextDateien[0]);
+                pQuelltext.hinzuEditor(klassenName, quelltextDateien[1]);
+                pQuelltext.hinzuEditor("GUIApplication" + klassenName + "Window", quelltextDateien[2]);
 
-			}
+            }
 
-		}
+        }
 
-		getContentPane().add(pQuelltext, BorderLayout.CENTER);
-		this.validate();
+        getContentPane().add(pQuelltext, BorderLayout.CENTER);
+        this.validate();
 
-		untertitel.setText(messages.getString("framesoftwarewizard_msg6"));
-		zurueckButton.setText(messages.getString("framesoftwarewizard_msg2"));
-		vorButton.setText(messages.getString("framesoftwarewizard_msg3"));
+        untertitel.setText(messages.getString("framesoftwarewizard_msg6"));
+        zurueckButton.setText(messages.getString("framesoftwarewizard_msg2"));
+        vorButton.setText(messages.getString("framesoftwarewizard_msg3"));
 
-		zustand = QUELLTEXT;
-	}
+        zustand = QUELLTEXT;
+    }
 
-	private void setzeCompiler() {
-		JScrollPane scrollPane;
+    private void setzeCompiler() {
+        JScrollPane scrollPane;
 
-		if (pCompiler == null) {
-			pCompiler = new PanelCompiler(quelltextDateien, anwendungsName, klassenName);
-		}
+        if (pCompiler == null) {
+            pCompiler = new PanelCompiler(quelltextDateien, anwendungsName, klassenName);
+        }
 
-		scrollPane = new JScrollPane(pCompiler);
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
-		this.validate();
+        scrollPane = new JScrollPane(pCompiler);
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
+        this.validate();
 
-		untertitel.setText(messages.getString("framesoftwarewizard_msg7"));
-		zurueckButton.setText(messages.getString("framesoftwarewizard_msg2"));
-		vorButton.setText(messages.getString("framesoftwarewizard_msg8"));
+        untertitel.setText(messages.getString("framesoftwarewizard_msg7"));
+        zurueckButton.setText(messages.getString("framesoftwarewizard_msg2"));
+        vorButton.setText(messages.getString("framesoftwarewizard_msg8"));
 
-		(new Thread(pCompiler)).start();
+        (new Thread(pCompiler)).start();
 
-		zustand = COMPILER;
-	}
+        zustand = COMPILER;
+    }
 
-	private void weiter() {
-		String[] array;
+    private void weiter() {
+        String[] array;
 
-		switch (zustand) {
-		case VERWALTUNG:
-			array = pVerwaltung.holeAnwendung();
-			if (array != null) {
-				anwendungsName = array[0];
-				klassenName = array[1];
-				quelltextDateien = pVerwaltung.initQuelltextDateien();
+        switch (zustand) {
+        case VERWALTUNG:
+            array = pVerwaltung.holeAnwendung();
+            if (array != null) {
+                anwendungsName = array[0];
+                klassenName = array[1];
+                quelltextDateien = pVerwaltung.initQuelltextDateien();
 
-				initKomponenten();
-				pQuelltext = null;
-				setzeEditor();
-			}
-			break;
-		case QUELLTEXT:
-			pQuelltext.speicherQuelltexte();
+                initKomponenten();
+                pQuelltext = null;
+                setzeEditor();
+            }
+            break;
+        case QUELLTEXT:
+            pQuelltext.speicherQuelltexte();
 
-			initKomponenten();
-			pCompiler = null;
-			setzeCompiler();
-			break;
-		case COMPILER:
-			pCompiler.speichern();
-			setVisible(false);
+            initKomponenten();
+            pCompiler = null;
+            setzeCompiler();
+            break;
+        case COMPILER:
+            pCompiler.speichern();
+            setVisible(false);
 
-			break;
-		}
-	}
+            break;
+        }
+    }
 
-	private void zurueck() {
+    private void zurueck() {
 
-		switch (zustand) {
-		case VERWALTUNG:
-			setVisible(false);
-			break;
-		case QUELLTEXT:
-			initKomponenten();
-			setzeVerwaltung();
-			break;
-		case COMPILER:
-			initKomponenten();
-			setzeEditor();
-			break;
-		}
-	}
+        switch (zustand) {
+        case VERWALTUNG:
+            setVisible(false);
+            break;
+        case QUELLTEXT:
+            initKomponenten();
+            setzeVerwaltung();
+            break;
+        case COMPILER:
+            initKomponenten();
+            setzeEditor();
+            break;
+        }
+    }
 }

@@ -27,7 +27,7 @@ package filius.exception;
 
 public class ServerSocketException extends HauptException {
 
-	public ServerSocketException(String s) {
-		super(s);
-	}
+    public ServerSocketException(String s) {
+        super(s);
+    }
 }

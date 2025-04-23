@@ -30,16 +30,16 @@ import javax.swing.table.DefaultTableModel;
 
 public class AnwendungsTabelle extends JTable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public AnwendungsTabelle(DefaultTableModel model) {
-		super(model);
-	}
+    public AnwendungsTabelle(DefaultTableModel model) {
+        super(model);
+    }
 
-	public boolean isCellEditable(int row, int column) {
-		if (column == 0)
-			return true;
-		else
-			return false;
-	}
+    public boolean isCellEditable(int row, int column) {
+        if (column == 0)
+            return true;
+        else
+            return false;
+    }
 }

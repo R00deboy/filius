@@ -61,10 +61,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
+import filius.gui.schichtensicht.GlobalLayerPath;
+import filius.gui.schichtensicht.LocalLayerPathPanel;
+import filius.gui.schichtensicht.LayerPathDialog;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.rahmenprogramm.nachrichten.LauscherBeobachter;
+import filius.software.netzzugangsschicht.Ethernet;
+import filius.software.system.SystemSoftware;
 
 public class AggregatedMessageTable extends JTable implements LauscherBeobachter, I18n {
     private static Logger LOG = LoggerFactory.getLogger(AggregatedMessageTable.class);
@@ -78,7 +83,11 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
     public static final int BEMERKUNG_SPALTE = 6;
     public static final int LFD_NR_SPALTE = 0;
 
+    private SystemSoftware systemSoftware;
+
     private String interfaceId;
+
+    private int selectedRowByRightclick;
 
     private JCheckBoxMenuItem checkbox;
 
@@ -87,12 +96,14 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
     private boolean autoscroll = true;
     private JPopupMenu menu;
 
-    public AggregatedMessageTable(AggregatedExchangeComponent component, String macAddress) {
+    public AggregatedMessageTable(AggregatedExchangeComponent component, String macAddress,
+            SystemSoftware systemSoftware) {
         super();
 
         TableColumn col;
         DefaultTableColumnModel columnModel;
 
+        this.systemSoftware = systemSoftware;
         this.exchangeComponent = component;
         setinterfaceId(macAddress);
 
@@ -129,6 +140,17 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
         this.addMouseListener(new MouseInputAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == 3) {
+                    AggregatedMessageTable target = (AggregatedMessageTable) e.getSource();
+                    target.selectedRowByRightclick = target.rowAtPoint(e.getPoint());
+
+                    // Falls der Rechtsklick im leeren Bereich gemacht wurde
+                    if (target.selectedRowByRightclick == -1) {
+                        disablePathOptions();
+                    } else {
+                        target.setRowSelectionInterval(target.selectedRowByRightclick, target.selectedRowByRightclick);
+                        enablePathOptions();
+                    }
+
                     menu.setVisible(true);
                     menu.show(getTabelle(), e.getX(), e.getY());
                 }
@@ -172,8 +194,31 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
         this.getColumnModel().getColumn(6).setResizable(true);
     }
 
-    private void initKontextMenue() {
+    private int initKontextMenue() {
         menu = new JPopupMenu();
+        AggregatedMessageTable target = this;
+
+        JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
+        localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (isPathOptionsEnabled()) {
+                    menu.setVisible(false);
+                    showLocalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+                }
+            }
+        });
+        menu.add(localPathThroughLayersMenuItem);
+
+        JMenuItem globalPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
+        globalPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (isPathOptionsEnabled()) {
+                    menu.setVisible(false);
+                    showGlobalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+                }
+            }
+        });
+        menu.add(globalPathThroughLayersMenuItem);
 
         JMenuItem resetMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg7"));
         resetMenuItem.addMouseListener(new MouseInputAdapter() {
@@ -183,6 +228,7 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
             }
         });
         menu.add(resetMenuItem);
+
         JMenuItem exportMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg9"));
         exportMenuItem.addMouseListener(new MouseInputAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -240,6 +286,28 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
 
         menu.setVisible(false);
         exchangeComponent.getRootPane().getLayeredPane().add(menu);
+
+        return menu.getComponentCount();
+    }
+
+    // activate context menu entries "lokaler Weg ..." and "globaler Weg ..."
+    private void enablePathOptions() {
+        if (!menu.getComponent(0).isEnabled() && !menu.getComponent(1).isEnabled()) {
+            menu.getComponent(0).setEnabled(true);
+            menu.getComponent(1).setEnabled(true);
+        }
+    }
+
+    // deactivate context menu entries "lokaler Weg ..." and "globaler Weg ..."
+    private void disablePathOptions() {
+        if (menu.getComponent(0).isEnabled() && menu.getComponent(1).isEnabled()) {
+            menu.getComponent(0).setEnabled(false);
+            menu.getComponent(1).setEnabled(false);
+        }
+    }
+
+    private boolean isPathOptionsEnabled() {
+        return menu.getComponent(0).isEnabled() && menu.getComponent(1).isEnabled();
     }
 
     private void setinterfaceId(String interfaceId) {
@@ -379,6 +447,78 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
         return lineData;
     }
 
+    /**
+     * Original Filius colors for the different layers.
+     */
+    public enum LayerColorOrig {
+        DEFAULT(Color.WHITE, Color.GRAY), LINK(Color.BLACK, new Color(0.9f, 0.9f, 0.9f)), INTERNET(Color.BLACK,
+                new Color(0.3f, 1f, 0.3f)), TRANSPORT(Color.BLACK, Color.CYAN), APPLICATION(Color.WHITE, Color.BLUE);
+
+        public final Color foregroundColor;
+        public final Color backgroundColor;
+
+        private LayerColorOrig(Color foregroundColor, Color backgroundColor) {
+            this.foregroundColor = foregroundColor;
+            this.backgroundColor = backgroundColor;
+        }
+    }
+
+    /**
+     * Color variants for the different layers.
+     * 
+     * @author Christoph Irniger
+     */
+    public enum LayerColorVar {
+        DEFAULT(Color.BLACK, Color.decode("#A6A6A6"), Color.WHITE, Color.WHITE, Color.WHITE), LINK(Color.BLACK,
+                Color.decode("#A6A6A6"), Color.decode("#C9C9C9"), Color.decode("#DBDBDB"),
+                Color.decode("#F2F2F2")), INTERNET(Color.BLACK, Color.decode("#A6A6A6"), Color.decode("#8FAADC"),
+                        Color.decode("#B4C6E7"), Color.decode("#D9E2F3")), TRANSPORT(Color.BLACK,
+                                Color.decode("#A6A6A6"), Color.decode("#F4B183"), Color.decode("#F7CAAC"),
+                                Color.decode("#FBE4D5")), APPLICATION(Color.BLACK, Color.decode("#A6A6A6"),
+                                        Color.decode("#FFD966"), Color.decode("#FFE599"), Color.decode("#FFF2CC"));
+
+        public final Color foregroundColor;
+        public final Color foregroundColorGreyedOut;
+        public final Color backgroundColor;
+        public final Color backgroundColorFine;
+        public final Color backgroundColorUltraFine;
+
+        private LayerColorVar(Color foregroundColor, Color foregroundColorGreyedOut, Color backgroundColor,
+                Color backgroundColorFine, Color backgroundColorUltraFine) {
+            this.foregroundColor = foregroundColor;
+            this.foregroundColorGreyedOut = foregroundColorGreyedOut;
+            this.backgroundColor = backgroundColor;
+            this.backgroundColorFine = backgroundColorFine;
+            this.backgroundColorUltraFine = backgroundColorUltraFine;
+        }
+
+        public static Color getLayerColorVar(String typeOfColor, int layerNumber) {
+            String layerName = null;
+            if (layerNumber == 1) {
+                layerName = "LINK";
+            } else if (layerNumber == 2) {
+                layerName = "INTERNET";
+            } else if (layerNumber == 3) {
+                layerName = "TRANSPORT";
+            } else if (layerNumber == 4) {
+                layerName = "APPLICATION";
+            }
+            Color color = null;
+            if (typeOfColor == "foregroundColor") {
+                color = valueOf(layerName).foregroundColor;
+            } else if (typeOfColor == "foregroundColorGreyedOut") {
+                color = valueOf(layerName).foregroundColorGreyedOut;
+            } else if (typeOfColor == "backgroundColor") {
+                color = valueOf(layerName).backgroundColor;
+            } else if (typeOfColor == "backgroundColorFine") {
+                color = valueOf(layerName).backgroundColorFine;
+            } else if (typeOfColor == "backgroundColorUltraFine") {
+                color = valueOf(layerName).backgroundColorUltraFine;
+            }
+            return color;
+        }
+    }
+
     static List<String> splitString(String text, int maxLength) {
         String normalizedText = StringUtils.normalizeSpace(text);
         String[] tokens = normalizedText.split(" ");
@@ -407,5 +547,45 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
         }
         lines.add(lineBuilder.toString().trim());
         return lines;
+    }
+
+    /**
+     * Opens local view of the path through layers.
+     * 
+     * @param systemSoftware
+     *            system software of the node
+     * @param frameNumber
+     *            number of the selected frame in the data exchange (starts with 1)
+     * 
+     * @author Christoph Irniger
+     */
+    private void showLocalPathThroughLayers(SystemSoftware systemSoftware, int frameNumber) {
+        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
+                + " (AggregatedMessageTable), showLocalPathThroughLayers()");
+        new LayerPathDialog(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, frameNumber, null,
+                true);
+    }
+
+    /**
+     * Opens global view of the path through layers.
+     * 
+     * @param systemSoftware
+     *            system software of the node
+     * @param frameNumber
+     *            number of the selected frame in the data exchange (starts with 1)
+     * 
+     * @author Christoph Irniger
+     */
+    private void showGlobalPathThroughLayers(SystemSoftware systemSoftware, int frameNumber) {
+        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
+                + " (AggregatedMessageTable), showGlobalPathThroughLayers()");
+        // if the frame was sent and destination MAC of the frame is broadcast, global
+        // view is not possible
+        if (LocalLayerPathPanel.isFrameSent(interfaceId, frameNumber) && Lauscher.getLauscher()
+                .getFrame(interfaceId, frameNumber).getZielMacAdresse().equals(Ethernet.ETHERNET_BROADCAST)) {
+            JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), messages.getString("nachrichtentabelle_msg12"));
+        } else {
+            new GlobalLayerPath(filius.gui.JMainFrame.getJMainFrame(), interfaceId, systemSoftware, frameNumber);
+        }
     }
 }

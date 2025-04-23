@@ -34,18 +34,18 @@ import filius.software.transportschicht.Socket;
  *
  */
 public class RIPServer extends UDPServerAnwendung {
-	public RIPServer() {
-		super();
+    public RIPServer() {
+        super();
 
-		port = 520;
-	}
+        port = 520;
+    }
 
-	protected void neuerMitarbeiter(Socket socket) {
-		RIPServerMitarbeiter ripMitarbeiter;
+    protected void neuerMitarbeiter(Socket socket) {
+        RIPServerMitarbeiter ripMitarbeiter;
 
-		ripMitarbeiter = new RIPServerMitarbeiter(this, socket);
-		ripMitarbeiter.starten();
-		mitarbeiter.add(ripMitarbeiter);
-	}
+        ripMitarbeiter = new RIPServerMitarbeiter(this, socket);
+        ripMitarbeiter.starten();
+        mitarbeiter.add(ripMitarbeiter);
+    }
 
 }

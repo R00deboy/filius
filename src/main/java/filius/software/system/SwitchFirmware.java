@@ -44,30 +44,30 @@ import filius.rahmenprogramm.I18n;
 import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.netzzugangsschicht.SwitchPortBeobachter;
 
-/** Diese Klasse erweitert den Wert der HashMap für die SAT um einen Eintrag für das letzte Update.
+/**
+ * Diese Klasse erweitert den Wert der HashMap für die SAT um einen Eintrag für das letzte Update.
  */
 class satEntry {
-	
-	private Port port;
-	private Date letztes_Update;
-	
-	public Port getPort(){
-		return port;
-	}
-	
-	public Date holeLetztesUpdate() {
-		return letztes_Update;
-	}
-	
-	public void setPort(Port port) {
-		this.port = port;
-	}
-	
-	public void hinzuLetztesUpdate(Date letztes_Update) {
-		this.letztes_Update = letztes_Update;
-	}
-}
 
+    private Port port;
+    private Date letztes_Update;
+
+    public Port getPort() {
+        return port;
+    }
+
+    public Date holeLetztesUpdate() {
+        return letztes_Update;
+    }
+
+    public void setPort(Port port) {
+        this.port = port;
+    }
+
+    public void hinzuLetztesUpdate(Date letztes_Update) {
+        this.letztes_Update = letztes_Update;
+    }
+}
 
 /**
  * Diese Klasse stellt die Funktionalitaet des Switches zur Verfuegung. Wichtiges Element ist die Source Address Table
@@ -125,18 +125,18 @@ public class SwitchFirmware extends SystemSoftware implements I18n {
             switchBeobachter.add(anschlussBeobachter);
         }
         firePropertyChanged(new PropertyChangeEvent(this, "sat_entry", null, null));
-        
+
         Timer timer = new Timer();
-       
-        timer.scheduleAtFixedRate(new TimerTask(){
-        	@Override
-        	public void run() {
-        		if(!isStarted()) {
-        			timer.cancel();
-        		} else if (!sat.isEmpty()) {
-        			checkSAT();	
-        		}
-        	}
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!isStarted()) {
+                    timer.cancel();
+                } else if (!sat.isEmpty()) {
+                    checkSAT();
+                }
+            }
         }, 1000, 1000);
     }
 
@@ -183,9 +183,9 @@ public class SwitchFirmware extends SystemSoftware implements I18n {
     public void hinzuSatEintrag(String macAdresse, Port anschluss, Date letztes_Update) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (SwitchFirmware), hinzuSatEintrag(" + macAdresse
                 + "," + anschluss + "," + letztes_Update + ")");
-        satEntry eintrag = new satEntry();	
+        satEntry eintrag = new satEntry();
         eintrag.setPort(anschluss);
-        eintrag.hinzuLetztesUpdate(letztes_Update);	
+        eintrag.hinzuLetztesUpdate(letztes_Update);
         sat.put(macAdresse, eintrag);
         firePropertyChanged(new PropertyChangeEvent(this, "sat_entry", null, anschluss));
     }
@@ -225,25 +225,26 @@ public class SwitchFirmware extends SystemSoftware implements I18n {
     public String getSSID() {
         return ssid;
     }
-    
+
     /**
      * Methode zum Löschen der gesamten SAT
      */
     public void loescheSAT() {
-    	sat.clear();
+        sat.clear();
         firePropertyChanged(new PropertyChangeEvent(this, "sat_entry", null, null));
     }
-    
+
     /**
      * Methode zum Überprüfen der SAT
      */
     public void checkSAT() {
-    	Date jetzt = new Date();
-    	sat.forEach((mac,eintrag) -> {
-    		if (jetzt.getTime()-eintrag.holeLetztesUpdate().getTime() >= getRetentionTime()) {
-    			sat.remove(mac);
-    			firePropertyChanged(new PropertyChangeEvent(this, "sat_entry", null, null));
-    		};
-    	});
+        Date jetzt = new Date();
+        sat.forEach((mac, eintrag) -> {
+            if (jetzt.getTime() - eintrag.holeLetztesUpdate().getTime() >= getRetentionTime()) {
+                sat.remove(mac);
+                firePropertyChanged(new PropertyChangeEvent(this, "sat_entry", null, null));
+            }
+            ;
+        });
     }
 }

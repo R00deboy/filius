@@ -35,20 +35,20 @@ import filius.software.system.SystemSoftware;
  */
 public interface ExchangeComponent {
 
-	/**
-	 * @param system
-	 * @param identifier
-	 */
-	void addTable(SystemSoftware system, String identifier);
+    /**
+     * @param system
+     * @param identifier
+     */
+    void addTable(SystemSoftware system, String identifier);
 
-	/**
-	 * @param system
-	 * @param panel
-	 */
-	void removeTable(String mac, JPanel panel);
+    /**
+     * @param system
+     * @param panel
+     */
+    void removeTable(String mac, JPanel panel);
 
-	/**
+    /**
      * 
      */
-	void reset();
+    void reset();
 }

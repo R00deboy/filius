@@ -26,9 +26,10 @@ public class DHCPMessageTest {
     public void testToString_WithInitialization() throws Exception {
         DHCPMessage dhcpMessage = prepareTestMessage(DHCPMessageType.OFFER, "192.168.1.111", "abcdefgh", "192.168.1.5",
                 "192.168.1.1", "255.255.255.0", "1.2.3.4", "5.6.7.8");
-        assertThat(dhcpMessage.toString(), is("DHCPOFFER"
-                + "\nyiaddr=192.168.1.111\nchaddr=abcdefgh\nrouter=192.168.1.1"
-                + "\nsubnetmask=255.255.255.0\ndnsserver=192.168.1.5" + "\nrequested=1.2.3.4\nserverident=5.6.7.8"));
+        assertThat(dhcpMessage.toString(),
+                is("DHCPOFFER" + "\nyiaddr=192.168.1.111\nchaddr=abcdefgh\nrouter=192.168.1.1"
+                        + "\nsubnetmask=255.255.255.0\ndnsserver=192.168.1.5"
+                        + "\nrequested=1.2.3.4\nserverident=5.6.7.8"));
     }
 
     private DHCPMessage prepareTestMessage(DHCPMessageType type, String yiaddr, String chaddr, String dnsServer,

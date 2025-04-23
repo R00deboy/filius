@@ -48,6 +48,7 @@ public class Vermittlungsrechner extends InternetKnoten implements I18n {
 
     public Vermittlungsrechner() {
         super();
+        setMaxLayerOfOperation(2);
         LOG.trace("INVOKED-2 (" + this.hashCode() + ") " + getClass()
                 + " (Vermittlungsrechner), constr: Vermittlungsrechner()");
 

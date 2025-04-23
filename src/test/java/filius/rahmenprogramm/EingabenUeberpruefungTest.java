@@ -60,7 +60,7 @@ public class EingabenUeberpruefungTest {
     public void testIpAdresseAuchLeer_AktuellesNetzwerk() throws Exception {
         assertTrue(EingabenUeberpruefung.isGueltig("0.0.0.0", musterIpAdresseAuchLeer));
     }
-    
+
     @Test
     public void testDomain_StartsWithLetter() throws Exception {
         assertFalse(EingabenUeberpruefung.isGueltig("0a2b3c.a4b5c6", musterDomain));
@@ -105,7 +105,6 @@ public class EingabenUeberpruefungTest {
     @Test
     public void testDomain_DoNOTAllow64Characters() throws Exception {
         assertFalse(EingabenUeberpruefung.isGueltig("a123456789012345678901234567890123456789012345678901234567890123."
-                + "a123456789012345678901234567890123456789012345678901234567890123.",
-                musterDomain));
+                + "a123456789012345678901234567890123456789012345678901234567890123.", musterDomain));
     }
 }

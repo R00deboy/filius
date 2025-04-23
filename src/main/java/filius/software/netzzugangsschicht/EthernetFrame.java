@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.software.ProtocolDataUnit;
+import filius.software.vermittlungsschicht.ArpPaket;
 import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 
@@ -116,5 +117,76 @@ public class EthernetFrame extends ProtocolDataUnit {
     public String toString() {
         return "[" + "src=" + quellMacAdresse + ", " + "dest=" + zielMacAdresse + ", " + "type=" + typ
                 + (daten != null ? " | " + daten : "") + "]";
+    }
+
+    /**
+     * Checks if the whole content (which consists of {@code zielMacAdresse}, {@code quellMacAdresse} and {@code daten})
+     * of <i>this</i> frame is equal to the frame in the argument.
+     * 
+     * @param frame
+     *            frame to be compared to <i>this</i> frame
+     * @return true if zielMacAdresse, quellMacAdresse and daten are equal
+     * @author Christoph Irniger
+     */
+    public boolean sameContent(EthernetFrame frame) {
+        if (frame == this) {
+            return true;
+        }
+
+        // check header
+        if (zielMacAdresse.equals(frame.getZielMacAdresse()) && quellMacAdresse.equals(frame.getQuellMacAdresse())
+                && typ.equals(frame.getTyp())) {
+
+            Object argumentData = frame.getDaten();
+            // check payload
+            if (daten instanceof IpPaket && argumentData instanceof IpPaket) {
+                IpPaket argumentPacket = (IpPaket) argumentData;
+                IpPaket thisPacket = (IpPaket) daten;
+                return thisPacket.getIdentification() == argumentPacket.getIdentification()
+                        && thisPacket.getTtl() == argumentPacket.getTtl();
+            } else if (daten instanceof ArpPaket && argumentData instanceof ArpPaket) {
+                ArpPaket thisArpPacket = (ArpPaket) daten;
+                ArpPaket argumentArpPacket = (ArpPaket) frame.getDaten();
+                return thisArpPacket.getArpPacketNumber() == argumentArpPacket.getArpPacketNumber();
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * If <i>this</i> frame and the frame in the first argument both encapsule an IP packet, this method checks if the
+     * packets have the same content and if the IP packet inside <i>this</i> frame has a specific TTL.
+     * 
+     * @param frame
+     *            the frame whose payload should be compared to <i>this</i> payload
+     * @param ttl
+     *            the desired TTL of <i>this</i> frame in the first argument
+     * @return true if the frame in the first argument has the same payload and the specified TTL
+     * @author Christoph Irniger
+     */
+    public boolean samePayload(EthernetFrame frame, int ttl) {
+        Object framePayload = frame.getDaten();
+
+        // if both frames are of type IP
+        if (daten instanceof IpPaket && framePayload instanceof IpPaket) {
+            if (!(daten instanceof IcmpPaket) && !(framePayload instanceof IcmpPaket)) {
+                IpPaket thisIpPacket = (IpPaket) daten;
+                IpPaket argumentIpPacket = (IpPaket) framePayload;
+                return thisIpPacket.getIdentification() == argumentIpPacket.getIdentification()
+                        && thisIpPacket.getTtl() == ttl;
+            } else if (daten instanceof IcmpPaket && framePayload instanceof IcmpPaket) {
+                IcmpPaket thisIcmpPacket = (IcmpPaket) daten;
+                IcmpPaket argumentIcmpPacket = (IcmpPaket) framePayload;
+                return thisIcmpPacket.getIdentification() == argumentIcmpPacket.getIdentification()
+                        && thisIcmpPacket.getTtl() == ttl;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

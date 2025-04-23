@@ -29,24 +29,24 @@ import javax.swing.JOptionPane;
 
 public class GUIErrorHandler {
 
-	/**
-	 * 
-	 */
-	private static GUIErrorHandler ref;
+    /**
+     * 
+     */
+    private static GUIErrorHandler ref;
 
-	private GUIErrorHandler() {
+    private GUIErrorHandler() {
 
-	}
+    }
 
-	public static GUIErrorHandler getGUIErrorHandler() {
-		if (ref == null) {
-			ref = new GUIErrorHandler();
-		}
+    public static GUIErrorHandler getGUIErrorHandler() {
+        if (ref == null) {
+            ref = new GUIErrorHandler();
+        }
 
-		return ref;
-	}
+        return ref;
+    }
 
-	public void DisplayError(String s) {
-		JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), s);
-	}
+    public void DisplayError(String s) {
+        JOptionPane.showMessageDialog(JMainFrame.getJMainFrame(), s);
+    }
 }

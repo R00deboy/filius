@@ -25,14 +25,13 @@
  */
 package filius.exception;
 
-
 public abstract class HauptException extends Exception {
 
-	public HauptException() {
-		super();
-	}
+    public HauptException() {
+        super();
+    }
 
-	public HauptException(String s) {
-		super(s);
-	}
+    public HauptException(String s) {
+        super(s);
+    }
 }

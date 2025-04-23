@@ -34,6 +34,9 @@ public class ArpPaket extends ProtocolDataUnit {
 
     private static final long serialVersionUID = 1L;
 
+    /** counter for the arp packet number */
+    private static long arpPacketNumberCounter;
+
     /** Protokoll-Typ der Vermittlungsschicht */
     private String protokollTyp;
 
@@ -53,6 +56,22 @@ public class ArpPaket extends ProtocolDataUnit {
      * Ziel-IP-Adresse bzw. die Adresse des Knotens, zu dem die MAC-Adresse gesucht wird
      */
     private String targetIP;
+
+    /** ARP packet number (does not exist in reality) */
+    private final long arpPacketNumber;
+
+    public ArpPaket() {
+        this.arpPacketNumber = getNextArpPacketCounter();
+    }
+
+    /**
+     * Gets the next ARP packet number and increases global counter by 1.
+     * 
+     * @return next arp packet number
+     */
+    private static synchronized long getNextArpPacketCounter() {
+        return ++arpPacketNumberCounter;
+    }
 
     public String getProtokollTyp() {
         return protokollTyp;
@@ -92,6 +111,10 @@ public class ArpPaket extends ProtocolDataUnit {
 
     public void setTargetMAC(String zielMacAdresse) {
         this.targetMAC = zielMacAdresse;
+    }
+
+    public long getArpPacketNumber() {
+        return arpPacketNumber;
     }
 
     public String toString() {

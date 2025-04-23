@@ -52,224 +52,221 @@ import filius.software.system.Dateisystem;
 
 public class DMTNFileChooser implements I18n {
 
-	private JPanel pHaupt;
-	private JList lVerzeichnisse;
-	private DefaultMutableTreeNode aktuellerOrdner;
-	private String aktuellerDateiname;
-	private JButton btEbeneHoch;
-	private JTextField tfDateiname;
-	private JLabel lbDateiname, lbAktuellerOrdner;
-	private JButton btAktion, btAbbrechen;
-	private Betriebssystem betriebssystem;
-	private int rueckgabe = 0;
-	private JDialog dialog;
+    private JPanel pHaupt;
+    private JList lVerzeichnisse;
+    private DefaultMutableTreeNode aktuellerOrdner;
+    private String aktuellerDateiname;
+    private JButton btEbeneHoch;
+    private JTextField tfDateiname;
+    private JLabel lbDateiname, lbAktuellerOrdner;
+    private JButton btAktion, btAbbrechen;
+    private Betriebssystem betriebssystem;
+    private int rueckgabe = 0;
+    private JDialog dialog;
 
-	public static final int OK = 1;
-	public static final int CANCEL = 2;
+    public static final int OK = 1;
+    public static final int CANCEL = 2;
 
-	public DMTNFileChooser(Betriebssystem bs) {
-		dialog = new JDialog();
-		dialog.setIconImage(JMainFrame.getJMainFrame().getIconImage());
+    public DMTNFileChooser(Betriebssystem bs) {
+        dialog = new JDialog();
+        dialog.setIconImage(JMainFrame.getJMainFrame().getIconImage());
 
-		this.betriebssystem = bs;
-		this.aktuellerOrdner = betriebssystem.getDateisystem().getRoot();
-		pHaupt = new JPanel(new BorderLayout());
-		Box boxHaupt = Box.createVerticalBox();
-		Box tmpBox = Box.createHorizontalBox();
-		tmpBox.add(Box.createHorizontalStrut(5));
+        this.betriebssystem = bs;
+        this.aktuellerOrdner = betriebssystem.getDateisystem().getRoot();
+        pHaupt = new JPanel(new BorderLayout());
+        Box boxHaupt = Box.createVerticalBox();
+        Box tmpBox = Box.createHorizontalBox();
+        tmpBox.add(Box.createHorizontalStrut(5));
 
-		lbAktuellerOrdner = new JLabel(aktuellerOrdner.toString());
-		lbAktuellerOrdner.setHorizontalAlignment(JLabel.LEFT);
+        lbAktuellerOrdner = new JLabel(aktuellerOrdner.toString());
+        lbAktuellerOrdner.setHorizontalAlignment(JLabel.LEFT);
 
-		boxHaupt.add(Box.createVerticalStrut(10));
-		tmpBox.add(lbAktuellerOrdner);
+        boxHaupt.add(Box.createVerticalStrut(10));
+        tmpBox.add(lbAktuellerOrdner);
 
-		tmpBox.add(Box.createHorizontalStrut(20));
-		btEbeneHoch = new JButton(messages.getString("dmtnfilechooser_msg1"));
-		btEbeneHoch.setActionCommand("ebeneHoch");
-		btEbeneHoch.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (e.getActionCommand().equals(btEbeneHoch.getActionCommand())) {
-					if (aktuellerOrdner.getParent() != null) {
-						aktuellerOrdner = (DefaultMutableTreeNode) aktuellerOrdner.getParent();
+        tmpBox.add(Box.createHorizontalStrut(20));
+        btEbeneHoch = new JButton(messages.getString("dmtnfilechooser_msg1"));
+        btEbeneHoch.setActionCommand("ebeneHoch");
+        btEbeneHoch.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (e.getActionCommand().equals(btEbeneHoch.getActionCommand())) {
+                    if (aktuellerOrdner.getParent() != null) {
+                        aktuellerOrdner = (DefaultMutableTreeNode) aktuellerOrdner.getParent();
 
-						ordnerInhaltAnzeigen(aktuellerOrdner);
+                        ordnerInhaltAnzeigen(aktuellerOrdner);
 
-					}
+                    }
 
-				}
-			}
-		});
-		tmpBox.add(Box.createHorizontalStrut(5));
-		tmpBox.add(btEbeneHoch);
-		boxHaupt.add(Box.createVerticalStrut(10));
-		boxHaupt.add(tmpBox);
+                }
+            }
+        });
+        tmpBox.add(Box.createHorizontalStrut(5));
+        tmpBox.add(btEbeneHoch);
+        boxHaupt.add(Box.createVerticalStrut(10));
+        boxHaupt.add(tmpBox);
 
-		DefaultListModel lmDateiListe = new DefaultListModel();
-		lVerzeichnisse = new JList(lmDateiListe);
-		lVerzeichnisse.setFixedCellHeight(16);
-		JScrollPane dateiListenScrollPane = new JScrollPane(lVerzeichnisse);
-		boxHaupt.add(Box.createVerticalStrut(10));
-		boxHaupt.add(dateiListenScrollPane);
+        DefaultListModel lmDateiListe = new DefaultListModel();
+        lVerzeichnisse = new JList(lmDateiListe);
+        lVerzeichnisse.setFixedCellHeight(16);
+        JScrollPane dateiListenScrollPane = new JScrollPane(lVerzeichnisse);
+        boxHaupt.add(Box.createVerticalStrut(10));
+        boxHaupt.add(dateiListenScrollPane);
 
-		lVerzeichnisse.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				/* Doppelklick (Linke Maustaste) */
-				if (e.getClickCount() == 2 && e.getButton() == 1) {
-					int index = ((JList) e.getSource()).locationToIndex(e.getPoint());
+        lVerzeichnisse.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                /* Doppelklick (Linke Maustaste) */
+                if (e.getClickCount() == 2 && e.getButton() == 1) {
+                    int index = ((JList) e.getSource()).locationToIndex(e.getPoint());
 
-					DefaultListModel lm = (DefaultListModel) lVerzeichnisse.getModel();
-					int selektiert = selektierteZelle(index, e.getPoint());
-					if (selektiert > -1) {
-						String[] teile = lm.getElementAt(index).toString().split(";");
-						if (teile.length > 0) {
-							if (teile[0].equals("Ordner")) {
-								DefaultMutableTreeNode ordnerNode = Dateisystem.verzeichnisKnoten(aktuellerOrdner,
-								        teile[1]);
-								aktuellerOrdner = ordnerNode;
-								ordnerInhaltAnzeigen(ordnerNode);
-							}
-							if (teile[0].equals("Datei")) {
-								Datei datei = betriebssystem.getDateisystem().holeDatei(aktuellerOrdner, teile[1]);
-								tfDateiname.setText(datei.getName());
-							}
+                    DefaultListModel lm = (DefaultListModel) lVerzeichnisse.getModel();
+                    int selektiert = selektierteZelle(index, e.getPoint());
+                    if (selektiert > -1) {
+                        String[] teile = lm.getElementAt(index).toString().split(";");
+                        if (teile.length > 0) {
+                            if (teile[0].equals("Ordner")) {
+                                DefaultMutableTreeNode ordnerNode = Dateisystem.verzeichnisKnoten(aktuellerOrdner,
+                                        teile[1]);
+                                aktuellerOrdner = ordnerNode;
+                                ordnerInhaltAnzeigen(ordnerNode);
+                            }
+                            if (teile[0].equals("Datei")) {
+                                Datei datei = betriebssystem.getDateisystem().holeDatei(aktuellerOrdner, teile[1]);
+                                tfDateiname.setText(datei.getName());
+                            }
 
-						}
-					}
-				}
-			}
-		});
-		Box boxDateiname = Box.createHorizontalBox();
-		lbDateiname = new JLabel(messages.getString("dmtnfilechooser_msg2"));
-		boxDateiname.add(lbDateiname);
-		tfDateiname = new JTextField();
-		boxDateiname.add(Box.createHorizontalStrut(5));
-		boxDateiname.add(tfDateiname);
-		boxHaupt.add(Box.createVerticalStrut(10));
-		boxHaupt.add(boxDateiname);
+                        }
+                    }
+                }
+            }
+        });
+        Box boxDateiname = Box.createHorizontalBox();
+        lbDateiname = new JLabel(messages.getString("dmtnfilechooser_msg2"));
+        boxDateiname.add(lbDateiname);
+        tfDateiname = new JTextField();
+        boxDateiname.add(Box.createHorizontalStrut(5));
+        boxDateiname.add(tfDateiname);
+        boxHaupt.add(Box.createVerticalStrut(10));
+        boxHaupt.add(boxDateiname);
 
-		Box boxButtons = Box.createHorizontalBox();
-		btAktion = new JButton(messages.getString("dmtnfilechooser_msg3"));
-		btAbbrechen = new JButton(messages.getString("dmtnfilechooser_msg4"));
-		btAbbrechen.setActionCommand("cancel");
-		boxButtons.add(Box.createHorizontalStrut(5));
-		boxButtons.add(btAktion);
-		boxButtons.add(Box.createHorizontalStrut(5));
-		boxButtons.add(btAbbrechen);
-		boxHaupt.add(Box.createVerticalStrut(10));
-		boxHaupt.add(boxButtons);
-		boxHaupt.add(Box.createVerticalStrut(10));
+        Box boxButtons = Box.createHorizontalBox();
+        btAktion = new JButton(messages.getString("dmtnfilechooser_msg3"));
+        btAbbrechen = new JButton(messages.getString("dmtnfilechooser_msg4"));
+        btAbbrechen.setActionCommand("cancel");
+        boxButtons.add(Box.createHorizontalStrut(5));
+        boxButtons.add(btAktion);
+        boxButtons.add(Box.createHorizontalStrut(5));
+        boxButtons.add(btAbbrechen);
+        boxHaupt.add(Box.createVerticalStrut(10));
+        boxHaupt.add(boxButtons);
+        boxHaupt.add(Box.createVerticalStrut(10));
 
-		btAbbrechen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (e.getActionCommand().equals(btAbbrechen.getActionCommand())) {
-					rueckgabe = CANCEL;
-					dialog.setVisible(false);
-					dialog.dispose();
+        btAbbrechen.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (e.getActionCommand().equals(btAbbrechen.getActionCommand())) {
+                    rueckgabe = CANCEL;
+                    dialog.setVisible(false);
+                    dialog.dispose();
 
-				}
-			}
-		});
+                }
+            }
+        });
 
-		pHaupt.add(boxHaupt, BorderLayout.CENTER);
-		dialog.setModal(true);
-		dialog.setBounds(100, 100, 320, 240);
-		dialog.add(pHaupt);
+        pHaupt.add(boxHaupt, BorderLayout.CENTER);
+        dialog.setModal(true);
+        dialog.setBounds(100, 100, 320, 240);
+        dialog.add(pHaupt);
 
-	}
+    }
 
-	public int saveDialog() {
-		dialog.setTitle(messages.getString("dmtnfilechooser_msg5"));
-		btAktion.setText(messages.getString("dmtnfilechooser_msg6"));
-		btAktion.setActionCommand("save");
-		btAktion.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (e.getActionCommand().equals(btAktion.getActionCommand())) {
-					rueckgabe = OK;
-					aktuellerDateiname = tfDateiname.getText();
-					dialog.setVisible(false);
-					dialog.dispose();
-				}
-			}
-		});
-		ordnerInhaltAnzeigen(aktuellerOrdner);
-		dialog.setVisible(true);
-		return rueckgabe;
-	}
+    public int saveDialog() {
+        dialog.setTitle(messages.getString("dmtnfilechooser_msg5"));
+        btAktion.setText(messages.getString("dmtnfilechooser_msg6"));
+        btAktion.setActionCommand("save");
+        btAktion.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (e.getActionCommand().equals(btAktion.getActionCommand())) {
+                    rueckgabe = OK;
+                    aktuellerDateiname = tfDateiname.getText();
+                    dialog.setVisible(false);
+                    dialog.dispose();
+                }
+            }
+        });
+        ordnerInhaltAnzeigen(aktuellerOrdner);
+        dialog.setVisible(true);
+        return rueckgabe;
+    }
 
-	public int openDialog() {
-		dialog.setTitle(messages.getString("dmtnfilechooser_msg7"));
-		btAktion.setText(messages.getString("dmtnfilechooser_msg8"));
-		btAktion.setActionCommand("open");
-		btAktion.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (e.getActionCommand().equals(btAktion.getActionCommand())) {
-					rueckgabe = OK;
-					aktuellerDateiname = tfDateiname.getText();
-					dialog.setVisible(false);
-					dialog.dispose();
-				}
-			}
-		});
-		ordnerInhaltAnzeigen(aktuellerOrdner);
-		dialog.setVisible(true);
-		return rueckgabe;
-	}
+    public int openDialog() {
+        dialog.setTitle(messages.getString("dmtnfilechooser_msg7"));
+        btAktion.setText(messages.getString("dmtnfilechooser_msg8"));
+        btAktion.setActionCommand("open");
+        btAktion.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (e.getActionCommand().equals(btAktion.getActionCommand())) {
+                    rueckgabe = OK;
+                    aktuellerDateiname = tfDateiname.getText();
+                    dialog.setVisible(false);
+                    dialog.dispose();
+                }
+            }
+        });
+        ordnerInhaltAnzeigen(aktuellerOrdner);
+        dialog.setVisible(true);
+        return rueckgabe;
+    }
 
-	public DefaultMutableTreeNode getAktuellerOrdner() {
-		return aktuellerOrdner;
-	}
+    public DefaultMutableTreeNode getAktuellerOrdner() {
+        return aktuellerOrdner;
+    }
 
-	public void setAktuellerOrdner(DefaultMutableTreeNode aktuellerOrdner) {
-		this.aktuellerOrdner = aktuellerOrdner;
-	}
+    public void setAktuellerOrdner(DefaultMutableTreeNode aktuellerOrdner) {
+        this.aktuellerOrdner = aktuellerOrdner;
+    }
 
-	/**
-	 * Fuegt den Inhalt einer DefaultMutableTreeNode in ListModel der dateiListe
-	 * ein. Um im CellRenderer zwischen Dateien und Ordnern unterscheiden zu
-	 * koennen, wird der Typ (Datei/Ordner) gefolgt von einem Semicolon
-	 * angegeben.
-	 * 
-	 * @param node
-	 *            Die DefaultMutableTreeNode deren Inhalt angezeigt werden soll.
-	 */
-	public void ordnerInhaltAnzeigen(DefaultMutableTreeNode node) {
-		DefaultListModel lm = (DefaultListModel) lVerzeichnisse.getModel();
-		lm.clear();
+    /**
+     * Fuegt den Inhalt einer DefaultMutableTreeNode in ListModel der dateiListe ein. Um im CellRenderer zwischen
+     * Dateien und Ordnern unterscheiden zu koennen, wird der Typ (Datei/Ordner) gefolgt von einem Semicolon angegeben.
+     * 
+     * @param node
+     *            Die DefaultMutableTreeNode deren Inhalt angezeigt werden soll.
+     */
+    public void ordnerInhaltAnzeigen(DefaultMutableTreeNode node) {
+        DefaultListModel lm = (DefaultListModel) lVerzeichnisse.getModel();
+        lm.clear();
 
-		lVerzeichnisse.setCellRenderer(new OrdnerInhaltListRenderer());
-		for (Enumeration e = node.children(); e.hasMoreElements();) {
-			DefaultMutableTreeNode enode = (DefaultMutableTreeNode) e.nextElement();
-			if (enode.getUserObject().getClass().equals(Datei.class)) {
-				Datei dat = (Datei) enode.getUserObject();
-				lm.addElement("Datei;" + dat.getName());
-			} else {
-				lm.addElement("Ordner;" + enode.toString());
-			}
-		}
-		lbAktuellerOrdner.setText(messages.getString("dmtnfilechooser_msg11") + " " + aktuellerOrdner.toString());
-	}
+        lVerzeichnisse.setCellRenderer(new OrdnerInhaltListRenderer());
+        for (Enumeration e = node.children(); e.hasMoreElements();) {
+            DefaultMutableTreeNode enode = (DefaultMutableTreeNode) e.nextElement();
+            if (enode.getUserObject().getClass().equals(Datei.class)) {
+                Datei dat = (Datei) enode.getUserObject();
+                lm.addElement("Datei;" + dat.getName());
+            } else {
+                lm.addElement("Ordner;" + enode.toString());
+            }
+        }
+        lbAktuellerOrdner.setText(messages.getString("dmtnfilechooser_msg11") + " " + aktuellerOrdner.toString());
+    }
 
-	/**
-	 * Ueberprueft ob eine (per locationToIndex) ermittelte Zelle wirklich
-	 * geklickt wurde Das ist noetig, weil im leeren, unteren Teil der JList
-	 * automatisch der unterste Index zurueckgegeben wird.
-	 */
-	public int selektierteZelle(int index, Point punkt) {
-		int ergebnis = -1;
-		if (lVerzeichnisse.indexToLocation(index) != null) {
-			if (lVerzeichnisse.indexToLocation(index).getY() + lVerzeichnisse.getFixedCellHeight() > punkt.getY()) {
-				ergebnis = index;
-			}
-		}
-		return ergebnis;
-	}
+    /**
+     * Ueberprueft ob eine (per locationToIndex) ermittelte Zelle wirklich geklickt wurde Das ist noetig, weil im
+     * leeren, unteren Teil der JList automatisch der unterste Index zurueckgegeben wird.
+     */
+    public int selektierteZelle(int index, Point punkt) {
+        int ergebnis = -1;
+        if (lVerzeichnisse.indexToLocation(index) != null) {
+            if (lVerzeichnisse.indexToLocation(index).getY() + lVerzeichnisse.getFixedCellHeight() > punkt.getY()) {
+                ergebnis = index;
+            }
+        }
+        return ergebnis;
+    }
 
-	public String getAktuellerDateiname() {
-		return aktuellerDateiname;
-	}
+    public String getAktuellerDateiname() {
+        return aktuellerDateiname;
+    }
 
-	public void setAktuellerDateiname(String aktuellerDateiname) {
-		this.aktuellerDateiname = aktuellerDateiname;
-	}
+    public void setAktuellerDateiname(String aktuellerDateiname) {
+        this.aktuellerDateiname = aktuellerDateiname;
+    }
 }

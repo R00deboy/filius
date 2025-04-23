@@ -34,8 +34,8 @@ import javax.swing.table.DefaultTableModel;
 @SuppressWarnings("serial")
 public class LauscherTableModel extends DefaultTableModel {
 
-	@Override
-	public boolean isCellEditable(int row, int col) {
-		return false;
-	}
+    @Override
+    public boolean isCellEditable(int row, int col) {
+        return false;
+    }
 }

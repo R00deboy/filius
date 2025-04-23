@@ -36,21 +36,37 @@ public class IpPaket extends ProtocolDataUnit implements Cloneable {
 
     public static final int UDP = 17, TCP = 6;
 
+    /** counter of the identification number of the IP packet */
+    private static long identificationCounter;
+
     /** IP-Adresse des sendenden Knotens */
     private String sender;
     private String empfaenger;
     /** Time-to-Live */
     private int ttl;
-    final private int protocol;
+    private final int protocol;
+    /** identification number of the IP packet */
+    private final long identification;
     private Segment data;
 
-    public IpPaket(int protocol) {
+    public IpPaket(int protocol, long identification) {
         this.protocol = protocol;
+        // only use identification argument if it is not negative
+        this.identification = identification < 0 ? getNextIdentCounter() : identification;
+    }
+
+    /**
+     * Gets the next identification number and increases global counter by 1.
+     * 
+     * @return next identification number
+     */
+    private static synchronized long getNextIdentCounter() {
+        return ++identificationCounter;
     }
 
     @Override
     public IpPaket clone() {
-        IpPaket clone = new IpPaket(protocol);
+        IpPaket clone = new IpPaket(protocol, identification);
         clone.setRcvNic(getRcvNic());
         copyIpPacketAttributes(clone);
         return clone;
@@ -91,6 +107,10 @@ public class IpPaket extends ProtocolDataUnit implements Cloneable {
         this.ttl = ttl;
     }
 
+    public long getIdentification() {
+        return identification;
+    }
+
     public Segment getSegment() {
         return data;
     }
@@ -101,7 +121,7 @@ public class IpPaket extends ProtocolDataUnit implements Cloneable {
 
     public String toString() {
         return "[" + "ttl=" + ttl + ", " + "protocol=" + protocol + ", " + "empfaenger=" + empfaenger + ", " + "sender="
-                + sender + "]";
+                + sender + ", " + "identification=" + identification + "]";
     }
 
     public void decrementTtl() {

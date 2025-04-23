@@ -27,11 +27,11 @@ package filius.exception;
 
 public class VerbindungsException extends StilleException {
 
-	public VerbindungsException() {
-		super();
-	}
+    public VerbindungsException() {
+        super();
+    }
 
-	public VerbindungsException(String s) {
-		super(s);
-	}
+    public VerbindungsException(String s) {
+        super(s);
+    }
 }

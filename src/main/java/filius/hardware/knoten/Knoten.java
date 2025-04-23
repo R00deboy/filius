@@ -72,8 +72,7 @@ public abstract class Knoten extends Hardware {
     public void setName(String name) {
         this.name = name;
         if (systemAnwendung != null) {
-            LOG.debug(
-                    "node with SystemSoftware (" + systemAnwendung.hashCode() + ") now has name '" + name + "'");
+            LOG.debug("node with SystemSoftware (" + systemAnwendung.hashCode() + ") now has name '" + name + "'");
         }
     }
 

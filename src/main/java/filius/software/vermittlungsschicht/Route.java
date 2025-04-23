@@ -31,43 +31,43 @@ package filius.software.vermittlungsschicht;
  */
 public class Route {
 
-	private String netAddress;
-	private String netMask;
-	protected String gateway;
-	protected String interfaceIpAddress;
+    private String netAddress;
+    private String netMask;
+    protected String gateway;
+    protected String interfaceIpAddress;
 
-	public String getNetAddress() {
-		return netAddress;
-	}
+    public String getNetAddress() {
+        return netAddress;
+    }
 
-	public String getNetMask() {
-		return netMask;
-	}
+    public String getNetMask() {
+        return netMask;
+    }
 
-	public String getGateway() {
-		return gateway;
-	}
+    public String getGateway() {
+        return gateway;
+    }
 
-	public String getInterfaceIpAddress() {
-		return interfaceIpAddress;
-	}
+    public String getInterfaceIpAddress() {
+        return interfaceIpAddress;
+    }
 
-	public Route(String netAddress, String netMask, String gateway, String interfaceIpAddress) {
-		this.netAddress = netAddress;
-		this.netMask = netMask;
-		this.gateway = gateway;
-		this.interfaceIpAddress = interfaceIpAddress;
-	}
+    public Route(String netAddress, String netMask, String gateway, String interfaceIpAddress) {
+        this.netAddress = netAddress;
+        this.netMask = netMask;
+        this.gateway = gateway;
+        this.interfaceIpAddress = interfaceIpAddress;
+    }
 
-	public Route(String[] routingInfo) {
-		if (routingInfo.length == 4) {
-			netAddress = routingInfo[0];
-			netMask = routingInfo[1];
-			gateway = routingInfo[2];
-			interfaceIpAddress = routingInfo[3];
-		} else if (routingInfo.length == 2) {
-			gateway = routingInfo[0];
-			interfaceIpAddress = routingInfo[1];
-		}
-	}
+    public Route(String[] routingInfo) {
+        if (routingInfo.length == 4) {
+            netAddress = routingInfo[0];
+            netMask = routingInfo[1];
+            gateway = routingInfo[2];
+            interfaceIpAddress = routingInfo[3];
+        } else if (routingInfo.length == 2) {
+            gateway = routingInfo[0];
+            interfaceIpAddress = routingInfo[1];
+        }
+    }
 }

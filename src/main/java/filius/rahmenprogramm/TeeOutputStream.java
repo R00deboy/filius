@@ -38,45 +38,45 @@ import java.io.OutputStream;
 
 public class TeeOutputStream extends OutputStream {
 
-	/**
-	 * Attributes
-	 */
-	private OutputStream outFile = null;
-	private OutputStream outScreen = null;
+    /**
+     * Attributes
+     */
+    private OutputStream outFile = null;
+    private OutputStream outScreen = null;
 
-	public TeeOutputStream(OutputStream fileOS, OutputStream screenOS) {
-		this.outFile = fileOS;
-		this.outScreen = screenOS;
-	}
+    public TeeOutputStream(OutputStream fileOS, OutputStream screenOS) {
+        this.outFile = fileOS;
+        this.outScreen = screenOS;
+    }
 
-	/**
-	 * write characters to both OutputStreams
-	 */
-	public void write(int c) throws IOException {
-		if (this.outFile != null)
-			this.outFile.write(c);
-		if (this.outScreen != null) {
-			this.outScreen.write(c);
-			this.outScreen.flush();
-		}
-	}
+    /**
+     * write characters to both OutputStreams
+     */
+    public void write(int c) throws IOException {
+        if (this.outFile != null)
+            this.outFile.write(c);
+        if (this.outScreen != null) {
+            this.outScreen.write(c);
+            this.outScreen.flush();
+        }
+    }
 
-	/**
-	 * close streams
-	 */
-	public void close() throws IOException {
-		if (this.outFile != null) {
-			flush();
-			this.outFile.close();
-		}
-		if (this.outFile != null)
-			this.outScreen.close();
-	}
+    /**
+     * close streams
+     */
+    public void close() throws IOException {
+        if (this.outFile != null) {
+            flush();
+            this.outFile.close();
+        }
+        if (this.outFile != null)
+            this.outScreen.close();
+    }
 
-	/**
-	 * flushes file stream
-	 */
-	public void flush() throws IOException {
-		this.outFile.flush();
-	}
+    /**
+     * flushes file stream
+     */
+    public void flush() throws IOException {
+        this.outFile.flush();
+    }
 }

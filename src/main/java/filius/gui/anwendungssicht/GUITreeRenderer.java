@@ -35,56 +35,56 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import filius.software.system.Datei;
 
 class GUITreeRenderer extends DefaultTreeCellRenderer {
-	private Icon dateiIcon, ordnerIcon;
-	private boolean dateienAnzeigen;
+    private Icon dateiIcon, ordnerIcon;
+    private boolean dateienAnzeigen;
 
-	public GUITreeRenderer(Icon dateiIcon, Icon ordnerIcon) {
-		this.dateiIcon = dateiIcon;
-		this.ordnerIcon = ordnerIcon;
-	}
+    public GUITreeRenderer(Icon dateiIcon, Icon ordnerIcon) {
+        this.dateiIcon = dateiIcon;
+        this.ordnerIcon = ordnerIcon;
+    }
 
-	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
-	        boolean leaf, int row, boolean hasFocus) {
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
+            int row, boolean hasFocus) {
 
-		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-		if (leaf && isDatei(value)) {
-			setIcon(dateiIcon);
-			setText(this.getDateiName(value));
+        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+        if (leaf && isDatei(value)) {
+            setIcon(dateiIcon);
+            setText(this.getDateiName(value));
 
-		} else {
-			setIcon(ordnerIcon);
-		}
-		if (isDatei(value) && !isDateienAnzeigen()) {
-			setVisible(false);
-			setText("");
-			setIcon(null);
-		}
-		return this;
-	}
+        } else {
+            setIcon(ordnerIcon);
+        }
+        if (isDatei(value) && !isDateienAnzeigen()) {
+            setVisible(false);
+            setText("");
+            setIcon(null);
+        }
+        return this;
+    }
 
-	protected boolean isDatei(Object value) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		if (node.getUserObject().getClass().equals(Datei.class)) {
-			return true;
-		}
-		return false;
-	}
+    protected boolean isDatei(Object value) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+        if (node.getUserObject().getClass().equals(Datei.class)) {
+            return true;
+        }
+        return false;
+    }
 
-	protected String getDateiName(Object value) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		if (node.getUserObject().getClass().equals(Datei.class)) {
-			Datei datei = (Datei) node.getUserObject();
-			return datei.getName();
-		}
-		return "";
-	}
+    protected String getDateiName(Object value) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+        if (node.getUserObject().getClass().equals(Datei.class)) {
+            Datei datei = (Datei) node.getUserObject();
+            return datei.getName();
+        }
+        return "";
+    }
 
-	public boolean isDateienAnzeigen() {
-		return dateienAnzeigen;
-	}
+    public boolean isDateienAnzeigen() {
+        return dateienAnzeigen;
+    }
 
-	public void setDateienAnzeigen(boolean dateienAnzeigen) {
-		this.dateienAnzeigen = dateienAnzeigen;
-	}
+    public void setDateienAnzeigen(boolean dateienAnzeigen) {
+        this.dateienAnzeigen = dateienAnzeigen;
+    }
 
 }

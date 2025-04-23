@@ -89,18 +89,18 @@ public class AggregatedExchangePanel extends JTabbedPane implements AggregatedEx
         final AggregatedMessageTable tabelle;
 
         system.addObserver(this);
-        final MessageDetailsPanel detailsPanel = new MessageDetailsPanel(identifier);
+        final MessageDetailsTable messageDetailsTable = new MessageDetailsTable(identifier, 0, Color.WHITE);
 
         if (openedTabs.get(identifier) == null) {
-            tabelle = new AggregatedMessageTable(this, identifier);
+            tabelle = new AggregatedMessageTable(this, identifier, system);
             tabelle.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
                     if (tabelle.getSelectedRow() >= 0) {
-                        detailsPanel.update(tabelle.getValueAt(tabelle.getSelectedRow(), 0));
+                        messageDetailsTable.updateTable(identifier, tabelle.getSelectedRow() + 1);
                     } else {
-                        detailsPanel.clear();
+                        messageDetailsTable.clear();
                     }
                 }
             });
@@ -111,9 +111,13 @@ public class AggregatedExchangePanel extends JTabbedPane implements AggregatedEx
             tabelle.setScrollPane(scrollPane);
 
             JSplitPane splitPane = new JSplitPane();
+            // prevent the SplitPane to get user input (mainly to lock the divider)
+            splitPane.setEnabled(false);
+            splitPane.setDividerLocation(500);
             splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
             splitPane.setTopComponent(scrollPane);
-            splitPane.setBottomComponent(new JScrollPane(detailsPanel));
+            splitPane.setBottomComponent(new JScrollPane(messageDetailsTable));
+            splitPane.setOneTouchExpandable(true);
 
             panel.add(splitPane, BorderLayout.CENTER);
 
@@ -230,6 +234,9 @@ public class AggregatedExchangePanel extends JTabbedPane implements AggregatedEx
         }
     }
 
+    /**
+     * Not used anymore, since this presentation of the message details was replaced with class MessageDetailsTable.
+     */
     private class MessageDetailsPanel extends JPanel {
         private String macAddress;
 

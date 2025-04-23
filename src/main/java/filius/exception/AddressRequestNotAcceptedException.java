@@ -1,4 +1,3 @@
 package filius.exception;
 
-public class AddressRequestNotAcceptedException extends Exception {
-}
+public class AddressRequestNotAcceptedException extends Exception {}

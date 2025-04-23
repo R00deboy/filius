@@ -106,8 +106,8 @@ public class VermittlungsrechnerBetriebssystem extends InternetKnotenBetriebssys
         webkonfig.setPfad("konfig");
         server.setzePlugIn(webkonfig);
 
-        server.erzeugeIndexDatei(ResourceUtil
-                .getResourcePath("tmpl/vermittlung_index_" + Information.getInformation().getLocaleOrDefault() + ".txt"));
+        server.erzeugeIndexDatei(ResourceUtil.getResourcePath(
+                "tmpl/vermittlung_index_" + Information.getInformation().getLocaleOrDefault() + ".txt"));
 
         // ------------- RIP ------------------
         riptable = new RIPTable(this);

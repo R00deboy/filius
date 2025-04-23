@@ -43,8 +43,10 @@ public class NatGateway extends Firewall implements I18n {
     @Override
     protected void initFirewallThreads() {
         Gateway gateway = (Gateway) getSystemSoftware().getKnoten();
-        addAndStartThread(new NatGatewayLANThread(this, gateway.holeLANInterface(), gateway.holeWANInterface()));
-        addAndStartThread(new NatGatewayWANThread(this, gateway.holeWANInterface(), gateway.holeLANInterface()));
+        addAndStartThread(new NatGatewayLANThread(this, gateway.holeLANInterface(), gateway.holeWANInterface(),
+                this.betriebssystem));
+        addAndStartThread(new NatGatewayWANThread(this, gateway.holeWANInterface(), gateway.holeLANInterface(),
+                this.betriebssystem));
         LOG.debug("Threads for WAN and LAN nic are started on {}", gateway.getName());
     }
 

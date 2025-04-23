@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import filius.hardware.NetzwerkInterface;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.ProtokollThread;
+import filius.software.system.SystemSoftware;
 import filius.software.vermittlungsschicht.ArpPaket;
 import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
@@ -35,19 +36,23 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
     /** die Netzwerkkarte, deren Anschluss ueberwacht wird */
     private NetzwerkInterface netzwerkInterface;
 
+    /** die Systemsoftware (Betriebssystem), die auf dem Knoten läuft */
+    private SystemSoftware systemSoftware;
+
     /** die Ethernet-Schicht */
     private Ethernet ethernet;
 
     /**
      * Der Konstruktor zur Initialisierung des zu ueberwachenden Puffers und der Ethernet-Schicht und der Netzwerkkarte
      */
-    public EthernetThread(Ethernet ethernet, NetzwerkInterface nic) {
+    public EthernetThread(Ethernet ethernet, NetzwerkInterface nic, SystemSoftware systemSoftware) {
         super(nic.getPort().holeEingangsPuffer());
         LOG.trace("INVOKED-2 (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + " (EthernetThread), constr: EthernetThread(" + ethernet + "," + nic + ")");
 
         this.ethernet = ethernet;
         this.netzwerkInterface = nic;
+        this.systemSoftware = systemSoftware;
     }
 
     /**
@@ -58,7 +63,7 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
         LOG.trace("INVOKED (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + " (EthernetThread), verarbeiteDateneinheit(" + etp.toString() + ")");
         // record receipt (independent of further processing)
-        Lauscher.getLauscher().addDatenEinheit(netzwerkInterface.getMac(), etp);
+        Lauscher.getLauscher().addDatenEinheit(netzwerkInterface, systemSoftware, etp);
 
         // only process in case of correct MAC address, i.e., this packet is
         // addressed for this NIC (or broadcast)
@@ -91,5 +96,4 @@ public class EthernetThread extends ProtokollThread<EthernetFrame> {
             LOG.info("Paket konnte nicht zugeordnet werden");
         }
     }
-
 }

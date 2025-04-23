@@ -35,27 +35,27 @@ import org.junit.Test;
  */
 public class AddressEntryTest {
 
-	@Test
-	public void onlyName() throws Exception {
-		AddressEntry entry = new AddressEntry(" name ");
-		assertThat(entry.getName()).isEqualTo("name");
-		assertThat(entry.getMailAddress()).isNull();
-		assertThat(entry.toString()).isEqualTo("name");
-	}
+    @Test
+    public void onlyName() throws Exception {
+        AddressEntry entry = new AddressEntry(" name ");
+        assertThat(entry.getName()).isEqualTo("name");
+        assertThat(entry.getMailAddress()).isNull();
+        assertThat(entry.toString()).isEqualTo("name");
+    }
 
-	@Test
-	public void onlyAddress() throws Exception {
-		AddressEntry entry = new AddressEntry(" <address >");
-		assertThat(entry.getMailAddress()).isEqualTo("address");
-		assertThat(entry.getName()).isNull();
-		assertThat(entry.toString()).isEqualTo("<address>");
-	}
+    @Test
+    public void onlyAddress() throws Exception {
+        AddressEntry entry = new AddressEntry(" <address >");
+        assertThat(entry.getMailAddress()).isEqualTo("address");
+        assertThat(entry.getName()).isNull();
+        assertThat(entry.toString()).isEqualTo("<address>");
+    }
 
-	@Test
-	public void nameAndAddress() throws Exception {
-		AddressEntry entry = new AddressEntry(" name    < address   > ");
-		assertThat(entry.getMailAddress()).isEqualTo("address");
-		assertThat(entry.getName()).isEqualTo("name");
-		assertThat(entry.toString()).isEqualTo("name <address>");
-	}
+    @Test
+    public void nameAndAddress() throws Exception {
+        AddressEntry entry = new AddressEntry(" name    < address   > ");
+        assertThat(entry.getMailAddress()).isEqualTo("address");
+        assertThat(entry.getName()).isEqualTo("name");
+        assertThat(entry.toString()).isEqualTo("name <address>");
+    }
 }

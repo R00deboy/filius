@@ -34,39 +34,39 @@ import filius.software.vermittlungsschicht.Route;
  * 
  */
 public class RIPRoute extends Route {
-	public long expires;
-	public long created;
-	public int hops;
+    public long expires;
+    public long created;
+    public int hops;
 
-	public String hopPublicIp; // hint for system administrator
+    public String hopPublicIp; // hint for system administrator
 
-	public RIPRoute(int timeout, String netAddr, String netMask, String nextHop, String hopPublicIp, String nic,
-	        int hops) {
-		super(netAddr, netMask, nextHop, nic);
-		this.created = RIPUtil.getTime();
-		refresh(timeout);
+    public RIPRoute(int timeout, String netAddr, String netMask, String nextHop, String hopPublicIp, String nic,
+            int hops) {
+        super(netAddr, netMask, nextHop, nic);
+        this.created = RIPUtil.getTime();
+        refresh(timeout);
 
-		this.hopPublicIp = hopPublicIp;
-		this.hops = hops;
-	}
+        this.hopPublicIp = hopPublicIp;
+        this.hops = hops;
+    }
 
-	public void refresh(int timeout) {
-		if (timeout > 0) {
-			this.expires = RIPUtil.getTime() + timeout;
-		} else {
-			this.expires = 0;
-		}
-	}
+    public void refresh(int timeout) {
+        if (timeout > 0) {
+            this.expires = RIPUtil.getTime() + timeout;
+        } else {
+            this.expires = 0;
+        }
+    }
 
-	public boolean isExpired() {
-		return (this.expires > 0) && (this.expires < RIPUtil.getTime());
-	}
+    public boolean isExpired() {
+        return (this.expires > 0) && (this.expires < RIPUtil.getTime());
+    }
 
-	public void setGateway(String gateway) {
-		this.gateway = gateway;
-	}
+    public void setGateway(String gateway) {
+        this.gateway = gateway;
+    }
 
-	public void setInterfaceIpAddress(String interfaceIpAddress) {
-		this.interfaceIpAddress = interfaceIpAddress;
-	}
+    public void setInterfaceIpAddress(String interfaceIpAddress) {
+        this.interfaceIpAddress = interfaceIpAddress;
+    }
 }

@@ -30,6 +30,7 @@ import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.firewall.FirewallThread;
 import filius.software.netzzugangsschicht.EthernetFrame;
+import filius.software.system.SystemSoftware;
 import filius.software.transportschicht.TcpSegment;
 import filius.software.transportschicht.UdpSegment;
 import filius.software.vermittlungsschicht.IcmpPaket;
@@ -43,8 +44,9 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
     private NetzwerkInterface wanNic;
 
     /** Init thread for the LAN network interface */
-    public NatGatewayLANThread(NatGateway natGateway, NetzwerkInterface nic, NetzwerkInterface wanNic) {
-        super(natGateway, nic);
+    public NatGatewayLANThread(NatGateway natGateway, NetzwerkInterface nic, NetzwerkInterface wanNic,
+            SystemSoftware systemSoftware) {
+        super(natGateway, nic, systemSoftware);
         this.lanNic = nic;
         this.wanNic = wanNic;
         this.natGateway = natGateway;
@@ -52,7 +54,7 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
 
     @Override
     protected void verarbeiteDatenEinheit(EthernetFrame frame) {
-        Lauscher.getLauscher().addDatenEinheit(lanNic.getMac(), frame);
+        Lauscher.getLauscher().addDatenEinheit(lanNic, systemSoftware, frame);
         if (!checkDiscardByFirewall(frame) && !checkTTLExceeded(frame)) {
             updateNatTable(frame);
             EthernetFrame modifiedFrame = modifyOutgoingFrame(frame);

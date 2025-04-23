@@ -90,7 +90,7 @@ public class Ethernet extends Protokoll {
     }
 
     /**
-     * sendet Pakete ueber als Ethernet-Frame weiter. Zuerst wird dazu ueberprueft, ob die Ziel-MAC-Adresse eine eigene
+     * Sendet Pakete als Ethernet-Frame weiter. Zuerst wird dazu ueberprueft, ob die Ziel-MAC-Adresse eine eigene
      * Netzwerkkarte adressiert. Wenn dies nicht der Fall ist, wird der Frame ueber die Netzwerkkarte verschickt, die
      * durch die Quell-MAC-Adresse spezifiziert wird.
      * 
@@ -131,7 +131,7 @@ public class Ethernet extends Protokoll {
                 nic.getPort().holeAusgangsPuffer().add(ethernetFrame);
                 nic.getPort().holeAusgangsPuffer().notify();
             }
-            Lauscher.getLauscher().addDatenEinheit(nic.getMac(), ethernetFrame);
+            Lauscher.getLauscher().addDatenEinheit(nic, holeSystemSoftware(), ethernetFrame);
         }
     }
 
@@ -165,7 +165,7 @@ public class Ethernet extends Protokoll {
             knoten = (InternetKnoten) holeSystemSoftware().getKnoten();
 
             for (NetzwerkInterface nic : knoten.getNetzwerkInterfaces()) {
-                interfaceBeobachter = new EthernetThread(this, nic);
+                interfaceBeobachter = new EthernetThread(this, nic, holeSystemSoftware());
                 interfaceBeobachter.starten();
                 try {
                     threads.add(interfaceBeobachter);

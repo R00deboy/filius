@@ -35,51 +35,51 @@ import javax.swing.BoxLayout;
 import filius.gui.JBackgroundPanel;
 
 public abstract class GUISidebar {
-	protected JBackgroundPanel leistenpanel;
-	protected List<JSidebarButton> buttonList;
+    protected JBackgroundPanel leistenpanel;
+    protected List<JSidebarButton> buttonList;
 
-	private static int width = 0;
+    private static int width = 0;
 
-	protected GUISidebar() {
-		buttonList = new LinkedList<JSidebarButton>();
+    protected GUISidebar() {
+        buttonList = new LinkedList<JSidebarButton>();
 
-		leistenpanel = new JBackgroundPanel() {
-			private static final long serialVersionUID = 1L;
+        leistenpanel = new JBackgroundPanel() {
+            private static final long serialVersionUID = 1L;
 
-			public Dimension getPreferredSize() {
-				int height = 0;
-				for (Component component : this.getComponents()) {
-					if (component.getWidth() > width)
-						width = component.getWidth();
-					height += component.getHeight();
-				}
-				height += 30;
-				return new Dimension(width, height);
-			}
-		};
-		leistenpanel.setBackgroundImage("gfx/allgemein/leisten_hg.png");
-		BoxLayout layout = new BoxLayout( leistenpanel, BoxLayout.Y_AXIS );
-        leistenpanel.setLayout( layout);
-		leistenpanel.setEnabled(false);
+            public Dimension getPreferredSize() {
+                int height = 0;
+                for (Component component : this.getComponents()) {
+                    if (component.getWidth() > width)
+                        width = component.getWidth();
+                    height += component.getHeight();
+                }
+                height += 30;
+                return new Dimension(width, height);
+            }
+        };
+        leistenpanel.setBackgroundImage("gfx/allgemein/leisten_hg.png");
+        BoxLayout layout = new BoxLayout(leistenpanel, BoxLayout.Y_AXIS);
+        leistenpanel.setLayout(layout);
+        leistenpanel.setEnabled(false);
 
-		addItemsToSidebar();
-	}
+        addItemsToSidebar();
+    }
 
-	protected abstract void addItemsToSidebar();
+    protected abstract void addItemsToSidebar();
 
-	public JSidebarButton findButtonAt(int x, int y) {
-		JSidebarButton klickLabel = null;
-		for (JSidebarButton tmpLbl : buttonList) {
-			if (x >= tmpLbl.getX() && y >= tmpLbl.getY() && x <= tmpLbl.getX() + tmpLbl.getWidth()
-			        && y <= tmpLbl.getY() + tmpLbl.getHeight()) {
-				klickLabel = tmpLbl;
-			}
+    public JSidebarButton findButtonAt(int x, int y) {
+        JSidebarButton klickLabel = null;
+        for (JSidebarButton tmpLbl : buttonList) {
+            if (x >= tmpLbl.getX() && y >= tmpLbl.getY() && x <= tmpLbl.getX() + tmpLbl.getWidth()
+                    && y <= tmpLbl.getY() + tmpLbl.getHeight()) {
+                klickLabel = tmpLbl;
+            }
 
-		}
-		return klickLabel;
-	}
+        }
+        return klickLabel;
+    }
 
-	public JBackgroundPanel getLeistenpanel() {
-		return leistenpanel;
-	}
+    public JBackgroundPanel getLeistenpanel() {
+        return leistenpanel;
+    }
 }

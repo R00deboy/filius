@@ -37,7 +37,7 @@ public class GUIDocuItem {
     private int y;
     private int width;
     private int height;
-    private Color color; 
+    private Color color;
     private Font font;
     private JDocuElement elem;
 
@@ -54,7 +54,7 @@ public class GUIDocuItem {
         item.elem = elem;
         return item;
     }
-    
+
     public JDocuElement asDocuElement() {
         if (elem == null) {
             elem = new JDocuElement(type == TEXT);
@@ -66,7 +66,7 @@ public class GUIDocuItem {
         }
         return elem;
     }
-    
+
     public int getType() {
         return type;
     }
@@ -144,7 +144,7 @@ public class GUIDocuItem {
             elem.setBounds(x, y, width, height);
         }
     }
-    
+
     public Color getColor() {
         if (elem != null) {
             color = elem.getColor();
@@ -158,7 +158,7 @@ public class GUIDocuItem {
             elem.setColor(color);
         }
     }
-    
+
     public Font getFont() {
         if (elem != null) {
             font = elem.getFont();

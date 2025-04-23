@@ -27,11 +27,11 @@ package filius.exception;
 
 public class StilleException extends Exception {
 
-	public StilleException() {
-		super();
-	}
+    public StilleException() {
+        super();
+    }
 
-	public StilleException(String s) {
-		super(s);
-	}
+    public StilleException(String s) {
+        super(s);
+    }
 }

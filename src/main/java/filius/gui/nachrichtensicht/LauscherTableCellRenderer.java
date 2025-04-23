@@ -32,106 +32,106 @@ import java.awt.Font;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import filius.gui.nachrichtensicht.AggregatedMessageTable.LayerColorVar;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 
 public class LauscherTableCellRenderer extends DefaultTableCellRenderer {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-	        int row, int column) {
-		String schichtString;
-		int schicht = 5;
-		int lfdNr = 0;
-		int tblCols = table.getColumnCount();
-		int tblRows = table.getRowCount();
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
+        String schichtString;
+        int schicht = 5;
+        int lfdNr = 0;
+        int tblCols = table.getColumnCount();
+        int tblRows = table.getRowCount();
 
-		if (tblRows > row && tblCols > LayeredMessageTable.SCHICHT_SPALTE
-		        && table.getValueAt(row, LayeredMessageTable.SCHICHT_SPALTE) != null)
-			schichtString = table.getValueAt(row, LayeredMessageTable.SCHICHT_SPALTE).toString();
-		else
-			schichtString = "";
+        if (tblRows > row && tblCols > LayeredMessageTable.SCHICHT_SPALTE
+                && table.getValueAt(row, LayeredMessageTable.SCHICHT_SPALTE) != null)
+            schichtString = table.getValueAt(row, LayeredMessageTable.SCHICHT_SPALTE).toString();
+        else
+            schichtString = "";
 
-		if (table.getValueAt(row, 0) != null) {
-			try {
-				lfdNr = Integer.parseInt((String) table.getValueAt(row, 0));
-			} catch (Exception e) {
-			}
-		}
+        if (table.getValueAt(row, 0) != null) {
+            try {
+                lfdNr = Integer.parseInt((String) table.getValueAt(row, 0));
+            } catch (Exception e) {}
+        }
 
-		for (int i = 0; i < Lauscher.PROTOKOLL_SCHICHTEN.length; i++) {
-			if (schichtString.equals(Lauscher.PROTOKOLL_SCHICHTEN[i]))
-				schicht = i;
-		}
+        for (int i = 0; i < Lauscher.PROTOKOLL_SCHICHTEN.length; i++) {
+            if (schichtString.equals(Lauscher.PROTOKOLL_SCHICHTEN[i]))
+                schicht = i;
+        }
 
-		Color color1;
-		Color color2;
-		switch (schicht) {
-		case 0:
-			color1 = Color.BLACK;
-			// if (lfdNr%2==0)
-			color2 = new Color(0.9f, 0.9f, 0.9f);
-			// else setBackground(new Color(0.8f, 0.8f, 0.8f));
-			break;
-		case 1:
-			color1 = Color.BLACK;
-			// if (lfdNr % 2 == 0)
-			color2 = new Color(0.3f, 1f, 0.3f);
-			// else
-			// setBackground(new Color(0.2f, 1f, 0.2f));
-			break;
-		case 2:
-			color1 = Color.BLACK;
-			color2 = Color.CYAN;
-			// setFont(new Font(Font.MONOSPACED, Font.PLAIN, 10));
-			break;
-		case 3:
-			color1 = Color.WHITE;
-			color2 = Color.BLUE;
-			// setFont(new Font(Font.DIALOG, Font.BOLD, 12));
-			break;
-		default:
-			color1 = Color.WHITE;
-			color2 = Color.DARK_GRAY;
-		}
+        Color color1;
+        Color color2;
+        switch (schicht) {
+        case 0:
+            color1 = LayerColorVar.LINK.foregroundColor;
+            // if (lfdNr%2==0)
+            color2 = LayerColorVar.LINK.backgroundColor;
+            // else setBackground(new Color(0.8f, 0.8f, 0.8f));
+            break;
+        case 1:
+            color1 = LayerColorVar.INTERNET.foregroundColor;
+            // if (lfdNr % 2 == 0)
+            color2 = LayerColorVar.INTERNET.backgroundColor;
+            // else
+            // setBackground(new Color(0.2f, 1f, 0.2f));
+            break;
+        case 2:
+            color1 = LayerColorVar.TRANSPORT.foregroundColor;
+            color2 = LayerColorVar.TRANSPORT.backgroundColor;
+            // setFont(new Font(Font.MONOSPACED, Font.PLAIN, 10));
+            break;
+        case 3:
+            color1 = LayerColorVar.APPLICATION.foregroundColor;
+            color2 = LayerColorVar.APPLICATION.backgroundColor;
+            // setFont(new Font(Font.DIALOG, Font.BOLD, 12));
+            break;
+        default:
+            color1 = LayerColorVar.DEFAULT.foregroundColor;
+            color2 = LayerColorVar.DEFAULT.backgroundColor;
+        }
 
-		if (!isSelected) {
-			setForeground(color1);
-			setBackground(color2);
-		} else {
-			setForeground(Color.WHITE);
-			setBackground(Color.BLACK);
-		}
+        if (!isSelected) {
+            setForeground(color1);
+            setBackground(color2);
+        } else {
+            setForeground(Color.WHITE);
+            setBackground(Color.BLACK);
+        }
 
-		switch (column) {
-		case 0:
-			setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-			break;
-		case 1:
-			setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-			break;
-		case 2:
-		case 3:
-			setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-			break;
-		case 4:
-			setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-			break;
-		case 5:
-			setFont(new Font(Font.DIALOG, Font.BOLD + Font.ITALIC, 12));
-			break;
-		case 6:
-			setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-			break;
-		default:
-			setFont(new Font(Font.DIALOG, Font.ITALIC, 12));
-		}
+        switch (column) {
+        case 0:
+            setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
+            break;
+        case 1:
+            setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
+            break;
+        case 2:
+        case 3:
+            setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            break;
+        case 4:
+            setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
+            break;
+        case 5:
+            setFont(new Font(Font.DIALOG, Font.BOLD + Font.ITALIC, 12));
+            break;
+        case 6:
+            setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            break;
+        default:
+            setFont(new Font(Font.DIALOG, Font.ITALIC, 12));
+        }
 
-		if (value != null)
-			setText(value.toString().replace('\n', ' '));
-		else
-			setText("");
+        if (value != null)
+            setText(value.toString().replace('\n', ' '));
+        else
+            setText("");
 
-		return this;
-	}
+        return this;
+    }
 }

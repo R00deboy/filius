@@ -27,8 +27,8 @@ package filius.exception;
 
 public class DeleteAccountException extends Exception {
 
-	public DeleteAccountException(String s) {
-		super(s);
-	}
+    public DeleteAccountException(String s) {
+        super(s);
+    }
 
 }

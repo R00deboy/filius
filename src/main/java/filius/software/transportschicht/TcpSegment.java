@@ -34,116 +34,118 @@ import java.io.Serializable;
  */
 public class TcpSegment extends Segment implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	private long seqNummer, ackNummer;
-	private int dataOffset;
-	private int reservedField = 0;
-	private boolean urg = false;
-	private boolean ack = false;
-	private boolean psh = false;
-	private boolean rst = false;
-	private boolean syn = false;
-	private boolean fin = false;
-	private int window;
-	private int urgentPointer;
+    private static final long serialVersionUID = 1L;
+    private long seqNummer, ackNummer;
+    private int dataOffset;
+    private int reservedField = 0;
+    private boolean urg = false;
+    private boolean ack = false;
+    private boolean psh = false;
+    private boolean rst = false;
+    private boolean syn = false;
+    private boolean fin = false;
+    private int window;
+    private int urgentPointer;
 
-	public TcpSegment() {
+    public TcpSegment() {}
 
-	}
+    public boolean isAck() {
+        return ack;
+    }
 
-	public boolean isAck() {
-		return ack;
-	}
+    public void setAck(boolean ack) {
+        this.ack = ack;
+    }
 
-	public void setAck(boolean ack) {
-		this.ack = ack;
-	}
+    public long getAckNummer() {
+        return ackNummer;
+    }
 
-	public long getAckNummer() {
-		return ackNummer;
-	}
+    public void setAckNummer(long ackNummer) {
+        this.ackNummer = ackNummer;
+    }
 
-	public void setAckNummer(long ackNummer) {
-		this.ackNummer = ackNummer;
-	}
+    public int getDataOffset() {
+        return dataOffset;
+    }
 
-	public int getDataOffset() {
-		return dataOffset;
-	}
+    public void setDataOffset(int dataOffset) {
+        this.dataOffset = dataOffset;
+    }
 
-	public void setDataOffset(int dataOffset) {
-		this.dataOffset = dataOffset;
-	}
+    public boolean isFin() {
+        return fin;
+    }
 
-	public boolean isFin() {
-		return fin;
-	}
+    public void setFin(boolean fin) {
+        this.fin = fin;
+    }
 
-	public void setFin(boolean fin) {
-		this.fin = fin;
-	}
+    public boolean isPush() {
+        return psh;
+    }
 
-	public boolean isPush() {
-		return psh;
-	}
+    public void setPush(boolean psh) {
+        this.psh = psh;
+    }
 
-	public void setPush(boolean psh) {
-		this.psh = psh;
-	}
+    public int getReservedField() {
+        return reservedField;
+    }
 
-	public int getReservedField() {
-		return reservedField;
-	}
+    public void setReservedField(int reservedField) {
+        this.reservedField = reservedField;
+    }
 
-	public void setReservedField(int reservedField) {
-		this.reservedField = reservedField;
-	}
+    public boolean isRst() {
+        return rst;
+    }
 
-	public boolean isRst() {
-		return rst;
-	}
+    public void setRst(boolean rst) {
+        this.rst = rst;
+    }
 
-	public void setRst(boolean rst) {
-		this.rst = rst;
-	}
+    public long getSeqNummer() {
+        return seqNummer;
+    }
 
-	public long getSeqNummer() {
-		return seqNummer;
-	}
+    public void setSeqNummer(long seqNummer) {
+        this.seqNummer = seqNummer;
+    }
 
-	public void setSeqNummer(long seqNummer) {
-		this.seqNummer = seqNummer;
-	}
+    public boolean isSyn() {
+        return syn;
+    }
 
-	public boolean isSyn() {
-		return syn;
-	}
+    public void setSyn(boolean syn) {
+        this.syn = syn;
+    }
 
-	public void setSyn(boolean syn) {
-		this.syn = syn;
-	}
+    public boolean isUrg() {
+        return urg;
+    }
 
-	public boolean isUrg() {
-		return urg;
-	}
+    public void setUrg(boolean urg) {
+        this.urg = urg;
+    }
 
-	public void setUrg(boolean urg) {
-		this.urg = urg;
-	}
+    public boolean isPsh() {
+        return psh;
+    }
 
-	public int getUrgentPointer() {
-		return urgentPointer;
-	}
+    public int getUrgentPointer() {
+        return urgentPointer;
+    }
 
-	public void setUrgentPointer(int urgentPointer) {
-		this.urgentPointer = urgentPointer;
-	}
+    public void setUrgentPointer(int urgentPointer) {
+        this.urgentPointer = urgentPointer;
+    }
 
-	public int getWindow() {
-		return window;
-	}
+    public int getWindow() {
+        return window;
+    }
 
-	public void setWindow(int window) {
-		this.window = window;
-	}
+    public void setWindow(int window) {
+        this.window = window;
+    }
 }

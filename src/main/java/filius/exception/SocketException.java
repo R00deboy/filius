@@ -27,11 +27,11 @@ package filius.exception;
 
 public class SocketException extends StilleException {
 
-	public SocketException() {
-		super();
-	}
+    public SocketException() {
+        super();
+    }
 
-	public SocketException(String s) {
-		super(s);
-	}
+    public SocketException(String s) {
+        super(s);
+    }
 }

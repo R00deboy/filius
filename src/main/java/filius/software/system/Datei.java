@@ -31,148 +31,145 @@ import java.util.Observable;
 import filius.rahmenprogramm.Base64;
 
 /**
- * Dateien sind Objekte, die vom Betriebssystem verwaltet werden. Jede Datei hat
- * einen Dateinamen (der eindeutig sein sollte, einen Datei Typ (ähnlich einem
- * mime/type) und natürlich den Dateiinhalt selber.
+ * Dateien sind Objekte, die vom Betriebssystem verwaltet werden. Jede Datei hat einen Dateinamen (der eindeutig sein
+ * sollte, einen Datei Typ (ähnlich einem mime/type) und natürlich den Dateiinhalt selber.
  * 
  * @author Nadja & Thomas Gerding
  * 
  */
 public class Datei extends Observable implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/** Typ der Datei, z.B. mp3, doc, txt,... */
-	private String dateiTyp;
+    /** Typ der Datei, z.B. mp3, doc, txt,... */
+    private String dateiTyp;
 
-	/** Inhalt der Datei als String (ggf. Base64-kodiert) */
-	private String dateiInhalt;
+    /** Inhalt der Datei als String (ggf. Base64-kodiert) */
+    private String dateiInhalt;
 
-	/** Der Dateiname (ist auch der Rueckgabewert von toString()) */
-	private String name; // Dateiname
+    /** Der Dateiname (ist auch der Rueckgabewert von toString()) */
+    private String name; // Dateiname
 
-	// real size of file without having enforced Base64 encoding
-	private long decodedSize = -1;
+    // real size of file without having enforced Base64 encoding
+    private long decodedSize = -1;
 
-	/**
-	 * Erzeugt ein neues Objekt vom Typ Datei. Dieser Konstruktor wird
-	 * benoetigt, damit die Klasse den Anforderungen an JavaBeans entspricht!
-	 * 
-	 */
-	public Datei() {
+    /**
+     * Erzeugt ein neues Objekt vom Typ Datei. Dieser Konstruktor wird benoetigt, damit die Klasse den Anforderungen an
+     * JavaBeans entspricht!
+     * 
+     */
+    public Datei() {
 
-	}
+    }
 
-	/**
-	 * Erzeugt ein neues Objekt vom Typ Datei
-	 * 
-	 * @param name
-	 *            der Bezeichner der Datei
-	 * @param typ
-	 *            ein Dateittyp
-	 * @param dateiInhalt
-	 *            der eigentliche Inhalt. Binaerdateien sollten Base64-kodiert
-	 *            gespeichert werden.
-	 */
-	public Datei(String name, String typ, String dateiInhalt) {
-		this.dateiInhalt = dateiInhalt;
-		this.name = name;
-		this.dateiTyp = typ;
-	}
+    /**
+     * Erzeugt ein neues Objekt vom Typ Datei
+     * 
+     * @param name
+     *            der Bezeichner der Datei
+     * @param typ
+     *            ein Dateittyp
+     * @param dateiInhalt
+     *            der eigentliche Inhalt. Binaerdateien sollten Base64-kodiert gespeichert werden.
+     */
+    public Datei(String name, String typ, String dateiInhalt) {
+        this.dateiInhalt = dateiInhalt;
+        this.name = name;
+        this.dateiTyp = typ;
+    }
 
-	public void setSize(long size) {
-		this.decodedSize = size;
-	}
+    public void setSize(long size) {
+        this.decodedSize = size;
+    }
 
-	/**
-	 * Liefert die Groesse der Datei zurueck
-	 * 
-	 * @return die Laenge des Strings dateiInhalt
-	 */
-	public long holeGroesse() {
-		if (this.getDateiInhalt() == null)
-			return 0;
-		if (this.dateiTyp != null && this.dateiTyp.equals("text"))
-			return this.getDateiInhalt().length();
-		else {
-			try {
-				if (decodedSize < 0)
-					setSize(Base64.decode(this.getDateiInhalt()).length); // set
-					                                                      // current
-					                                                      // size
-					                                                      // to
-					                                                      // be
-					                                                      // sure
-					                                                      // it's
-					                                                      // correct
-				return decodedSize;
-			} catch (Exception e) {
-				// current file does not seem to be Base64 encoded (that's why
-				// an error occurred... hopefully)
-				if (decodedSize < 0)
-					return this.getDateiInhalt().length();
-				else
-					return decodedSize;
-			}
-		}
-	}
+    /**
+     * Liefert die Groesse der Datei zurueck
+     * 
+     * @return die Laenge des Strings dateiInhalt
+     */
+    public long holeGroesse() {
+        if (this.getDateiInhalt() == null)
+            return 0;
+        if (this.dateiTyp != null && this.dateiTyp.equals("text"))
+            return this.getDateiInhalt().length();
+        else {
+            try {
+                if (decodedSize < 0)
+                    setSize(Base64.decode(this.getDateiInhalt()).length); // set
+                                                                          // current
+                                                                          // size
+                                                                          // to
+                                                                          // be
+                                                                          // sure
+                                                                          // it's
+                                                                          // correct
+                return decodedSize;
+            } catch (Exception e) {
+                // current file does not seem to be Base64 encoded (that's why
+                // an error occurred... hopefully)
+                if (decodedSize < 0)
+                    return this.getDateiInhalt().length();
+                else
+                    return decodedSize;
+            }
+        }
+    }
 
-	/**
-	 * Liefert den Dateiinhalt so zurueck, wie er gespeichert wurde. D. h., dass
-	 * kodierte Dateien auch kodiert ausgegeben werden.
-	 * 
-	 * @return der Dateiinhalt als String
-	 */
-	public String getDateiInhalt() {
-		return dateiInhalt;
-	}
+    /**
+     * Liefert den Dateiinhalt so zurueck, wie er gespeichert wurde. D. h., dass kodierte Dateien auch kodiert
+     * ausgegeben werden.
+     * 
+     * @return der Dateiinhalt als String
+     */
+    public String getDateiInhalt() {
+        return dateiInhalt;
+    }
 
-	public void setDateiInhalt(String dateiInhalt) {
-		this.dateiInhalt = dateiInhalt;
-		this.setChanged();
-		this.notifyObservers();
-	}
+    public void setDateiInhalt(String dateiInhalt) {
+        this.dateiInhalt = dateiInhalt;
+        this.setChanged();
+        this.notifyObservers();
+    }
 
-	/**
-	 * Methode fuer den Zugriff auf Base64-kodierte Dateien.
-	 * 
-	 * @return Gibt den Base64-dekodierten Dateiinhalt als String zurück.
-	 * @see setzeDateiInhaltDecoded
-	 */
-	public String holeDateiInhaltDecoded() {
-		return (String) Base64.decodeToObject(this.getDateiInhalt());
-	}
+    /**
+     * Methode fuer den Zugriff auf Base64-kodierte Dateien.
+     * 
+     * @return Gibt den Base64-dekodierten Dateiinhalt als String zurück.
+     * @see setzeDateiInhaltDecoded
+     */
+    public String holeDateiInhaltDecoded() {
+        return (String) Base64.decodeToObject(this.getDateiInhalt());
+    }
 
-	/**
-	 * Methode fuer den Zugriff auf Base64-kodierte Dateien.
-	 * 
-	 * @param dateiInhalt
-	 *            einen "binaeren" Dateiinhalt, der Base64-kodiert gespeichert
-	 *            werden soll
-	 */
-	public void setzeDateiInhaltDecoded(String dateiInhalt) {
-		this.dateiInhalt = Base64.encodeObject(dateiInhalt);
-	}
+    /**
+     * Methode fuer den Zugriff auf Base64-kodierte Dateien.
+     * 
+     * @param dateiInhalt
+     *            einen "binaeren" Dateiinhalt, der Base64-kodiert gespeichert werden soll
+     */
+    public void setzeDateiInhaltDecoded(String dateiInhalt) {
+        this.dateiInhalt = Base64.encodeObject(dateiInhalt);
+    }
 
-	public String getDateiTyp() {
-		return dateiTyp;
-	}
+    public String getDateiTyp() {
+        return dateiTyp;
+    }
 
-	public void setDateiTyp(String dateiTyp) {
-		this.dateiTyp = dateiTyp;
-	}
+    public void setDateiTyp(String dateiTyp) {
+        this.dateiTyp = dateiTyp;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-		this.setChanged();
-		this.notifyObservers();
-	}
+    public void setName(String name) {
+        this.name = name;
+        this.setChanged();
+        this.notifyObservers();
+    }
 
-	public String toString() {
-		return name;
-	}
+    public String toString() {
+        return name;
+    }
 }

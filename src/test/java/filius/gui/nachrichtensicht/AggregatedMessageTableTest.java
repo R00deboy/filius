@@ -30,7 +30,7 @@ public class AggregatedMessageTableTest {
 
         AggregatedExchangePanel exchangePanel = new AggregatedExchangePanel();
         new JFrame().getContentPane().add(exchangePanel, BorderLayout.CENTER);
-        AggregatedMessageTable messageTable = new AggregatedMessageTable(exchangePanel, null);
+        AggregatedMessageTable messageTable = new AggregatedMessageTable(exchangePanel, null, null);
         messageTable.writeToStream(outputStream);
         outputStream.close();
 

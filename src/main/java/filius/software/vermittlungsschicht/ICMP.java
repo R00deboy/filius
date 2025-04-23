@@ -108,11 +108,11 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
     }
 
     public void sendeICMP(int typ, int code, int seqNr, String quellIP, String zielIP) {
-        sendeICMP(typ, code, 64, seqNr, quellIP, zielIP);
+        sendeICMP(typ, code, 64, seqNr, -1, quellIP, zielIP);
     }
 
-    private void sendeICMP(int typ, int code, int ttl, int seqNr, String quellIP, String zielIP) {
-        IcmpPaket icmpPaket = new IcmpPaket();
+    private void sendeICMP(int typ, int code, int ttl, int seqNr, long identification, String quellIP, String zielIP) {
+        IcmpPaket icmpPaket = new IcmpPaket(identification);
         icmpPaket.setEmpfaenger(zielIP);
         icmpPaket.setIcmpType(typ);
         icmpPaket.setIcmpCode(code);
@@ -228,7 +228,7 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
             // TTL ist nicht abgelaufen.
             // Paket weiterleiten:
             sendeICMP(icmpPaket.getIcmpType(), icmpPaket.getIcmpCode(), icmpPaket.getTtl() - 1, icmpPaket.getSeqNr(),
-                    icmpPaket.getSender(), icmpPaket.getEmpfaenger());
+                    icmpPaket.getIdentification(), icmpPaket.getSender(), icmpPaket.getEmpfaenger());
         }
     }
 
@@ -255,7 +255,7 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
     /** method to send a traceroute probe (realized as ping) */
     public IcmpPaket sendProbe(String destIp, int ttl, int seqNr) {
         thread.resetIcmpResponseQueue();
-        sendeICMP(ICMP.TYPE_ECHO_REQUEST, ICMP.CODE_ECHO, ttl, seqNr, null, destIp);
+        sendeICMP(ICMP.TYPE_ECHO_REQUEST, ICMP.CODE_ECHO, ttl, seqNr, -1, null, destIp);
         return thread.waitForIcmpResponse();
     }
 

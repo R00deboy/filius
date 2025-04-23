@@ -29,15 +29,15 @@ import java.io.Serializable;
 
 public class UdpSegment extends Segment implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private int laenge;
+    private int laenge;
 
-	public int getLaenge() {
-		return laenge;
-	}
+    public int getLaenge() {
+        return laenge;
+    }
 
-	public void setLaenge(int laenge) {
-		this.laenge = laenge;
-	}
+    public void setLaenge(int laenge) {
+        this.laenge = laenge;
+    }
 }

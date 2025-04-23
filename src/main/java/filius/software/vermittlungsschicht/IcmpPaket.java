@@ -50,13 +50,13 @@ public class IcmpPaket extends IpPaket {
      */
     private int icmpCode;
 
-    public IcmpPaket() {
-        super(ICMP_PROTOCOL);
+    public IcmpPaket(long identification) {
+        super(ICMP_PROTOCOL, identification);
     }
 
     @Override
     public IcmpPaket clone() {
-        IcmpPaket clone = new IcmpPaket();
+        IcmpPaket clone = new IcmpPaket(getIdentification());
         copyIpPacketAttributes(clone);
         copyIcmpAttributes(clone);
         return clone;
@@ -102,6 +102,7 @@ public class IcmpPaket extends IpPaket {
 
     public String toString() {
         return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
-                + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + "]";
+                + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + ", "
+                + "identification=" + getIdentification() + "]";
     }
 }

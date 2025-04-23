@@ -103,8 +103,7 @@ public class EingabenUeberpruefung implements I18n {
                 while (currBin.length() < 8)
                     currBin = "0" + currBin;
                 binary += currBin;
-                LOG.debug(
-                        "(EingabenUeberpruefung), '" + token[i] + "' ~~> binary (" + i + ") = '" + binary + "'");
+                LOG.debug("(EingabenUeberpruefung), '" + token[i] + "' ~~> binary (" + i + ") = '" + binary + "'");
             }
         } catch (Exception e) {
             return false;

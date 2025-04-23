@@ -43,6 +43,18 @@ public abstract class InternetKnoten extends Knoten {
     private static final long serialVersionUID = 1L;
     private List<NetzwerkInterface> netzwerkInterfaces = new LinkedList<NetzwerkInterface>();
 
+    // maximum layer on which the node operates
+    // (1 = link, 2 = internet, 3 = transport, 4 = application)
+    private int maxLayerOfOperation;
+
+    public int getMaxLayerOfOperation() {
+        return maxLayerOfOperation;
+    }
+
+    public void setMaxLayerOfOperation(int maxLayerOfOperation) {
+        this.maxLayerOfOperation = maxLayerOfOperation;
+    }
+
     public Port holeFreienPort() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (InternetKnoten), holeFreienPort()");
         ListIterator<NetzwerkInterface> iter = getNetzwerkInterfaces().listIterator();
@@ -151,7 +163,7 @@ public abstract class InternetKnoten extends Knoten {
     }
 
     public void hinzuAnschluss() {
-        netzwerkInterfaces.add(new NetzwerkInterface());
+        netzwerkInterfaces.add(new NetzwerkInterface(this));
     }
 
     public void setzeAnzahlAnschluesse(int anzahlAnschluesse) {
@@ -160,7 +172,7 @@ public abstract class InternetKnoten extends Knoten {
 
         netzwerkInterfaces = new LinkedList<NetzwerkInterface>();
         for (int i = 0; i < anzahlAnschluesse; i++) {
-            netzwerkInterfaces.add(new NetzwerkInterface());
+            netzwerkInterfaces.add(new NetzwerkInterface(this));
         }
     }
 }

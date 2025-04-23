@@ -27,58 +27,58 @@ package filius.software.dns;
 
 public class DNSVerknuepfung {
 
-	private String wert; // kann eine IP oder eine MailDomain sein
-	private String domain;
-	private long ttl; // Lebensdauer
-	private String typ; // kann a, mx oder ns(zur Zeit nicht implementiert) sein
+    private String wert; // kann eine IP oder eine MailDomain sein
+    private String domain;
+    private long ttl; // Lebensdauer
+    private String typ; // kann a, mx oder ns(zur Zeit nicht implementiert) sein
 
-	/**
-	 * Ist die DNSVerknuepfung vom typ mx, dann enthält wert keine IP sondern
-	 * eine domain. Beispiel: typ: mx domain: gmx.de wert: mail.gmx.de
-	 * 
-	 * In dem Fall MUSS es dann noch eine weitere DNSVerknüpfung geben
-	 * 
-	 * typ: a domain: mail.gmx.de wert: 81.25.21.123
-	 * 
-	 * 
-	 * @return
-	 */
+    /**
+     * Ist die DNSVerknuepfung vom typ mx, dann enthält wert keine IP sondern eine domain. Beispiel: typ: mx domain:
+     * gmx.de wert: mail.gmx.de
+     * 
+     * In dem Fall MUSS es dann noch eine weitere DNSVerknüpfung geben
+     * 
+     * typ: a domain: mail.gmx.de wert: 81.25.21.123
+     * 
+     * 
+     * @return
+     */
 
-	public long getTtl() {
-		return ttl;
-	}
+    public long getTtl() {
+        return ttl;
+    }
 
-	public void setTtl(long ttl) {
-		this.ttl = ttl;
-	}
+    public void setTtl(long ttl) {
+        this.ttl = ttl;
+    }
 
-	public String getTyp() {
-		return typ;
-	}
+    public String getTyp() {
+        return typ;
+    }
 
-	public void setTyp(String typ) {
-		this.typ = typ;
-	}
+    public void setTyp(String typ) {
+        this.typ = typ;
+    }
 
-	public String getWert() {
-		return wert;
-	}
+    public String getWert() {
+        return wert;
+    }
 
-	public void setWert(String wert) {
-		this.wert = wert;
-	}
+    public void setWert(String wert) {
+        this.wert = wert;
+    }
 
-	public String getDomain() {
-		return domain;
-	}
+    public String getDomain() {
+        return domain;
+    }
 
-	public void setDomain(String domain) {
-		this.domain = domain;
-	}
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
 
-	public String toString() {
-		String str = wert + "   " + ttl + "   " + typ + "   " + domain;
-		return str;
-	}
+    public String toString() {
+        String str = wert + "   " + ttl + "   " + typ + "   " + domain;
+        return str;
+    }
 
 }

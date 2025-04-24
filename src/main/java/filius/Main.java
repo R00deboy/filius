@@ -125,6 +125,9 @@ public class Main implements I18n {
                             Information.getInformation().setIconMode(IconMode.SYMBOL);
                         }
                     }
+                    if (programmKonfig.length >= 8 && (Boolean) programmKonfig[7]) {
+                        Information.getInformation().setLayerVisualization((Boolean) programmKonfig[7]);
+                    }
                 }
             } catch (Exception e) {
                 LOG.info("There is no user configuration available.");
@@ -206,7 +209,6 @@ public class Main implements I18n {
     public static void beenden() {
         LOG.debug("beenden");
         Object[] programmKonfig;
-        int entscheidung;
         boolean abbruch = false;
 
         GUIContainer.getGUIContainer().getMenu().selectMode(GUIMainMenu.MODUS_ENTWURF);
@@ -221,7 +223,7 @@ public class Main implements I18n {
                     GUIContainer.getGUIContainer().getDocuItems());
         }
         if (!abbruch) {
-            programmKonfig = new Object[7];
+            programmKonfig = new Object[8];
             programmKonfig[0] = JMainFrame.getJMainFrame().getBounds();
             programmKonfig[1] = SzenarioVerwaltung.getInstance().holePfad();
             programmKonfig[2] = Information.getInformation().getLocale().getLanguage();
@@ -229,6 +231,7 @@ public class Main implements I18n {
             programmKonfig[4] = Information.getInformation().getLastOpenedDirectory();
             programmKonfig[5] = SzenarioVerwaltung.getInstance().istGeaendert();
             programmKonfig[6] = Information.getInformation().getIconMode().toString();
+            programmKonfig[7] = Information.getInformation().isLayerVisualization();
 
             String applicationConfigPath = Information.getInformation().getArbeitsbereichPfad() + "konfig.xml";
             try (FileOutputStream fos = new FileOutputStream(applicationConfigPath);

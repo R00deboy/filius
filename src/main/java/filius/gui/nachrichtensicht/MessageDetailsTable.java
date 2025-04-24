@@ -11,7 +11,6 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
@@ -27,7 +26,7 @@ import filius.rahmenprogramm.nachrichten.Lauscher;
  * 
  * @author Christoph Irniger
  */
-public class MessageDetailsTable extends JPanel implements I18n {
+public class MessageDetailsTable extends MessageDetails implements I18n {
     private final GridBagLayout GRID_BAG_LAYOUT;
     private GridBagConstraints c;
 
@@ -55,7 +54,7 @@ public class MessageDetailsTable extends JPanel implements I18n {
         setBackground(Color.WHITE);
 
         if (frameNumber >= 1) {
-            updateTable(interfaceId, frameNumber);
+            update(interfaceId, frameNumber);
         }
     }
 
@@ -314,7 +313,7 @@ public class MessageDetailsTable extends JPanel implements I18n {
      * @param frameNumber
      *            the number of the frame in the data exchange of the interface (starts with 1)
      */
-    public void updateTable(String interfaceId, int frameNumber) {
+    public void update(String interfaceId, int frameNumber) {
         this.interfaceId = interfaceId;
         this.frameNumber = frameNumber;
         messageDetailsMatrix = new String[6][8];

@@ -144,6 +144,16 @@ public class Information implements Serializable {
 
     private IconMode iconMode = IconMode.DEFAULT;
 
+    private boolean layerVisualization = false;
+
+    public boolean isLayerVisualization() {
+        return layerVisualization;
+    }
+
+    public void setLayerVisualization(boolean layerVisualization) {
+        this.layerVisualization = layerVisualization;
+    }
+
     public boolean isGatewayAvailable() {
         return gatewayAvailable;
     }

@@ -62,9 +62,10 @@ import org.slf4j.LoggerFactory;
 
 import filius.gui.JMainFrame;
 import filius.gui.schichtensicht.GlobalLayerPath;
-import filius.gui.schichtensicht.LocalLayerPathPanel;
 import filius.gui.schichtensicht.LayerPathDialog;
+import filius.gui.schichtensicht.LocalLayerPathPanel;
 import filius.rahmenprogramm.I18n;
+import filius.rahmenprogramm.Information;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.rahmenprogramm.nachrichten.LauscherBeobachter;
@@ -198,27 +199,29 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
         menu = new JPopupMenu();
         AggregatedMessageTable target = this;
 
-        JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
-        localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
-            public void mousePressed(MouseEvent e) {
-                if (isPathOptionsEnabled()) {
-                    menu.setVisible(false);
-                    showLocalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+        if (Information.getInformation().isLayerVisualization()) {
+            JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
+            localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    if (isPathOptionsEnabled()) {
+                        menu.setVisible(false);
+                        showLocalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+                    }
                 }
-            }
-        });
-        menu.add(localPathThroughLayersMenuItem);
+            });
+            menu.add(localPathThroughLayersMenuItem);
 
-        JMenuItem globalPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
-        globalPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
-            public void mousePressed(MouseEvent e) {
-                if (isPathOptionsEnabled()) {
-                    menu.setVisible(false);
-                    showGlobalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+            JMenuItem globalPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
+            globalPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    if (isPathOptionsEnabled()) {
+                        menu.setVisible(false);
+                        showGlobalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
+                    }
                 }
-            }
-        });
-        menu.add(globalPathThroughLayersMenuItem);
+            });
+            menu.add(globalPathThroughLayersMenuItem);
+        }
 
         JMenuItem resetMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg7"));
         resetMenuItem.addMouseListener(new MouseInputAdapter() {

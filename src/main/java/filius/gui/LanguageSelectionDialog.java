@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -55,6 +56,7 @@ public class LanguageSelectionDialog extends JDialog {
     private JComboBox<String> languageSelection = new JComboBox<>();
     private JLabel selectIconModeLabel = new JLabel();
     private JComboBox<String> iconModeSelection = new JComboBox<>();
+    private JCheckBox layerVisualization = new JCheckBox();
     private JLabel restartHint = new JLabel();
     private JButton confirm = new JButton();
     private JButton confirmAndExit = new JButton();
@@ -87,6 +89,7 @@ public class LanguageSelectionDialog extends JDialog {
         } else {
             iconModeSelection.setSelectedIndex(2);
         }
+        layerVisualization.setSelected(Information.getInformation().isLayerVisualization());
     }
 
     private void initializeText(Locale locale) {
@@ -108,6 +111,8 @@ public class LanguageSelectionDialog extends JDialog {
         iconModeSelection.addItem(bundle.getString("settings_msg3"));
         iconModeSelection.addItem(bundle.getString("settings_msg4"));
         iconModeSelection.setSelectedIndex(selectedIndex);
+
+        layerVisualization.setText(bundle.getString("settings_msg5"));
 
         restartHint.setText("<html>" + bundle.getString("languageSelection_msg2") + "</html>");
         confirm.setText(bundle.getString("languageSelection_msg3"));
@@ -135,6 +140,7 @@ public class LanguageSelectionDialog extends JDialog {
         default:
             Information.getInformation().setIconMode(IconMode.DEFAULT);
         }
+        Information.getInformation().setLayerVisualization(layerVisualization.isSelected());
     }
 
     private Locale languageToLocale(String language) {
@@ -161,7 +167,7 @@ public class LanguageSelectionDialog extends JDialog {
 
     private void initialize(boolean restartMode) {
         Box verticalBox = Box.createVerticalBox();
-        verticalBox.setPreferredSize(new Dimension(400, 280));
+        verticalBox.setPreferredSize(new Dimension(400, 320));
         getContentPane().add(verticalBox);
         pack();
 
@@ -218,27 +224,20 @@ public class LanguageSelectionDialog extends JDialog {
             iconModeSelectBox.add(iconModeSelection);
             iconModeSelectBox.add(Box.createGlue());
             verticalBox.add(iconModeSelectBox);
+        }
 
-            // iconSelect.addItem(DEUTSCH);
-            // languageSelection.addItem(ENGLISH);
-            // languageSelection.addItem(FRANCAIS);
-            // languageSelection.setSelectedItem(localeToLanguage(Information.getInformation().getLocaleOrDefault()));
-            // languageSelection.setMaximumSize(new Dimension(380, 30));
-            // languageSelection.setPreferredSize(new Dimension(380, 30));
-            //
-            // String[] choices = { "home", "enterprise", "symbols" };
-            // iconSelect = new JComboBox(choices);
-            // iconSelect.setVisible(true);
-            // iconSelect.setBounds(520, 8, 90, 20);
-            // iconSelect.setActionCommand("iconselect");
-            // iconSelect.setToolTipText(messages.getString("guimainmemu_msg19"));
-            // iconSelect.addActionListener (new ActionListener () {
-            // public void actionPerformed(ActionEvent e) {
-            // iconTheme = iconSelect.getSelectedIndex();
-            // updateIcons();
-            // }
-            // });
-            Box iconModeBox = Box.createHorizontalBox();
+        if (restartMode) {
+            verticalBox.add(Box.createVerticalStrut(10));
+
+            Box layerVisualizationBox = Box.createHorizontalBox();
+            layerVisualizationBox.add(Box.createHorizontalStrut(10));
+            layerVisualizationBox.add(layerVisualization);
+            layerVisualizationBox.add(Box.createGlue());
+            verticalBox.add(layerVisualizationBox);
+
+            verticalBox.add(Box.createVerticalStrut(10));
+            layerVisualization.setMaximumSize(new Dimension(380, 30));
+            layerVisualization.setPreferredSize(new Dimension(380, 30));
         }
 
         if (restartMode) {

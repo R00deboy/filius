@@ -988,6 +988,7 @@ public class GUIContainer implements Serializable, I18n {
             window.setVisible(false);
         }
         SatViewerControl.getInstance().hideViewer();
+        NatViewerControl.getInstance().hideViewer();
         lastVisibilityStateLauscher = ((JDialog) getExchangeDialog()).isVisible();
         ((JDialog) GUIContainer.getGUIContainer().getExchangeDialog()).setVisible(false);
     }

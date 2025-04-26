@@ -33,6 +33,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -90,6 +91,8 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
 
     private JTabbedPane tpNetzwerkKarten;
 
+    private JPortForwardingDialog portForwardingDialog;
+
     private Kabel highlightedCable = null;
 
     protected JGatewayConfiguration(Hardware hardware) {
@@ -135,6 +138,17 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         firewallDialog.setVisible(true);
     }
 
+    private void showPortForwardingDialog() {
+        LinkedList<String[]> staticNat = ((GatewayFirmware) ((Gateway) holeHardware()).getSystemSoftware())
+                .getStaticNAT();
+        portForwardingDialog = new JPortForwardingDialog(staticNat, JMainFrame.getJMainFrame());
+        portForwardingDialog.setBounds(100, 100, 550, 340);
+        portForwardingDialog.setName(messages.getString("jgatewayconfiguration_msg19"));
+
+        portForwardingDialog.createStaticTable();
+        portForwardingDialog.setVisible(true);
+    }
+
     private void showDhcpConfiguration() {
         JDHCPKonfiguration dhcpKonfig = new JDHCPKonfiguration(JMainFrame.getJMainFrame(),
                 messages.getString("jhostkonfiguration_msg8"),
@@ -148,6 +162,7 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         KeyAdapter ipAdresseKeyAdapter;
         KeyAdapter netzmaskeKeyAdapter;
         JButton btFirewall;
+        JButton btPortForwarding;
 
         JLabel tempLabel;
         Box tempBox;
@@ -267,6 +282,16 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
             }
         });
         tempBox.add(btFirewall);
+
+        tempBox.add(Box.createHorizontalStrut(20));
+
+        btPortForwarding = new JButton(messages.getString("jgatewayconfiguration_msg19"));
+        btPortForwarding.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showPortForwardingDialog();
+            }
+        });
+        tempBox.add(btPortForwarding);
 
         vBox.add(tempBox);
 
@@ -433,6 +458,12 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         dhcp.setSelected(dhcpEnabled);
         ipAddressWANPort.setEnabled(!dhcpEnabled);
         netmaskWANPort.setEnabled(!dhcpEnabled);
+
+        /* Für den Fall, dass später zwischen Full cone und Restricted Cone unterschieden werden soll */
+        /*
+         * switch (bs.getNatMethod()) { case fullCone: coneTypeSelect.setSelectedIndex(0); break; case restrictedCone:
+         * coneTypeSelect.setSelectedIndex(1); break; }
+         */
 
         updateNICConfigPane("LAN", vRechner.holeLANInterface(), ipAddressLANPort, macAddressLANPort, netmaskLANPort,
                 connectedComponentLAN, LAN_TAB_IDX);

@@ -52,7 +52,12 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
     @Override
     protected void verarbeiteDatenEinheit(EthernetFrame frame) {
         Lauscher.getLauscher().addDatenEinheit(wanNic, systemSoftware, frame);
-        if (!checkToLANAddress(frame) && !checkDiscardByFirewall(frame)) {
+        boolean check = true;
+        if (frame.getDaten() instanceof IpPaket) {
+            IpPaket packet = (IpPaket) frame.getDaten();
+            check = (natGateway.eintragExistiert(packet));
+        }
+        if (!checkToLANAddress(frame) && !checkDiscardByFirewall(frame) && check) {
             EthernetFrame modifiedFrame = modifyIncomingFrame(frame);
             forwardFrame(modifiedFrame);
         }

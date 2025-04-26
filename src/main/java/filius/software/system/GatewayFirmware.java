@@ -25,22 +25,40 @@
  */
 package filius.software.system;
 
+import java.beans.PropertyChangeEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.hardware.NetzwerkInterface;
+import filius.hardware.Verbindung;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.Knoten;
+import filius.rahmenprogramm.EingabenUeberpruefung;
 import filius.rahmenprogramm.Information;
 import filius.rahmenprogramm.ResourceUtil;
 import filius.software.firewall.Firewall;
 import filius.software.firewall.FirewallRule;
 import filius.software.firewall.FirewallWebKonfig;
 import filius.software.firewall.FirewallWebLog;
+import filius.software.nat.InetAddress;
+import filius.software.nat.NatEntry;
 import filius.software.nat.NatGateway;
+import filius.software.nat.NetworkAddressTranslationTable;
+import filius.software.nat.PortProtocolPair;
 import filius.software.rip.RIPTable;
+import filius.software.vermittlungsschicht.IcmpPaket;
+import filius.software.vermittlungsschicht.IpPaket;
 import filius.software.www.WebServer;
 
 /**
@@ -53,6 +71,28 @@ import filius.software.www.WebServer;
 @SuppressWarnings("serial")
 public class GatewayFirmware extends InternetKnotenBetriebssystem {
     private static Logger LOG = LoggerFactory.getLogger(GatewayFirmware.class);
+
+    private long retentionTime = 300000;
+
+    private boolean natMethodChanged = false;
+
+    private LinkedList<String[]> staticNAT = null;
+
+    public long getRetentionTime() {
+        return retentionTime * Verbindung.holeVerzoegerungsFaktor();
+    }
+
+    public void setNatMethodChanged(boolean b) {
+        natMethodChanged = b;
+    }
+
+    public void setStaticNAT(LinkedList<String[]> staticNAT) {
+        this.staticNAT = new LinkedList<String[]>(staticNAT);
+    }
+
+    public LinkedList<String[]> getStaticNAT() {
+        return this.staticNAT;
+    }
 
     /** Konstruktor mit Initialisierung von Firewall und Webserver */
     public GatewayFirmware() {
@@ -88,6 +128,7 @@ public class GatewayFirmware extends InternetKnotenBetriebssystem {
         FirewallWebKonfig webkonfig;
         WebServer server = null;
         Firewall firewall = null;
+        staticNAT = new LinkedList<String[]>();
 
         // Installation von Firewall und Webserver
         installApp("filius.software.nat.NatGateway");
@@ -124,6 +165,74 @@ public class GatewayFirmware extends InternetKnotenBetriebssystem {
     public void starten() {
         super.starten();
         holeWebServer().setAktiv(true);
+
+        Timer timer = new Timer();
+
+        NetworkAddressTranslationTable nat = ((NatGateway) this.holeFirewall()).getNATTable();
+        nat.resetStaticNATTable();
+
+        if (!staticNAT.isEmpty()) {
+            for (int i = 0; i < staticNAT.size(); i++) {
+                String[] entry = staticNAT.get(i);
+                if (validateData(entry)) {
+                    int protocol;
+                    switch (entry[0].toUpperCase()) {
+                    case "TCP":
+                        protocol = IpPaket.TCP;
+                        break;
+                    case "UDP":
+                        protocol = IpPaket.UDP;
+                        break;
+                    default:
+                        protocol = Integer.parseInt(entry[0]);
+                    }
+                    InetAddress lanAddress = new InetAddress(entry[2], Integer.parseInt(entry[3]), protocol);
+                    nat.addStatic(Integer.parseInt(entry[1]), protocol, lanAddress);
+                }
+            }
+        }
+        fireNATPropertyChange();
+
+        Map<PortProtocolPair, NatEntry> dynNat = nat.getDynamicNATTable();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!isStarted()) {
+                    timer.cancel();
+                } else if (!dynNat.isEmpty()) {
+                    checkNAT();
+                }
+            }
+        }, 1000, 1000);
+
+        if (natMethodChanged) {
+            firePropertyChanged(new PropertyChangeEvent(this, "nat_method", null, null));
+            natMethodChanged = false;
+        }
+    }
+
+    private Boolean validateData(String[] entry) {
+        for (int i = 0; i < entry.length; i++) {
+            Pattern pattern = null;
+            switch (i) {
+            case 0:
+                pattern = EingabenUeberpruefung.musterProtocol;
+                break;
+            case 1:
+                pattern = EingabenUeberpruefung.musterPort;
+                break;
+            case 2:
+                pattern = EingabenUeberpruefung.musterIpAdresse;
+                break;
+            case 3:
+                pattern = EingabenUeberpruefung.musterPort;
+                break;
+            }
+            if (!EingabenUeberpruefung.isGueltig(entry[i], pattern)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void beenden() {
@@ -158,5 +267,97 @@ public class GatewayFirmware extends InternetKnotenBetriebssystem {
     @Override
     public boolean isRipEnabled() {
         return false;
+    }
+
+    public Vector<Vector<String>> holeNAT() {
+        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (GatewayFirmware), holeNAT()");
+
+        NetworkAddressTranslationTable nat = null;
+        nat = ((NatGateway) this.holeFirewall()).getNATTable();
+
+        Vector<Vector<String>> eintraege = new Vector<Vector<String>>();
+        Vector<String> eintrag;
+
+        for (PortProtocolPair key : nat.getStaticNATTable().keySet()) {
+            eintrag = new Vector<String>();
+            eintrag = createEintrag(key.getProtocol(), "*", key.getPort(),
+                    nat.getStaticNATTable().get(key).getInetAddress().getIpAddress(),
+                    nat.getStaticNATTable().get(key).getInetAddress().getPort(), null);
+            eintraege.add(eintrag);
+        }
+        for (PortProtocolPair key : nat.getDynamicNATTable().keySet()) {
+            eintrag = new Vector<String>();
+            eintrag = createEintrag(key.getProtocol(), key.getAddress(), key.getPort(),
+                    nat.getDynamicNATTable().get(key).getInetAddress().getIpAddress(),
+                    nat.getDynamicNATTable().get(key).getInetAddress().getPort(),
+                    nat.getDynamicNATTable().get(key).getLastUpdate());
+            eintraege.add(eintrag);
+        }
+
+        return eintraege;
+    }
+
+    private Vector<String> createEintrag(int prot, String wanAddress, int mappedPort, String lanAddress, int lanPort,
+            Date update) {
+
+        Vector<String> eintrag = new Vector<String>();
+        String ausgabe;
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+
+        switch (prot) {
+        case IpPaket.TCP:
+            ausgabe = "TCP";
+            break;
+        case IpPaket.UDP:
+            ausgabe = "UDP";
+            break;
+        case IcmpPaket.ICMP_PROTOCOL:
+            ausgabe = "ICMP";
+            break;
+        default:
+            ausgabe = "" + prot;
+        }
+
+        eintrag.add(ausgabe);
+        eintrag.add("" + mappedPort);
+        eintrag.add(wanAddress);
+        eintrag.add(lanAddress);
+        eintrag.add("" + lanPort);
+        if (update == null) {
+            eintrag.add("-");
+        } else {
+            eintrag.add(formatter.format(update));
+        }
+
+        return eintrag;
+    }
+
+    /**
+     * Methode zum Löschen der dynamischen Einträge der NAT-Tabelle
+     */
+    public void loescheNAT() {
+        Map<PortProtocolPair, NatEntry> nat = ((NatGateway) this.holeFirewall()).getNATTable().getDynamicNATTable();
+        nat.clear();
+        firePropertyChanged(new PropertyChangeEvent(this, "nat_entry", null, null));
+    }
+
+    /**
+     * Methode zum Überprüfen der NAT
+     */
+    public void checkNAT() {
+        Date jetzt = new Date();
+        ConcurrentHashMap<PortProtocolPair, NatEntry> nat = ((NatGateway) this.holeFirewall()).getNATTable()
+                .getDynamicNATTable();
+        nat.forEach((portProtocolPair, natEntry) -> {
+            if (jetzt.getTime() - natEntry.getLastUpdate().getTime() >= getRetentionTime()) {
+                nat.remove(portProtocolPair);
+                firePropertyChanged(new PropertyChangeEvent(this, "nat_entry", null, null));
+            }
+            ;
+        });
+    }
+
+    public void fireNATPropertyChange() {
+        firePropertyChanged(new PropertyChangeEvent(this, "nat_entry", null, null));
     }
 }

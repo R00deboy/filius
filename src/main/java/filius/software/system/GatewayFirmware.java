@@ -287,8 +287,8 @@ public class GatewayFirmware extends InternetKnotenBetriebssystem {
         }
         for (PortProtocolPair key : nat.getDynamicNATTable().keySet()) {
             eintrag = new Vector<String>();
-            eintrag = createEintrag(key.getProtocol(), key.getAddress(), key.getPort(),
-                    nat.getDynamicNATTable().get(key).getInetAddress().getIpAddress(),
+            eintrag = createEintrag(key.getProtocol(),(key.getProtocol() == IcmpPaket.ICMP_PROTOCOL?"*":key.getAddress()), key.getPort(),
+            		nat.getDynamicNATTable().get(key).getInetAddress().getIpAddress(),
                     nat.getDynamicNATTable().get(key).getInetAddress().getPort(),
                     nat.getDynamicNATTable().get(key).getLastUpdate());
             eintraege.add(eintrag);

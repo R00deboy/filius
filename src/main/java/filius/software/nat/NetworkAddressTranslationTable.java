@@ -35,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import filius.software.vermittlungsschicht.IcmpPaket;
+
 public class NetworkAddressTranslationTable {
     private static Logger LOG = LoggerFactory.getLogger(NetworkAddressTranslationTable.class);
 
@@ -63,7 +65,7 @@ public class NetworkAddressTranslationTable {
             entry.setInetAddress(lanAddress);
             entry.setNatType(natType);
             entry.setLastUpdate(new Date());
-            dynamicNATTable.put(new PortProtocolPair(wanAddress, port, protocol), entry);
+            dynamicNATTable.put(new PortProtocolPair((protocol==IcmpPaket.ICMP_PROTOCOL?"":wanAddress), port, protocol), entry);
         }
     }
 

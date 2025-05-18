@@ -1,5 +1,16 @@
 # Changelog Filius
 
+## [2.9.0] - 2025-05-18
+### Added
+ * Support mapped ports with NAT
+ * Experimental feature to visualize network traffic over the network layers (to be activated on settings dialog)
+ 
+### Changed
+ * Colors on network viewer changed
+
+### Fixed
+ * Use bind address for sockets in order to prevent processing ARP messages from wrong network by home router
+
 ## [2.8.0] - 2025-03-15
 ### Added
  * Experimental feature for additional icon sets (select via settings)

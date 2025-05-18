@@ -1,5 +1,10 @@
 # Changelog Filius
 
+## [2.9.1] - 2025-05-18
+### Fixed
+ * Show all contributors on info dialog
+ * Fix initial window width
+
 ## [2.9.0] - 2025-05-18
 ### Added
  * Support mapped ports with NAT

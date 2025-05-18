@@ -222,8 +222,8 @@ public class JMainFrame extends javax.swing.JFrame implements WindowListener, Ob
 
     private void setDefaultBounds() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = (int) Math.min(1000, 0.8 * screenSize.getWidth());
-        int height = (int) Math.min(700, 0.8 * screenSize.getHeight());
+        int width = (int) Math.min(1020, 0.9 * screenSize.getWidth());
+        int height = (int) Math.min(700, 0.9 * screenSize.getHeight());
         super.setBounds(
                 new Rectangle(screenSize.width / 2 - (width / 2), screenSize.height / 2 - (height / 2), width, height));
     }

@@ -70,7 +70,7 @@ public class InfoDialog extends JDialog implements I18n {
      * @return void
      */
     private void initialize() {
-        this.setSize(350, 550);
+        this.setSize(350, 580);
         setLocation((getToolkit().getScreenSize().width - getWidth()) / 2,
                 (getToolkit().getScreenSize().height - getHeight()) / 2);
         this.setForeground(Color.blue);

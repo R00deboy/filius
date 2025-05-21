@@ -12,7 +12,6 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -158,8 +157,8 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
         BufferedImage arrowRightBI = null;
         BufferedImage arrowLeftBI = null;
         try {
-            arrowRightBI = ImageIO.read(new File("src/main/resources/gfx/allgemein/arrow_right.png"));
-            arrowLeftBI = ImageIO.read(new File("src/main/resources/gfx/allgemein/arrow_left.png"));
+            arrowRightBI = ImageIO.read(getClass().getResource("/gfx/allgemein/arrow_right.png"));
+            arrowLeftBI = ImageIO.read(getClass().getResource("/gfx/allgemein/arrow_left.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

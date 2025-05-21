@@ -1,5 +1,10 @@
 # Changelog Filius
 
+## [2.9.2] - 2025-05-21
+### Fixed
+ * Fix info dialog
+ * Fix animated layer visualization (started from layer view context menu)
+
 ## [2.9.1] - 2025-05-18
 ### Fixed
  * Show all contributors on info dialog

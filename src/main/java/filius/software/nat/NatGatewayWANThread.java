@@ -31,6 +31,7 @@ import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.firewall.FirewallThread;
 import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.system.SystemSoftware;
+import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 import filius.software.vermittlungsschicht.VermittlungsProtokoll;
 
@@ -54,8 +55,25 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
         Lauscher.getLauscher().addDatenEinheit(wanNic, systemSoftware, frame);
         boolean check = true;
         if (frame.getDaten() instanceof IpPaket) {
-            IpPaket packet = (IpPaket) frame.getDaten();
-            check = (natGateway.eintragExistiert(packet));
+            IpPaket packet = (IpPaket) frame.getDaten();     
+            /* Variante 1: ICMP Echo Requests werden wenn möglich weitergeleitet*/
+            /*check = (natGateway.eintragExistiert(packet));
+              if ((packet instanceof IcmpPaket)&&(!check)) {
+            	if(((IcmpPaket) packet).isEchoRequest()) {
+            		natGateway.getSystemSoftware().holeICMP().sendEchoReply((IcmpPaket) packet);
+            	}
+            }*/
+            /* Variante 2: ICMP Echo Requests werden nicht weitergeleitet*/
+            if ((packet instanceof IcmpPaket)) {
+            	if(((IcmpPaket) packet).isEchoRequest()) {
+            		natGateway.getSystemSoftware().holeICMP().sendEchoReply((IcmpPaket) packet);
+            		check = false;
+            	} else {
+                	check = (natGateway.eintragExistiert(packet));
+                }
+            } else {
+            	check = (natGateway.eintragExistiert(packet));
+            }
         }
         if (!checkToLANAddress(frame) && !checkDiscardByFirewall(frame) && check) {
             EthernetFrame modifiedFrame = modifyIncomingFrame(frame);

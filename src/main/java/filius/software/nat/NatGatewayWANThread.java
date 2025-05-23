@@ -55,15 +55,7 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
         Lauscher.getLauscher().addDatenEinheit(wanNic, systemSoftware, frame);
         boolean check = true;
         if (frame.getDaten() instanceof IpPaket) {
-            IpPaket packet = (IpPaket) frame.getDaten();     
-            /* Variante 1: ICMP Echo Requests werden wenn möglich weitergeleitet*/
-            /*check = (natGateway.eintragExistiert(packet));
-              if ((packet instanceof IcmpPaket)&&(!check)) {
-            	if(((IcmpPaket) packet).isEchoRequest()) {
-            		natGateway.getSystemSoftware().holeICMP().sendEchoReply((IcmpPaket) packet);
-            	}
-            }*/
-            /* Variante 2: ICMP Echo Requests werden nicht weitergeleitet*/
+            IpPaket packet = (IpPaket) frame.getDaten();
             if ((packet instanceof IcmpPaket)) {
             	if(((IcmpPaket) packet).isEchoRequest()) {
             		natGateway.getSystemSoftware().holeICMP().sendEchoReply((IcmpPaket) packet);

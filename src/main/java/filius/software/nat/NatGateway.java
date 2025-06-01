@@ -80,10 +80,14 @@ public class NatGateway extends Firewall implements I18n {
     }
 
     public void replaceDestination(IpPaket packet) {
-        int port = (packet.getProtocol() == IpPaket.TCP || packet.getProtocol() == IpPaket.UDP)
+    	int protocol = packet.getProtocol();
+    	int port = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
                 ? packet.getSegment().getZielPort()
                 : PSEUDO_PORT_ICMP;
-        InetAddress dest = natTable.find(port, packet.getSender(), packet.getProtocol());
+        String sender = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
+                ? packet.getSender()
+                : "";
+        InetAddress dest = natTable.find(port, sender, protocol);
         Gateway gateway = (Gateway) getSystemSoftware().getKnoten();
         ((GatewayFirmware) gateway.getSystemSoftware()).fireNATPropertyChange();
         if (dest != null) {
@@ -99,9 +103,13 @@ public class NatGateway extends Firewall implements I18n {
     }
     
     public boolean eintragExistiert(IpPaket packet) {
-    	int port = (packet.getProtocol() == IpPaket.TCP || packet.getProtocol() == IpPaket.UDP)
+    	int protocol = packet.getProtocol();
+    	int port = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
                 ? packet.getSegment().getZielPort()
                 : PSEUDO_PORT_ICMP;
-    	return (natTable.find(port, packet.getSender(), packet.getProtocol())) == null? false: true;
+    	String sender = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
+                ? packet.getSender()
+                : "";
+    	return (natTable.find(port, sender, protocol)) == null? false: true;
     }
 }

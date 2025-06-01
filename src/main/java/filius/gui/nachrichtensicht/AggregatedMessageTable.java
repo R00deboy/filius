@@ -200,16 +200,13 @@ public class AggregatedMessageTable extends JTable implements LauscherBeobachter
         AggregatedMessageTable target = this;
 
         if (Information.getInformation().isLayerVisualization()) {
-            JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
-            localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    if (isPathOptionsEnabled()) {
-                        menu.setVisible(false);
-                        showLocalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1);
-                    }
-                }
-            });
-            menu.add(localPathThroughLayersMenuItem);
+            /*
+             * JMenuItem localPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg10"));
+             * localPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() { public void
+             * mousePressed(MouseEvent e) { if (isPathOptionsEnabled()) { menu.setVisible(false);
+             * showLocalPathThroughLayers(systemSoftware, target.selectedRowByRightclick + 1); } } });
+             * menu.add(localPathThroughLayersMenuItem);
+             */
 
             JMenuItem globalPathThroughLayersMenuItem = new JMenuItem(messages.getString("nachrichtentabelle_msg11"));
             globalPathThroughLayersMenuItem.addMouseListener(new MouseInputAdapter() {

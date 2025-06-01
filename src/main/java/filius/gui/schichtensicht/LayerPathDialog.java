@@ -30,9 +30,6 @@ public class LayerPathDialog extends JDialog implements I18n {
         BorderLayout borderLayout = new BorderLayout(10, 10);
         setLayout(borderLayout);
 
-        // title "Lokaler Weg durch die Schichten"
-        setTitle(messages.getString("schichten_lokaler_weg_msg1"));
-
         LOCAL_LAYER_PATH_PANEL = new LocalLayerPathPanel(owner, interfaceId, systemSoftware, selectedFrameNumber,
                 globalLayerPath, isMainNode);
 

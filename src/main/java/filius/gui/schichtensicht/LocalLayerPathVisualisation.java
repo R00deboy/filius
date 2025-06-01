@@ -83,7 +83,7 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
     /**
      * width of rectangle including border (must be divisible by 2 * RECTANGLE_RATIO)
      */
-    private static final int RECTANGLE_WIDTH = 180;
+    private static final int RECTANGLE_WIDTH = 200;
     /** ratio of width to height of a rectangle including border */
     private static final int RECTANGLE_RATIO = 3;
     /** resulting height of a rectangle including border (must be divisible by 2) */
@@ -232,12 +232,6 @@ public class LocalLayerPathVisualisation extends JPanel implements I18n {
             // set point in time for senders side
             pointInTimeForSenderSide = minPointInTime + 3;
             visualisationForwarded();
-        }
-        if (globalLayerPath != null) {
-            JLabel label = setLabel(this, messages.getString("schichten_lokaler_weg_msg11"), 0, 0, 14, 1, false);
-            label.setFont(new Font("Dialog", Font.BOLD, 12));
-            label.setBackground(Color.BLACK);
-            label.setForeground(Color.WHITE);
         }
     }
 

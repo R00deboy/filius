@@ -1,5 +1,13 @@
 # Changelog Filius
 
+## [2.9.3] - 2025-06-02
+### Fixed
+ * Fix layer visualization in French and English
+ * Fix ping / traceroute with home router and NAT
+ 
+### Changed
+ * Rename menu entry to Settings (from Change Language)
+ 
 ## [2.9.2] - 2025-05-21
 ### Fixed
  * Fix info dialog

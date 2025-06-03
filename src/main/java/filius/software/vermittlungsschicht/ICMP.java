@@ -95,16 +95,12 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
 
     /** Hilfsmethode zum Versenden eines ICMP Echo Requests */
     public void sendEchoRequest(String destIp, int seqNr) {
-        sendeICMP(TYPE_ECHO_REQUEST, CODE_ECHO, 64, seqNr, -1, null, destIp, null);
+        sendeICMP(TYPE_ECHO_REQUEST, CODE_ECHO, seqNr, null, destIp);
     }
 
     /** Hilfsmethode zum Versenden eines ICMP Echo Reply */
     public void sendEchoReply(IcmpPaket rcvPacket) {
-        sendeICMP(TYPE_ECHO_REPLY, CODE_ECHO, 64, rcvPacket.getSeqNr(), -1, null, rcvPacket.getSender(), null);
-    }
-
-    public void sendeICMP(int typ, int code, String zielIP) {
-        sendeICMP(typ, code, 64, 0, -1, null, zielIP, null);
+        sendeICMP(TYPE_ECHO_REPLY, CODE_ECHO, rcvPacket.getSeqNr(), null, rcvPacket.getSender());
     }
 
     public void sendeICMP(int typ, int code, String zielIP, IpPaket paket) {
@@ -119,10 +115,6 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
         sendeICMP(typ, code, 64, 0, -1, quellIP, zielIP, paket);
     }
 
-    public void sendeICMP(int typ, int code, int seqNr, String quellIP, String zielIP, IpPaket paket) {
-        sendeICMP(typ, code, 64, seqNr, -1, quellIP, zielIP, paket);
-    }
-
     private void sendeICMP(int typ, int code, int ttl, int seqNr, long identification, String quellIP, String zielIP, IpPaket paket) {
         IcmpPaket icmpPaket = new IcmpPaket(identification);
         icmpPaket.setEmpfaenger(zielIP);
@@ -130,7 +122,9 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
         icmpPaket.setIcmpCode(code);
         icmpPaket.setSeqNr(seqNr);
         icmpPaket.setTtl(ttl);
-        icmpPaket.setPayload(paket);
+        if (paket != null) {
+        	icmpPaket.setPayload(paket);
+        }
 
         try {
             InternetKnotenBetriebssystem bs = (InternetKnotenBetriebssystem) holeSystemSoftware();

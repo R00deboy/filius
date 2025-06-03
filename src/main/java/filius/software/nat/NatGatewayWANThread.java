@@ -61,6 +61,10 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
             		natGateway.getSystemSoftware().holeICMP().sendEchoReply((IcmpPaket) packet);
             		check = false;
             	} else {
+            		/* TODO 
+            		 * Für ICMP-Fehlermeldungen anpassen
+            		 * Adresse und port müssen aus der Payload der Nachricht geholt werden
+            		 * */
                 	check = (natGateway.eintragExistiert(packet));
                 }
             } else {
@@ -76,6 +80,11 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
     private EthernetFrame modifyIncomingFrame(EthernetFrame frame) {
         EthernetFrame modifiedFrame = frame.clone();
         if (modifiedFrame.getDaten() instanceof IpPaket) {
+    		/* TODO 
+    		 * Für ICMP-Fehlermeldungen anpassen:
+    		 * Adresse muss aus der Payload der Nachricht geholt werden
+    		 * Port muss 0 sein
+    		 * */
             IpPaket packet = (IpPaket) modifiedFrame.getDaten();
             if (packet.getEmpfaenger().contentEquals(wanNic.getIp())) {
                 natGateway.replaceDestination(packet);

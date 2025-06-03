@@ -65,6 +65,10 @@ public class NetworkAddressTranslationTable {
             entry.setInetAddress(lanAddress);
             entry.setNatType(natType);
             entry.setLastUpdate(new Date());
+    		/* TODO 
+    		 * Für ICMP Echo-Nachrichten anpassen
+    		 * Adresse wieder einfügen, Identifier statt Port verwenden
+    		 * */
             dynamicNATTable.put(new PortProtocolPair((protocol==IcmpPaket.ICMP_PROTOCOL?"":wanAddress), port, protocol), entry);
         }
     }

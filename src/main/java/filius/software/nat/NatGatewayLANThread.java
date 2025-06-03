@@ -71,7 +71,7 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
                 if (packet instanceof IcmpPaket) {
                     seqNo = ((IcmpPaket) packet).getSeqNr();
                 }
-                natGateway.getSystemSoftware().holeICMP().sendeTimeExceededReply(packet.getSender(), seqNo);
+                natGateway.getSystemSoftware().holeICMP().sendeTimeExceededReply(packet.getSender(), packet);
                 exceeded = true;
             }
         }

@@ -49,6 +49,8 @@ public class IcmpPaket extends IpPaket {
      * other: ICMP Destination Unreachable
      */
     private int icmpCode;
+    
+    private IpPaket payload;
 
     public IcmpPaket(long identification) {
         super(ICMP_PROTOCOL, identification);
@@ -66,6 +68,7 @@ public class IcmpPaket extends IpPaket {
         clone.seqNr = seqNr;
         clone.icmpType = icmpType;
         clone.icmpCode = icmpCode;
+        clone.payload = payload;
     }
 
     public void setIcmpType(int type) {
@@ -75,6 +78,13 @@ public class IcmpPaket extends IpPaket {
     public void setIcmpCode(int code) {
         this.icmpCode = code;
     }
+    
+    public void setPayload(IpPaket payload) {
+    	if(!(payload instanceof IcmpPaket)) {
+    		payload.getSegment().setDaten(null);
+    	}
+    	this.payload = payload;
+    }
 
     public int getIcmpType() {
         return icmpType;
@@ -82,6 +92,10 @@ public class IcmpPaket extends IpPaket {
 
     public int getIcmpCode() {
         return icmpCode;
+    }
+    
+    public IpPaket getPayload() {
+    	return payload;
     }
 
     public boolean isEchoResponse() {

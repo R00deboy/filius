@@ -60,13 +60,9 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
             	if(((IcmpPaket) packet).isEchoRequest()) {
             		natGateway.getSystemSoftware().holeICMP().sendEchoReply((IcmpPaket) packet);
             		check = false;
-            	} else {
-            		/* TODO 
-            		 * Für ICMP-Fehlermeldungen anpassen
-            		 * Adresse und port müssen aus der Payload der Nachricht geholt werden
-            		 * */
+            	} else if(((IcmpPaket) packet).isEchoResponse()) {
                 	check = (natGateway.eintragExistiert(packet));
-                }
+                } // da ICMP-Fehlermeldungen immer weitergeleitet werden gibt es keine Überprüfung, ob ein passender Eintrag in der NAT existiert.
             } else {
             	check = (natGateway.eintragExistiert(packet));
             }

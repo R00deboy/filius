@@ -32,6 +32,7 @@ import filius.hardware.knoten.Gateway;
 import filius.rahmenprogramm.I18n;
 import filius.software.firewall.Firewall;
 import filius.software.system.GatewayFirmware;
+import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 
 public class NatGateway extends Firewall implements I18n {
@@ -55,14 +56,13 @@ public class NatGateway extends Firewall implements I18n {
         InetAddress lanAddress = new InetAddress(lanIpAddress, lanPort, protocol);
         Gateway gateway = (Gateway) getSystemSoftware().getKnoten();
         if (!natTable.hasConnection(lanAddress)) {
-            int port = PSEUDO_PORT_ICMP;
             if (protocol == IpPaket.TCP) {
-                port = getSystemSoftware().holeTcp().reserviereFreienPort();
+            	wanPort = getSystemSoftware().holeTcp().reserviereFreienPort();
             } else if (protocol == IpPaket.UDP) {
-                port = getSystemSoftware().holeUdp().reserviereFreienPort();
+            	wanPort = getSystemSoftware().holeUdp().reserviereFreienPort();
             }
-            LOG.debug("New connection in NAT table: protocol={}, port={}, address={}", protocol, port, lanAddress);
-            natTable.addDynamic(port, wanIpAddress, protocol, lanAddress, NatType.DynamicEntry);
+            LOG.debug("New connection in NAT table: protocol={}, port={}, address={}", protocol, wanPort, lanAddress);
+            natTable.addDynamic(wanPort, wanIpAddress, protocol, lanAddress, NatType.DynamicEntry);
             natTable.print();
             ((GatewayFirmware) gateway.getSystemSoftware()).fireNATPropertyChange();
         }
@@ -81,19 +81,36 @@ public class NatGateway extends Firewall implements I18n {
 
     public void replaceDestination(IpPaket packet) {
     	int protocol = packet.getProtocol();
-    	int port = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
-                ? packet.getSegment().getZielPort()
-                : PSEUDO_PORT_ICMP;
-        String sender = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
-                ? packet.getSender()
-                : "";
+    	int port = 0;
+        String sender = "";
+        if ((protocol == IpPaket.TCP)||(protocol == IpPaket.UDP)){
+        	port = packet.getSegment().getZielPort();
+        	sender = packet.getSender();
+        } else if (protocol == IcmpPaket.ICMP_PROTOCOL) {
+        	if (((IcmpPaket) packet).getPayload() != null) {
+        		IpPaket payload = ((IcmpPaket) packet).getPayload();
+        		sender = payload.getEmpfaenger();
+        		if (payload instanceof IcmpPaket) {
+        			port = 0;
+        		} else {
+        			port = payload.getSegment().getQuellPort();
+        		}
+        		protocol = payload.getProtocol();
+        	} else {
+        		port = ((IcmpPaket)packet).getIdentifier();
+        		sender = packet.getSender();
+        	}
+        }
         InetAddress dest = natTable.find(port, sender, protocol);
+    	protocol = packet.getProtocol();
         Gateway gateway = (Gateway) getSystemSoftware().getKnoten();
         ((GatewayFirmware) gateway.getSystemSoftware()).fireNATPropertyChange();
         if (dest != null) {
             packet.setEmpfaenger(dest.getIpAddress());
             if (packet.getProtocol() == IpPaket.TCP || packet.getProtocol() == IpPaket.UDP) {
                 packet.getSegment().setZielPort(dest.getPort());
+            } else {
+            	port = PSEUDO_PORT_ICMP;
             }
         }
     }
@@ -106,10 +123,7 @@ public class NatGateway extends Firewall implements I18n {
     	int protocol = packet.getProtocol();
     	int port = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
                 ? packet.getSegment().getZielPort()
-                : PSEUDO_PORT_ICMP;
-    	String sender = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
-                ? packet.getSender()
-                : "";
-    	return (natTable.find(port, sender, protocol)) == null? false: true;
+                : ((IcmpPaket) packet).getIdentifier();
+    	return (natTable.find(port, packet.getSender(), protocol)) == null? false: true;
     }
 }

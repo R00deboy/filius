@@ -71,7 +71,7 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
                 if (packet instanceof IcmpPaket) {
                     seqNo = ((IcmpPaket) packet).getSeqNr();
                 }
-                natGateway.getSystemSoftware().holeICMP().sendeTimeExceededReply(packet.getSender(), packet);
+                natGateway.getSystemSoftware().holeICMP().sendeTimeExceededReply(packet.getSender(), seqNo, packet);
                 exceeded = true;
             }
         }
@@ -106,7 +106,7 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
                             packet.getEmpfaenger(), udpSegment.getZielPort());
                 } else if (packet.getProtocol() == IcmpPaket.ICMP_PROTOCOL) {
                     natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(),
-                            NatGateway.PSEUDO_PORT_ICMP, packet.getEmpfaenger(), NatGateway.PSEUDO_PORT_ICMP);
+                            NatGateway.PSEUDO_PORT_ICMP, packet.getEmpfaenger(), ((IcmpPaket) packet).getIdentifier());
                 }
             }
         }

@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Random;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -80,6 +81,8 @@ public class Terminal extends ClientAnwendung implements I18n {
 
     private DefaultMutableTreeNode aktuellerOrdner;
     private boolean interrupted = false;
+    
+    private int identifier = -1;
 
     public void initUsageInfo() {
         if (usageInfo == null) {
@@ -828,6 +831,7 @@ public class Terminal extends ClientAnwendung implements I18n {
         }
 
         // second: send several ICMP echo requests
+        setIdentifier();
         long timeStart, timeDiff;
         // inform about a multiple data transmission to the observer
         benachrichtigeBeobachter(Boolean.TRUE);
@@ -839,7 +843,7 @@ public class Terminal extends ClientAnwendung implements I18n {
         for (num = 0; !interrupted && num < loopNumber; num++) {
             try {
                 timeStart = System.currentTimeMillis();
-                IcmpPaket pingResponse = getSystemSoftware().holeICMP().startSinglePing(targetIp, num + 1);
+                IcmpPaket pingResponse = getSystemSoftware().holeICMP().startSinglePing(targetIp, identifier, num + 1);
                 timeDiff = 1000 - (System.currentTimeMillis() - timeStart);
                 if (pingResponse.getTtl() >= 0) {
                     benachrichtigeBeobachter("\nFrom " + pingResponse.getSender() + ": icmp_seq=" + (num + 1) + " ttl="
@@ -938,7 +942,7 @@ public class Terminal extends ClientAnwendung implements I18n {
             usage("traceroute");
             return null;
         }
-
+        
         int maxHops = 20;
 
         // 1.: Hostnamen auflösen
@@ -969,6 +973,7 @@ public class Terminal extends ClientAnwendung implements I18n {
         }
 
         // 2.: Pings senden und gucken, was alles zurueckkommt
+        setIdentifier();
         IcmpPaket recv = null;
         int seqNr = 42 * 23;
         int fehler = 0;
@@ -979,7 +984,7 @@ public class Terminal extends ClientAnwendung implements I18n {
 
             for (int i = 0; i < 3 && !interrupted; i++) {
                 seqNr++;
-                recv = getSystemSoftware().holeICMP().sendProbe(destIP, ttl, seqNr);
+                recv = getSystemSoftware().holeICMP().sendProbe(destIP, ttl, identifier, seqNr);
                 if (recv != null && recv.getSeqNr() == seqNr) {
                     fehler = 0;
                     break;
@@ -1036,7 +1041,15 @@ public class Terminal extends ClientAnwendung implements I18n {
         return null;
     }
 
-    public void setInterrupt(boolean val) {
+    private void setIdentifier() {
+		if (identifier == -1) {
+			identifier = new Random().nextInt(43)*23;
+		} else {
+			identifier++;
+		}
+	}
+
+	public void setInterrupt(boolean val) {
         this.interrupted = val;
     }
 

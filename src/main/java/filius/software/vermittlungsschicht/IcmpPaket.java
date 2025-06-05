@@ -31,6 +31,10 @@ public class IcmpPaket extends IpPaket {
 
     public static final int ICMP_PROTOCOL = 1;
     /**
+     * identifier of Echo Request packet: The identifier is used by the router in place of the port by Echo Requests and Responses
+     */
+    private int identifier;
+    /**
      * sequence number of Echo Request packet: The sequence number can be used by the client to associate each echo
      * request with its reply.
      */
@@ -39,7 +43,7 @@ public class IcmpPaket extends IpPaket {
      * 0: ICMP Echo Reply (pong) <br />
      * 3: see {@link #icmpType} <br />
      * 8: ICMP Echo Request (ping)<br />
-     * 11: ICMP Time Exeeded (poof) <br />
+     * 11: ICMP Time Exceeded (poof) <br />
      * else: ICMP unknown
      */
     private int icmpType;
@@ -65,6 +69,7 @@ public class IcmpPaket extends IpPaket {
     }
 
     private void copyIcmpAttributes(IcmpPaket clone) {
+    	clone.identifier = identifier;
         clone.seqNr = seqNr;
         clone.icmpType = icmpType;
         clone.icmpCode = icmpCode;
@@ -114,9 +119,17 @@ public class IcmpPaket extends IpPaket {
         this.seqNr = seqNr;
     }
 
+    public int getIdentifier() {
+        return this.identifier;
+    }
+
+    public void setIdentifier(int identifier) {
+        this.identifier = identifier;
+    }
+
     public String toString() {
         return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
-                + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + ", "
+                + " identifier=" + identifier + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + ", "
                 + "identification=" + getIdentification() + "]";
     }
 }

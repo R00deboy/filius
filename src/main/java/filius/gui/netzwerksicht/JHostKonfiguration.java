@@ -364,7 +364,7 @@ public class JHostKonfiguration extends JKonfiguration implements I18n {
         ssid.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                LOG.debug("Action listener on SSID combo box is triggered be event '{}'", e.getID());
+                LOG.trace("Action listener on SSID combo box is triggered be event '{}'", e.getID());
                 aenderungenAnnehmen();
             }
         });

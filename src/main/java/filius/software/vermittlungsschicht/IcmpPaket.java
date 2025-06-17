@@ -129,7 +129,7 @@ public class IcmpPaket extends IpPaket {
 
     public String toString() {
         return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
-                + " identifier=" + identifier + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + ", "
+                + "identifier=" + identifier + "; " + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + ", "
                 + "identification=" + getIdentification() + "]";
     }
 }

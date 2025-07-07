@@ -28,6 +28,9 @@ package filius.software.system;
 import java.io.Serializable;
 import java.util.Observable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import filius.rahmenprogramm.Base64;
 
 /**
@@ -38,6 +41,7 @@ import filius.rahmenprogramm.Base64;
  * 
  */
 public class Datei extends Observable implements Serializable {
+    private static Logger LOG = LoggerFactory.getLogger(Datei.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -95,18 +99,12 @@ public class Datei extends Observable implements Serializable {
         else {
             try {
                 if (decodedSize < 0)
-                    setSize(Base64.decode(this.getDateiInhalt()).length); // set
-                                                                          // current
-                                                                          // size
-                                                                          // to
-                                                                          // be
-                                                                          // sure
-                                                                          // it's
-                                                                          // correct
+                    setSize(Base64.decode(this.getDateiInhalt()).length);
                 return decodedSize;
             } catch (Exception e) {
                 // current file does not seem to be Base64 encoded (that's why
                 // an error occurred... hopefully)
+                LOG.debug("File {} is not base64 encoded. File size is its character number.", this.name);
                 if (decodedSize < 0)
                     return this.getDateiInhalt().length();
                 else

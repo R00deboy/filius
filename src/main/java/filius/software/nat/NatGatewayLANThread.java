@@ -106,7 +106,7 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
                             packet.getEmpfaenger(), udpSegment.getZielPort());
                 } else if (packet.getProtocol() == IcmpPaket.ICMP_PROTOCOL) {
                     natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(),
-                            NatGateway.PSEUDO_PORT_ICMP, packet.getEmpfaenger(), ((IcmpPaket) packet).getIdentifier());
+                    		((IcmpPaket) packet).getIdentifier(), packet.getEmpfaenger(), ((IcmpPaket) packet).getIdentifier());
                 }
             }
         }

@@ -125,7 +125,15 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
         icmpPaket.setTtl(ttl);
         if ((typ != TYPE_ECHO_REPLY)&&(typ != TYPE_ECHO_REQUEST)) {
         	icmpPaket.setPayload(paket);
-        	System.out.println("sendeICMP: "+icmpPaket.toString()+" "+paket.toString());
+        	if (paket instanceof IcmpPaket) {
+        		if (((IcmpPaket) paket).getPayload() != null) {
+        			icmpPaket.setPayload(((IcmpPaket) paket).getPayload());
+        		} else {
+                	icmpPaket.setPayload(paket);
+        		}
+        	} else {
+            	icmpPaket.setPayload(paket);
+        	}
         }
 
         try {

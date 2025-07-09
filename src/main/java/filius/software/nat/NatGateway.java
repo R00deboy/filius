@@ -91,7 +91,7 @@ public class NatGateway extends Firewall implements I18n {
         		IpPaket payload = ((IcmpPaket) packet).getPayload();
         		sender = payload.getEmpfaenger();
         		if (payload instanceof IcmpPaket) {
-        			port = 0;
+        			port = ((IcmpPaket) payload).getIdentifier();
         		} else {
         			port = payload.getSegment().getQuellPort();
         		}

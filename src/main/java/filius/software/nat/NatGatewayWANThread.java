@@ -31,6 +31,7 @@ import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.firewall.FirewallThread;
 import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.system.SystemSoftware;
+import filius.software.vermittlungsschicht.ICMP;
 import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 import filius.software.vermittlungsschicht.VermittlungsProtokoll;
@@ -76,11 +77,6 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
     private EthernetFrame modifyIncomingFrame(EthernetFrame frame) {
         EthernetFrame modifiedFrame = frame.clone();
         if (modifiedFrame.getDaten() instanceof IpPaket) {
-    		/* TODO 
-    		 * Für ICMP-Fehlermeldungen anpassen:
-    		 * Adresse muss aus der Payload der Nachricht geholt werden
-    		 * Port muss 0 sein
-    		 * */
             IpPaket packet = (IpPaket) modifiedFrame.getDaten();
             if (packet.getEmpfaenger().contentEquals(wanNic.getIp())) {
                 natGateway.replaceDestination(packet);

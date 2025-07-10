@@ -111,8 +111,8 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
         sendeICMP(typ, code, 64, identifier, seqNr, -1, quellIP, zielIP, null);
     }
 
-    public void sendeICMP(int typ, int code, int seqNr, String quellIP, String zielIP, IpPaket paket) {
-        sendeICMP(typ, code, 64, 0, seqNr, -1, quellIP, zielIP, paket);
+    public void sendeICMP(int typ, int code, String quellIP, String zielIP, IpPaket paket) {
+        sendeICMP(typ, code, 64, 0, 0, -1, quellIP, zielIP, paket);
     }
 
     private void sendeICMP(int typ, int code, int ttl, int identifier, int seqNr, long identification, String quellIP, String zielIP, IpPaket paket) {
@@ -153,7 +153,7 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
             // zurueckgesendet werden. Andere ICMP-Paket muessen verworfen
             // werden.
             if (icmpPaket.isEchoRequest()) {
-                sendeICMP(TYPE_DESTINATION_UNREACHABLE, CODE_DEST_NETWORK_UNREACHABLE, seqNr,null, quellIP, icmpPaket);
+                sendeICMP(TYPE_DESTINATION_UNREACHABLE, CODE_DEST_NETWORK_UNREACHABLE, null, quellIP, icmpPaket);
             }
         }
     }
@@ -210,7 +210,7 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
             // zurueckgesendet werden. Andere ICMP-Paket muessen verworfen
             // werden.
             if (paket.isEchoRequest()) {
-                sendeICMP(TYPE_DESTINATION_UNREACHABLE, CODE_DEST_HOST_UNREACHABLE, paket.getSeqNr(), null,
+                sendeICMP(TYPE_DESTINATION_UNREACHABLE, CODE_DEST_HOST_UNREACHABLE, null,
                         paket.getSender(),paket);
             }
         }
@@ -240,7 +240,7 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
             // dekrementiert, bevor diese Funktion aufgerufen
             // wird)
             // ICMP Timeout Expired In Transit (11/0) zuruecksenden:
-            sendeTimeExceededReply(icmpPaket.getSender(), icmpPaket.getSeqNr(), icmpPaket);
+            sendeTimeExceededReply(icmpPaket.getSender(), icmpPaket);
         } else {
             // TTL ist nicht abgelaufen.
             // Paket weiterleiten:
@@ -249,8 +249,8 @@ public class ICMP extends VermittlungsProtokoll implements I18n {
         }
     }
 
-    public void sendeTimeExceededReply(String replyRecipient, int seqNo, IpPaket paket) {
-        sendeICMP(TYPE_TIME_EXCEEDED, CODE_TTL_EXPIRED, seqNo, null, replyRecipient, paket);
+    public void sendeTimeExceededReply(String replyRecipient, IpPaket paket) {
+        sendeICMP(TYPE_TIME_EXCEEDED, CODE_TTL_EXPIRED, null, replyRecipient, paket);
     }
 
     /** method to actually send a ping and compute the pong event */

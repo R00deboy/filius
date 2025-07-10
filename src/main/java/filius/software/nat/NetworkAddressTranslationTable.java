@@ -35,8 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import filius.software.vermittlungsschicht.IcmpPaket;
-
 public class NetworkAddressTranslationTable {
     private static Logger LOG = LoggerFactory.getLogger(NetworkAddressTranslationTable.class);
 

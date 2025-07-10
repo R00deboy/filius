@@ -840,13 +840,13 @@ public class Terminal extends ClientAnwendung implements I18n {
         int receivedReplies = 0;
         int num;
         int loopNumber = Information.isPosixCommandLineToolBehaviour() ? 10 : 4;
-        for (num = 0; !interrupted && num < loopNumber; num++) {
+        for (num = 1; !interrupted && num <= loopNumber; num++) {
             try {
                 timeStart = System.currentTimeMillis();
-                IcmpPaket pingResponse = getSystemSoftware().holeICMP().startSinglePing(targetIp, identifier, num + 1);
+                IcmpPaket pingResponse = getSystemSoftware().holeICMP().startSinglePing(targetIp, identifier, num);
                 timeDiff = 1000 - (System.currentTimeMillis() - timeStart);
-                if (pingResponse.getTtl() >= 0) {
-                    benachrichtigeBeobachter("\nFrom " + pingResponse.getSender() + ": icmp_seq=" + (num + 1) + " ttl="
+                if (pingResponse.getTtl() >= 0 && pingResponse.getIdentifier() == identifier && pingResponse.getSeqNr() == num) {
+                    benachrichtigeBeobachter("\nFrom " + pingResponse.getSender() + ": icmp_seq=" + num + " ttl="
                             + pingResponse.getTtl() + " time=" + (System.currentTimeMillis() - timeStart) + "ms");
                     receivedReplies++;
                 }
@@ -858,12 +858,13 @@ public class Terminal extends ClientAnwendung implements I18n {
                 }
             } catch (java.util.concurrent.TimeoutException e) {
                 benachrichtigeBeobachter(
-                        "\nFrom " + args[0] + " (" + targetIp + "): icmp_seq=" + (num + 1) + "   -- Timeout!");
+                        "\nFrom " + args[0] + " (" + targetIp + "): icmp_seq=" + num + "   -- Timeout!");
             } catch (Exception e) {
                 LOG.debug("", e);
             }
         }
         // print statistics
+        num--;
         benachrichtigeBeobachter("\n--- " + args[0] + " " + messages.getString("sw_terminal_msg45") + " ---\n" + num
                 + " " + messages.getString("sw_terminal_msg46") + ", " + receivedReplies + " "
                 + messages.getString("sw_terminal_msg47") + ", "
@@ -985,9 +986,10 @@ public class Terminal extends ClientAnwendung implements I18n {
             for (int i = 0; i < 3 && !interrupted; i++) {
                 seqNr++;
                 recv = getSystemSoftware().holeICMP().sendProbe(destIP, ttl, identifier, seqNr);
-                if (recv != null && recv.getSeqNr() == seqNr) {
-                    fehler = 0;
-                    break;
+                if ((recv != null && recv.getSeqNr() == seqNr && recv.getIdentifier() == identifier) 
+                		|| (recv != null && recv.getSeqNr() == 0 && recv.getIdentifier() == 0 && ((IcmpPaket) recv.getPayload()).getSeqNr() == seqNr && ((IcmpPaket) recv.getPayload()).getIdentifier() == identifier)) {
+                	fehler = 0;
+                	break;
                 }
                 fehler++;
                 benachrichtigeBeobachter("* ");

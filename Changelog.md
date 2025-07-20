@@ -1,5 +1,10 @@
 # Changelog Filius
 
+## [2.9.4] - 2025-07-20
+### Fixed
+ * DHCP must work for WAN port on home router
+ * Changes on linux app meta information
+ 
 ## [2.9.3] - 2025-06-02
 ### Fixed
  * Fix layer visualization in French and English

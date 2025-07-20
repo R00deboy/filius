@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Filius
 Name[de]=Filius
-GenericName=Computer network simulator
-GenericName[de]=Computernetzwerk-Simulator
+GenericName=Computer Network Simulator
+GenericName[de]=Simulator Rechnernetze
 Comment=Learn how Computer Networks are built
 Comment[de]=Lernsoftware zu Rechnernetzen
 Exec=/usr/share/filius/filius.sh %f

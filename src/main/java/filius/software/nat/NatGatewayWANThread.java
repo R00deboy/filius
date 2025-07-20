@@ -25,17 +25,20 @@
  */
 package filius.software.nat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import filius.hardware.NetzwerkInterface;
 import filius.rahmenprogramm.I18n;
 import filius.rahmenprogramm.nachrichten.Lauscher;
 import filius.software.firewall.FirewallThread;
 import filius.software.netzzugangsschicht.EthernetFrame;
 import filius.software.system.SystemSoftware;
-import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 import filius.software.vermittlungsschicht.VermittlungsProtokoll;
 
 public class NatGatewayWANThread extends FirewallThread implements I18n {
+    private static Logger LOG = LoggerFactory.getLogger(NatGatewayWANThread.class);
     private NatGateway natGateway;
 
     private NetzwerkInterface lanNic;
@@ -53,23 +56,21 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
     @Override
     protected void verarbeiteDatenEinheit(EthernetFrame frame) {
         Lauscher.getLauscher().addDatenEinheit(wanNic, systemSoftware, frame);
-        boolean check = true;
+        boolean applyNATForwarding = true;
         if (frame.getDaten() instanceof IpPaket) {
             IpPaket packet = (IpPaket) frame.getDaten();
-            if ((packet instanceof IcmpPaket)) {
-            	if(((IcmpPaket) packet).isEchoRequest()) {
-            		natGateway.getSystemSoftware().holeICMP().sendEchoReply((IcmpPaket) packet);
-            		check = false;
-            	} else {
-                	check = (natGateway.eintragExistiert(packet));
-                }
-            } else {
-            	check = (natGateway.eintragExistiert(packet));
-            }
+            applyNATForwarding = natGateway.eintragExistiert(packet);
         }
-        if (!checkToLANAddress(frame) && !checkDiscardByFirewall(frame) && check) {
-            EthernetFrame modifiedFrame = modifyIncomingFrame(frame);
-            forwardFrame(modifiedFrame);
+        if (checkToLANAddress(frame)) {
+            LOG.debug("Discarded frame addressed to LAN address but received on WAN port: {}", frame);
+        } else if (checkDiscardByFirewall(frame)) {
+            LOG.debug("Discarded frame by firewall: {}", frame);
+        } else {
+            if (applyNATForwarding) {
+                forwardFrame(modifyIncomingFrame(frame));
+            } else {
+                forwardFrame(frame);
+            }
         }
     }
 

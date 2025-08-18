@@ -319,10 +319,16 @@ public class GatewayFirmware extends InternetKnotenBetriebssystem {
         }
 
         eintrag.add(ausgabe);
-        eintrag.add("" + mappedPort);
+        if (prot == IcmpPaket.ICMP_PROTOCOL)
+        	eintrag.add("0 (Identifier: " + mappedPort +")");
+        else 
+        	eintrag.add("" + mappedPort);
         eintrag.add(wanAddress);
         eintrag.add(lanAddress);
-        eintrag.add("" + lanPort);
+        if (prot == IcmpPaket.ICMP_PROTOCOL)
+        	eintrag.add("0 (Identifier: " + lanPort +")");
+        else 
+        	eintrag.add("" + lanPort);
         if (update == null) {
             eintrag.add("-");
         } else {

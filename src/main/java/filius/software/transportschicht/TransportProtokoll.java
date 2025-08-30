@@ -44,9 +44,9 @@ import filius.software.system.InternetKnotenBetriebssystem;
 public abstract class TransportProtokoll extends Protokoll implements I18n, Runnable {
     private static Logger LOG = LoggerFactory.getLogger(TransportProtokoll.class);
 
-    private static final int PORT_UNTERE_GRENZE = 1024;
+    private static final int PORT_UNTERE_GRENZE = 49_152;
 
-    private static final int PORT_OBERE_GRENZE = 65535;
+    private static final int PORT_OBERE_GRENZE = 65_535;
 
     protected static final int TTL = 64;
 

@@ -120,8 +120,8 @@ public class IpPaket extends ProtocolDataUnit implements Cloneable {
     }
 
     public String toString() {
-        return "[" + "ttl=" + ttl + ", " + "protocol=" + protocol + ", " + "empfaenger=" + empfaenger + ", " + "sender="
-                + sender + ", " + "identification=" + identification + "]";
+        return "[" + "id=" + identification + ", " + "ttl=" + ttl + ", " + "protocol=" + protocol + ", " + "dest=" + empfaenger + ", " + "src="
+                + sender + "]";
     }
 
     public void decrementTtl() {

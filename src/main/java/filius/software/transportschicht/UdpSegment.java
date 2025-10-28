@@ -40,4 +40,9 @@ public class UdpSegment extends Segment implements Serializable {
     public void setLaenge(int laenge) {
         this.laenge = laenge;
     }
+    
+    public String toString() {
+    	return "[" + "src=" + getQuellPort() + ", " + "dest=" + getZielPort() + ", " + "length=" + laenge + ", " 
+    				+ "checksum=" + getPruefSumme() + (getDaten() != null ? ", " + "data=" + getDaten() : "") + "]";
+    }
 }

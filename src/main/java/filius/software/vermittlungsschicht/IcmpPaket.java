@@ -128,8 +128,8 @@ public class IcmpPaket extends IpPaket {
     }
 
     public String toString() {
-        return "[" + "sender=" + getSender() + "; " + "recipient=" + getEmpfaenger() + "; " + "ttl=" + getTtl() + "; "
-                + "identifier=" + identifier + "; " + "seqNr=" + seqNr + "; " + "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + ", "
-                + "identification=" + getIdentification() + "]";
+        return "[" + "id=" + getIdentification() + "; " + "ttl=" + getTtl() + "; " + "protocol="+ getProtocol() +"; " + "sender=" + getSender() + "; " + "target=" + getEmpfaenger() + "; "
+        		+ "icmpType=" + icmpType + "; " + "icmpCode=" + icmpCode + "; "+ "identifier=" + identifier + "; " + "seqNr=" + seqNr + 
+        		(payload != null? ", " + "payload:" + payload : "") + "]";
     }
 }

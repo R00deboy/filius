@@ -108,7 +108,7 @@ public abstract class ProtokollThread<T extends ProtocolDataUnit> extends Thread
         if (!running) {
             running = true;
             if (getState().equals(State.WAITING) || getState().equals(State.BLOCKED)) {
-                // LOG.debug(getClass()+"\n\tProtokollThread: Thread laeuft bereits.");
+                LOG.debug("ProtokollThread: Thread laeuft bereits.");
             } else {
                 start();
             }

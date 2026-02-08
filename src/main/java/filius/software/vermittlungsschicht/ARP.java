@@ -151,7 +151,7 @@ public class ARP extends VermittlungsProtokoll {
      * @author Thomas Gerding
      * @param maxRetries
      * @param selectNicByAddress
-     * @param ipAdresse
+     * @param zielIp
      * @return MAC Adresse, zu der die IP Adresse gehoert, oder null, wenn keine MAC-Adresse bestimmt werden konnte
      */
     public String holeARPTabellenEintrag(String zielIp, int maxRetries, boolean selectNicByAddress) {
@@ -160,8 +160,10 @@ public class ARP extends VermittlungsProtokoll {
             return ((InternetKnotenBetriebssystem) holeSystemSoftware()).primaryMACAddress();
         }
         if (holeSystemSoftware() instanceof InternetKnotenBetriebssystem) {
-            if (zielIp.equals(((InternetKnotenBetriebssystem) holeSystemSoftware()).primaryIPAdresse())) {
-                return ((InternetKnotenBetriebssystem) holeSystemSoftware()).primaryMACAddress();
+            for (NetzwerkInterface nic : ((InternetKnotenBetriebssystem) holeSystemSoftware()).allNetworkInterfaces()) {
+                if (zielIp.equals(nic.getIp())) {
+                    return nic.getMac();
+                }
             }
         }
         // Eintrag in ARP-Tabelle fuer gesuchte IP-Adresse?

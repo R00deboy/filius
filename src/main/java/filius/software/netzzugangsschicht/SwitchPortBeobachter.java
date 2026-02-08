@@ -80,8 +80,8 @@ public class SwitchPortBeobachter extends ProtokollThread<EthernetFrame> {
 
         if (!switchFirmware.holeDurchgelaufeneFrames().contains(etp)) {
             switchFirmware.holeDurchgelaufeneFrames().add(etp);
-            Date letztes_update = new Date();
-            switchFirmware.hinzuSatEintrag(etp.getQuellMacAdresse(), anschluss, letztes_update);
+            Date lastUpdate = new Date();
+            switchFirmware.hinzuSatEintrag(etp.getQuellMacAdresse(), anschluss, lastUpdate);
 
             Port zielAnschluss = switchFirmware.holeAnschlussFuerMAC(etp.getZielMacAdresse());
             if (zielAnschluss != null) {

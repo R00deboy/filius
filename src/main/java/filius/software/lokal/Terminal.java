@@ -25,13 +25,7 @@
  */
 package filius.software.lokal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -779,7 +773,7 @@ public class Terminal extends ClientAnwendung implements I18n {
      * 'ping' command to check connectivity via ICMP echo request/reply
      */
     public String ping(String[] args) {
-        LOG.debug("ping with params: {}", args.toString());
+        LOG.debug("ping with params: {}", Arrays.toString(args));
 
         String target = null;
         boolean enableBroadcast = false;
@@ -840,7 +834,7 @@ public class Terminal extends ClientAnwendung implements I18n {
         int receivedReplies = 0;
         int num;
         int loopNumber = Information.isPosixCommandLineToolBehaviour() ? 10 : 4;
-        for (num = 1; !interrupted && num <= loopNumber; num++) {
+        for (num = 1; !interrupted && num <= loopNumber && running; num++) {
             try {
                 timeStart = System.currentTimeMillis();
                 IcmpPaket pingResponse = getSystemSoftware().holeICMP().startSinglePing(targetIp, identifier, num);

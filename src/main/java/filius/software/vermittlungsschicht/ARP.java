@@ -45,6 +45,7 @@ import filius.software.system.SystemSoftware;
  */
 public class ARP extends VermittlungsProtokoll {
     private static Logger LOG = LoggerFactory.getLogger(ARP.class);
+    private boolean running = false;
 
     /**
      * Die ARP-Tabelle als Hashtabelle. Als Schluessel wird die IP-Adresse verwendet. Der zugehoerige Wert ist ein
@@ -70,6 +71,7 @@ public class ARP extends VermittlungsProtokoll {
     public void starten() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (ARP), starten()");
         resetArpTable();
+        running = true;
         thread = new ARPThread(this);
         thread.starten();
     }
@@ -83,6 +85,7 @@ public class ARP extends VermittlungsProtokoll {
 
     public void beenden() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (ARP), beenden()");
+        running = false;
         if (thread != null)
             thread.beenden();
     }
@@ -167,7 +170,7 @@ public class ARP extends VermittlungsProtokoll {
             return ((String[]) arpEntry)[0];
         } else {
             // ARP-Broadcast und warte auf Antwort
-            for (int i = 0; arpEntry == null && i < maxRetries; i++) {
+            for (int i = 0; arpEntry == null && i < maxRetries && running; i++) {
                 if (!sendeARPBroadcast(zielIp, selectNicByAddress)) {
                     LOG.debug("No ARP request sent. No applicable NIC.");
                 } else {

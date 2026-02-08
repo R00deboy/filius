@@ -201,8 +201,6 @@ public class TCPSocket extends Socket implements Runnable {
      * Der Konstruktor ist <b> nicht blockierend</b>.
      * 
      * @param betriebssystem
-     * @param zielAdresse
-     * @param zielPort
      * @throws VerbindungsException
      */
     public TCPSocket(InternetKnotenBetriebssystem betriebssystem, int lokalerPort) throws VerbindungsException {

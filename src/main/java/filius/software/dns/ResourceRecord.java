@@ -1,9 +1,9 @@
 /*
  ** This file is part of Filius, a network construction and simulation software.
- ** 
+ **
  ** Originally created at the University of Siegen, Institute "Didactics of
  ** Informatics and E-Learning" by a students' project group:
- **     members (2006-2007): 
+ **     members (2006-2007):
  **         André Asschoff, Johannes Bade, Carsten Dittich, Thomas Gerding,
  **         Nadja Haßler, Ernst Johannes Klebert, Michell Weyer
  **     supervisors:
@@ -14,12 +14,12 @@
  ** it under the terms of the GNU General Public License as published by
  ** the Free Software Foundation, either version 2 of the License, or
  ** (at your option) version 3.
- ** 
+ **
  ** Filius is distributed in the hope that it will be useful,
  ** but WITHOUT ANY WARRANTY; without even the implied
  ** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  ** PURPOSE. See the GNU General Public License for more details.
- ** 
+ **
  ** You should have received a copy of the GNU General Public License
  ** along with Filius.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import filius.rahmenprogramm.EingabenUeberpruefung;
+
+import static filius.rahmenprogramm.EingabenUeberpruefung.*;
 
 /**
  * <b> Resource record format </b> <br />
@@ -59,7 +61,9 @@ public class ResourceRecord {
     public static final String ADDRESS = "A", MAIL_EXCHANGE = "MX", NAME_SERVER = "NS";
     public static ResourceRecord LOCALHOST_ADDRESS = new ResourceRecord("localhost", ADDRESS, "127.0.0.1");
 
-    /** NAME a domain name to which this resource record pertains. */
+    /**
+     * NAME a domain name to which this resource record pertains.
+     */
     private String domainname = "";
 
     /**
@@ -83,7 +87,7 @@ public class ResourceRecord {
 
     public ResourceRecord(String domainname, String typ, String rdata) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (ResourceRecord), constr: ResourceRecord("
-                + domainname + "," + typ + "," + rdata + ")");
+            + domainname + "," + typ + "," + rdata + ")");
         setDomainname(domainname);
         this.type = typ;
         setRdata(rdata);
@@ -92,13 +96,12 @@ public class ResourceRecord {
     /**
      * Ein Konstruktor, der aus einem String, der durch den Aufruf der Methode toString() erzeugt wurde, wieder einen
      * Resource-Record erstellt.
-     * 
-     * @param nachricht
-     *            ein String, der durch die Methode toString() erstellt wurde
+     *
+     * @param rr ein String, der durch die Methode toString() erstellt wurde
      */
     public ResourceRecord(String rr) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (ResourceRecord), constr: ResourceRecord(" + rr
-                + ")");
+            + ")");
         StringTokenizer tokenizer;
         String token;
 
@@ -130,6 +133,20 @@ public class ResourceRecord {
         }
     }
 
+    public boolean isValid() {
+        boolean valid = true;
+        switch (this.type) {
+            case ADDRESS:
+                valid = isGueltig(domainname, musterDomain) && isGueltig(rdata, musterIpAdresse);
+                break;
+            case MAIL_EXCHANGE:
+            case NAME_SERVER:
+                valid = isGueltig(domainname, musterDomain) && isGueltig(rdata, musterDomain);
+                break;
+        }
+        return valid;
+    }
+
     /**
      * Diese Methode liefert einen Resource Record als String zurueck. Methode zum Abruf eines Resource Record. Das
      * Rueckgabeformat ist NAME TYPE CLASS TTL RDATA (Bsp. web.de. A IN 3600 217.72.195.42)
@@ -146,11 +163,10 @@ public class ResourceRecord {
     }
 
     /**
-     * @param domainname
-     *            the domainname to set
+     * @param domainname the domainname to set
      */
     public void setDomainname(String domainname) {
-        if (EingabenUeberpruefung.isGueltig(domainname, EingabenUeberpruefung.musterDomain)) {
+        if (isGueltig(domainname, musterDomain)) {
             if (domainname.matches(".*\\.$")) {
                 this.domainname = domainname;
             } else {
@@ -170,8 +186,7 @@ public class ResourceRecord {
     }
 
     /**
-     * @param rdata
-     *            the rdata to set
+     * @param rdata the rdata to set
      */
     public void setRdata(String rdata) {
         if ((this.type.equals(NAME_SERVER) || this.type.equals(MAIL_EXCHANGE)) && !rdata.matches(".*\\.")) {
@@ -183,13 +198,10 @@ public class ResourceRecord {
 
     /**
      * Find the exact matching record for given domain and type.
-     * 
-     * @param domainname
-     *            the domainname to look for in field domainname of the resource record
-     * @param typ
-     *            one of A, NS, MX
-     * @param recordList
-     *            the list to search in
+     *
+     * @param domainname the domainname to look for in field domainname of the resource record
+     * @param typ        one of A, NS, MX
+     * @param recordList the list to search in
      * @return the resource record or null if no applicable record could be found
      */
     public static ResourceRecord findRecord(String domainname, String typ, List<ResourceRecord> recordList) {
@@ -203,13 +215,10 @@ public class ResourceRecord {
 
     /**
      * Find the exact matching records for given domain and type.
-     * 
-     * @param domainname
-     *            the domainname to look for in field domainname of the resource record
-     * @param typ
-     *            one of A, NS, MX
-     * @param recordList
-     *            the list to search in
+     *
+     * @param domainname the domainname to look for in field domainname of the resource record
+     * @param typ        one of A, NS, MX
+     * @param recordList the list to search in
      * @return the resource record list, emty if no applicable record could be found
      */
     public static List<ResourceRecord> findRecords(String domainname, String typ, List<ResourceRecord> recordList) {
@@ -224,7 +233,7 @@ public class ResourceRecord {
 
     /**
      * Find the best matching NS record for the given domain.
-     * 
+     *
      * @return the resource record or null if no applicable record could be found
      */
     public static ResourceRecord findApplicableNSRecord(String domainname, List<ResourceRecord> recordList) {
@@ -264,8 +273,7 @@ public class ResourceRecord {
     }
 
     /**
-     * @param ttl
-     *            the ttl to set
+     * @param ttl the ttl to set
      */
     public void setTtl(int ttl) {
         this.ttl = ttl;
@@ -279,8 +287,7 @@ public class ResourceRecord {
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(String type) {
         this.type = type;

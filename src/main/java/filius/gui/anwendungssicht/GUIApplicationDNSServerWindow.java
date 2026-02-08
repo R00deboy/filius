@@ -46,6 +46,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
@@ -93,6 +95,15 @@ public class GUIApplicationDNSServerWindow extends GUIApplicationWindow {
                 new ImageIcon(getClass().getResource("/gfx/desktop/peertopeer_netzwerk_klein.png")), createMXPanel());
         tabbedPane.addTab(messages.getString("dnsserver_msg15"),
                 new ImageIcon(getClass().getResource("/gfx/desktop/peertopeer_netzwerk_klein.png")), createNSPanel());
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent changeEvent) {
+                LOG.trace(changeEvent.toString());
+                aRecordsTable.apply();
+                nsRecordsTable.apply();
+                mxRecordsTable.apply();
+            }
+        });
         Box hBox = Box.createHorizontalBox();
         hBox.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         hBox.add(tabbedPane);

@@ -46,6 +46,7 @@ public class DNSServer extends UDPServerAnwendung {
 
     private boolean recursiveResolutionEnabled = false;
     private Resolver resolver;
+    private List<ResourceRecord> cachedRrList;
 
     public boolean isRecursiveResolutionEnabled() {
         return recursiveResolutionEnabled;
@@ -59,7 +60,6 @@ public class DNSServer extends UDPServerAnwendung {
         super();
         LOG.trace("INVOKED-2 (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + " (DNSServer), constr: DNSServer()");
-
         setPort(53);
     }
 
@@ -67,6 +67,7 @@ public class DNSServer extends UDPServerAnwendung {
     public void setSystemSoftware(InternetKnotenBetriebssystem bs) {
         super.setSystemSoftware(bs);
         resolver = ((InternetKnotenBetriebssystem) bs).holeDNSClient();
+        cachedRrList = leseRecordListe();
     }
 
     public void starten() {
@@ -75,12 +76,9 @@ public class DNSServer extends UDPServerAnwendung {
 
         Dateisystem dateisystem = getSystemSoftware().getDateisystem();
         if (!dateisystem.dateiVorhanden(Dateisystem.FILE_SEPARATOR + "dns", "hosts")) {
-            dateisystem.erstelleVerzeichnis(dateisystem.getRoot(), "dns");
-            Datei hostsFile = new Datei();
-            hostsFile.setName("hosts");
-            hostsFile.setDateiInhalt("");
-            dateisystem.speicherDatei(Dateisystem.FILE_SEPARATOR + "dns", hostsFile);
+            schreibeRecordListe(cachedRrList);
         }
+        cachedRrList = leseRecordListe();
     }
 
     public void beenden() {
@@ -98,9 +96,8 @@ public class DNSServer extends UDPServerAnwendung {
         ResourceRecord rr;
 
         rr = new ResourceRecord(domainname, typ, rdata);
-        List<ResourceRecord> rrList = leseRecordListe();
-        rrList.add(rr);
-        this.schreibeRecordListe(rrList);
+        cachedRrList.add(rr);
+        this.schreibeRecordListe(cachedRrList);
     }
 
     private List<ResourceRecord> leseRecordListe() {
@@ -118,7 +115,11 @@ public class DNSServer extends UDPServerAnwendung {
                 String line = tokenizer.nextToken().trim();
                 if (!line.equals("") && !(line.split(" ", 5).length < 4)) {
                     ResourceRecord rr = new ResourceRecord(line);
-                    resourceRecords.add(rr);
+                    if (rr.isValid()) {
+                        resourceRecords.add(rr);
+                    } else {
+                        LOG.debug("Ignore invalid resource record: " + line);
+                    }
                 }
             }
         }
@@ -150,23 +151,22 @@ public class DNSServer extends UDPServerAnwendung {
     public void changeSingleEntry(int recordIdx, int partIdx, String type, String newValue) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", changeSingleEntry(" + recordIdx + "," + partIdx
                 + "," + type + "," + newValue + ")");
-        List<ResourceRecord> rrList = leseRecordListe();
         int countA = 0;
         // iterating whole list is necessary, since MX and A records are mixed
         // in the records list! :-(
-        for (ResourceRecord rrec : rrList) {
+        for (ResourceRecord rrec : cachedRrList) {
             if (rrec.getType().equals(type)) {
                 countA++;
             }
             if (countA - 1 == recordIdx) {
-                if (partIdx == 0) { // change URL
+                if (partIdx == 0) {
                     rrec.setDomainname(newValue);
-                } else if (partIdx == 3) { // change IP
+                } else if (partIdx == 3) {
                     rrec.setRdata(newValue);
                 }
             }
         }
-        this.schreibeRecordListe(rrList);
+        this.schreibeRecordListe(cachedRrList);
         benachrichtigeBeobachter(type);
     }
 

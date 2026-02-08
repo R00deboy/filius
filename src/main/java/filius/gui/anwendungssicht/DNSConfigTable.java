@@ -49,9 +49,8 @@ public class DNSConfigTable extends JExtendedTable {
 
     public void editingStopped(ChangeEvent e) {
         TableCellEditor editor = getCellEditor();
-        if (editor != null) {
-            String value = (String) editor.getCellEditorValue();
-            value = value.trim();
+        if (null != editor && null != editor.getCellEditorValue()) {
+            String value = editor.getCellEditorValue().toString().trim();
             DNSServer dnsServer = (DNSServer) ((GUIApplicationDNSServerWindow) parentGUI).holeAnwendung();
             boolean validChange;
             if (typeID != null && typeID.equals("A")) {
@@ -97,5 +96,12 @@ public class DNSConfigTable extends JExtendedTable {
 
     public String getType() {
         return this.typeID;
+    }
+
+    public void apply() {
+        TableCellEditor editor = getCellEditor();
+        if (null != editor) {
+            editor.stopCellEditing();
+        }
     }
 }

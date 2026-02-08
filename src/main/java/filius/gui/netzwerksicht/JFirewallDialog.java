@@ -241,6 +241,7 @@ public class JFirewallDialog extends JDialog implements I18n {
 
         defaultPolicyCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                LOG.trace("Action listener on default policy combo box is triggered be event '{}'", e.getID());
                 firewall.setDefaultPolicy(stringToPolicy((String) defaultPolicyCombo.getSelectedItem()));
                 updateRuleTable();
             }

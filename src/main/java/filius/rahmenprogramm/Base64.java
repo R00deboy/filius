@@ -769,8 +769,7 @@ public class Base64 {
             sbiCrop = (byte) (source[i] & 0x7f); // Only the low seven bits
             sbiDecode = DECODABET[sbiCrop];
 
-            if (sbiDecode >= WHITE_SPACE_ENC) // White space, Equals sign or
-                                              // better
+            if (sbiDecode >= WHITE_SPACE_ENC) // White space, Equals sign or better
             {
                 if (sbiDecode >= EQUALS_SIGN_ENC) {
                     b4[b4Posn++] = sbiCrop;
@@ -787,7 +786,8 @@ public class Base64 {
 
             } // end if: white space, equals sign or better
             else {
-                LOG.error("Bad Base64 input character at " + i + ": " + source[i] + "(decimal)");
+                LOG.debug("Invalid Base64 input character at " + i + ": decimal=" + source[i] + " / char="
+                        + (char) source[i]);
                 return null;
             } // end else:
         } // each input character
@@ -806,7 +806,11 @@ public class Base64 {
      * @since 1.4
      */
     public static byte[] decode(String s) {
-        return decode(s, NO_OPTIONS);
+        byte[] decodedBytes = decode(s, NO_OPTIONS);
+        if (null == decodedBytes) {
+            LOG.debug("Could not decode string: {}", s);
+        }
+        return decodedBytes;
     }
 
     /**

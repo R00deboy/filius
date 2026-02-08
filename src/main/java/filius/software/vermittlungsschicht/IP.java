@@ -226,7 +226,7 @@ public class IP extends VermittlungsProtokoll implements I18n {
             // Es muss ein ICMP Destination Unreachable: Host Unreachable
             // (3/1) zurueckgesendet werden:
             bs.holeICMP().sendeICMP(ICMP.TYPE_DESTINATION_UNREACHABLE, ICMP.CODE_DEST_HOST_UNREACHABLE,
-                    paket.getSender());
+                    paket.getSender(),paket);
         }
     }
 
@@ -283,7 +283,7 @@ public class IP extends VermittlungsProtokoll implements I18n {
         InternetKnotenBetriebssystem bs = (InternetKnotenBetriebssystem) holeSystemSoftware();
 
         if (paket.getTtl() <= 1) {
-            bs.holeICMP().sendeICMP(ICMP.TYPE_TIME_EXCEEDED, ICMP.CODE_TTL_EXPIRED, paket.getSender());
+            bs.holeICMP().sendeICMP(ICMP.TYPE_TIME_EXCEEDED, ICMP.CODE_TTL_EXPIRED, paket.getSender(),paket);
         } else {
             try {
                 Route route = bs.determineRoute(paket.getEmpfaenger());
@@ -292,7 +292,7 @@ public class IP extends VermittlungsProtokoll implements I18n {
                 sendeUnicast(packetClone, route);
             } catch (RouteNotFoundException e) {
                 bs.holeICMP().sendeICMP(ICMP.TYPE_DESTINATION_UNREACHABLE, ICMP.CODE_DEST_NETWORK_UNREACHABLE,
-                        paket.getSender());
+                        paket.getSender(),paket);
                 bs.benachrichtigeBeobacher(messages.getString("sw_ip_msg4") + " \"" + bs.getKnoten().getName() + "\"!\n"
                         + messages.getString("sw_ip_msg5") + " " + paket.getEmpfaenger() + " "
                         + messages.getString("sw_ip_msg6"));

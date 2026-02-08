@@ -148,4 +148,11 @@ public class TcpSegment extends Segment implements Serializable {
     public void setWindow(int window) {
         this.window = window;
     }
+    
+    public String toString() {
+    	return "[" + "src=" + getQuellPort() + ", " + "dest=" + getZielPort() + ", " + "seq=" + seqNummer + ", " + "ack=" + ackNummer + ", " 
+    				+ "offset=" + dataOffset + ", " + "reserved=" + reservedField + ", " + "urg=" + urg + ", " + "ack=" + ack + ", " + "psh=" + psh + ", " 
+    				+ "rst=" + rst + ", " + "syn=" + syn + ", " + "fin=" + fin + ", " + "window=" + window+ ", " + "checksum=" + getPruefSumme() + ", " 
+    				+ "urgent=" + urgentPointer +  (getDaten() != null ? ", " + "data=" + getDaten() : "") + "]";
+    }
 }

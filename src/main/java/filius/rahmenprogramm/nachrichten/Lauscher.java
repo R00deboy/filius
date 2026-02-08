@@ -432,8 +432,11 @@ public class Lauscher implements I18n {
                                     + icmpPaket.getIcmpCode();
                             break;
                         }
-                        neuerEintrag[6] = neuerEintrag[6] + ", TTL: " + icmpPaket.getTtl() + ", Seq.-No.: "
+                        neuerEintrag[6] = neuerEintrag[6] + ", TTL: " + icmpPaket.getTtl() +", Identifier: "+ icmpPaket.getIdentifier() +", Seq.-No.: "
                                 + icmpPaket.getSeqNr();
+                        if (icmpPaket.getPayload() != null) {
+                        	neuerEintrag[6] += ", Payload: " + icmpPaket.getPayload().toString();
+                        }
 
                         daten.addElement(neuerEintrag);
                     }

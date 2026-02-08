@@ -59,7 +59,16 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
         boolean applyNATForwarding = true;
         if (frame.getDaten() instanceof IpPaket) {
             IpPaket packet = (IpPaket) frame.getDaten();
-            applyNATForwarding = natGateway.eintragExistiert(packet);
+            if ((packet instanceof IcmpPaket)) {
+            	if(((IcmpPaket) packet).isEchoRequest()) {
+            		natGateway.getSystemSoftware().holeICMP().sendEchoReply((IcmpPaket) packet);
+            		check = false;
+            	} else if(((IcmpPaket) packet).isEchoResponse()) {
+                	check = (natGateway.eintragExistiert(packet));
+                } // da ICMP-Fehlermeldungen immer weitergeleitet werden gibt es keine Überprüfung, ob ein passender Eintrag in der NAT existiert.
+            } else {
+            	check = (natGateway.eintragExistiert(packet));
+            }
         }
         if (checkToLANAddress(frame)) {
             LOG.debug("Discarded frame addressed to LAN address but received on WAN port: {}", frame);

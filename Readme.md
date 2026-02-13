@@ -56,7 +56,7 @@ jdeps -recursive --ignore-missing-deps --multi-release base --print-module-deps 
 The output contains some warnings and the following required modules:
 
 ```
-java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.sql,java.xml.crypto,jdk.unsupported
+java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.net.http,java.prefs,java.sql,java.xml.crypto,jdk.jfr,jdk.unsupported,jdk.xml.dom
 ```
 
 Additionally, the following runtime dependencies are required in order to use the Software Assistant for application compilation at runtime in Filius:
@@ -67,7 +67,7 @@ Additionally, the following runtime dependencies are required in order to use th
 The bundled JRE (if available) is built with the following command:
 
 ```
-jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.base,java.desktop,java.instrument,java.management,java.naming,java.sql,java.xml.crypto,jdk.unsupported,java.compiler,jdk.compiler,jdk.zipfs --output java-runtime
+jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.net.http,java.prefs,java.sql,java.xml.crypto,jdk.jfr,jdk.unsupported,jdk.xml.dom,jdk.compiler,jdk.zipfs --output java-runtime
 ```
 
 ## Generate Documentation

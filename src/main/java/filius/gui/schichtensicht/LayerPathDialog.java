@@ -36,7 +36,7 @@ public class LayerPathDialog extends JDialog implements I18n {
         // set size and positioning properties of outer JDialog
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(screenSize.width / 6, screenSize.height / 6);
-        int dialogWidth = LOCAL_LAYER_PATH_PANEL.getSizeOfMessageDetailsTable().width;
+        int dialogWidth = LOCAL_LAYER_PATH_PANEL.getSizeOfMessageDetailsTable().width + 30;
         int dialogHeight = LOCAL_LAYER_PATH_PANEL.getSizeOfMessageDetailsTable().height
                 + LOCAL_LAYER_PATH_PANEL.getDefaultDividerLocation() + 100;
         setPreferredSize(new Dimension(dialogWidth, dialogHeight));

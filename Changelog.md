@@ -1,16 +1,21 @@
 # Changelog Filius
+
+## [2.10.1] - 2026-02-15
+### Fixed
+ * Layer visualization under Windows was broken
+
 ## [2.10.0] - 2026-02-14
-## New
+### Added
  * Introduced identifier and payload in ICMP to support advanced NAT features
  * Show identifier and payload in network traffic viewer
  * Show identifier in NAT table of home router
  * New and improved example files
  * For Windows: embedded Java updated to OpenJDK 25
 
-## Changed
+### Changed
  * Use the correct port range for ephemeral ports (49152 to 65535)
 
-## Fixed
+### Fixed
  * Stop data transfer for ARP and Ping in case of mode switch
  * Update icon cache for debian post installation
  * Concurrent editing of different DNS record types more stable

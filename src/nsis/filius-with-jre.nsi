@@ -36,7 +36,7 @@
 !insertmacro MUI_UNPAGE_INSTFILES
 
 ; Language files
-!insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "English"
 
 ; MUI end ------
 
@@ -69,9 +69,11 @@ Section "Filius" SEC01
   File "Changelog.md"
   File "Readme.md"
   SetOutPath "$INSTDIR"
-  File "Einfuehrung_Filius.pdf"
   CreateDirectory "$SMPROGRAMS\Filius"
-  CreateShortCut "$SMPROGRAMS\Filius\Filius Einfuehrung.lnk" "$INSTDIR\Einfuehrung_Filius.pdf" 
+  File "Einfuehrung_Filius.pdf"
+  CreateShortCut "$SMPROGRAMS\Filius\Filius Einfuehrung.lnk" "$INSTDIR\Einfuehrung_Filius.pdf"
+  File "Introduction_Filius.pdf"
+  CreateShortCut "$SMPROGRAMS\Filius\Filius Introduction.lnk" "$INSTDIR\Introduction_Filius.pdf"
   File "Filius.exe"
   CreateShortCut "$SMPROGRAMS\Filius\Filius.lnk" "$INSTDIR\Filius.exe"
   CreateShortCut "$SMPROGRAMS\Filius\Filius Info.lnk" "$INSTDIR\project-info.html"
@@ -113,12 +115,12 @@ SectionEnd
 
 Function un.onUninstSuccess
   HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) wurde erfolgreich deinstalliert." /SD IDOK
+  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) has been successfully uninstalled." /SD IDOK
 FunctionEnd
 
 Function un.onInit
 !insertmacro MUI_UNGETLANGUAGE
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Sie sind dabei $(^Name) und alle seinen Komponenten zu entfernen. Fortfahren?" /SD IDYES IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "You are removing $(^Name) and all its components. Continue?" /SD IDYES IDYES +2
   Abort
 FunctionEnd
 

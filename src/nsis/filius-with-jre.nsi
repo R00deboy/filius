@@ -17,11 +17,6 @@
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
-; Language Selection Dialog Settings
-!define MUI_LANGDLL_REGISTRY_ROOT "${PRODUCT_UNINST_ROOT_KEY}"
-!define MUI_LANGDLL_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
-!define MUI_LANGDLL_REGISTRY_VALUENAME "NSIS:Language"
-
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
@@ -37,6 +32,8 @@
 
 ; Language files
 !insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "French"
 
 ; MUI end ------
 
@@ -57,7 +54,7 @@ Function RefreshShellIcons
 FunctionEnd
 
 Function .onInit
-  !insertmacro MUI_LANGDLL_DISPLAY
+  ;!insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
 
 Section "Filius" SEC01
@@ -119,7 +116,7 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit
-!insertmacro MUI_UNGETLANGUAGE
+;!insertmacro MUI_UNGETLANGUAGE
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "You are removing $(^Name) and all its components. Continue?" /SD IDYES IDYES +2
   Abort
 FunctionEnd
@@ -129,7 +126,9 @@ Section Uninstall
 
   Delete "$SMPROGRAMS\Filius\www.lernsoftware-filius.de.lnk"
   Delete "$SMPROGRAMS\Filius\Filius.lnk"
-  Delete "$SMPROGRAMS\Filius\Filius.pdf.lnk"
+  Delete "$SMPROGRAMS\Filius\Filius Einfuehrung.lnk"
+  Delete "$SMPROGRAMS\Filius\Filius Introduction.lnk"
+  Delete "$SMPROGRAMS\Filius\Filius Info.lnk"
 
   RMDir "$SMPROGRAMS\Filius"
   RMDir /r "$INSTDIR"

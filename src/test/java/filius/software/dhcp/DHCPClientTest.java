@@ -74,7 +74,7 @@ public class DHCPClientTest {
         assertThat(config.getIpAddress(), is(offeredIpAddress));
         assertThat(config.getDnsServer(), is(dnsServer));
         assertThat(config.getSubnetMask(), is(subnetMask));
-        assertThat(config.getRouter(), is(router));
+        assertThat(config.getGateway(), is(router));
         assertThat(config.getDhcpServer(), is(serverIdentifier));
     }
 
@@ -136,7 +136,7 @@ public class DHCPClientTest {
         assertThat(config.getIpAddress(), is(offeredIpAddress));
         assertThat(config.getDnsServer(), is(dnsServer));
         assertThat(config.getSubnetMask(), is(subnetMask));
-        assertThat(config.getRouter(), is(router));
+        assertThat(config.getGateway(), is(router));
         assertThat(config.getDhcpServer(), is(serverIdentifier));
     }
 

@@ -47,7 +47,7 @@ import filius.software.netzzugangsschicht.SwitchPortBeobachter;
 /**
  * Diese Klasse erweitert den Wert der HashMap für die SAT um einen Eintrag für das letzte Update.
  */
-class satEntry {
+class SatEntry {
 
     private Port port;
     private Date letztes_Update;
@@ -81,7 +81,7 @@ public class SwitchFirmware extends SystemSoftware implements I18n {
     /**
      * Die Source Address Tabel (SAT), in der die MAC-Adressen den physischen Anschluessen des Switch zugeordnet werden
      */
-    private ConcurrentHashMap<String, satEntry> sat = new ConcurrentHashMap<String, satEntry>();
+    private ConcurrentHashMap<String, SatEntry> sat = new ConcurrentHashMap<String, SatEntry>();
 
     /**
      * Liste der Anschlussbeobachter. Sie implementieren die Netzzugangsschicht.
@@ -116,7 +116,7 @@ public class SwitchFirmware extends SystemSoftware implements I18n {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (SwitchFirmware), starten()");
         SwitchPortBeobachter anschlussBeobachter;
 
-        sat = new ConcurrentHashMap<String, satEntry>();
+        sat = new ConcurrentHashMap<String, SatEntry>();
         switchBeobachter = new LinkedList<SwitchPortBeobachter>();
 
         for (Port anschluss : ((Switch) getKnoten()).getAnschluesse()) {
@@ -183,7 +183,7 @@ public class SwitchFirmware extends SystemSoftware implements I18n {
     public void hinzuSatEintrag(String macAdresse, Port anschluss, Date letztes_Update) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (SwitchFirmware), hinzuSatEintrag(" + macAdresse
                 + "," + anschluss + "," + letztes_Update + ")");
-        satEntry eintrag = new satEntry();
+        SatEntry eintrag = new SatEntry();
         eintrag.setPort(anschluss);
         eintrag.hinzuLetztesUpdate(letztes_Update);
         sat.put(macAdresse, eintrag);

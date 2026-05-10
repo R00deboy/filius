@@ -43,7 +43,7 @@ public class UDPSocket extends Socket {
     private static Logger LOG = LoggerFactory.getLogger(UDPSocket.class);
 
     /** Liste eingehender Segmente */
-    private LinkedList<UdpSegment> puffer = new LinkedList<UdpSegment>();
+    private final LinkedList<UdpSegment> puffer = new LinkedList<UdpSegment>();
 
     /**
      * Ob der Socket verbunden ist, d. h. Aufruf von verbinden() war erfolgreich und Socket wurde noch nicht durch
@@ -93,8 +93,6 @@ public class UDPSocket extends Socket {
      * 
      * @param betriebssystem
      * @param lokalerPort
-     * @param zielAdresse
-     * @param zielPort
      * @throws VerbindungsException
      */
     public UDPSocket(InternetKnotenBetriebssystem betriebssystem, int lokalerPort) throws VerbindungsException {
@@ -110,7 +108,7 @@ public class UDPSocket extends Socket {
      */
     @Override
     public void hinzufuegen(String startIp, int startPort, Segment segment) {
-        LOG.trace("UDP data received from " + startIp + ":" + startPort + ", data: " + segment);
+        LOG.debug("UDP data received from " + startIp + ":" + startPort + ", data: " + segment);
         zielIp = startIp;
         zielPort = startPort;
 
@@ -139,6 +137,7 @@ public class UDPSocket extends Socket {
                 }
             }
             if (puffer.size() >= 1) {
+                LOG.debug("UDP data received (local port {})", lokalerPort);
                 segment = (UdpSegment) puffer.removeFirst();
                 return segment.getDaten();
             } else {

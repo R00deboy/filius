@@ -138,8 +138,6 @@ public abstract class Socket implements SocketSchnittstelle, I18n {
      * Der Konstruktor ist <b> nicht blockierend</b>.
      * 
      * @param betriebssystem
-     * @param zielAdresse
-     * @param zielPort
      * @throws VerbindungsException
      */
     public Socket(InternetKnotenBetriebssystem betriebssystem, int lokalerPort, int transportProtokoll)

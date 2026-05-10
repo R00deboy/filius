@@ -95,7 +95,7 @@ public class SatViewer extends JDialog implements I18n, PropertyChangeListener {
         return sw;
     }
 
-    private void updateSat() {
+    private synchronized void updateSat() {
         dtm.setRowCount(0);
         for (Vector<String> zeile : ((SwitchFirmware) sw.getSystemSoftware()).holeSAT()) {
             dtm.addRow(zeile);

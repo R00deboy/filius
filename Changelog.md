@@ -1,5 +1,12 @@
 # Changelog Filius
 
+## [2.11.0] - 2026-05-10
+### Added
+* Use link-local addresses after unsuccessful DHCP retries
+
+### Changed
+* Windows installer uses os language for en/de/fr or en as default.
+
 ## [2.10.1] - 2026-02-15
 ### Fixed
  * Layer visualization under Windows was broken

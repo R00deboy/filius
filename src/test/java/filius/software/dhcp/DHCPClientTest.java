@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
+import filius.hardware.knoten.Rechner;
+import filius.software.system.InternetKnotenBetriebssystem;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -31,6 +33,8 @@ public class DHCPClientTest {
     @Mock
     private ARP arpMock;
     private long defaultSocketTimeoutMillis = 100;
+    @Mock
+    private InternetKnotenBetriebssystem betriebssystemMock;
 
     @Before
     public void initMocks() {
@@ -82,6 +86,7 @@ public class DHCPClientTest {
     public void testDiscover_NoResponse() throws Exception {
         String clientMacAddress = "01:23:45:67:89:AB";
         when(socketMock.empfangen(anyLong())).thenReturn(null);
+        when(betriebssystemMock.getKnoten()).thenReturn(new Rechner());
 
         dhcpClient.discover(socketMock, clientMacAddress, defaultSocketTimeoutMillis);
     }
@@ -154,6 +159,7 @@ public class DHCPClientTest {
                     dnsServer, serverIdentifier).toString();
         }
         when(socketMock.empfangen(anyLong())).thenReturn(messages[0], Arrays.copyOfRange(messages, 1, messages.length));
+        when(betriebssystemMock.getKnoten()).thenReturn(new Rechner());
 
         dhcpClient.discover(socketMock, clientMacAddress, defaultSocketTimeoutMillis);
     }
@@ -220,6 +226,7 @@ public class DHCPClientTest {
                     .createAckMessage("aa:aa:aa:aa:aa:aa", config.getIpAddress(), config.getDhcpServer()).toString();
         }
         when(socketMock.empfangen(anyLong())).thenReturn(messages[0], Arrays.copyOfRange(messages, 1, messages.length));
+        when(betriebssystemMock.getKnoten()).thenReturn(new Rechner());
 
         dhcpClient.request(socketMock, clientMacAddress, config, defaultSocketTimeoutMillis);
     }
@@ -229,6 +236,7 @@ public class DHCPClientTest {
         String clientMacAddress = "01:23:45:67:89:AB";
         IpConfig config = new IpConfig("1.2.3.4", "5.6.7.8", "255.255.255.128", "9.10.11.12", "13.14.15.16");
         when(socketMock.empfangen(anyLong())).thenReturn(null);
+        when(betriebssystemMock.getKnoten()).thenReturn(new Rechner());
 
         dhcpClient.request(socketMock, clientMacAddress, config, defaultSocketTimeoutMillis);
     }

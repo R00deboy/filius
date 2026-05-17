@@ -48,6 +48,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import filius.rahmenprogramm.Information;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,11 +82,15 @@ public class GUIApplicationTerminalWindow extends GUIApplicationWindow {
 
     private boolean multipleObserverEvents;
 
+    private int fontSize = 11;
+
     private ArrayList<String> commandHistory = new ArrayList<String>();
     private int commandHistoryPointer = -1;
 
     public GUIApplicationTerminalWindow(GUIDesktopPanel desktop, String appName) {
         super(desktop, appName);
+        fontSize = Information.getInformation().getTerminalFontSize();
+
         jobRunning = false;
         multipleObserverEvents = false;
 
@@ -94,7 +99,7 @@ public class GUIApplicationTerminalWindow extends GUIApplicationWindow {
         terminalField.setCaretColor(FOREGROUND);
         terminalField.setForeground(FOREGROUND);
         terminalField.setBackground(BACKGROUND);
-        terminalField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
+        terminalField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
         terminalField.setFocusable(false);
         terminalField.setBorder(null);
         terminalField.setLineWrap(true);
@@ -104,7 +109,7 @@ public class GUIApplicationTerminalWindow extends GUIApplicationWindow {
         inputLabel = new JLabel(">");
         inputLabel.setBackground(BACKGROUND);
         inputLabel.setForeground(FOREGROUND);
-        inputLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
+        inputLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
 
         Box terminalBox = Box.createHorizontalBox();
         terminalBox.setBackground(BACKGROUND);
@@ -160,7 +165,7 @@ public class GUIApplicationTerminalWindow extends GUIApplicationWindow {
         inputField.setForeground(FOREGROUND);
         inputField.setCaretColor(FOREGROUND);
         inputField.setBorder(null);
-        inputField.setFont(new Font("Courier New", Font.PLAIN, 11));
+        inputField.setFont(new Font("Courier New", Font.PLAIN, fontSize));
         inputField.setOpaque(false);
 
         inputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "doNothing");

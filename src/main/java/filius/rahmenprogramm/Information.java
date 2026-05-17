@@ -146,6 +146,8 @@ public class Information implements Serializable {
 
     private boolean layerVisualization = false;
 
+    private int terminalFontSize = 11;
+
     public boolean isLayerVisualization() {
         return layerVisualization;
     }
@@ -169,6 +171,8 @@ public class Information implements Serializable {
     private static String getHomeDir() {
         return System.getProperty("user.home");
     }
+
+    public int getTerminalFontSize() { return terminalFontSize; }
 
     /**
      * ensure a correct and well functioning path to write all necessary data
@@ -638,10 +642,14 @@ public class Information implements Serializable {
                                 } else if (configKey.equalsIgnoreCase("native-look-n-feel")) {
                                     if (configValue.trim().equals("1")) {
                                         Main.activateNativeLookAndFeel();
+                                    } else {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
                                     }
                                 } else if (configKey.equalsIgnoreCase("posix-behaviour")) {
                                     if (configValue.trim().equals("1")) {
                                         posixCommandLineToolBehaviour = true;
+                                    } else {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
                                     }
                                 } else if (configKey.equalsIgnoreCase("desktop-mode")) {
                                     desktopWindowMode = GUIDesktopWindow.Mode
@@ -651,6 +659,8 @@ public class Information implements Serializable {
                                         this.oldExchangeDialog = true;
                                     } else if (configValue.trim().equals("0")) {
                                         this.oldExchangeDialog = false;
+                                    } else {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
                                     }
                                 } else if (configKey.equalsIgnoreCase("software-wizard")) {
                                     if (configValue.trim().equals("1")) {
@@ -659,20 +669,40 @@ public class Information implements Serializable {
                                         softwareWizardMode = FeatureMode.FORCE_DISABLE;
                                     } else if (configValue.trim().equals("2")) {
                                         softwareWizardMode = FeatureMode.AUTO;
+                                    } else {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
                                     }
                                 } else if (configKey.equalsIgnoreCase("pane-width")) {
                                     try {
                                         width = Integer.parseInt(configValue);
-                                    } catch (NumberFormatException e) {}
+                                    } catch (NumberFormatException e) {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
+                                    }
                                 } else if (configKey.equalsIgnoreCase("pane-height")) {
                                     try {
                                         height = Integer.parseInt(configValue);
-                                    } catch (NumberFormatException e) {}
+                                    } catch (NumberFormatException e) {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
+                                    }
                                 } else if (configKey.equalsIgnoreCase("gateway")) {
                                     if (configValue.trim().equals("1")) {
                                         this.gatewayAvailable = true;
                                     } else if (configValue.trim().equals("0")) {
                                         this.gatewayAvailable = false;
+                                    } else {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
+                                    }
+                                } else if (configKey.equalsIgnoreCase("terminal-font-size")) {
+                                    int configSize = terminalFontSize;
+                                    try {
+                                        configSize = Integer.parseInt(configValue);
+                                    } catch (NumberFormatException e) {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
+                                    }
+                                    if (configSize >= 10 && configSize <= 20) {
+                                        terminalFontSize = configSize;
+                                    } else {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
                                     }
                                 }
                             }

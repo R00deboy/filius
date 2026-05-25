@@ -1,9 +1,9 @@
 /*
  ** This file is part of Filius, a network construction and simulation software.
- ** 
+ **
  ** Originally created at the University of Siegen, Institute "Didactics of
  ** Informatics and E-Learning" by a students' project group:
- **     members (2006-2007): 
+ **     members (2006-2007):
  **         André Asschoff, Johannes Bade, Carsten Dittich, Thomas Gerding,
  **         Nadja Haßler, Ernst Johannes Klebert, Michell Weyer
  **     supervisors:
@@ -14,22 +14,18 @@
  ** it under the terms of the GNU General Public License as published by
  ** the Free Software Foundation, either version 2 of the License, or
  ** (at your option) version 3.
- ** 
+ **
  ** Filius is distributed in the hope that it will be useful,
  ** but WITHOUT ANY WARRANTY; without even the implied
  ** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  ** PURPOSE. See the GNU General Public License for more details.
- ** 
+ **
  ** You should have received a copy of the GNU General Public License
  ** along with Filius.  If not, see <http://www.gnu.org/licenses/>.
  */
 package filius.software.www;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -61,14 +57,14 @@ import filius.software.transportschicht.TCPSocket;
  * </ol>
  * Diese Methoden haben keinen Rueckgabewert und blockieren auch nicht. Die vom Server gelieferten Daten werden an den
  * Beobachter als HTTPNachricht weitergegeben.
- * 
+ *
  */
 public class WebBrowser extends ClientAnwendung implements I18n {
     private static Logger LOG = LoggerFactory.getLogger(WebBrowser.class);
 
     private static final int ABRUF_HTML = 1, ABRUF_IMG = 2;
 
-    private LinkedList<String> bilddateien = new LinkedList<String>();
+    private final LinkedList<String> bilddateien = new LinkedList<String>();
 
     private String host;
 
@@ -84,10 +80,23 @@ public class WebBrowser extends ClientAnwendung implements I18n {
             ausfuehren("closeConnection", new Object[0]);
         }
 
-        ausfuehren("initConnection", new Object[] { url });
-        ausfuehren("retrieveWebpage", new Object[] { url, post });
+        clearImageCache();
+
+        ausfuehren("initConnection", new Object[]{url});
+        ausfuehren("retrieveWebpage", new Object[]{url, post});
         ausfuehren("retrieveImages", new Object[0]);
         ausfuehren("closeConnection", new Object[0]);
+    }
+
+    private void clearImageCache() {
+        synchronized (bilddateien) {
+            for (String bild : bilddateien) {
+                String cachedImage = getBrowserCachePath(bild);
+                new File(cachedImage).delete();
+            }
+            LOG.debug("image cache of browser with {} files cleared", bilddateien.size());
+            bilddateien.clear();
+        }
     }
 
     void initConnection(URL url) {
@@ -162,11 +171,6 @@ public class WebBrowser extends ClientAnwendung implements I18n {
         return host;
     }
 
-    public void starten() {
-        super.starten();
-        bilddateien = new LinkedList<String>();
-    }
-
     /**
      * liest eine reale Textdatei vom Format .txt ein. Diese befinden sich im Ordner /config
      */
@@ -214,7 +218,7 @@ public class WebBrowser extends ClientAnwendung implements I18n {
     /**
      * Methode zur Verarbeitung von IMG-Tags. Mit einem Parser werden IMG-Tags im uebergebenen Quelltext gesucht. Alle
      * Bilddateien werden in eine Liste geschrieben.
-     * 
+     *
      * @param quelltext
      * @param host
      */
@@ -223,7 +227,7 @@ public class WebBrowser extends ClientAnwendung implements I18n {
                 + " (WebBrowser), verarbeiteIMGTags(" + quelltext + "," + host + ")");
 
         Parser parser = Parser.createParser(quelltext, null);
-        TagFindingVisitor nodeVisitor = new TagFindingVisitor(new String[] { "img" });
+        TagFindingVisitor nodeVisitor = new TagFindingVisitor(new String[]{"img"});
         try {
             parser.visitAllNodesWith(nodeVisitor);
             Node[] nodes = nodeVisitor.getTags(0);
@@ -264,13 +268,8 @@ public class WebBrowser extends ClientAnwendung implements I18n {
                                         || HTTPNachricht.IMAGE_GIF.equalsIgnoreCase(contentType)
                                         || HTTPNachricht.IMAGE_JPG.equalsIgnoreCase(contentType)
                                         || HTTPNachricht.IMAGE_PNG.equalsIgnoreCase(contentType)) {
-                                    synchronized (bilddateien) {
-                                        if (bilddateien.size() > 0) {
-                                            dateipfad = bilddateien.removeFirst();
-                                            Base64.decodeToFile(response.getDaten(),
-                                                    Information.getInformation().getTempPfad() + dateipfad);
-                                        }
-                                    }
+                                    Base64.decodeToFile(response.getDaten(),
+                                            getBrowserCachePath(dateipfad));
                                     benachrichtigeBeobachter();
                                 }
                             }
@@ -283,6 +282,19 @@ public class WebBrowser extends ClientAnwendung implements I18n {
                 }
             }
         }
+    }
+
+    private String getBrowserCachePath(String filename) {
+        return getBrowserCacheDirectory() + filename;
+    }
+
+    public String getBrowserCacheDirectory() {
+        File cacheDir = new File(Information.getInformation().getTempPfad() + getSystemSoftware().primaryMACAddress());
+        if (!cacheDir.exists()) {
+            boolean success = cacheDir.mkdir();
+            LOG.debug("Created temp directory '{}' with result: {}", cacheDir, success);
+        }
+        return cacheDir.getAbsolutePath() + File.separator;
     }
 
     void closeConnection() {

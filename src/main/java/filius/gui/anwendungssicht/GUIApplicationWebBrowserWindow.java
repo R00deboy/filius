@@ -65,6 +65,8 @@ public class GUIApplicationWebBrowserWindow extends GUIApplicationWindow {
 
     private static final long serialVersionUID = 1L;
 
+    private WebBrowser webBrowser ;
+
     private JPanel browserPanel;
 
     private JTextField urlFeld;
@@ -75,7 +77,8 @@ public class GUIApplicationWebBrowserWindow extends GUIApplicationWindow {
 
     public GUIApplicationWebBrowserWindow(final GUIDesktopPanel desktop, String appName) {
         super(desktop, appName);
-        HTMLEditorKit ek;
+
+        webBrowser = (WebBrowser) holeAnwendung();
 
         browserPanel = new JPanel(new BorderLayout());
         add(browserPanel, BorderLayout.CENTER);
@@ -127,7 +130,7 @@ public class GUIApplicationWebBrowserWindow extends GUIApplicationWindow {
             public void keyTyped(KeyEvent arg0) {}
         });
 
-        ek = new HTMLEditorKit(); // Braucht er für SubmitEvent!
+        HTMLEditorKit ek = new HTMLEditorKit(); // Braucht er für SubmitEvent!
         ek.setAutoFormSubmission(false); // muss!
 
         anzeigeFeld = new JEditorPane();
@@ -138,17 +141,12 @@ public class GUIApplicationWebBrowserWindow extends GUIApplicationWindow {
                 + "<center><img src=\"browser_waterwolf_logo.png\" align=\"top\"></center>" + "</font>"
                 + "</body></html>");
 
-        // filius.rahmenprogramm.SzenarioVerwaltung.kopiereDatei(Information
-        // .getInformation().getProgrammPfad()
-        // + "gfx/desktop/browser_waterwolf_logo.png", Information
-        // .getInformation().getTempPfad()
-        // + "browser_waterwolf_logo.png");
         filius.rahmenprogramm.SzenarioVerwaltung.saveStream(
                 getClass().getResourceAsStream("/gfx/desktop/browser_waterwolf_logo.png"),
-                Information.getInformation().getTempPfad() + "browser_waterwolf_logo.png");
+                webBrowser.getBrowserCacheDirectory() + "browser_waterwolf_logo.png");
         try {
             ((HTMLDocument) anzeigeFeld.getDocument())
-                    .setBase(new URL("file:" + Information.getInformation().getTempPfad()));
+                    .setBase(new URL("file:" + webBrowser.getBrowserCacheDirectory()));
         } catch (MalformedURLException e1) {
             LOG.debug("", e1);
         }
@@ -210,12 +208,12 @@ public class GUIApplicationWebBrowserWindow extends GUIApplicationWindow {
 
         if (url != null) {
             if (postDaten == null) {
-                ((WebBrowser) holeAnwendung()).holeWebseite(url);
+                webBrowser.holeWebseite(url);
             } else {
-                ((WebBrowser) holeAnwendung()).holeWebseite(url, postDaten);
+                webBrowser.holeWebseite(url, postDaten);
             }
             if (url.getHost() == null || url.getHost().equals("")) {
-                host = ((WebBrowser) holeAnwendung()).holeHost();
+                host = webBrowser.holeHost();
             } else {
                 host = url.getHost();
             }

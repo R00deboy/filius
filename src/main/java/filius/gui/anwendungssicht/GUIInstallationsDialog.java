@@ -1,9 +1,9 @@
 /*
  ** This file is part of Filius, a network construction and simulation software.
- ** 
+ **
  ** Originally created at the University of Siegen, Institute "Didactics of
  ** Informatics and E-Learning" by a students' project group:
- **     members (2006-2007): 
+ **     members (2006-2007):
  **         André Asschoff, Johannes Bade, Carsten Dittich, Thomas Gerding,
  **         Nadja Haßler, Ernst Johannes Klebert, Michell Weyer
  **     supervisors:
@@ -14,12 +14,12 @@
  ** it under the terms of the GNU General Public License as published by
  ** the Free Software Foundation, either version 2 of the License, or
  ** (at your option) version 3.
- ** 
+ **
  ** Filius is distributed in the hope that it will be useful,
  ** but WITHOUT ANY WARRANTY; without even the implied
  ** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  ** PURPOSE. See the GNU General Public License for more details.
- ** 
+ **
  ** You should have received a copy of the GNU General Public License
  ** along with Filius.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -200,7 +200,7 @@ public class GUIInstallationsDialog extends GUIApplicationWindow implements I18n
             vLoeschen.add((String) lmVerfuegbar.get(i));
         }
 
-        for (Enumeration<String> e = vLoeschen.elements(); e.hasMoreElements();) {
+        for (Enumeration<String> e = vLoeschen.elements(); e.hasMoreElements(); ) {
             String oZuLoeschen = e.nextElement();
             lmVerfuegbar.removeElement(oZuLoeschen);
         }
@@ -215,7 +215,7 @@ public class GUIInstallationsDialog extends GUIApplicationWindow implements I18n
             hinzu.add((String) lmInstalliert.getElementAt(i));
         }
 
-        for (Enumeration<String> e = hinzu.elements(); e.hasMoreElements();) {
+        for (Enumeration<String> e = hinzu.elements(); e.hasMoreElements(); ) {
             String hinzuObjekt = e.nextElement();
             lmInstalliert.removeElement(hinzuObjekt);
         }
@@ -228,21 +228,14 @@ public class GUIInstallationsDialog extends GUIApplicationWindow implements I18n
         for (Map<String, String> appInfo : programme) {
             for (int i = 0; i < lmInstalliert.getSize(); i++) {
                 if (lmInstalliert.getElementAt(i).equals(appInfo.get("Anwendung"))
-                        && bs.holeSoftware(appInfo.get("Klasse").toString()) == null) {
+                    && bs.holeSoftware(appInfo.get("Klasse").toString()) == null) {
                     bs.installAppIfAvailable(appInfo.get("Klasse").toString());
-
-                    anwendung = bs.holeSoftware(appInfo.get("Klasse").toString());
-                    anwendung.starten();
                 }
             }
 
             for (int i = 0; i < lmVerfuegbar.getSize(); i++) {
                 if (lmVerfuegbar.getElementAt(i).equals(appInfo.get("Anwendung"))) {
-                    anwendung = bs.holeSoftware(appInfo.get("Klasse").toString());
-                    if (anwendung != null) {
-                        anwendung.beenden();
-                        bs.entferneSoftware(appInfo.get("Klasse").toString());
-                    }
+                    bs.entferneSoftware(appInfo.get("Klasse").toString());
                 }
             }
         }
@@ -250,5 +243,6 @@ public class GUIInstallationsDialog extends GUIApplicationWindow implements I18n
     }
 
     @Override
-    public void update(Observable arg0, Object arg1) {}
+    public void update(Observable arg0, Object arg1) {
+    }
 }

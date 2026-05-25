@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import filius.software.clientserver.ServerAnwendung;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -403,13 +404,15 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
                 + " (InternetKnotenBetriebssystem), entferneSoftware(" + awKlasse + ")");
         printInstallierteAnwendungen(); // DEBUG
         boolean entfernt = false;
-        Iterator it = installierteAnwendung.entrySet().iterator();
-
-        while (it.hasNext() && !entfernt) {
-            if (awKlasse.equals((String) ((Entry) it.next()).getKey())) {
-                it.remove();
-                entfernt = true;
+        Anwendung app = installierteAnwendung.get(awKlasse);
+        if (app != null) {
+            if (app instanceof ServerAnwendung) {
+                ((ServerAnwendung)app).setAktiv(false);
             }
+            app.beenden();
+            installierteAnwendung.remove(awKlasse);
+            LOG.info("Anwendung " + awKlasse + " entfernt.");
+            entfernt = true;
         }
         return entfernt;
     }
@@ -459,28 +462,12 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
             Anwendung neueAnwendung = (Anwendung) cl.getConstructor().newInstance();
             neueAnwendung.setSystemSoftware(this);
             installierteAnwendung.put(klassenname, neueAnwendung);
+            neueAnwendung.starten();
         } catch (Exception e) {
             LOG.debug("App could not be instantiated. Probably because class could not be found.", e);
             erfolg = false;
         }
         return erfolg;
-    }
-
-    public boolean deinstalliereAnwendung(String anwendungsName) {
-        LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (InternetKnotenBetriebssystem), deinstalliereAnwendung(" + anwendungsName + ")");
-        printInstallierteAnwendungen(); // DEBUG
-        Anwendung anwendung;
-
-        if (anwendungsName == null)
-            return false;
-        anwendung = (Anwendung) installierteAnwendung.get(anwendungsName);
-        if (anwendung == null) {
-            return false;
-        } else {
-            installierteAnwendung.remove(anwendung.holeAnwendungsName());
-            return true;
-        }
     }
 
     /**

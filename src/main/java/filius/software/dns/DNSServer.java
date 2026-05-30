@@ -257,15 +257,15 @@ public class DNSServer extends UDPServerAnwendung {
     public void loescheResourceRecord(String domainname, String typ) {
         LOG.trace("INVOKED (" + this.hashCode() + ", T" + this.getId() + ") " + getClass()
                 + " (DNSServer), loescheResourceRecord(" + domainname + "," + typ + ")");
-        List<ResourceRecord> rrList = leseRecordListe();
+        cachedRrList = leseRecordListe();
 
-        for (ResourceRecord rr : rrList) {
+        for (ResourceRecord rr : cachedRrList) {
             if (rr.getDomainname().equalsIgnoreCase(domainname) && rr.getType().equals(typ)) {
-                rrList.remove(rr);
+                cachedRrList.remove(rr);
                 break;
             }
         }
-        this.schreibeRecordListe(rrList);
+        this.schreibeRecordListe(cachedRrList);
     }
 
     protected void neuerMitarbeiter(Socket socket) {

@@ -2,13 +2,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>filius</groupId>
 	<artifactId>filius</artifactId>
-	<version>2.11.0</version>
+	<version>2.12.0</version>
 	<inceptionYear>2007</inceptionYear>
 	<properties>
-		<buildDate>10.05.2026</buildDate>
+		<buildDate>06.06.2026</buildDate>
 		<publisher>Stefan Freischlad</publisher>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<junit.version>4.10</junit.version>
+		<junit.version>4.13</junit.version>
 		<mockito.version>4.11.0</mockito.version>
 		<fest.version>1.4</fest.version>
 		<htmlparser.version>2.1</htmlparser.version>
@@ -113,7 +113,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>7.0.4</version>
+			<version>7.0.7</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -294,7 +294,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.9.0</version>
 				<reportSets>
 					<reportSet>
 						<reports>
@@ -366,7 +366,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.2</version>
+						<version>3.6.3</version>
 						<executions>
 							<execution>
 								<id>create installer</id>

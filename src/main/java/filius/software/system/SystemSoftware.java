@@ -41,9 +41,8 @@ import filius.hardware.knoten.Knoten;
  * (Endsysteme und Uebertragungseinheiten) zur Verfuegung stehen muss. <br />
  * Die Klasse ist abstrakt und wird fuer die verschiedenen Stationen unterschiedlich implementiert.
  */
-@SuppressWarnings("serial")
 public abstract class SystemSoftware extends Observable implements Serializable {
-    private static Logger LOG = LoggerFactory.getLogger(SystemSoftware.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SystemSoftware.class);
 
     /** Die Hardware, auf der diese Systemsoftware laeuft. */
     private Knoten hardware;
@@ -107,6 +106,7 @@ public abstract class SystemSoftware extends Observable implements Serializable 
      * 
      * @deprecated Use firePropertyChanged based on the {@link PropertyChangeSupport} mechanism instead.
      */
+    @Deprecated
     public void benachrichtigeBeobacher(Object o) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + " (SystemSoftware), benachrichtigeBeobachter(" + o
                 + ")");

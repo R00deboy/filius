@@ -1,9 +1,9 @@
 /*
  ** This file is part of Filius, a network construction and simulation software.
- ** 
+ **
  ** Originally created at the University of Siegen, Institute "Didactics of
  ** Informatics and E-Learning" by a students' project group:
- **     members (2006-2007): 
+ **     members (2006-2007):
  **         André Asschoff, Johannes Bade, Carsten Dittich, Thomas Gerding,
  **         Nadja Haßler, Ernst Johannes Klebert, Michell Weyer
  **     supervisors:
@@ -14,12 +14,12 @@
  ** it under the terms of the GNU General Public License as published by
  ** the Free Software Foundation, either version 2 of the License, or
  ** (at your option) version 3.
- ** 
+ **
  ** Filius is distributed in the hope that it will be useful,
  ** but WITHOUT ANY WARRANTY; without even the implied
  ** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  ** PURPOSE. See the GNU General Public License for more details.
- ** 
+ **
  ** You should have received a copy of the GNU General Public License
  ** along with Filius.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,10 +35,11 @@ import filius.rahmenprogramm.Information;
 import filius.software.vermittlungsschicht.IP;
 
 public class NetzwerkInterface implements Serializable {
-    private static Logger LOG = LoggerFactory.getLogger(NetzwerkInterface.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetzwerkInterface.class);
 
-    private static final long serialVersionUID = 1L;
-    /** The node that the interface belongs to */
+    /**
+     * The node that the interface belongs to
+     */
     private InternetKnoten node;
     private String mac;
     private String ip;
@@ -50,7 +51,7 @@ public class NetzwerkInterface implements Serializable {
 
     public NetzwerkInterface() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (NetzwerkInterface), constr: NetzwerkInterface()");
+            + " (NetzwerkInterface), constr: NetzwerkInterface()");
         setMac(Information.getInformation().holeFreieMACAdresse());
         // set initial IP address to the same value for all new devices
         // QUESTION: Is this actually wanted for educational reasons?
@@ -68,10 +69,6 @@ public class NetzwerkInterface implements Serializable {
     public NetzwerkInterface(InternetKnoten node) {
         this();
         this.node = node;
-    }
-
-    private InternetKnoten getNode() {
-        return this.node;
     }
 
     /**
@@ -94,7 +91,6 @@ public class NetzwerkInterface implements Serializable {
     // e.printStackTrace();
     // }
     // }
-
     public Port getPort() {
         return anschluss;
     }
@@ -105,7 +101,7 @@ public class NetzwerkInterface implements Serializable {
 
     /**
      * IP-Adresse des DNS-Servers, der zur Aufloesung von Domainnamen verwendet wird.
-     * 
+     * <p>
      * NOTE: die IP-Adresse des DNS-Servers ist kein Parameter des Netzwerk-Interfaces, wird aber aus Gruenden der
      * Kompatibilitaet hier verwaltet. Jedes Netzwerk-Interface der gleichen Komponente sollte hier den gleichen Wert
      * haben!
@@ -116,11 +112,12 @@ public class NetzwerkInterface implements Serializable {
 
     /**
      * IP-Adresse des DNS-Servers, der zur Aufloesung von Domainnamen verwendet wird.
-     * 
+     *
      * @deprecated die IP-Adresse des DNS-Servers ist kein Parameter des Netzwerk-Interfaces, wird aber aus Gruenden der
-     *             Kompatibilitaet hier verwaltet. Jedes Netzwerk-Interface der gleichen Komponente sollte hier den
-     *             gleichen Wert haben!
+     * Kompatibilitaet hier verwaltet. Jedes Netzwerk-Interface der gleichen Komponente sollte hier den
+     * gleichen Wert haben!
      */
+    @Deprecated
     public void setDns(String dns) {
         this.dns = dns;
     }
@@ -155,7 +152,7 @@ public class NetzwerkInterface implements Serializable {
     /**
      * IP-Adresse des Standard-Gateways. Dorthin werden alle Pakete gesendet, fuer dessen Zieladresse kein anderer
      * Eintrag in der Weiterleitungstabelle vorhanden ist.
-     * 
+     * <p>
      * NOTE: die IP-Adresse des Standard-Gateways ist kein Parameter des Netzwerk-Interfaces, wird aber aus Gruenden der
      * Kompatibilitaet hier verwaltet. Jedes Netzwerk-Interface der gleichen Komponente sollte hier den gleichen Wert
      * haben!
@@ -167,11 +164,12 @@ public class NetzwerkInterface implements Serializable {
     /**
      * IP-Adresse des Standard-Gateways. Dorthin werden alle Pakete gesendet, fuer dessen Zieladresse kein anderer
      * Eintrag in der Weiterleitungstabelle vorhanden ist.
-     * 
+     *
      * @deprecated die IP-Adresse des Standard-Gateways ist kein Parameter des Netzwerk-Interfaces, wird aber aus
-     *             Gruenden der Kompatibilitaet hier verwaltet. Jedes Netzwerk-Interface der gleichen Komponente sollte
-     *             hier den gleichen Wert haben!
+     * Gruenden der Kompatibilitaet hier verwaltet. Jedes Netzwerk-Interface der gleichen Komponente sollte
+     * hier den gleichen Wert haben!
      */
+    @Deprecated
     public void setGateway(String gateway) {
         this.gateway = gateway;
     }

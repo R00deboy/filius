@@ -1,5 +1,15 @@
 # Changelog Filius
 
+## [2.12.0] - 2026-06-06
+### Added
+* Configurable font size for terminal (in filius.ini) as experimental feature
+
+### Fixed
+* Uninstall of apps requires release of resources (e.g. port of active webserver)
+* DNS entries re-appeared after removal because of internal cache handling
+* One browser cache for all computers leads to unexpected behavior
+* Internal list of web browser of required resources was not reset and caused wrong http requests
+
 ## [2.11.0] - 2026-05-10
 ### Added
 * Use link-local addresses after unsuccessful DHCP retries

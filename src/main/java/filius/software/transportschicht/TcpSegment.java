@@ -148,6 +148,24 @@ public class TcpSegment extends Segment implements Serializable {
     public void setWindow(int window) {
         this.window = window;
     }
+
+    @Override
+    public TcpSegment clone() {
+        TcpSegment clone = new TcpSegment();
+        clone.ack = ack;
+        clone.ackNummer = ackNummer;
+        clone.dataOffset = dataOffset;
+        clone.seqNummer = seqNummer;
+        clone.urg = urg;
+        clone.psh = psh;
+        clone.rst = rst;
+        clone.syn = syn;
+        clone.fin = fin;
+        clone.window = window;
+        clone.urgentPointer = urgentPointer;
+        clone.copySegmentAttributes(this);
+        return clone;
+    }
     
     public String toString() {
     	return "[" + "src=" + getQuellPort() + ", " + "dest=" + getZielPort() + ", " + "seq=" + seqNummer + ", " + "ack=" + ackNummer + ", " 

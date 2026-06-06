@@ -76,7 +76,7 @@ public class IpPaket extends ProtocolDataUnit implements Cloneable {
         clone.ttl = ttl;
         clone.empfaenger = empfaenger;
         clone.sender = sender;
-        clone.data = data;
+        clone.data = data.clone();
     }
 
     public String getEmpfaenger() {

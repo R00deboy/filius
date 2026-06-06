@@ -161,7 +161,7 @@ public class Lauscher implements I18n {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass() + ", addDatenEinheit(" + interfaceId + "," + frame
                 + ")");
         if (!frame.isReadByLauscherForMac(interfaceId)) {
-            Object[] frameMitZeitstempel = frameWithTimestamp(frame);
+            Object[] frameMitZeitstempel = frameWithTimestamp(frame.clone());
 
             LinkedList<Object[]> liste = (LinkedList<Object[]>) datenEinheiten.get(interfaceId);
             if (liste == null) {
@@ -187,7 +187,7 @@ public class Lauscher implements I18n {
     protected Object[] frameWithTimestamp(EthernetFrame frame) {
         Object[] frameMitZeitstempel = new Object[2];
         frameMitZeitstempel[0] = Long.valueOf(System.currentTimeMillis());
-        frameMitZeitstempel[1] = frame.clone();
+        frameMitZeitstempel[1] = frame;
         return frameMitZeitstempel;
     }
 

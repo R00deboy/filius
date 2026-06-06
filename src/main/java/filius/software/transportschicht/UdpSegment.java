@@ -40,6 +40,14 @@ public class UdpSegment extends Segment implements Serializable {
     public void setLaenge(int laenge) {
         this.laenge = laenge;
     }
+
+    @Override
+    public UdpSegment clone() {
+        UdpSegment clone = new UdpSegment();
+        clone.laenge = laenge;
+        clone.copySegmentAttributes(this);
+        return clone;
+    }
     
     public String toString() {
     	return "[" + "src=" + getQuellPort() + ", " + "dest=" + getZielPort() + ", " + "length=" + laenge + ", " 

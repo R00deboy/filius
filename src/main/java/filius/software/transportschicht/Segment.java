@@ -28,7 +28,7 @@ package filius.software.transportschicht;
 import filius.software.ProtocolDataUnit;
 
 @SuppressWarnings("serial")
-public class Segment extends ProtocolDataUnit {
+public abstract class Segment extends ProtocolDataUnit {
 
     private int quellPort;
     private int zielPort;
@@ -65,5 +65,14 @@ public class Segment extends ProtocolDataUnit {
 
     public void setZielPort(int zielPort) {
         this.zielPort = zielPort;
+    }
+
+    public abstract Segment clone();
+
+    public void copySegmentAttributes(Segment segment) {
+        daten = segment.daten;
+        quellPort = segment.quellPort;
+        zielPort = segment.zielPort;
+        pruefSumme = segment.pruefSumme;
     }
 }

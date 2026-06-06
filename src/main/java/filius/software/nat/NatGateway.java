@@ -1,9 +1,9 @@
 /*
  ** This file is part of Filius, a network construction and simulation software.
- ** 
+ **
  ** Originally created at the University of Siegen, Institute "Didactics of
  ** Informatics and E-Learning" by a students' project group:
- **     members (2006-2007): 
+ **     members (2006-2007):
  **         André Asschoff, Johannes Bade, Carsten Dittich, Thomas Gerding,
  **         Nadja Haßler, Ernst Johannes Klebert, Michell Weyer
  **     supervisors:
@@ -14,12 +14,12 @@
  ** it under the terms of the GNU General Public License as published by
  ** the Free Software Foundation, either version 2 of the License, or
  ** (at your option) version 3.
- ** 
+ **
  ** Filius is distributed in the hope that it will be useful,
  ** but WITHOUT ANY WARRANTY; without even the implied
  ** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  ** PURPOSE. See the GNU General Public License for more details.
- ** 
+ **
  ** You should have received a copy of the GNU General Public License
  ** along with Filius.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,9 +46,9 @@ public class NatGateway extends Firewall implements I18n {
     protected void initFirewallThreads() {
         Gateway gateway = (Gateway) getSystemSoftware().getKnoten();
         addAndStartThread(new NatGatewayLANThread(this, gateway.holeLANInterface(), gateway.holeWANInterface(),
-                this.betriebssystem));
+            this.betriebssystem));
         addAndStartThread(new NatGatewayWANThread(this, gateway.holeWANInterface(), gateway.holeLANInterface(),
-                this.betriebssystem));
+            this.betriebssystem));
         LOG.debug("Threads for WAN and LAN nic are started on {}", gateway.getName());
     }
 
@@ -57,9 +57,9 @@ public class NatGateway extends Firewall implements I18n {
         Gateway gateway = (Gateway) getSystemSoftware().getKnoten();
         if (!natTable.hasConnection(lanAddress)) {
             if (protocol == IpPaket.TCP) {
-            	wanPort = getSystemSoftware().holeTcp().reserviereFreienPort();
+                wanPort = getSystemSoftware().holeTcp().reserviereFreienPort();
             } else if (protocol == IpPaket.UDP) {
-            	wanPort = getSystemSoftware().holeUdp().reserviereFreienPort();
+                wanPort = getSystemSoftware().holeUdp().reserviereFreienPort();
             }
             LOG.debug("New connection in NAT table: protocol={}, port={}, address={}", protocol, wanPort, lanAddress);
             natTable.addDynamic(wanPort, wanIpAddress, protocol, lanAddress, NatType.DynamicEntry);
@@ -70,60 +70,65 @@ public class NatGateway extends Firewall implements I18n {
 
     public void replaceSource(IpPaket packet) {
         Gateway gateway = (Gateway) getSystemSoftware().getKnoten();
+        int newSourcePort = 0, oldSourcePort = 0;
         if (packet.getProtocol() == IpPaket.TCP || packet.getProtocol() == IpPaket.UDP) {
-            InetAddress lanAddress = new InetAddress(packet.getSender(), packet.getSegment().getQuellPort(),
-                    packet.getProtocol());
-            int port = natTable.findPort(lanAddress);
-            packet.getSegment().setQuellPort(port);
+            oldSourcePort = packet.getSegment().getQuellPort();
+            InetAddress lanAddress = new InetAddress(packet.getSender(), oldSourcePort,
+                packet.getProtocol());
+            newSourcePort = natTable.findPort(lanAddress);
+            packet.getSegment().setQuellPort(newSourcePort);
         }
-        packet.setSender(gateway.holeWANInterface().getIp());
+        String newSourceAddress = gateway.holeWANInterface().getIp();
+        LOG.debug("NAT substitution SOURCE (protocol={}): {}->{} / {}->{}", packet.getProtocol(), packet.getSender(), newSourceAddress, oldSourcePort, newSourcePort);
+        packet.setSender(newSourceAddress);
     }
 
     public void replaceDestination(IpPaket packet) {
-    	int protocol = packet.getProtocol();
-    	int port = 0;
+        int protocol = packet.getProtocol();
+        int port = 0;
         String sender = "";
-        if ((protocol == IpPaket.TCP)||(protocol == IpPaket.UDP)){
-        	port = packet.getSegment().getZielPort();
-        	sender = packet.getSender();
+        if ((protocol == IpPaket.TCP) || (protocol == IpPaket.UDP)) {
+            port = packet.getSegment().getZielPort();
+            sender = packet.getSender();
         } else if (protocol == IcmpPaket.ICMP_PROTOCOL) {
-        	if (((IcmpPaket) packet).getPayload() != null) {
-        		IpPaket payload = ((IcmpPaket) packet).getPayload();
-        		sender = payload.getEmpfaenger();
-        		if (payload instanceof IcmpPaket) {
-        			port = ((IcmpPaket) payload).getIdentifier();
-        		} else {
-        			port = payload.getSegment().getQuellPort();
-        		}
-        		protocol = payload.getProtocol();
-        	} else {
-        		port = ((IcmpPaket)packet).getIdentifier();
-        		sender = packet.getSender();
-        	}
+            if (((IcmpPaket) packet).getPayload() != null) {
+                IpPaket payload = ((IcmpPaket) packet).getPayload();
+                sender = payload.getEmpfaenger();
+                if (payload instanceof IcmpPaket) {
+                    port = ((IcmpPaket) payload).getIdentifier();
+                } else {
+                    port = payload.getSegment().getQuellPort();
+                }
+                protocol = payload.getProtocol();
+            } else {
+                port = ((IcmpPaket) packet).getIdentifier();
+                sender = packet.getSender();
+            }
         }
         InetAddress dest = natTable.find(port, sender, protocol);
-    	protocol = packet.getProtocol();
+        protocol = packet.getProtocol();
         Gateway gateway = (Gateway) getSystemSoftware().getKnoten();
         ((GatewayFirmware) gateway.getSystemSoftware()).fireNATPropertyChange();
         if (dest != null) {
+            LOG.debug("NAT substitution dest (protocol={}): {}->{} / {}->{}", protocol, packet.getEmpfaenger(), dest.getIpAddress(), port, dest.getPort());
             packet.setEmpfaenger(dest.getIpAddress());
             if (packet.getProtocol() == IpPaket.TCP || packet.getProtocol() == IpPaket.UDP) {
                 packet.getSegment().setZielPort(dest.getPort());
             } else {
-            	port = PSEUDO_PORT_ICMP;
+                port = PSEUDO_PORT_ICMP;
             }
         }
     }
-    
+
     public NetworkAddressTranslationTable getNATTable() {
-    	return natTable;
+        return natTable;
     }
-    
+
     public boolean eintragExistiert(IpPaket packet) {
-    	int protocol = packet.getProtocol();
-    	int port = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
-                ? packet.getSegment().getZielPort()
-                : ((IcmpPaket) packet).getIdentifier();
-    	return (natTable.find(port, packet.getSender(), protocol)) == null? false: true;
+        int protocol = packet.getProtocol();
+        int port = (protocol == IpPaket.TCP || protocol == IpPaket.UDP)
+            ? packet.getSegment().getZielPort()
+            : ((IcmpPaket) packet).getIdentifier();
+        return (natTable.find(port, packet.getSender(), protocol)) == null ? false : true;
     }
 }

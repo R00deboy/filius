@@ -1,5 +1,9 @@
 # Changelog Filius
 
+## [2.12.1] - 2026-06-08
+### Fixed
+* Null pointer exception in case of ICMP 
+
 ## [2.12.0] - 2026-06-06
 ### Added
 * Configurable font size for terminal (in filius.ini) as experimental feature

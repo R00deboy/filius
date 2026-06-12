@@ -1,5 +1,11 @@
 # Changelog Filius
 
+## [2.12.2] - 2026-06-12
+### Fixed
+* Fix web browser for host os Windows
+* Fix initialization of NAT gateway
+* Make start-up more robust in case of corrupted settings file
+
 ## [2.12.1] - 2026-06-08
 ### Fixed
 * Null pointer exception in case of ICMP 

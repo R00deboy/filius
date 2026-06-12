@@ -427,7 +427,7 @@ public class Information implements Serializable {
 
     private String holeAnwendungenDateipfad() {
         String pfad = "config/Desktop";
-        File desktopResource = ResourceUtil.getResourceFile(pfad + "_" + locale.toString() + ".txt");
+        File desktopResource = ResourceUtil.getResourceFile(pfad + "_" + getLocaleOrDefault().toString() + ".txt");
         return desktopResource.getAbsolutePath();
     }
 

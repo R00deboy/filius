@@ -100,11 +100,11 @@ public class GatewayFirmware extends InternetKnotenBetriebssystem {
         LOG.trace("INVOKED-2 (" + this.hashCode() + ") " + getClass()
                 + " (VermittlungsrechnerBetriebssystem), constr: VermittlungsrechnerBetriebssystem()");
         setIpForwardingEnabled(true);
-        initialisiereAnwendungen();
     }
 
     public void setKnoten(Knoten gateway) {
         super.setKnoten(gateway);
+        initialisiereAnwendungen();
         getDHCPServer().bindAddress(List.of(((Gateway) gateway).holeLANInterface()));
     }
 

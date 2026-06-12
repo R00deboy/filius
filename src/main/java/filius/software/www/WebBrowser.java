@@ -289,7 +289,7 @@ public class WebBrowser extends ClientAnwendung implements I18n {
     }
 
     public String getBrowserCacheDirectory() {
-        File cacheDir = new File(Information.getInformation().getTempPfad() + getSystemSoftware().primaryMACAddress());
+        File cacheDir = new File(Information.getInformation().getTempPfad() + getSystemSoftware().primaryMACAddress().replace(":", "_"));
         if (!cacheDir.exists()) {
             boolean success = cacheDir.mkdir();
             LOG.debug("Created temp directory '{}' with result: {}", cacheDir, success);

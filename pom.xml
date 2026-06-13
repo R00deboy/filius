@@ -512,9 +512,9 @@
 										</data>
 										<data>
 											<src>
-												${project.basedir}/src/deb/filius32.png</src>
+												${project.basedir}/src/deb/filius.png</src>
 											<type>file</type>
-											<dst>/usr/share/icons/hicolor/32x32/filius.png</dst>
+											<dst>/usr/share/icons/hicolor/96x96/filius.png</dst>
 										</data>
 										<data>
 											<src>

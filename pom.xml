@@ -512,9 +512,21 @@
 										</data>
 										<data>
 											<src>
-												${project.basedir}/src/deb/filius.png</src>
+												${project.basedir}/src/deb/icons/hicolor/32x32/apps/filius.png</src>
 											<type>file</type>
-											<dst>/usr/share/icons/hicolor/96x96/filius.png</dst>
+											<dst>/usr/share/icons/hicolor/32x32/apps/filius.png</dst>
+										</data>
+										<data>
+											<src>
+												${project.basedir}/src/deb/icons/hicolor/64x64/apps/filius.png</src>
+											<type>file</type>
+											<dst>/usr/share/icons/hicolor/64x64/apps/filius.png</dst>
+										</data>
+										<data>
+											<src>
+												${project.basedir}/src/deb/icons/hicolor/96x96/apps/filius.png</src>
+											<type>file</type>
+											<dst>/usr/share/icons/hicolor/96x96/apps/filius.png</dst>
 										</data>
 										<data>
 											<src>

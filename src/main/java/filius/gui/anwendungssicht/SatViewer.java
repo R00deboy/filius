@@ -48,7 +48,7 @@ import filius.software.system.SwitchFirmware;
 @SuppressWarnings("serial")
 public class SatViewer extends JDialog implements I18n, PropertyChangeListener {
 
-    private Switch sw;
+    private final Switch sw;
     private DefaultTableModel dtm;
 
     public SatViewer(Switch sw) {
@@ -59,7 +59,7 @@ public class SatViewer extends JDialog implements I18n, PropertyChangeListener {
     }
 
     private void init() {
-        setBounds(100, 100, 400, 280);
+        resetSizeAndPosition();
 
         ImageIcon icon = new ImageIcon(getClass().getResource("/gfx/hardware/switch.png"));
         setIconImage(icon.getImage());
@@ -91,6 +91,12 @@ public class SatViewer extends JDialog implements I18n, PropertyChangeListener {
         getContentPane().add(spSAT);
     }
 
+    public void resetSizeAndPosition() {
+        this.setSize(400, 280);
+        setLocation(getParent().getX() + (getParent().getWidth() - getWidth()) / 2,
+            getParent().getY() + (getParent().getHeight() - getHeight()) / 2);
+    }
+
     public Switch getSwitch() {
         return sw;
     }
@@ -104,7 +110,7 @@ public class SatViewer extends JDialog implements I18n, PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName() == "sat_entry") {
+        if ("sat_entry".equals(evt.getPropertyName())) {
             updateSat();
         }
     }

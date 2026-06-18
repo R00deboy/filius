@@ -132,6 +132,12 @@ public class JConnectionsDialog extends JDialog implements I18n {
         this.internetSwitch = internetSwitch;
         initComponents();
 
+        // positioning and size
+        setSize(550, 580);
+        setResizable(true);
+        setLocation(getParent().getX() + (getParent().getWidth() - getWidth()) / 2,
+            getParent().getY() + (getParent().getHeight() - getHeight()) / 2);
+
         updateAll();
     }
 
@@ -238,7 +244,7 @@ public class JConnectionsDialog extends JDialog implements I18n {
         // upperCompound.setBackground(Color.GREEN);
         upperCompound.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         upperCompound.setLayout(new BoxLayout(upperCompound, BoxLayout.X_AXIS));
-        upperCompound.setPreferredSize(new Dimension(700, 360));
+        upperCompound.setPreferredSize(new Dimension(500, 360));
 
         initRemoteInterfaces();
         initLocalInterfaces();
@@ -261,11 +267,11 @@ public class JConnectionsDialog extends JDialog implements I18n {
         usageNote.setLineWrap(true);
         usageNote.setWrapStyleWord(true);
         usageNote.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-        usageNote.setSize(new Dimension(700, 200));
+        usageNote.setSize(new Dimension(500, 200));
         // usageNote.setBorder(BorderFactory.createLineBorder(Color.GRAY,2));
         noteCompound.add(Box.createVerticalGlue());
         noteCompound.add(usageNote, BorderLayout.CENTER);
-        noteCompound.setMinimumSize(new Dimension(700, 200));
+        noteCompound.setMinimumSize(new Dimension(500, 200));
 
         // - create main button area
         buttonCompound = new JPanel();

@@ -131,7 +131,6 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         Firewall firewall = ((GatewayFirmware) ((Gateway) holeHardware()).getSystemSoftware()).holeFirewall();
 
         JFirewallDialog firewallDialog = new JFirewallDialog(firewall, JMainFrame.getJMainFrame());
-        firewallDialog.setBounds(100, 100, 850, 340);
         firewallDialog.setName(messages.getString("jgatewayconfiguration_msg1"));
 
         firewallDialog.updateRuleTable();
@@ -142,7 +141,6 @@ public class JGatewayConfiguration extends JKonfiguration implements I18n {
         LinkedList<String[]> staticNat = ((GatewayFirmware) ((Gateway) holeHardware()).getSystemSoftware())
                 .getStaticNAT();
         portForwardingDialog = new JPortForwardingDialog(staticNat, JMainFrame.getJMainFrame());
-        portForwardingDialog.setBounds(100, 100, 550, 340);
         portForwardingDialog.setName(messages.getString("jgatewayconfiguration_msg19"));
 
         portForwardingDialog.createStaticTable();

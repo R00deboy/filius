@@ -62,6 +62,11 @@ public class JPortForwardingDialog extends JDialog implements I18n {
         super(dummyFrame, messages.getString("jgatewayconfiguration_msg19"), true);
         LOG.trace("INVOKED-2 (" + this.hashCode() + ") " + getClass() + ", constr: JPortForwardingDialog(" + staticNat2 + ","
                 + dummyFrame + ")");
+
+        setSize(550, 340);
+        setLocation(getParent().getX() + (getParent().getWidth() - getWidth()) / 2,
+            getParent().getY() + (getParent().getHeight() - getHeight()) / 2);
+
         this.staticNat = staticNat2;
         jpfd = this;
         

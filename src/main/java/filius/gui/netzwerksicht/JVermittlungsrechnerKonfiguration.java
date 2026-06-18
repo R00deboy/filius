@@ -1,9 +1,9 @@
 /*
  ** This file is part of Filius, a network construction and simulation software.
- ** 
+ **
  ** Originally created at the University of Siegen, Institute "Didactics of
  ** Informatics and E-Learning" by a students' project group:
- **     members (2006-2007): 
+ **     members (2006-2007):
  **         André Asschoff, Johannes Bade, Carsten Dittich, Thomas Gerding,
  **         Nadja Haßler, Ernst Johannes Klebert, Michell Weyer
  **     supervisors:
@@ -14,12 +14,12 @@
  ** it under the terms of the GNU General Public License as published by
  ** the Free Software Foundation, either version 2 of the License, or
  ** (at your option) version 3.
- ** 
+ **
  ** Filius is distributed in the hope that it will be useful,
  ** but WITHOUT ANY WARRANTY; without even the implied
  ** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  ** PURPOSE. See the GNU General Public License for more details.
- ** 
+ **
  ** You should have received a copy of the GNU General Public License
  ** along with Filius.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -103,7 +103,7 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
     public void aenderungenAnnehmen() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (JVermittlungsrechnerKonfiguration), aenderungenAnnehmen()");
+            + " (JVermittlungsrechnerKonfiguration), aenderungenAnnehmen()");
 
         Vermittlungsrechner vRechner = (Vermittlungsrechner) holeHardware();
         VermittlungsrechnerBetriebssystem bs = (VermittlungsrechnerBetriebssystem) vRechner.getSystemSoftware();
@@ -134,13 +134,12 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
     private void showFirewallDialog() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (JVermittlungsrechnerKonfiguration), firewallDialogAnzeigen()");
+            + " (JVermittlungsrechnerKonfiguration), firewallDialogAnzeigen()");
 
         Firewall firewall = ((VermittlungsrechnerBetriebssystem) ((Vermittlungsrechner) holeHardware())
-                .getSystemSoftware()).holeFirewall();
+            .getSystemSoftware()).holeFirewall();
 
         JFirewallDialog firewallDialog = new JFirewallDialog(firewall, JMainFrame.getJMainFrame());
-        firewallDialog.setBounds(100, 100, 850, 340);
         firewallDialog.setName(messages.getString("jvermittlungsrechnerkonfiguration_msg1"));
 
         firewallDialog.updateRuleTable();
@@ -149,7 +148,7 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
     protected void initContents() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (JVermittlungsrechnerKonfiguration), initAttributEingabeBox(" + box + ")");
+            + " (JVermittlungsrechnerKonfiguration), initAttributEingabeBox(" + box + ")");
         Vermittlungsrechner vRechner;
         NetzwerkInterface tempNic;
         Knoten tempKnoten;
@@ -183,7 +182,8 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
         focusListener = new FocusListener() {
 
-            public void focusGained(FocusEvent arg0) {}
+            public void focusGained(FocusEvent arg0) {
+            }
 
             public void focusLost(FocusEvent arg0) {
                 aenderungenAnnehmen();
@@ -349,7 +349,7 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
                 verbundeneKomponente[i] = new JLabel(messages.getString("jvermittlungsrechnerkonfiguration_msg5"));
             else
                 verbundeneKomponente[i] = new JLabel(messages.getString("jvermittlungsrechnerkonfiguration_msg6") + " "
-                        + tempKnoten.holeAnzeigeName());
+                    + tempKnoten.holeAnzeigeName());
             verbundeneKomponente[i].setPreferredSize(new Dimension(400, 10));
             boxKomponente.add(verbundeneKomponente[i]);
 
@@ -394,10 +394,10 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
             if (tempKnoten == null) {
                 tpNetzwerkKarten.addTab(messages.getString("jvermittlungsrechnerkonfiguration_msg10") + (i + 1),
-                        new ImageIcon(getClass().getResource("/gfx/allgemein/conn_fail.png")), boxNic);
+                    new ImageIcon(getClass().getResource("/gfx/allgemein/conn_fail.png")), boxNic);
             } else {
                 tpNetzwerkKarten.addTab(messages.getString("jvermittlungsrechnerkonfiguration_msg10") + (i + 1),
-                        new ImageIcon(getClass().getResource("/gfx/allgemein/conn_ok.png")), boxNic);
+                    new ImageIcon(getClass().getResource("/gfx/allgemein/conn_ok.png")), boxNic);
             }
         }
 
@@ -423,7 +423,7 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
                 }
                 if (sel > 0 && sel < pane.getComponentCount() - 1) {
                     Verbindung conn = ((NetzwerkInterface) ((Vermittlungsrechner) holeHardware())
-                            .getNetzwerkInterfaces().get(sel - 1)).getPort().getVerbindung();
+                        .getNetzwerkInterfaces().get(sel - 1)).getPort().getVerbindung();
                     if (conn != null) {
                         conn.setAktiv(true);
                         highlightedCable = (Kabel) conn;
@@ -486,9 +486,9 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
                 tabellenDialog = new JDialog(filius.gui.JMainFrame.getJMainFrame(), true);
                 tabellenDialog.setTitle(messages.getString("jvermittlungsrechnerkonfiguration_msg15"));
                 tabellenDialog.setSize(600, 400);
+                tabellenDialog.setLocation(tabellenDialog.getParent().getX() + (tabellenDialog.getParent().getWidth() - tabellenDialog.getWidth()) / 2,
+                    tabellenDialog.getParent().getY() + (tabellenDialog.getParent().getHeight() - tabellenDialog.getHeight()) / 2);
 
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                tabellenDialog.setLocation(screenSize.width / 2 - 300, screenSize.height / 2 - 200);
                 tabelle = new JWeiterleitungsTabelle(getKonfiguration());
                 tabelle.updateAttribute();
                 scrollPane = new JScrollPane(tabelle);
@@ -516,26 +516,19 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
     private void showConnectionsDialog() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (JVermittlungsrechnerKonfiguration), showConnectionsDialog()");
+            + " (JVermittlungsrechnerKonfiguration), showConnectionsDialog()");
         GUIContainer.getGUIContainer().getProperty().minimieren();
         // basic dialog creation and settings
         changeBasicSettingsDialog = new JConnectionsDialog(filius.gui.JMainFrame.getJMainFrame(),
-                (Vermittlungsrechner) holeHardware());
+            (Vermittlungsrechner) holeHardware());
         changeBasicSettingsDialog.setTitle(messages.getString("jvermittlungsrechnerkonfiguration_msg23"));
-
-        // positioning and size
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        changeBasicSettingsDialog.setLocation(screenSize.width / 2 - 300, screenSize.height / 2 - 200);
-
-        changeBasicSettingsDialog.setSize(750, 530);
-        changeBasicSettingsDialog.setResizable(true);
 
         changeBasicSettingsDialog.setVisible(true);
     }
 
     public void doUnselectAction() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (JVermittlungsrechnerKonfiguration), doUnselectAction()");
+            + " (JVermittlungsrechnerKonfiguration), doUnselectAction()");
         if (highlightedCable != null) {
             highlightedCable.setAktiv(false);
             highlightedCable = null;
@@ -557,7 +550,7 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
     public void updateAttribute() {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (JVermittlungsrechnerKonfiguration), updateAttribute()");
+            + " (JVermittlungsrechnerKonfiguration), updateAttribute()");
         Knoten tempKnoten;
 
         Vermittlungsrechner vRechner = (Vermittlungsrechner) holeHardware();
@@ -580,10 +573,10 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
             if (tempKnoten == null) {
                 verbundeneKomponente[i].setText(messages.getString("jvermittlungsrechnerkonfiguration_msg16"));
                 tpNetzwerkKarten.setIconAt(i + 1,
-                        new ImageIcon(getClass().getResource("/gfx/allgemein/conn_fail.png")));
+                    new ImageIcon(getClass().getResource("/gfx/allgemein/conn_fail.png")));
             } else {
                 verbundeneKomponente[i].setText(messages.getString("jvermittlungsrechnerkonfiguration_msg6") + " "
-                        + tempKnoten.holeAnzeigeName());
+                    + tempKnoten.holeAnzeigeName());
                 tpNetzwerkKarten.setIconAt(i + 1, new ImageIcon(getClass().getResource("/gfx/allgemein/conn_ok.png")));
             }
             String tabtitle;
@@ -599,7 +592,7 @@ public class JVermittlungsrechnerKonfiguration extends JKonfiguration implements
 
     private Knoten holeVerbundeneKomponente(NetzwerkInterface nic) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
-                + " (JVermittlungsrechnerKonfiguration), holeVerbundeneKomponente(" + nic + ")");
+            + " (JVermittlungsrechnerKonfiguration), holeVerbundeneKomponente(" + nic + ")");
 
         if (nic.getPort().getVerbindung() == null) {
             return null;

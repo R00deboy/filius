@@ -79,11 +79,16 @@ public class JFirewallDialog extends JDialog implements I18n {
     private JCheckBox dropICMP;
     private JCheckBox onlyFilterSYN;
 
-    public JFirewallDialog(Firewall firewall, JFrame dummyFrame) {
-        super(dummyFrame, messages.getString("jfirewalldialog_msg1"), true);
+    public JFirewallDialog(Firewall firewall, JFrame owner) {
+        super(owner, messages.getString("jfirewalldialog_msg1"), true);
         LOG.trace("INVOKED-2 (" + this.hashCode() + ") " + getClass() + ", constr: JFirewallDialog(" + firewall + ","
-                + dummyFrame + ")");
+                + owner + ")");
         this.firewall = firewall;
+
+        setSize(850, 340);
+        setLocation(getParent().getX() + (getParent().getWidth() - getWidth()) / 2,
+            getParent().getY() + (getParent().getHeight() - getHeight()) / 2);
+
         jfd = this;
         erzeugeFenster();
     }

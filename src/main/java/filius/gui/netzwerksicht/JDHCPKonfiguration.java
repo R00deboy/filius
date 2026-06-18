@@ -90,9 +90,8 @@ public class JDHCPKonfiguration extends JDialog implements I18n, ItemListener {
         this.setSize(380, 380);
         this.setResizable(true);
 
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        Point location = new Point((screen.width / 2) - 190, (screen.height / 2) - 140);
-        this.setLocation(location);
+        setLocation(getParent().getX() + (getParent().getWidth() - getWidth()) / 2,
+            getParent().getY() + (getParent().getHeight() - getHeight()) / 2);
 
         initComponents();
     }

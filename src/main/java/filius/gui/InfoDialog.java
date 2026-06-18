@@ -1,9 +1,9 @@
 /*
  ** This file is part of Filius, a network construction and simulation software.
- ** 
+ **
  ** Originally created at the University of Siegen, Institute "Didactics of
  ** Informatics and E-Learning" by a students' project group:
- **     members (2006-2007): 
+ **     members (2006-2007):
  **         André Asschoff, Johannes Bade, Carsten Dittich, Thomas Gerding,
  **         Nadja Haßler, Ernst Johannes Klebert, Michell Weyer
  **     supervisors:
@@ -14,12 +14,12 @@
  ** it under the terms of the GNU General Public License as published by
  ** the Free Software Foundation, either version 2 of the License, or
  ** (at your option) version 3.
- ** 
+ **
  ** Filius is distributed in the hope that it will be useful,
  ** but WITHOUT ANY WARRANTY; without even the implied
  ** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  ** PURPOSE. See the GNU General Public License for more details.
- ** 
+ **
  ** You should have received a copy of the GNU General Public License
  ** along with Filius.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -66,13 +66,13 @@ public class InfoDialog extends JDialog implements I18n {
 
     /**
      * This method initializes this
-     * 
+     *
      * @return void
      */
     private void initialize() {
         this.setSize(350, 580);
-        setLocation((getToolkit().getScreenSize().width - getWidth()) / 2,
-                (getToolkit().getScreenSize().height - getHeight()) / 2);
+        setLocation(getParent().getX() + (getParent().getWidth() - getWidth()) / 2,
+            getParent().getY() + (getParent().getHeight() - getHeight()) / 2);
         this.setForeground(Color.blue);
         this.setTitle(messages.getString("infodialog_msg1"));
         this.setContentPane(getJContentPane());
@@ -80,7 +80,7 @@ public class InfoDialog extends JDialog implements I18n {
 
     /**
      * This method initializes jContentPane
-     * 
+     *
      * @return javax.swing.JPanel
      */
     private JPanel getJContentPane() {
@@ -115,20 +115,20 @@ public class InfoDialog extends JDialog implements I18n {
 
             personen = new JLabel();
             personen.setText("<html>" + "<b>" + messages.getString("infodialog_msg3") + "</b>"
-                    + "<p> Andr&eacute; Asschoff, " + "Johannes Bade, " + "Carsten Dittich, " + "Thomas Gerding, "
-                    + "Nadja Ha&szlig;ler, " + "Ernst Johannes Klebert, " + "Michell Weyer </p>" + "<b>"
-                    + messages.getString("infodialog_msg4") + "</b>" + "<p> Stefan Freischlad, " + "Peer Stechert </p>"
-                    + "<b>" + messages.getString("infodialog_msg11")
-                    + "</b><p>Matthias Brauer, Christian Eibl, Christoph Irniger, Detlef Justen, Andreas B. Mundt, Patrice Treton, pyropeter</p>"
-                    + "</html>");
+                + "<p> Andr&eacute; Asschoff, " + "Johannes Bade, " + "Carsten Dittich, " + "Thomas Gerding, "
+                + "Nadja Ha&szlig;ler, " + "Ernst Johannes Klebert, " + "Michell Weyer </p>" + "<b>"
+                + messages.getString("infodialog_msg4") + "</b>" + "<p> Stefan Freischlad, " + "Peer Stechert </p>"
+                + "<b>" + messages.getString("infodialog_msg11")
+                + "</b><p>Matthias Brauer, Christian Eibl, Christoph Irniger, Detlef Justen, Andreas B. Mundt, Patrice Treton, pyropeter</p>"
+                + "</html>");
             personen.setVerticalAlignment(SwingConstants.TOP);
             personen.setForeground(Color.WHITE);
             personen.setFont(new Font("Dialog", Font.PLAIN, 12));
             personen.setPreferredSize(new Dimension(270, 180));
             maintainer = new JLabel();
             maintainer.setText("<html>" + "<b>" + messages.getString("infodialog_msg5") + "</b>" + "<p>"
-                    + "Stefan Freischlad <br/>&nbsp;</p>" + "<p>" + messages.getString("infodialog_msg8") + "<br/>"
-                    + " https://www.lernsoftware-filius.de." + "</p></html>");
+                + "Stefan Freischlad <br/>&nbsp;</p>" + "<p>" + messages.getString("infodialog_msg8") + "<br/>"
+                + " https://www.lernsoftware-filius.de." + "</p></html>");
             maintainer.setVerticalAlignment(SwingConstants.TOP);
             maintainer.setForeground(Color.WHITE);
             maintainer.setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -136,8 +136,8 @@ public class InfoDialog extends JDialog implements I18n {
 
             version = new JLabel();
             version.setText("<html><center><p><b>" + messages.getString("infodialog_msg6") + " "
-                    + Information.getVersion() + "</b></p><br/><p><small>" + messages.getString("infodialog_msg10")
-                    + "</small></p></center></html>");
+                + Information.getVersion() + "</b></p><br/><p><small>" + messages.getString("infodialog_msg10")
+                + "</small></p></center></html>");
             version.setFont(new Font("Dialog", Font.PLAIN, 12));
             version.setForeground(Color.WHITE);
             version.setVerticalAlignment(SwingConstants.TOP);

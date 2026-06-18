@@ -79,8 +79,13 @@ public class LayeredExchangeDialog extends JDialog implements ExchangeComponent,
         Image image;
 
         setTitle(messages.getString("lauscherdialog_msg1"));
-        setBounds(20, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 350,
-                ((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth()) - 40, 300);
+
+        int screenHeight = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+        int screenWidth = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        setSize(3 * screenWidth / 4, 4 * screenHeight / 5);
+        setLocation(getParent().getX() + (getParent().getWidth() - getWidth()) / 2,
+            getParent().getY() + (getParent().getHeight() - getHeight()) / 2);
+
         image = Toolkit.getDefaultToolkit()
                 .getImage(getClass().getResource("/gfx/allgemein/nachrichtenfenster_icon.png"));
         setIconImage(image);

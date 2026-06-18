@@ -226,8 +226,8 @@ public class Main implements I18n {
             programmKonfig = new Object[8];
             programmKonfig[0] = JMainFrame.getJMainFrame().getBounds();
             programmKonfig[1] = SzenarioVerwaltung.getInstance().holePfad();
-            programmKonfig[2] = Information.getInformation().getLocale().getLanguage();
-            programmKonfig[3] = Information.getInformation().getLocale().getCountry();
+            programmKonfig[2] = Information.getInformation().getLocaleOrDefault().getLanguage();
+            programmKonfig[3] = Information.getInformation().getLocaleOrDefault().getCountry();
             programmKonfig[4] = Information.getInformation().getLastOpenedDirectory();
             programmKonfig[5] = SzenarioVerwaltung.getInstance().istGeaendert();
             programmKonfig[6] = Information.getInformation().getIconMode().toString();

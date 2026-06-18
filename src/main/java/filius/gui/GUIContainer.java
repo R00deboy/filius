@@ -25,14 +25,7 @@
  */
 package filius.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FileDialog;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -163,7 +156,7 @@ public class GUIContainer implements Serializable, I18n {
 
     private JBackgroundPanel simulationBackgroundPanel = new JBackgroundPanel();
     private JScrollPane simulationView;
-    private List<GUIDesktopWindow> desktopWindowList = new LinkedList<GUIDesktopWindow>();
+    private Set<GUIDesktopWindow> desktopWindowList = new HashSet<>();
     private boolean lastVisibilityStateLauscher;
 
     /** enthält einen Integerwert dafür welche Ansicht gerade aktiv ist */
@@ -573,7 +566,6 @@ public class GUIContainer implements Serializable, I18n {
      * 
      * @author Johannes Bade & Thomas Gerding
      * 
-     * @param komponente
      * @param x
      * @param y
      * @return boolean
@@ -913,70 +905,71 @@ public class GUIContainer implements Serializable, I18n {
     public void showDesktop(GUIKnotenItem hardwareItem) {
         ListIterator<GUIDesktopWindow> it;
         Betriebssystem bs;
-        GUIDesktopWindow tmpDesktop = null;
         boolean fertig = false;
 
         if (hardwareItem != null && hardwareItem.getKnoten() instanceof Host) {
             bs = (Betriebssystem) ((Host) hardwareItem.getKnoten()).getSystemSoftware();
 
-            it = desktopWindowList.listIterator();
-            while (!fertig && it.hasNext()) {
-                tmpDesktop = it.next();
-                if (bs == tmpDesktop.getBetriebssystem()) {
-                    tmpDesktop.setVisible(true);
+            for (GUIDesktopWindow desktop : desktopWindowList) {
+                if (bs == desktop.getBetriebssystem()) {
+                    desktop.setVisible(true);
                     fertig = true;
                 }
             }
-
             if (!fertig) {
-                tmpDesktop = new GUIDesktopWindow(bs);
+                GUIDesktopWindow tmpDesktop = new GUIDesktopWindow(bs);
                 setDesktopPos(tmpDesktop);
                 tmpDesktop.setVisible(true);
                 tmpDesktop.toFront();
                 fertig = true;
-            }
-
-            if (tmpDesktop != null) {
-                this.desktopWindowList.add(tmpDesktop);
+                desktopWindowList.add(tmpDesktop);
             }
         }
     }
 
     private void setDesktopPos(GUIDesktopWindow tmpDesktop) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        GraphicsConfiguration gc = JMainFrame.getJMainFrame().getGraphicsConfiguration();
+        Rectangle screenSize = gc.getBounds();
+        LOG.debug("current monitor bounds: {}", screenSize.toString());
         Dimension desktopSize = tmpDesktop.getSize();
         int numberOfDesktopsPerRow = (int) (screenSize.getWidth() / desktopSize.getWidth());
         int numberOfDesktopsPerColumn = (int) (screenSize.getHeight() / desktopSize.getHeight());
         int totalNumberOfDesktops = numberOfDesktopsPerRow * numberOfDesktopsPerColumn;
-        int xPos = MIN_DESKTOP_SPACING;
-        int yPos = MIN_DESKTOP_SPACING;
+        int xPos = (int)screenSize.getX() + MIN_DESKTOP_SPACING;
+        int yPos = (int)screenSize.getY() + MIN_DESKTOP_SPACING;
         if (desktopWindowList.size() < totalNumberOfDesktops
                 && !Information.getDesktopWindowMode().equals(GUIDesktopWindow.Mode.STACK)) {
+            LOG.debug("Use tile alignment for desktop windows.");
             if (Information.getDesktopWindowMode().equals(GUIDesktopWindow.Mode.COLUMN)) {
-                xPos = MIN_DESKTOP_SPACING
-                        + (desktopWindowList.size() / numberOfDesktopsPerColumn) * (int) desktopSize.getWidth();
-                yPos = MIN_DESKTOP_SPACING
-                        + (desktopWindowList.size() % numberOfDesktopsPerColumn) * (int) desktopSize.getHeight();
+                xPos += (desktopWindowList.size() / numberOfDesktopsPerColumn) * (int) desktopSize.getWidth();
+                yPos += (desktopWindowList.size() % numberOfDesktopsPerColumn) * (int) desktopSize.getHeight();
             } else {
-                xPos = MIN_DESKTOP_SPACING
-                        + (desktopWindowList.size() % numberOfDesktopsPerRow) * (int) desktopSize.getWidth();
-                yPos = MIN_DESKTOP_SPACING
-                        + (desktopWindowList.size() / numberOfDesktopsPerRow) * (int) desktopSize.getHeight();
+                xPos += (desktopWindowList.size() % numberOfDesktopsPerRow) * (int) desktopSize.getWidth();
+                yPos += (desktopWindowList.size() / numberOfDesktopsPerRow) * (int) desktopSize.getHeight();
             }
         } else {
+            LOG.debug("Use stack alignment for desktop windows.");
             int overlappingDesktops = Information.getDesktopWindowMode().equals(GUIDesktopWindow.Mode.STACK)
                     ? desktopWindowList.size()
                     : desktopWindowList.size() - totalNumberOfDesktops;
-            xPos = (overlappingDesktops + 1) * 20;
-            yPos = (overlappingDesktops + 1) * 20;
-            if (xPos + desktopSize.getWidth() > screenSize.getWidth()) {
-                xPos = MIN_DESKTOP_SPACING;
+            LOG.debug("overlapping desktops: " + overlappingDesktops);
+            int relXPos = (overlappingDesktops + 1) * 20;
+            int relYPos = (overlappingDesktops + 1) * 20;
+            if (xPos + relXPos + desktopSize.getWidth() <= screenSize.getX() + screenSize.getWidth()) {
+                LOG.debug("shift new desktop window. relXPos: " + relXPos);
+                xPos += relXPos;
             }
-            if (yPos + desktopSize.getHeight() > screenSize.getHeight()) {
-                yPos = MIN_DESKTOP_SPACING;
+            if (yPos + relYPos + desktopSize.getHeight() <= screenSize.getY() + screenSize.getHeight()) {
+                LOG.debug("shift new desktop window. relYPos: " + relYPos);
+                yPos += relYPos;
             }
         }
         tmpDesktop.setBounds(xPos, yPos, tmpDesktop.getWidth(), tmpDesktop.getHeight());
+    }
+
+    public void removeDesktopWindow(GUIDesktopWindow tmpDesktop) {
+        LOG.debug("remove desktop window: " + desktopWindowList.contains(tmpDesktop));
+        desktopWindowList.remove(tmpDesktop);
     }
 
     public void closeDialogs() {

@@ -28,12 +28,15 @@ package filius.gui.anwendungssicht;
 import static filius.gui.anwendungssicht.GUIDesktopPanel.HEIGHT_OVERALL;
 import static filius.gui.anwendungssicht.GUIDesktopPanel.PANEL_WIDTH;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import filius.gui.GUIContainer;
 import filius.gui.JMainFrame;
 import filius.gui.netzwerksicht.GUIDesignSidebar;
 import filius.hardware.Hardware;
@@ -43,10 +46,13 @@ import filius.hardware.knoten.Rechner;
 import filius.rahmenprogramm.IconMode;
 import filius.rahmenprogramm.Information;
 import filius.software.system.Betriebssystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings({ "serial", "deprecation" })
 public class GUIDesktopWindow extends JFrame implements Observer {
-    private GUIDesktopPanel desktopPanel;
+    private static final Logger LOG = LoggerFactory.getLogger(GUIDesktopWindow.class);
+    private final GUIDesktopPanel desktopPanel;
 
     public enum Mode {
         ROW(0), COLUMN(1), STACK(2);
@@ -94,6 +100,14 @@ public class GUIDesktopWindow extends JFrame implements Observer {
 
         desktopPanel = new GUIDesktopPanel(bs);
         getContentPane().add(desktopPanel);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                LOG.debug("Desktop window closed");
+                GUIContainer.getGUIContainer().removeDesktopWindow(GUIDesktopWindow.this);
+            }
+        });
     }
 
     public void setVisible(boolean flag) {

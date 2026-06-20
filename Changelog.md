@@ -1,5 +1,14 @@
 # Changelog Filius
 
+## [2.13.0] - 2026-06-20
+### Changed
+* Open new windows dialogs on same screen in multi-display environments
+* Provide scaled program icons for Linux
+
+### Fixed
+* Make program exit more robust in case of corrupted settings file
+* Show Filius icon on Linux when running
+
 ## [2.12.2] - 2026-06-12
 ### Fixed
 * Fix web browser for host os Windows

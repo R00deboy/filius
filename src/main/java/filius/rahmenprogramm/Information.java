@@ -623,7 +623,7 @@ public class Information implements Serializable {
                 iniFile = new RandomAccessFile(tmpFile.getAbsolutePath(), "r");
                 int width = 0;
                 int height = 0;
-                for (String line; (line = iniFile.readLine()) != null;) {
+                for (String line; (line = iniFile.readLine()) != null; ) {
                     if (!line.trim().equals("") && !line.trim().startsWith("#")) {
                         StringTokenizer st = new StringTokenizer(line, "=");
 
@@ -653,7 +653,7 @@ public class Information implements Serializable {
                                     }
                                 } else if (configKey.equalsIgnoreCase("desktop-mode")) {
                                     desktopWindowMode = GUIDesktopWindow.Mode
-                                            .getMode(Integer.parseInt(configValue.trim()));
+                                        .getMode(Integer.parseInt(configValue.trim()));
                                 } else if (configKey.equalsIgnoreCase("old-exchange-dialog")) {
                                     if (configValue.trim().equals("1")) {
                                         this.oldExchangeDialog = true;
@@ -713,6 +713,9 @@ public class Information implements Serializable {
                 if (width > 0 && height > 0) {
                     GUIContainer.getGUIContainer(width, height);
                 }
+            } catch (Exception e) {
+                LOG.warn("Something went wrong when reading filius.ini: {}", e.getMessage());
+
             } finally {
                 if (iniFile != null)
                     iniFile.close();

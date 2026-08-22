@@ -67,7 +67,7 @@ public class NatGateway extends Firewall implements I18n {
             }
             LOG.debug("New connection in NAT table: protocol={}, port={}, address={}", protocol, wanPort, lanAddress);
             natTable.addDynamic(wanPort, wanIpAddress, protocol, lanAddress, NatType.DynamicEntry);
-            natTable.print();
+            //natTable.print();
             ((GatewayFirmware) gateway.getSystemSoftware()).fireNATPropertyChange();
         }
     }

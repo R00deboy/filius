@@ -229,7 +229,7 @@ public class GUIInstallationsDialog extends GUIApplicationWindow implements I18n
             for (int i = 0; i < lmInstalliert.getSize(); i++) {
                 if (lmInstalliert.getElementAt(i).equals(appInfo.get("Anwendung"))
                     && bs.holeSoftware(appInfo.get("Klasse").toString()) == null) {
-                    bs.installAppIfAvailable(appInfo.get("Klasse").toString());
+                    bs.installAndStartAppIfAvailable(appInfo.get("Klasse").toString());
                 }
             }
 

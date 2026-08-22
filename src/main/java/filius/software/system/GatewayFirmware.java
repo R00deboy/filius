@@ -131,8 +131,8 @@ public class GatewayFirmware extends InternetKnotenBetriebssystem {
         staticNAT = new LinkedList<String[]>();
 
         // Installation von Firewall und Webserver
-        installApp("filius.software.nat.NatGateway");
-        installApp("filius.software.www.WebServer");
+        installApp("filius.software.nat.NatGateway", false);
+        installApp("filius.software.www.WebServer", false);
         firewall = this.holeFirewall();
         server = this.holeWebServer();
         firewall.setDefaultPolicy(FirewallRule.DROP);

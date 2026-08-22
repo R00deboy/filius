@@ -107,13 +107,19 @@ public class Firewall extends Anwendung implements I18n {
     }
 
     private void beendeFirewallThread(NetzwerkInterface nic) {
+        List<FirewallThread> stoppedThreads = new LinkedList<>();
         for (FirewallThread thread : this.firewallThreads) {
             if (nic == null) {
                 thread.beenden();
+                stoppedThreads.add(thread);
             } else if (nic == thread.getNetzwerkInterface()) {
                 thread.beenden();
+                stoppedThreads.add(thread);
                 break;
             }
+        }
+        for (FirewallThread thread : stoppedThreads) {
+            firewallThreads.remove(thread);
         }
     }
 

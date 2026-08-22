@@ -36,8 +36,11 @@ import filius.software.transportschicht.UdpSegment;
 import filius.software.vermittlungsschicht.IcmpPaket;
 import filius.software.vermittlungsschicht.IpPaket;
 import filius.software.vermittlungsschicht.VermittlungsProtokoll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NatGatewayLANThread extends FirewallThread implements I18n {
+    private static Logger LOG = LoggerFactory.getLogger(NatGatewayLANThread.class);
     private NatGateway natGateway;
 
     private NetzwerkInterface lanNic;
@@ -76,8 +79,9 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
 
     protected EthernetFrame modifyOutgoingFrame(EthernetFrame frame) {
         EthernetFrame modifiedFrame = frame.clone();
-        if (modifiedFrame.getDaten() instanceof IpPaket
-                && !((IpPaket) modifiedFrame.getDaten()).getEmpfaenger().equals(wanNic.getIp())) {
+        if (modifiedFrame.getDaten() instanceof IpPaket && ((IpPaket) modifiedFrame.getDaten()).getEmpfaenger().equals(wanNic.getIp())) {
+            LOG.debug("No NAT processing of packet to WAN port of NAT gateway: {}", modifiedFrame.getDaten());
+        } else if (modifiedFrame.getDaten() instanceof IpPaket) {
             IpPaket packet = (IpPaket) modifiedFrame.getDaten();
             if (isOutgoingPacket(packet)) {
                 natGateway.replaceSource(packet);
@@ -93,17 +97,22 @@ public class NatGatewayLANThread extends FirewallThread implements I18n {
                 if (packet.getSegment() instanceof TcpSegment) {
                     TcpSegment tcpSegment = (TcpSegment) packet.getSegment();
                     if (tcpSegment.isSyn() && !tcpSegment.isAck()) {
+                        LOG.debug("New NAT connection for outgoing TCP connection: {}", tcpSegment);
                         natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(),
                                 tcpSegment.getQuellPort(), packet.getEmpfaenger(), tcpSegment.getZielPort());
                     }
                 } else if (packet.getSegment() instanceof UdpSegment) {
                     UdpSegment udpSegment = (UdpSegment) packet.getSegment();
+                    LOG.debug("New NAT connection for outgoing UDP datagram: {}", udpSegment);
                     natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(), udpSegment.getQuellPort(),
                             packet.getEmpfaenger(), udpSegment.getZielPort());
                 } else if (packet.getProtocol() == IcmpPaket.ICMP_PROTOCOL) {
+                    LOG.debug("New NAT connection for outgoing ICMP message: {}", packet);
                     natGateway.insertNewConnection(packet.getProtocol(), packet.getSender(),
                     		((IcmpPaket) packet).getIdentifier(), packet.getEmpfaenger(), ((IcmpPaket) packet).getIdentifier());
                 }
+            } else {
+                LOG.debug("Ignore packet. No new NAT connection for outgoing packet: {}", packet);
             }
         }
     }

@@ -417,7 +417,7 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
         return entfernt;
     }
 
-    public boolean installAppIfAvailable(String klassenname) {
+    public boolean installAndStartAppIfAvailable(String klassenname) {
         LOG.trace("INVOKED (" + this.hashCode() + ") " + getClass()
                 + " (InternetKnotenBetriebssystem), installiereSoftware(" + klassenname + ")");
         printInstallierteAnwendungen(); // DEBUG
@@ -427,7 +427,7 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
             LOG.info("App {} could not be installed because app is already installed.", klassenname);
         } else if (!checkAppAvailable(klassenname)) {
             LOG.info("{} could not be installed because app is not in list of available software.", klassenname);
-        } else if (installApp(klassenname)) {
+        } else if (installApp(klassenname, true)) {
             LOG.info("App {} installed.", klassenname);
             erfolg = true;
         } else {
@@ -454,7 +454,7 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
         return available;
     }
 
-    public boolean installApp(String klassenname) {
+    public boolean installApp(String klassenname, boolean activate) {
         boolean erfolg = true;
         try {
             Class<?> cl = Class.forName(klassenname, true,
@@ -462,7 +462,9 @@ public abstract class InternetKnotenBetriebssystem extends SystemSoftware {
             Anwendung neueAnwendung = (Anwendung) cl.getConstructor().newInstance();
             neueAnwendung.setSystemSoftware(this);
             installierteAnwendung.put(klassenname, neueAnwendung);
-            neueAnwendung.starten();
+            if (activate) {
+                neueAnwendung.starten();
+            }
         } catch (Exception e) {
             LOG.debug("App could not be instantiated. Probably because class could not be found.", e);
             erfolg = false;

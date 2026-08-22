@@ -84,8 +84,8 @@ public class VermittlungsrechnerBetriebssystem extends InternetKnotenBetriebssys
         Firewall firewall = null;
 
         // Installation von Firewall und Webserver
-        installApp("filius.software.firewall.Firewall");
-        installApp("filius.software.www.WebServer");
+        installApp("filius.software.firewall.Firewall", false);
+        installApp("filius.software.www.WebServer", false);
         firewall = this.holeFirewall();
         server = this.holeWebServer();
         firewall.setDefaultPolicy(FirewallRule.DROP);

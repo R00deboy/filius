@@ -103,7 +103,12 @@ public class FirewallThread extends ProtokollThread<EthernetFrame> implements I1
     }
 
     protected boolean checkDiscardByFirewall(EthernetFrame frame) {
-        return frame.getDaten() != null && frame.getDaten() instanceof IpPaket
-                && !firewall.acceptIPPacket((IpPaket) frame.getDaten());
+        if( frame.getDaten() != null && frame.getDaten() instanceof IpPaket
+            && !firewall.acceptIPPacket((IpPaket) frame.getDaten())) {
+            LOG.debug("Discard packet by firewall: {}", frame);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

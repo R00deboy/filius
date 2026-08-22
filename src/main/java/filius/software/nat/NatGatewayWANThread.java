@@ -65,7 +65,7 @@ public class NatGatewayWANThread extends FirewallThread implements I18n {
             IpPaket packet = (IpPaket) frame.getDaten();
             if (!(packet instanceof IcmpPaket)) {
                 applyNATForwarding = natGateway.eintragExistiert(packet);
-            } else if (((IcmpPaket) packet).isEchoRequest()) {
+            } else if (((IcmpPaket) packet).isEchoRequest() && wanNic.getIp().equals(packet.getEmpfaenger())) {
                 isPingToWAN = true;
             } else if (((IcmpPaket) packet).isEchoResponse()) {
                 applyNATForwarding = natGateway.eintragExistiert(packet);

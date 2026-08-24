@@ -136,6 +136,8 @@ public class Information implements Serializable {
 
     private String lastOpenedDirectory;
 
+    private int pingRepeat = 4;
+
     private boolean oldExchangeDialog = true;
 
     private FeatureMode softwareWizardMode = FeatureMode.FORCE_ENABLE;
@@ -162,6 +164,10 @@ public class Information implements Serializable {
 
     public FeatureMode getSoftwareWizardMode() {
         return softwareWizardMode;
+    }
+
+    public int getPingRepeat() {
+        return pingRepeat;
     }
 
     public boolean isOldExchangeDialog() {
@@ -649,6 +655,12 @@ public class Information implements Serializable {
                                     if (configValue.trim().equals("1")) {
                                         posixCommandLineToolBehaviour = true;
                                     } else {
+                                        LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
+                                    }
+                                } else if (configKey.equalsIgnoreCase("ping-repeat")) {
+                                    try {
+                                        pingRepeat = Integer.parseInt(configValue);
+                                    } catch (NumberFormatException e) {
                                         LOG.info("Ignore invalid value '{}' for {}.", configValue, configKey);
                                     }
                                 } else if (configKey.equalsIgnoreCase("desktop-mode")) {

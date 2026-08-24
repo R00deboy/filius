@@ -833,7 +833,7 @@ public class Terminal extends ClientAnwendung implements I18n {
 
         int receivedReplies = 0;
         int num;
-        int loopNumber = Information.isPosixCommandLineToolBehaviour() ? 10 : 4;
+        int loopNumber = Information.isPosixCommandLineToolBehaviour() ? 10 : Information.getInformation().getPingRepeat();
         for (num = 1; !interrupted && num <= loopNumber && running; num++) {
             try {
                 timeStart = System.currentTimeMillis();

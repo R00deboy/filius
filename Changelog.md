@@ -1,5 +1,14 @@
 # Changelog Filius
 
+## [2.14.0] - 2026-08-29
+### Added
+* New parameter in filius.ini to configure the number of pings executed in loop from command line
+
+### Fixed
+* In case of invalid filius.ini program still starts up. But configuration parameter may be ignored.
+* Home router must not respond to ICMP messages (ping echo request) on WAN port for LAN address
+* General issue with home router package forwarding fixed.
+
 ## [2.13.0] - 2026-06-20
 ### Changed
 * Open new windows dialogs on same screen in multi-display environments

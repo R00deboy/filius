@@ -568,27 +568,21 @@ public class Information implements Serializable {
         return getArbeitsbereichPfad() + "anwendungen" + System.getProperty("file.separator");
     }
 
-    /**
-     * Automatische Erzeugung einer MAC-Adresse, funktioniert mit Hexadezimal-Zahlen
-     */
+    /** Automatische Erzeugung einer lokal administrierten Unicast-MAC-Adresse. */
     public String holeFreieMACAdresse() {
-        Random r = new Random();
-        String[] mac;
+        Random random = new Random();
+        byte[] mac = new byte[6]; // Eine EUI-48-Adresse besteht aus genau sechs Oktetten (48 Bit).
         String neueMac;
 
-        mac = new String[6];
-        for (int i = 0; i < mac.length; i++) {
-            mac[i] = Integer.toHexString(r.nextInt(255));
-            if (mac[i].length() == 1)
-                mac[i] = "0" + mac[i];
-        }
-        neueMac = mac[0] + ":" + mac[1] + ":" + mac[2] + ":" + mac[3] + ":" + mac[4] + ":" + mac[5];
+        do {
+            random.nextBytes(mac); // Alle Oktette nutzen den vollstaendigen Wertebereich von 00 bis ff.
+            // I/G-Bit = 0: individuelle Unicast-Adresse; U/L-Bit = 1: lokal administriert, also keine fremde OUI.
+            mac[0] = (byte) ((mac[0] & 0xfc) | 0x02);
+            neueMac = String.format("%02x:%02x:%02x:%02x:%02x:%02x", mac[0] & 0xff, mac[1] & 0xff,
+                    mac[2] & 0xff, mac[3] & 0xff, mac[4] & 0xff, mac[5] & 0xff);
+        } while (!macPruefen(neueMac)); // Bereits vergebene Adressen werden nicht erneut verwendet.
 
-        if (macPruefen(neueMac)) {
-            return neueMac;
-        } else {
-            return holeFreieMACAdresse();
-        }
+        return neueMac;
     }
 
     /** Eintragen einer verwendeten MAC-Adresse */
@@ -601,7 +595,7 @@ public class Information implements Serializable {
         boolean macOK = true;
 
         for (int i = 0; i < macAdressen.size(); i++) {
-            if (mac.equals((String) macAdressen.elementAt(i)))
+            if (mac.equalsIgnoreCase((String) macAdressen.elementAt(i)))
                 macOK = false;
         }
 

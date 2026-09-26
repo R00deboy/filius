@@ -28,7 +28,6 @@ package filius.gui.netzwerksicht;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -37,6 +36,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -239,6 +240,14 @@ public class JConnectionsDialog extends JDialog implements I18n {
     private void initComponents() {
         JPanel upperCompound, noteCompound, buttonCompound;
 
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeDialog();
+            }
+        });
+
         // - create assignment area
         upperCompound = new JPanel();
         // upperCompound.setBackground(Color.GREEN);
@@ -280,13 +289,7 @@ public class JConnectionsDialog extends JDialog implements I18n {
         JButton btnClose = new JButton(messages.getString("jvermittlungsrechnerkonfiguration_msg20"));
         btnClose.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                Container c = (Container) arg0.getSource();
-                do {
-                    c = c.getParent();
-                } while (!(c instanceof JDialog));
-                c.setVisible(false);
-                GUIContainer.getGUIContainer().getProperty().reInit();
-                GUIContainer.getGUIContainer().getProperty().maximieren();
+                closeDialog();
             }
         });
         buttonCompound.add(btnClose);
@@ -295,6 +298,12 @@ public class JConnectionsDialog extends JDialog implements I18n {
         this.getContentPane().add(upperCompound, BorderLayout.NORTH);
         this.getContentPane().add(noteCompound, BorderLayout.CENTER);
         this.getContentPane().add(buttonCompound, BorderLayout.SOUTH);
+    }
+
+    private void closeDialog() {
+        setVisible(false);
+        GUIContainer.getGUIContainer().getProperty().reInit();
+        GUIContainer.getGUIContainer().getProperty().maximieren();
     }
 
     private void initRemoteInterfaces() {

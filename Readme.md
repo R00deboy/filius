@@ -21,9 +21,48 @@ The personal configuration, i.e. selected language as well as the UI state when 
 Global configurations can be modified in the install directory within "filius.ini". For more details see the documented parameters in this file.
 
 ## Installation
-The Windows installer is based on nsis. It supports the standard parameter:
-* /S - for silent install/uninstall
-* /D - to set the install directory (e.g. /D=Z:\Filius)
+
+### Install Filius on Windows
+
+1. Download the Windows installer `Filius-Setup_with-JRE-<version>.exe` from the [Filius website](https://www.lernsoftware-filius.de/). This package includes a Java runtime, so no separate Java installation is needed.
+2. Close any running Filius instance, start the installer and allow administrator access when prompted. Filius is installed for all users.
+3. Follow the welcome and license pages, then choose the installation folder. The default is `C:\Program Files\Filius`; an existing installation's folder may be proposed instead.
+4. Click **Install**, wait for the installation to complete, then click **Finish**.
+5. Start Filius from the **Filius** folder in the Windows Start menu.
+
+The installer installs the application, bundled runtime and documentation together. It creates Start menu shortcuts for Filius, the German and English manuals, project information and the website, and associates `.fls` files with Filius. There is no component selection or option to disable these shortcuts or the file association. The installer includes English, German and French translations; it does not display a language selection dialog.
+
+### Command-Line Options
+
+The Windows installer uses NSIS and supports the following case-sensitive options:
+
+| Option | Effect |
+| --- | --- |
+| `/S` | Runs installation or uninstallation silently, without wizard pages or confirmation dialogs. Administrator privileges are still required. |
+| `/D=<absolute path>` | Sets the installation folder. Must be the last argument, with no quotes around the path, even when it contains spaces. |
+| `/NCRC` | Skips the installer's integrity check. Normally this option is unnecessary. |
+
+For example, run these commands from a Windows Command Prompt in the download folder, replacing `2.14.0` with the downloaded version:
+
+```bat
+Filius-Setup_with-JRE-2.14.0.exe /S
+Filius-Setup_with-JRE-2.14.0.exe /D=C:\Applications\Filius
+Filius-Setup_with-JRE-2.14.0.exe /S /D=C:\Educational Software\Filius
+```
+
+The first command installs silently in the default folder, the second opens the wizard with a custom folder, and the third combines both options. For unattended installation, run the command from an elevated Command Prompt to avoid an administrator access prompt.
+
+See the [NSIS command-line documentation](https://nsis.sourceforge.io/Docs/Chapter3.html#installerusage) for details.
+
+### Uninstall Filius
+
+Use the Filius uninstall entry in Windows, or run `uninst.exe` from the installation folder and confirm removal. For silent removal from the default folder, run:
+
+```bat
+"C:\Program Files\Filius\uninst.exe" /S
+```
+
+Adjust the path if you installed Filius elsewhere. Uninstallation removes the entire installation folder, the Start menu shortcuts and the `.fls` association. Save your own project files outside the installation folder. The personal configuration in your home directory's `.filius` folder is retained.
 
 ## Website
 https://www.lernsoftware-filius.de/

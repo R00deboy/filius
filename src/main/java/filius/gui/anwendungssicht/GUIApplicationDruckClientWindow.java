@@ -66,6 +66,7 @@ public class GUIApplicationDruckClientWindow extends GUIApplicationWindow {
         hBox.add(label);
         tfDrucker = new JTextField();
         tfDrucker.setPreferredSize(new Dimension(100, 20));
+        tfDrucker.setMaximumSize(new Dimension(Integer.MAX_VALUE, 24));
         String letzterDrucker = ((DruckClient) holeAnwendung()).getDruckerAdresse();
         tfDrucker.setText(letzterDrucker == null ? "" : letzterDrucker);
         hBox.add(tfDrucker);

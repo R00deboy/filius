@@ -6,6 +6,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.junit.Test;
 
 import filius.software.drucken.DruckServer;
@@ -63,6 +66,18 @@ public class NeueGeraeteTest {
         assertTrue(ap.inReichweite(60, 80));
         assertFalse(ap.inReichweite(60, 81));
         assertFalse(ap.inReichweite(-150, 0));
+    }
+
+    @Test
+    public void testUebersetzungen_UmlauteKorrektKodiert() {
+        ResourceBundle de = ResourceBundle.getBundle("filius.messages.MessagesBundle", Locale.GERMANY);
+        ResourceBundle fr = ResourceBundle.getBundle("filius.messages.MessagesBundle", Locale.FRANCE);
+        ResourceBundle en = ResourceBundle.getBundle("filius.messages.MessagesBundle", Locale.UK);
+
+        assertEquals("Druckauftrag wurde übertragen.", de.getString("sw_druckclient_msg2"));
+        assertEquals("Alle Aufträge löschen", de.getString("druckauftragviewer_msg5"));
+        assertEquals("Point d'accès (Wi-Fi)", fr.getString("hw_accesspoint_msg1"));
+        assertEquals("Printer", en.getString("hw_drucker_msg1"));
     }
 
     @Test

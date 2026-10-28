@@ -69,7 +69,29 @@ $env:Path = "$env:JAVA_HOME\bin;$env:USERPROFILE\tools\apache-maven-3.9.11\bin;$
 mvn package
 ```
 
-Starten: `target\Filius.exe` oder `java -jar target\filius.jar`.
+Starten: `java -jar target\filius.jar` (Arbeitsverzeichnis `target`).
+
+## Windows-Installer
+
+`src\nsis\filius-erweiterung.nsi` baut einen Installer mit eingebautem Java. Auf dem Zielrechner wird weder
+Java noch Maven gebraucht.
+
+```powershell
+mvn package
+nsis\makensis target\filius-erweiterung.nsi
+```
+
+Ergebnis: `target\Filius-Erweiterung-Setup-2.14.0.exe`, ca. 68 MB.
+
+- Der Installer installiert unter eigenem Namen **neben** dem offiziellen Filius: Ordner
+  `C:\Program Files\Filius Erweiterung`, Startmenü-Ordner "Filius Erweiterung" und eigener Eintrag unter
+  "Apps". Die `.fls`-Zuordnung des offiziellen Filius bleibt unberührt.
+- Er braucht Administratorrechte. Leise Installation: `Filius-Erweiterung-Setup-2.14.0.exe /S`.
+- Er ist nicht digital signiert. Windows SmartScreen warnt deshalb; mit "Weitere Informationen ->
+  Trotzdem ausführen" geht es weiter.
+- Beide Versionen teilen sich die persönlichen Einstellungen im Ordner `.filius` im Benutzerverzeichnis.
+- Getestet am 2026-10-28: Installation, Start mit dem mitgelieferten Java, neue Geräte in der Palette,
+  Deinstallation ohne Reste.
 
 ## Tests
 

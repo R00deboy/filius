@@ -11,3 +11,4 @@ Navigateur web;filius.software.www.WebBrowser;filius.gui.anwendungssicht.GUIAppl
 Serveur de messagerie;filius.software.email.EmailServer;filius.gui.anwendungssicht.GUIApplicationEmailServerWindow;gfx/desktop/icon_emailserver.png
 Client de messagerie;filius.software.email.EmailAnwendung;filius.gui.anwendungssicht.GUIApplicationEmailAnwendungWindow;gfx/desktop/icon_emailprogramm.png
 Gnutella (P2P);filius.software.dateiaustausch.PeerToPeerAnwendung;filius.gui.anwendungssicht.GUIApplicationPeerToPeerAnwendungWindow;gfx/desktop/icon_peertopeer.png
+Imprimer;filius.software.drucken.DruckClient;filius.gui.anwendungssicht.GUIApplicationDruckClientWindow;gfx/desktop/icon_drucken.png

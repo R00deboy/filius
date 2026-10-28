@@ -42,6 +42,7 @@ import filius.gui.netzwerksicht.GUIDesignSidebar;
 import filius.hardware.Hardware;
 import filius.hardware.knoten.Host;
 import filius.hardware.knoten.Notebook;
+import filius.hardware.knoten.Smartphone;
 import filius.hardware.knoten.Rechner;
 import filius.rahmenprogramm.IconMode;
 import filius.rahmenprogramm.Information;
@@ -84,6 +85,8 @@ public class GUIDesktopWindow extends JFrame implements Observer {
         hardware = bs.getKnoten();
         if (hardware instanceof Rechner) {
             imageFile = GUIDesignSidebar.RECHNER + mode.suffix();
+        } else if (hardware instanceof Smartphone) {
+            imageFile = GUIDesignSidebar.SMARTPHONE + mode.suffix();
         } else if (hardware instanceof Notebook) {
             imageFile = GUIDesignSidebar.NOTEBOOK + mode.suffix();
         }

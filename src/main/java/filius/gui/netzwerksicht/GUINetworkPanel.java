@@ -25,17 +25,25 @@
  */
 package filius.gui.netzwerksicht;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 
+import filius.hardware.knoten.AccessPoint;
+import filius.hardware.knoten.Drucker;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.InternetKnoten;
 import filius.hardware.knoten.Knoten;
 import filius.hardware.knoten.Modem;
 import filius.hardware.knoten.Notebook;
 import filius.hardware.knoten.Rechner;
+import filius.hardware.knoten.Smartphone;
 import filius.hardware.knoten.Switch;
 import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.IconMode;
@@ -44,6 +52,10 @@ import filius.rahmenprogramm.Information;
 public class GUINetworkPanel extends GUIMainArea {
 
     private static final long serialVersionUID = 1L;
+    private static final Color FARBE_REICHWEITE_FLAECHE = new Color(70, 140, 220, 22);
+    private static final Color FARBE_REICHWEITE_RAND = new Color(70, 140, 220, 140);
+
+    private transient List<GUIKnotenItem> knotenItems;
 
     public GUINetworkPanel(int width, int height) {
         setLayout(null);
@@ -52,8 +64,38 @@ public class GUINetworkPanel extends GUIMainArea {
         setBounds(0, 0, width, height);
     }
 
+    /**
+     * Zeichnet die Funkreichweite aller Access Points als gestrichelten Kreis hinter die Komponenten. So ist im
+     * Unterricht sichtbar, welche WLAN-Geraete sich mit einem Access Point verbinden koennen.
+     */
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (null == knotenItems) {
+            return;
+        }
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        float[] dash = { 8.0f, 6.0f };
+        for (GUIKnotenItem item : knotenItems) {
+            if (item.getKnoten() instanceof AccessPoint && item.getImageLabel() != null) {
+                int radius = ((AccessPoint) item.getKnoten()).getReichweite();
+                JSidebarButton label = item.getImageLabel();
+                int mx = label.getX() + label.getWidth() / 2;
+                int my = label.getY() + label.getHeight() / 2;
+                g2.setColor(FARBE_REICHWEITE_FLAECHE);
+                g2.fillOval(mx - radius, my - radius, 2 * radius, 2 * radius);
+                g2.setColor(FARBE_REICHWEITE_RAND);
+                g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
+                g2.drawOval(mx - radius, my - radius, 2 * radius, 2 * radius);
+            }
+        }
+        g2.dispose();
+    }
+
     public void updateViewport(List<GUIKnotenItem> knoten, List<GUIKabelItem> kabel) {
         removeAll();
+        knotenItems = knoten;
 
         for (GUIKnotenItem tempitem : knoten) {
             Knoten tempKnoten = tempitem.getKnoten();
@@ -71,7 +113,16 @@ public class GUINetworkPanel extends GUIMainArea {
                 templabel.updateTooltip((InternetKnoten) tempitem.getKnoten());
             }
             IconMode mode = Information.getInformation().getIconMode();
-            if (tempitem.getKnoten() instanceof Switch) {
+            if (tempitem.getKnoten() instanceof AccessPoint) {
+                templabel.setIcon(
+                        new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.ACCESSPOINT + mode.suffix())));
+            } else if (tempitem.getKnoten() instanceof Smartphone) {
+                templabel.setIcon(
+                        new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SMARTPHONE + mode.suffix())));
+            } else if (tempitem.getKnoten() instanceof Drucker) {
+                templabel
+                        .setIcon(new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.DRUCKER + mode.suffix())));
+            } else if (tempitem.getKnoten() instanceof Switch) {
                 if (((Switch) tempitem.getKnoten()).isCloud())
                     templabel.setIcon(new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH_CLOUD)));
                 else

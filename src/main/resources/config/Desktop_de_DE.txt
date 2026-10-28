@@ -11,3 +11,4 @@ Gnutella;filius.software.dateiaustausch.PeerToPeerAnwendung;filius.gui.anwendung
 Text-Editor;filius.software.lokal.TextEditor;filius.gui.anwendungssicht.GUIApplicationTextEditorWindow;gfx/desktop/icon_texteditor.png
 Webserver;filius.software.www.WebServer;filius.gui.anwendungssicht.GUIApplicationWebServerWindow;gfx/desktop/icon_webserver.png
 Webbrowser;filius.software.www.WebBrowser;filius.gui.anwendungssicht.GUIApplicationWebBrowserWindow;gfx/desktop/icon_browser.png
+Drucken;filius.software.drucken.DruckClient;filius.gui.anwendungssicht.GUIApplicationDruckClientWindow;gfx/desktop/icon_drucken.png

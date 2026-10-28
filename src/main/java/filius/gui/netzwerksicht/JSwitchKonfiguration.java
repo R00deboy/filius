@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import filius.gui.GUIContainer;
 import filius.gui.GUIEvents;
 import filius.hardware.Hardware;
+import filius.hardware.knoten.AccessPoint;
 import filius.hardware.knoten.Switch;
 import filius.rahmenprogramm.EingabenUeberpruefung;
 import filius.rahmenprogramm.I18n;
@@ -66,6 +67,7 @@ public class JSwitchKonfiguration extends JKonfiguration implements I18n {
     private JTextField ssid;
     private JTextField retentionTime;
     private JCheckBox checkCloud;
+    private JTextField reichweite;
 
     protected JSwitchKonfiguration(Hardware hardware) {
         super(hardware);
@@ -92,6 +94,11 @@ public class JSwitchKonfiguration extends JKonfiguration implements I18n {
             ((SwitchFirmware) ((Switch) holeHardware()).getSystemSoftware())
                     .setRetentionTime(Long.parseLong(retentionTime.getText()) * 1000);
         } catch (NumberFormatException e) {}
+        if (switchWAP instanceof AccessPoint && checkReichweite()) {
+            ((AccessPoint) switchWAP).setReichweite(Integer.parseInt(reichweite.getText()));
+        }
+        // WLAN-Geraete mit passender SSID in Reichweite (neu) verbinden
+        WlanVerwaltung.aktualisiereVerbindungen();
 
         GUIContainer.getGUIContainer().updateViewport();
         updateAttribute();
@@ -106,8 +113,10 @@ public class JSwitchKonfiguration extends JKonfiguration implements I18n {
             GUIContainer.getGUIContainer().updateViewport();
         } else {
             IconMode mode = Information.getInformation().getIconMode();
+            String symbol = holeHardware() instanceof AccessPoint ? GUIDesignSidebar.ACCESSPOINT
+                    : GUIDesignSidebar.SWITCH;
             GUIContainer.getGUIContainer().getLabelforKnoten(((Switch) holeHardware()))
-                    .setIcon(new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH + mode.suffix())));
+                    .setIcon(new ImageIcon(getClass().getResource("/" + symbol + mode.suffix())));
             ((Switch) holeHardware()).setCloud(false);
             GUIContainer.getGUIContainer().updateViewport();
         }
@@ -226,9 +235,38 @@ public class JSwitchKonfiguration extends JKonfiguration implements I18n {
         tempBox.add(retentionTime);
 
         rightBox.add(tempBox);
-        rightBox.add(Box.createVerticalStrut(190));
 
-        tempBox2.add(checkCloud);
+        if (holeHardware() instanceof AccessPoint) {
+            // Funkreichweite des Access Points (in Bildpunkten der Entwurfsansicht)
+            tempLabel = new JLabel(messages.getString("jswitchkonfiguration_ap_msg1"));
+            tempLabel.setPreferredSize(new Dimension(300, 10));
+            tempLabel.setVisible(true);
+            tempLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+            reichweite = new JTextField();
+            reichweite.setPreferredSize(new Dimension(100, 10));
+            reichweite.addActionListener(actionListener);
+            reichweite.addFocusListener(focusListener);
+            reichweite.addKeyListener(new KeyAdapter() {
+                public void keyReleased(KeyEvent e) {
+                    checkReichweite();
+                }
+            });
+
+            tempBox = Box.createHorizontalBox();
+            tempBox.setOpaque(false);
+            tempBox.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            tempBox.setPreferredSize(new Dimension(400, 40));
+            tempBox.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+            tempBox.add(tempLabel);
+            tempBox.add(Box.createHorizontalStrut(5));
+            tempBox.add(reichweite);
+            rightBox.add(tempBox);
+            rightBox.add(Box.createVerticalStrut(150));
+        } else {
+            rightBox.add(Box.createVerticalStrut(190));
+            tempBox2.add(checkCloud);
+        }
         box.add(tempBox2, BorderLayout.NORTH);
     }
 
@@ -243,6 +281,14 @@ public class JSwitchKonfiguration extends JKonfiguration implements I18n {
         checkRetentionTime();
         // eingefügt
         checkCloud.setSelected(switchWAP.isCloud());
+        if (switchWAP instanceof AccessPoint) {
+            reichweite.setText(Integer.toString(((AccessPoint) switchWAP).getReichweite()));
+            checkReichweite();
+        }
+    }
+
+    private boolean checkReichweite() {
+        return ueberpruefen(EingabenUeberpruefung.musterNurZahlen, reichweite);
     }
 
     private boolean checkSSID() {

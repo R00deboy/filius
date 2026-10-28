@@ -38,10 +38,13 @@ import org.slf4j.LoggerFactory;
 import filius.gui.GUIContainer;
 import filius.gui.GUIEvents;
 import filius.hardware.Kabel;
+import filius.hardware.knoten.AccessPoint;
+import filius.hardware.knoten.Drucker;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.Modem;
 import filius.hardware.knoten.Notebook;
 import filius.hardware.knoten.Rechner;
+import filius.hardware.knoten.Smartphone;
 import filius.hardware.knoten.Switch;
 import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.IconMode;
@@ -64,6 +67,9 @@ public class GUIDesignSidebar extends GUISidebar {
     public static final String NOTEBOOK = "gfx/hardware/laptop";
     public static final String MODEM = "gfx/hardware/modem";
     public static final String GATEWAY = "gfx/hardware/gateway";
+    public static final String SMARTPHONE = "gfx/hardware/smartphone";
+    public static final String DRUCKER = "gfx/hardware/drucker";
+    public static final String ACCESSPOINT = "gfx/hardware/accesspoint";
     private JLabel newCableCursor;
 
     private static GUIDesignSidebar sidebar;
@@ -107,7 +113,10 @@ public class GUIDesignSidebar extends GUISidebar {
         IconMode mode = Information.getInformation().getIconMode();
         addHardwareComponent(RECHNER + mode.suffix(), Rechner.TYPE);
         addHardwareComponent(NOTEBOOK + mode.suffix(), Notebook.TYPE);
+        addHardwareComponent(SMARTPHONE + mode.suffix(), Smartphone.TYPE);
+        addHardwareComponent(DRUCKER + mode.suffix(), Drucker.TYPE);
         addHardwareComponent(SWITCH + mode.suffix(), Switch.TYPE);
+        addHardwareComponent(ACCESSPOINT + mode.suffix(), AccessPoint.TYPE);
         if (Information.getInformation().isGatewayAvailable()) {
             addHardwareComponent(GATEWAY + mode.suffix(), Gateway.TYPE);
         }

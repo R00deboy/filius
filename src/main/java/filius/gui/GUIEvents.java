@@ -58,6 +58,10 @@ import filius.hardware.knoten.Knoten;
 import filius.hardware.knoten.Modem;
 import filius.hardware.knoten.Notebook;
 import filius.hardware.knoten.Rechner;
+import filius.hardware.knoten.Smartphone;
+import filius.hardware.knoten.Drucker;
+import filius.hardware.knoten.AccessPoint;
+import filius.gui.netzwerksicht.WlanVerwaltung;
 import filius.hardware.knoten.Switch;
 import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.I18n;
@@ -142,6 +146,8 @@ public class GUIEvents implements I18n {
             }
             auswahl.setVisible(false);
         }
+        // Geraete wurden evtl. in die Reichweite eines Access Points hinein oder heraus geschoben
+        WlanVerwaltung.aktualisiereVerbindungen();
     }
 
     public void mausDragged(MouseEvent e) {
@@ -306,6 +312,16 @@ public class GUIEvents implements I18n {
                                 success = false;
                                 GUIErrorHandler.getGUIErrorHandler()
                                         .DisplayError(messages.getString("guievents_msg26"));
+                            } else if ((tempKnoten instanceof AccessPoint && quellKnoten.getSystemSoftware().wireless()
+                                    || quellKnoten instanceof AccessPoint && tempKnoten.getSystemSoftware().wireless())
+                                    && !WlanVerwaltung.inReichweite(
+                                            tempKnoten instanceof AccessPoint ? aktivesItem
+                                                    : neuesKabel.getKabelpanel().getZiel1(),
+                                            tempKnoten instanceof AccessPoint ? neuesKabel.getKabelpanel().getZiel1()
+                                                    : aktivesItem)) {
+                                success = false;
+                                GUIErrorHandler.getGUIErrorHandler()
+                                        .DisplayError(messages.getString("guievents_wlan_msg1"));
                             }
                             if (tempKnoten.checkConnected(quellKnoten)) {
                                 success = false;
@@ -517,6 +533,11 @@ public class GUIEvents implements I18n {
 
         Kabel connection = new Kabel(anschluss1, anschluss2);
         connection.setWireless(wireless);
+        if (wireless) {
+            // bei einer von Hand gezogenen Funkverbindung die SSID des Access Points uebernehmen
+            merkeSsid(component1.getKnoten(), component2.getKnoten());
+            merkeSsid(component2.getKnoten(), component1.getKnoten());
+        }
 
         GUIKabelItem kabelItem = new GUIKabelItem();
         kabelItem.getKabelpanel().setZiel1(component1);
@@ -528,6 +549,13 @@ public class GUIEvents implements I18n {
         GUIContainer.getGUIContainer().getDesignpanel().updateUI();
         GUIContainer.getGUIContainer().getCableItems().add(kabelItem);
         return connection;
+    }
+
+    private void merkeSsid(Knoten host, Knoten accessPoint) {
+        if (host instanceof Host && accessPoint instanceof Switch) {
+            ((Betriebssystem) host.getSystemSoftware())
+                    .setSsid(((SwitchFirmware) accessPoint.getSystemSoftware()).getSSID());
+        }
     }
 
     public void resetAndHideCablePreview() {
@@ -598,8 +626,15 @@ public class GUIEvents implements I18n {
                 JMenuItem pmDesktopAnzeigen = new JMenuItem(messages.getString("guievents_msg3"));
                 pmDesktopAnzeigen.setActionCommand("desktopanzeigen");
                 pmDesktopAnzeigen.addActionListener(al);
-                if (knotenItem.getKnoten() instanceof Rechner || knotenItem.getKnoten() instanceof Notebook) {
+                if (knotenItem.getKnoten() instanceof Rechner || knotenItem.getKnoten() instanceof Notebook
+                        || knotenItem.getKnoten() instanceof Smartphone) {
                     popmen.add(pmDesktopAnzeigen);
+                }
+                if (knotenItem.getKnoten() instanceof Drucker) {
+                    JMenuItem pmDruckauftraege = new JMenuItem(messages.getString("guievents_drucker_msg1"));
+                    pmDruckauftraege.addActionListener(e -> DruckauftragViewerControl.getInstance()
+                            .showViewer((Drucker) knotenItem.getKnoten()));
+                    popmen.add(pmDruckauftraege);
                 }
 
                 InternetKnoten node = (InternetKnoten) knotenItem.getKnoten();
@@ -644,7 +679,7 @@ public class GUIEvents implements I18n {
         updateAktivesItem(posX, posY);
 
         if (aktivesItem != null) {
-            if (aktivesItem.getKnoten() instanceof Rechner || aktivesItem.getKnoten() instanceof Notebook) {
+            if (aktivesItem.getKnoten() instanceof Host) {
                 textKabelEntfernen = messages.getString("guievents_msg5");
             } else {
                 textKabelEntfernen = messages.getString("guievents_msg6");

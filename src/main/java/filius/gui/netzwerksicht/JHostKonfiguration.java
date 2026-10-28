@@ -562,38 +562,7 @@ public class JHostKonfiguration extends JKonfiguration implements I18n {
     }
 
     private void updateWifiConnection() {
-        Host host = (Host) holeHardware();
-
-        // Step 1: remove existing wifi connection
-        for (GUIKabelItem cable : GUIContainer.getGUIContainer().getCableItems()) {
-            if (cable.getDasKabel().getWireless() && (host.equals(cable.getKabelpanel().getZiel1().getKnoten())
-                    || host.equals(cable.getKabelpanel().getZiel2().getKnoten()))) {
-                GUIEvents.getGUIEvents().removeConnection(cable);
-                break;
-            }
-        }
-        // Step 2: (Re-)Connect to access point
-        Betriebssystem os = (Betriebssystem) host.getSystemSoftware();
-        String configuredSSID = os.getSsid();
-        boolean connectWifi = os.wireless() && null != configuredSSID;
-        if (connectWifi) {
-            GUIKnotenItem wifiAccessPoint = null;
-            GUIKnotenItem hostNode = null;
-            for (GUIKnotenItem item : GUIContainer.getGUIContainer().getKnotenItems()) {
-                if (item.getKnoten() instanceof Switch
-                        && configuredSSID.equals(((SwitchFirmware) item.getKnoten().getSystemSoftware()).getSSID())) {
-                    wifiAccessPoint = item;
-                } else if (item.getKnoten().equals(host)) {
-                    hostNode = item;
-                } else if (null != wifiAccessPoint && null != hostNode) {
-                    break;
-                }
-            }
-            if (null != wifiAccessPoint) {
-                GUIEvents.getGUIEvents().createConnection(hostNode, wifiAccessPoint);
-            }
-        }
-        GUIContainer.getGUIContainer().updateCables();
+        WlanVerwaltung.aktualisiereVerbindung((Host) holeHardware());
     }
 
     private void updateSsid() {

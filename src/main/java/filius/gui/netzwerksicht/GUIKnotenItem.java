@@ -34,13 +34,16 @@ import org.slf4j.LoggerFactory;
 
 import filius.gui.GUIContainer;
 import filius.gui.GUIEvents;
+import filius.gui.DruckauftragViewerControl;
 import filius.gui.GUIMainMenu;
 import filius.gui.NatViewerControl;
 import filius.gui.SatViewerControl;
+import filius.hardware.knoten.Drucker;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.Knoten;
 import filius.hardware.knoten.Notebook;
 import filius.hardware.knoten.Rechner;
+import filius.hardware.knoten.Smartphone;
 import filius.hardware.knoten.Switch;
 import filius.rahmenprogramm.SzenarioVerwaltung;
 
@@ -66,8 +69,12 @@ public class GUIKnotenItem {
                         GUIEvents.getGUIEvents().kontextMenueAktionsmodus(GUIKnotenItem.this, e.getX(), e.getY());
                     } else if (e.getButton() == 1) {
                         if (GUIKnotenItem.this.getKnoten() instanceof Rechner
-                                || GUIKnotenItem.this.getKnoten() instanceof Notebook) {
+                                || GUIKnotenItem.this.getKnoten() instanceof Notebook
+                                || GUIKnotenItem.this.getKnoten() instanceof Smartphone) {
                             GUIContainer.getGUIContainer().showDesktop(GUIKnotenItem.this);
+                        } else if (GUIKnotenItem.this.getKnoten() instanceof Drucker) {
+                            DruckauftragViewerControl.getInstance()
+                                    .showViewer((Drucker) GUIKnotenItem.this.getKnoten());
                         } else if (GUIKnotenItem.this.getKnoten() instanceof Switch) {
                             SatViewerControl.getInstance().showViewer((Switch) GUIKnotenItem.this.getKnoten());
                         } else if (GUIKnotenItem.this.getKnoten() instanceof Gateway) {

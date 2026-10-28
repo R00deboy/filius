@@ -86,6 +86,8 @@ import filius.gui.netzwerksicht.JSidebarButton;
 import filius.hardware.Hardware;
 import filius.hardware.Kabel;
 import filius.hardware.NetzwerkInterface;
+import filius.hardware.knoten.AccessPoint;
+import filius.hardware.knoten.Drucker;
 import filius.hardware.knoten.Gateway;
 import filius.hardware.knoten.Host;
 import filius.hardware.knoten.InternetKnoten;
@@ -93,6 +95,7 @@ import filius.hardware.knoten.Knoten;
 import filius.hardware.knoten.Modem;
 import filius.hardware.knoten.Notebook;
 import filius.hardware.knoten.Rechner;
+import filius.hardware.knoten.Smartphone;
 import filius.hardware.knoten.Switch;
 import filius.hardware.knoten.Vermittlungsrechner;
 import filius.rahmenprogramm.I18n;
@@ -588,7 +591,16 @@ public class GUIContainer implements Serializable, I18n {
         GUIEvents.getGUIEvents().cancelMultipleSelection();
 
         IconMode mode = Information.getInformation().getIconMode();
-        if (label.getTyp().equals(Switch.TYPE)) {
+        if (label.getTyp().equals(AccessPoint.TYPE)) {
+            neuerKnoten = new AccessPoint();
+            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.ACCESSPOINT + mode.suffix()));
+        } else if (label.getTyp().equals(Smartphone.TYPE)) {
+            neuerKnoten = new Smartphone();
+            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SMARTPHONE + mode.suffix()));
+        } else if (label.getTyp().equals(Drucker.TYPE)) {
+            neuerKnoten = new Drucker();
+            tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.DRUCKER + mode.suffix()));
+        } else if (label.getTyp().equals(Switch.TYPE)) {
             neuerKnoten = new Switch();
             tempIcon = new ImageIcon(getClass().getResource("/" + GUIDesignSidebar.SWITCH + mode.suffix()));
         } else if (label.getTyp().equals(Rechner.TYPE)) {
@@ -683,6 +695,12 @@ public class GUIContainer implements Serializable, I18n {
         LOG.debug("GUIContainer: die Komponenten-Vorschau wird erstellt.");
         if (hardwareTyp.equals(Kabel.TYPE)) {
             tmp = GUIDesignSidebar.KABEL;
+        } else if (hardwareTyp.equals(AccessPoint.TYPE)) {
+            tmp = GUIDesignSidebar.ACCESSPOINT + mode.suffix();
+        } else if (hardwareTyp.equals(Smartphone.TYPE)) {
+            tmp = GUIDesignSidebar.SMARTPHONE + mode.suffix();
+        } else if (hardwareTyp.equals(Drucker.TYPE)) {
+            tmp = GUIDesignSidebar.DRUCKER + mode.suffix();
         } else if (hardwareTyp.equals(Switch.TYPE)) {
             tmp = GUIDesignSidebar.SWITCH + mode.suffix();
         } else if (hardwareTyp.equals(Rechner.TYPE)) {
@@ -761,6 +779,8 @@ public class GUIContainer implements Serializable, I18n {
             GUIKabelItem tempCable = (GUIKabelItem) it.next();
             tempCable.getKabelpanel().updateBounds();
         }
+        // Funkreichweiten der Access Points werden im Hintergrund des Panels gezeichnet
+        networkPanel.repaint();
     }
 
     public JSidebarButton getKabelvorschau() {
@@ -982,6 +1002,7 @@ public class GUIContainer implements Serializable, I18n {
         }
         SatViewerControl.getInstance().hideViewer();
         NatViewerControl.getInstance().hideViewer();
+        DruckauftragViewerControl.getInstance().hideViewer();
         lastVisibilityStateLauscher = ((JDialog) getExchangeDialog()).isVisible();
         ((JDialog) GUIContainer.getGUIContainer().getExchangeDialog()).setVisible(false);
     }
